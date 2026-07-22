@@ -96,9 +96,10 @@
     const totals = {};
     for (const m of data.coreMetrics) totals[m.key] = slugs.reduce((s, sl) => s + (data.usage[sl]?.[m.key] || 0), 0);
     const featureCount = (data.features || []).length;
+    const measuredCount = (data.measuredFeatures || []).length;
     return e("div", { className: "cards" },
       e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"), e("div", { className: "v" }, data.orgs.length), e("div", { className: "d" }, slugs.length + " with usage data")),
-      e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"), e("div", { className: "v" }, featureCount || data.coreMetrics.length), e("div", { className: "d" }, featureCount ? "adoption signals" : "core modules")),
+      e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"), e("div", { className: "v" }, featureCount || data.coreMetrics.length), e("div", { className: "d" }, measuredCount ? measuredCount + " measured so far" : "core modules")),
       data.coreMetrics.slice(0, 4).map(m =>
         e("div", { className: "card", key: m.key }, e("div", { className: "k" }, m.icon + " " + m.label), e("div", { className: "v" }, fmt(totals[m.key])), e("div", { className: "d" }, "across all orgs"))
       )
@@ -161,11 +162,10 @@
   }
 
   function AdoptionMatrix({ data, nav }) {
-    // org × feature adoption heat-grid, grouped by category
-    const feats = data.features;
-    const cats = data.featureCategories && data.featureCategories.length
-      ? data.featureCategories
-      : [...new Set(feats.map(f => f.category))];
+    // org × feature adoption grid — only features measured so far get a column
+    const measured = new Set(data.measuredFeatures || []);
+    const feats = measured.size ? data.features.filter(f => measured.has(f.key)) : data.features;
+    if (!feats.length) return null;
     return e("div", { className: "panel" },
       e("h2", null, "🧩 Feature adoption matrix ", e("span", { className: "hint" }, "● adopted · ○ not using")),
       e("div", { className: "tablewrap" },

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-22T23:10:53.390Z",
+  "generatedAt": "2026-07-22T23:27:39.855Z",
   "source": "Rec Staff MCP (live rec.us database snapshot)",
-  "status": "core-usage-complete",
+  "status": "adoption-wave-1",
   "orgs": [
     {
       "id": "aeba47d0-c97f-49cb-a0e9-93c5af3a68fa",
@@ -918,7 +918,8 @@
       "description": "Restricting who can register for a section based on a minimum/maximum age.",
       "signal": "eligibility_rule.attribute_name (value 'age' or 'date_of_birth') with eligibility_rule.comparison_operator/attribute_value, linked to a section via eligibility_rule_group_lookup.section_id; section.age_evaluation_type governs how the age date is resolved",
       "adoption_definition": "Has >=1 section with an age-based eligibility rule attached (an eligibility_rule whose attribute is age/date_of_birth, joined through eligibility_rule_group_lookup.section_id)",
-      "measure_question": "How many of this organization's sections have an age minimum or maximum eligibility requirement, and how many sections does it have in total?"
+      "measure_question": "How many of this organization's sections have an age minimum or maximum eligibility requirement, and how many sections does it have in total?",
+      "short": "Age elig."
     },
     {
       "key": "grade_eligibility",
@@ -981,7 +982,8 @@
       "description": "Allowing participants to join a waitlist when a section is full.",
       "signal": "section.waitlist_config (JSONB, e.g. {\"enabled\": true, \"maxSize\": 20}); section.waitlist_override; table: waitlist (participant_user_id, section_id)",
       "adoption_definition": "Has >=1 section with waitlist_config enabled, or >=1 waitlist entry",
-      "measure_question": "How many of this organization's sections have a waitlist enabled, and how many sections total?"
+      "measure_question": "How many of this organization's sections have a waitlist enabled, and how many sections total?",
+      "short": "Waitlist"
     },
     {
       "key": "required_participant_info",
@@ -999,7 +1001,8 @@
       "description": "Collecting custom per-registration answers (e.g. t-shirt size, dietary needs) via program-level booking questions.",
       "signal": "table: default_booking_question (program_id, data JSONB); table: booking_question_response",
       "adoption_definition": "Has >=1 default_booking_question configured, or >=1 booking_question_response collected",
-      "measure_question": "How many of this organization's programs have custom booking questions configured, and how many programs total?"
+      "measure_question": "How many of this organization's programs have custom booking questions configured, and how many programs total?",
+      "short": "Bkg. Qs"
     },
     {
       "key": "custom_forms",
@@ -1008,7 +1011,8 @@
       "description": "Building dynamic custom forms attached to sections, sites, or products to collect structured responses.",
       "signal": "table: form (schema JSONB); table: form_lookup (section_id/site/product); table: form_submission",
       "adoption_definition": "Has >=1 form defined",
-      "measure_question": "How many custom forms has this organization created, and how many form submissions has it collected?"
+      "measure_question": "How many custom forms has this organization created, and how many form submissions has it collected?",
+      "short": "Forms"
     },
     {
       "key": "waivers_contracts",
@@ -1062,7 +1066,8 @@
       "description": "Grouping sections into named time periods (e.g. Spring 2025) with templated defaults.",
       "signal": "table: season (name, start_date, end_date, section_template JSONB); table: section_season",
       "adoption_definition": "Has >=1 season defined",
-      "measure_question": "How many seasons has this organization created, and how many sections are assigned to a season?"
+      "measure_question": "How many seasons has this organization created, and how many sections are assigned to a season?",
+      "short": "Seasons"
     },
     {
       "key": "instructors",
@@ -1152,7 +1157,8 @@
       "description": "Letting customers instantly confirm court/site reservations without admin approval.",
       "signal": "court.is_instant_bookable = true; table: site_instant_booking_configuration",
       "adoption_definition": "Has >=1 court with is_instant_bookable = true, or >=1 site_instant_booking_configuration",
-      "measure_question": "How many of this organization's sites/courts are instant-bookable, and how many sites total?"
+      "measure_question": "How many of this organization's sites/courts are instant-bookable, and how many sites total?",
+      "short": "Instant bk."
     },
     {
       "key": "reservation_buffers",
@@ -1197,7 +1203,8 @@
       "description": "Offering promo codes with usage limits and validity windows.",
       "signal": "table: discount_code (code, pricing_adjustment JSONB, is_active, max_total_redemptions); table: discount_redemption",
       "adoption_definition": "Has >=1 discount_code created",
-      "measure_question": "How many discount/promo codes has this organization created, and how many redemptions have been recorded?"
+      "measure_question": "How many discount/promo codes has this organization created, and how many redemptions have been recorded?",
+      "short": "Promos"
     },
     {
       "key": "payment_plans",
@@ -1206,7 +1213,8 @@
       "description": "Letting customers pay for a registration in scheduled installments.",
       "signal": "section.available_payment_plans (JSONB PaymentPlanSpec[]); table: payment_plan_installment; order.flow = 'installment'",
       "adoption_definition": "Has >=1 section with available_payment_plans set, or >=1 payment_plan_installment",
-      "measure_question": "How many of this organization's sections offer a payment plan (installments), and how many sections total?"
+      "measure_question": "How many of this organization's sections offer a payment plan (installments), and how many sections total?",
+      "short": "Pay plans"
     },
     {
       "key": "gift_cards",
@@ -1215,7 +1223,8 @@
       "description": "Selling gift cards that create stored-value accounts for later redemption.",
       "signal": "table: gift_card_product (value_cents, expiration_policy); stored_value_account.gift_card_product_id",
       "adoption_definition": "Has >=1 gift_card_product configured",
-      "measure_question": "How many gift card products has this organization configured, and how many gift card accounts have been issued?"
+      "measure_question": "How many gift card products has this organization configured, and how many gift card accounts have been issued?",
+      "short": "Gift cards"
     },
     {
       "key": "scholarships",
@@ -1224,7 +1233,8 @@
       "description": "Granting scholarship stored-value to help recipients pay for programs.",
       "signal": "table: scholarship (value_cents, expiration_policy); stored_value_account.scholarship_id",
       "adoption_definition": "Has >=1 scholarship defined",
-      "measure_question": "How many scholarship programs has this organization set up, and how many scholarship awards (stored value accounts) have been granted?"
+      "measure_question": "How many scholarship programs has this organization set up, and how many scholarship awards (stored value accounts) have been granted?",
+      "short": "Scholarship"
     },
     {
       "key": "store_credit",
@@ -1278,7 +1288,8 @@
       "description": "Categorizing revenue into a chart of general-ledger accounts for finance reporting.",
       "signal": "table: gl_account (name, gl_code); table: gl_config (revenue-type to GL-account mappings); program.gl_account_id / court.gl_account_id / section.gl_account_id",
       "adoption_definition": "Has >=1 gl_account defined (chart of accounts populated)",
-      "measure_question": "How many general-ledger accounts has this organization set up in its chart of accounts?"
+      "measure_question": "How many general-ledger accounts has this organization set up in its chart of accounts?",
+      "short": "GL acct."
     },
     {
       "key": "sms_messaging",
@@ -1287,7 +1298,8 @@
       "description": "Sending SMS messages to users (marketing and/or transactional).",
       "signal": "organization_sms_config.marketing_sms_number / transactional_sms_number (set); message.channel = 'sms'; message_delivery.segments/cost_cents",
       "adoption_definition": "Has an organization_sms_config with an SMS number set, or >=1 message with channel = 'sms'",
-      "measure_question": "How many SMS messages has this organization sent (channel = 'sms'), and how many messages has it sent in total across all channels?"
+      "measure_question": "How many SMS messages has this organization sent (channel = 'sms'), and how many messages has it sent in total across all channels?",
+      "short": "SMS"
     },
     {
       "key": "email_messaging",
@@ -1296,7 +1308,8 @@
       "description": "Sending email messages/campaigns to users and tracking delivery.",
       "signal": "message.channel = 'email'; table: message_delivery (delivered_at, first_opened_at, open_count)",
       "adoption_definition": "Has >=1 message with channel = 'email'",
-      "measure_question": "How many email messages has this organization sent, and how many total email deliveries (recipients) do those represent?"
+      "measure_question": "How many email messages has this organization sent, and how many total email deliveries (recipients) do those represent?",
+      "short": "Email"
     },
     {
       "key": "custom_email_domains",
@@ -1332,7 +1345,8 @@
       "description": "Running leagues, tournaments, or round-robins with teams and matches.",
       "signal": "table: competition (type league/tournament); table: competition_section; table: competition_event; table: competition_team",
       "adoption_definition": "Has >=1 competition defined",
-      "measure_question": "How many competitions (leagues/tournaments) has this organization created, and how many teams exist across them?"
+      "measure_question": "How many competitions (leagues/tournaments) has this organization created, and how many teams exist across them?",
+      "short": "Leagues"
     },
     {
       "key": "storefront_products",
@@ -1389,6 +1403,4395 @@
       "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?"
     }
   ],
-  "adoption": {},
-  "notes": "Core usage counts verified against live DB (each number required a real preview_query execution). null = count could not be verified for that org/metric. Feature-adoption measurements pending."
+  "adoption": {
+    "apex-park-and-recreation-district": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 5184,
+        "detail": "5,184 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 2960,
+        "detail": "2,960 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 175666,
+        "detail": "175,666 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 147,
+        "detail": "147 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 promo codes"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 82,
+        "detail": "82 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 41,
+        "detail": "41 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 887,
+        "detail": "887 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-boerne": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 185,
+        "detail": "185 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 4844,
+        "detail": "4,844 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 264,
+        "detail": "264 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 28,
+        "detail": "28 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "carmichael-district": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "chicorec": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 1138,
+        "detail": "1,138 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 995,
+        "detail": "995 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 2718,
+        "detail": "2,718 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2801,
+        "detail": "2,801 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 254,
+        "detail": "254 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 33,
+        "detail": "33 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 140,
+        "detail": "140 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 50,
+        "detail": "50 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-battle-ground": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 GL accounts"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-belmont": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-belton": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 58,
+        "detail": "58 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 61,
+        "detail": "61 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 19,
+        "detail": "19 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-brisbane": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 71,
+        "detail": "71 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-buffalo": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2106,
+        "detail": "2,106 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 40,
+        "detail": "40 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 31,
+        "detail": "31 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-easton": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 27,
+        "detail": "27 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "emeryville": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 920,
+        "detail": "920 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 941,
+        "detail": "941 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 30858,
+        "detail": "30,858 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 104,
+        "detail": "104 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 30,
+        "detail": "30 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 30,
+        "detail": "30 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 44,
+        "detail": "44 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-euclid": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "folsom": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 41,
+        "detail": "41 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "foster-city": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 forms"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-jeffersonville": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 108,
+        "detail": "108 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 108,
+        "detail": "108 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 1913,
+        "detail": "1,913 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 54,
+        "detail": "54 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 47,
+        "detail": "47 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 leagues/competitions"
+      }
+    },
+    "city-of-lewisburg": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 49,
+        "detail": "49 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 46,
+        "detail": "46 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 29,
+        "detail": "29 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "lincoln": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 415,
+        "detail": "415 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 emails sent"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 17,
+        "detail": "17 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-lockhart": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-madeira-beach": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 27,
+        "detail": "27 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 GL accounts"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-madison": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 142,
+        "detail": "142 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 144,
+        "detail": "144 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 39,
+        "detail": "39 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 64,
+        "detail": "64 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "city-of-malibu": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 574,
+        "detail": "574 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 430,
+        "detail": "430 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 688,
+        "detail": "688 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 4382,
+        "detail": "4,382 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 forms"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 leagues/competitions"
+      }
+    },
+    "city-of-menifee": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 581,
+        "detail": "581 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 471,
+        "detail": "471 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 29973,
+        "detail": "29,973 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 81,
+        "detail": "81 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 34,
+        "detail": "34 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 42,
+        "detail": "42 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 120,
+        "detail": "120 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-miamisburg": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 13,
+        "detail": "13 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-midland": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 22,
+        "detail": "22 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 108,
+        "detail": "108 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 104,
+        "detail": "104 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-milford": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 959,
+        "detail": "959 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 33,
+        "detail": "33 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-mountain-view": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 143,
+        "detail": "143 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-natchez": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-norman": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 522,
+        "detail": "522 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 337,
+        "detail": "337 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 308,
+        "detail": "308 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 26152,
+        "detail": "26,152 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 47,
+        "detail": "47 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 30,
+        "detail": "30 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 97,
+        "detail": "97 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 80,
+        "detail": "80 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "city-of-piedmont": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 438,
+        "detail": "438 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 406,
+        "detail": "406 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 20777,
+        "detail": "20,777 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 22,
+        "detail": "22 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "rocklin": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 85,
+        "detail": "85 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 58,
+        "detail": "58 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-smyrna": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 1566,
+        "detail": "1,566 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 1346,
+        "detail": "1,346 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 1989,
+        "detail": "1,989 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 388,
+        "detail": "388 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 23,
+        "detail": "23 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 53,
+        "detail": "53 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 leagues/competitions"
+      }
+    },
+    "city-of-torrance": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 3255,
+        "detail": "3,255 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 4197,
+        "detail": "4,197 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 6079,
+        "detail": "6,079 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 293,
+        "detail": "293 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 64,
+        "detail": "64 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 19,
+        "detail": "19 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "city-of-tullahoma": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 48,
+        "detail": "48 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 17,
+        "detail": "17 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-watsonville": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 36,
+        "detail": "36 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 13,
+        "detail": "13 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "city-of-west-sacramento": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 735,
+        "detail": "735 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 471,
+        "detail": "471 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 341,
+        "detail": "341 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 637,
+        "detail": "637 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 19,
+        "detail": "19 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 51,
+        "detail": "51 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 93,
+        "detail": "93 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-clarksville": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 77,
+        "detail": "77 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 70,
+        "detail": "70 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 693,
+        "detail": "693 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 13,
+        "detail": "13 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "douglas-county-nv": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 17,
+        "detail": "17 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 103,
+        "detail": "103 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 67,
+        "detail": "67 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "jurupa-area-recreation-and-park-district": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 729,
+        "detail": "729 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 645,
+        "detail": "645 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 169,
+        "detail": "169 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 promo codes"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 40,
+        "detail": "40 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 66,
+        "detail": "66 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 leagues/competitions"
+      }
+    },
+    "lake-county": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 140,
+        "detail": "140 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "mashantucket-pequot-tribal-nation": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 78,
+        "detail": "78 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 13,
+        "detail": "13 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "mission-oaks-rpd": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 22,
+        "detail": "22 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 103,
+        "detail": "103 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "norris": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 GL accounts"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "pleasant-hill": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 46,
+        "detail": "46 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 46,
+        "detail": "46 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 leagues/competitions"
+      }
+    },
+    "pueblo-county": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 26,
+        "detail": "26 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 791,
+        "detail": "791 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "putnam-county": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 83,
+        "detail": "83 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 forms"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 leagues/competitions"
+      }
+    },
+    "sacramento-county": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 34,
+        "detail": "34 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 66,
+        "detail": "66 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 54,
+        "detail": "54 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "san-francisco-rec-park": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 13459,
+        "detail": "13,459 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 7257,
+        "detail": "7,257 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 8773,
+        "detail": "8,773 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 107,
+        "detail": "107 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "santacruzcounty": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 167,
+        "detail": "167 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 211,
+        "detail": "211 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 89,
+        "detail": "89 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 248,
+        "detail": "248 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "sebastopol": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 94,
+        "detail": "94 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 50,
+        "detail": "50 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 240,
+        "detail": "240 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "sunrise-pickleball-club": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 167,
+        "detail": "167 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 339,
+        "detail": "339 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 42,
+        "detail": "42 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "sunrise-rpd": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 113,
+        "detail": "113 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "the-ranch": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 471,
+        "detail": "471 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 466,
+        "detail": "466 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 18130,
+        "detail": "18,130 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 29,
+        "detail": "29 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-corte-madera": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-danvers": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 195,
+        "detail": "195 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 223,
+        "detail": "223 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2554,
+        "detail": "2,554 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "prescott-valley": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 264,
+        "detail": "264 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 377,
+        "detail": "377 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 17,
+        "detail": "17 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 120,
+        "detail": "120 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 19,
+        "detail": "19 GL accounts"
+      }
+    },
+    "town-of-reading": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 262,
+        "detail": "262 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 58,
+        "detail": "58 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 66,
+        "detail": "66 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 89,
+        "detail": "89 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 78,
+        "detail": "78 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-shrewsbury": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 496,
+        "detail": "496 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 386,
+        "detail": "386 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 756,
+        "detail": "756 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 28,
+        "detail": "28 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 27,
+        "detail": "27 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 32,
+        "detail": "32 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-taylor": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 193,
+        "detail": "193 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 144,
+        "detail": "144 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 2407,
+        "detail": "2,407 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 106,
+        "detail": "106 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 leagues/competitions"
+      }
+    },
+    "watertown": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 470,
+        "detail": "470 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 547,
+        "detail": "547 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 1993,
+        "detail": "1,993 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 4933,
+        "detail": "4,933 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 346,
+        "detail": "346 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 46,
+        "detail": "46 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 27,
+        "detail": "27 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 27,
+        "detail": "27 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 leagues/competitions"
+      }
+    },
+    "city-of-west-haven": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 245,
+        "detail": "245 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 51,
+        "detail": "51 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 77,
+        "detail": "77 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 218,
+        "detail": "218 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 leagues/competitions"
+      }
+    },
+    "town-of-windham": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 221,
+        "detail": "221 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 150,
+        "detail": "150 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 26,
+        "detail": "26 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 216,
+        "detail": "216 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 35,
+        "detail": "35 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 promo codes"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 gift card products"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 35,
+        "detail": "35 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 160,
+        "detail": "160 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 432,
+        "detail": "432 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 leagues/competitions"
+      }
+    }
+  },
+  "notes": "Core usage + wave-1 adoption (14 of 53 catalog features) verified against live DB — every number required a real query execution. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.",
+  "measuredFeatures": [
+    "age_eligibility",
+    "waitlist",
+    "sms_messaging",
+    "email_messaging",
+    "payment_plans",
+    "discount_codes",
+    "scholarships",
+    "gift_cards",
+    "custom_booking_questions",
+    "custom_forms",
+    "instant_booking",
+    "gl_accounting",
+    "seasons",
+    "competitions_leagues"
+  ]
 }
