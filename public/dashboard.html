@@ -41,6 +41,12 @@
   td.num { font-variant-numeric: tabular-nums; }
   .zero { color: var(--none); }
   .pill { display: inline-block; min-width: 34px; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 12px; text-align: center; }
+  .scorebar { position: relative; display: inline-flex; align-items: center; width: 104px; height: 20px; border-radius: 999px; background: #eef2f7; overflow: hidden; vertical-align: middle; }
+  .scorebar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
+  .scorebar > b { position: relative; width: 100%; text-align: center; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .score-lg { display: inline-flex; align-items: baseline; gap: 6px; }
+  .score-lg .pct { font-size: 26px; font-weight: 800; }
+  .score-lg .of { font-size: 12px; color: var(--muted); }
   .search { margin: 0 16px 12px; padding: 8px 12px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
   .crumb { font-size: 13px; margin: 16px 0 4px; }
   .org-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 6px 0 16px; }
@@ -75,6 +81,45 @@
     return { background: `rgba(15,111,92,${alpha.toFixed(3)})`, color: t > 0.6 ? "#fff" : "#0f3d33", fontWeight: 600 };
   }
 
+  // Which feature keys carry a real adoption signal (the measured set, if any).
+  function measuredKeys(data) {
+    return (data.measuredFeatures && data.measuredFeatures.length)
+      ? data.measuredFeatures
+      : (data.features || []).map(f => f.key);
+  }
+
+  // % feature-adoption score for one org: adopted ÷ measured-for-this-org.
+  // Only features that actually have an adoption cell for the org count toward
+  // the denominator, so a half-measured org isn't unfairly diluted.
+  function adoptionScore(data, slug) {
+    const keys = measuredKeys(data);
+    const a = (data.adoption || {})[slug] || {};
+    let denom = 0, num = 0;
+    for (const k of keys) {
+      const st = a[k];
+      if (!st) continue;
+      denom++;
+      if (st.adopted) num++;
+    }
+    if (!denom) return null;
+    return { pct: Math.round((num / denom) * 100), adopted: num, total: denom };
+  }
+
+  // Fill color for a score bar — a continuous green ramp matching the heat table.
+  function scoreFill(pct) {
+    const t = Math.max(0, Math.min(1, pct / 100));
+    const alpha = 0.28 + t * 0.62;
+    return `rgba(15,111,92,${alpha.toFixed(3)})`;
+  }
+
+  function ScoreBar({ score }) {
+    if (!score) return e("span", { className: "zero" }, "—");
+    return e("span", { className: "scorebar", title: `${score.adopted} of ${score.total} measured features adopted` },
+      e("i", { style: { width: Math.max(score.pct, 4) + "%", background: scoreFill(score.pct) } }),
+      e("b", { style: { color: score.pct > 52 ? "#fff" : "#0f3d33" } }, score.pct + "%")
+    );
+  }
+
   function useRoute() {
     const parse = () => {
       const m = location.pathname.match(/^\/org\/([^/]+)/) || (location.hash.match(/^#\/org\/([^/]+)/));
@@ -96,11 +141,16 @@
     const totals = {};
     for (const m of data.coreMetrics) totals[m.key] = slugs.reduce((s, sl) => s + (data.usage[sl]?.[m.key] || 0), 0);
     const featureCount = (data.features || []).length;
-    const measuredCount = (data.measuredFeatures || []).length;
+    const measuredCount = measuredKeys(data).length;
+    const scores = data.orgs.map(o => adoptionScore(data, o.slug)).filter(Boolean);
+    const avgScore = scores.length ? Math.round(scores.reduce((s, x) => s + x.pct, 0) / scores.length) : null;
     return e("div", { className: "cards" },
       e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"), e("div", { className: "v" }, data.orgs.length), e("div", { className: "d" }, slugs.length + " with usage data")),
       e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"), e("div", { className: "v" }, featureCount || data.coreMetrics.length), e("div", { className: "d" }, measuredCount ? measuredCount + " measured so far" : "core modules")),
-      data.coreMetrics.slice(0, 4).map(m =>
+      avgScore != null && e("div", { className: "card", key: "avgscore" },
+        e("div", { className: "k" }, "◧ Avg adoption"), e("div", { className: "v" }, avgScore + "%"),
+        e("div", { className: "d" }, "of " + measuredCount + " measured features")),
+      data.coreMetrics.slice(0, avgScore != null ? 3 : 4).map(m =>
         e("div", { className: "card", key: m.key }, e("div", { className: "k" }, m.icon + " " + m.label), e("div", { className: "v" }, fmt(totals[m.key])), e("div", { className: "d" }, "across all orgs"))
       )
     );
@@ -111,11 +161,17 @@
     const [sort, setSort] = useState({ key: "name", dir: 1 });
     const metrics = data.coreMetrics;
 
+    const hasAdoption = measuredKeys(data).length > 0 && Object.keys(data.adoption || {}).length > 0;
+
     const rows = useMemo(() => {
-      let rows = data.orgs.map(o => ({ ...o, u: data.usage[o.slug] || null }));
+      let rows = data.orgs.map(o => ({ ...o, u: data.usage[o.slug] || null, score: adoptionScore(data, o.slug) }));
       if (q) { const s = q.toLowerCase(); rows = rows.filter(r => (r.name + " " + (r.displayName || "") + " " + r.slug).toLowerCase().includes(s)); }
       rows.sort((a, b) => {
         if (sort.key === "name") return a.name.localeCompare(b.name) * sort.dir;
+        if (sort.key === "adoption") {
+          const av = a.score ? a.score.pct : -1, bv = b.score ? b.score.pct : -1;
+          return (av - bv) * -sort.dir;
+        }
         const av = a.u?.[sort.key], bv = b.u?.[sort.key];
         return ((av == null ? -1 : av) - (bv == null ? -1 : bv)) * -sort.dir;
       });
@@ -141,11 +197,14 @@
           e("table", null,
             e("thead", null, e("tr", null,
               e("th", { className: "org", onClick: () => clickSort("name") }, "Organization" + arrow("name")),
+              hasAdoption && e("th", { key: "adoption", onClick: () => clickSort("adoption"), title: "% of measured features this organization has adopted" }, "◧ Adoption" + arrow("adoption")),
               metrics.map(m => e("th", { key: m.key, onClick: () => clickSort(m.key), title: m.description }, m.icon + " " + m.label + arrow(m.key)))
             )),
             e("tbody", null, rows.map(r =>
               e("tr", { key: r.slug, style: { cursor: "pointer" }, onClick: () => nav("/org/" + r.slug) },
                 e("td", { className: "org", title: r.name }, r.displayName || r.name),
+                hasAdoption && e("td", { key: "adoption", className: "num", style: { textAlign: "center" } },
+                  e(ScoreBar, { score: r.score })),
                 metrics.map(m => {
                   const v = r.u ? r.u[m.key] : null;
                   return e("td", { key: m.key, className: "num" },
@@ -198,11 +257,15 @@
     const a = (data.adoption || {})[slug] || {};
     const feats = data.features || [];
     const cats = [...new Set(feats.map(f => f.category))];
+    const score = adoptionScore(data, slug);
     return e(React.Fragment, null,
       e("div", { className: "crumb" }, e("a", { href: "/", onClick: (ev) => { ev.preventDefault(); nav("/"); } }, "← All organizations")),
       e("div", { className: "org-h" },
         e("h2", null, org.name),
-        e("span", { className: "slug" }, "rec.us/" + org.slug)),
+        e("span", { className: "slug" }, "rec.us/" + org.slug),
+        score && e("span", { className: "score-lg", title: score.adopted + " of " + score.total + " measured features adopted" },
+          e("span", { className: "pct", style: { color: scoreFill(score.pct).replace(/[\d.]+\)$/, "1)") } }, score.pct + "%"),
+          e("span", { className: "of" }, "feature adoption"))),
       e("div", { className: "cards" }, data.coreMetrics.map(m =>
         e("div", { className: "card", key: m.key },
           e("div", { className: "k" }, m.icon + " " + m.label),

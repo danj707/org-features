@@ -9,7 +9,9 @@ passes, facilities, reservations) down to optional feature adoption
 ## Views
 
 - **`/`** — all-orgs dashboard: sortable usage heat-table across every
-  organization, summary cards, and (as signals land) an org × feature
+  organization with a per-org **feature-adoption score** (% of measured
+  features that organization has adopted), summary cards including the
+  fleet-wide average adoption, and (as signals land) an org × feature
   adoption matrix.
 - **`/org/:slug`** — per-org drill-in: that organization's core usage plus
   a categorized feature-adoption checklist.
@@ -21,6 +23,11 @@ The deployed server has **no direct database access**. The snapshot in
 `data/features-data.json` is baked from the live rec.us production database
 via the Rec Staff MCP and committed. Refreshing the numbers = re-baking the
 snapshot and pushing.
+
+The **adoption score** shown per organization is the share of *measured*
+features (`measuredFeatures`, currently 14 of the 53-feature catalog) that
+the org has adopted — i.e. adopted ÷ measured. As later waves measure more
+features, the denominator grows and scores re-baseline automatically.
 
 If a `DATA_DIR` env var is set (e.g. a Railway volume mounted at `/data`),
 a `features-data.json` dropped there takes precedence over the baked copy,
