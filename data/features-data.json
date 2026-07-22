@@ -1,0 +1,1394 @@
+{
+  "generatedAt": "2026-07-22T23:10:53.390Z",
+  "source": "Rec Staff MCP (live rec.us database snapshot)",
+  "status": "core-usage-complete",
+  "orgs": [
+    {
+      "id": "aeba47d0-c97f-49cb-a0e9-93c5af3a68fa",
+      "slug": "apex-park-and-recreation-district",
+      "name": "Apex Park and Recreation District",
+      "displayName": "Apex PRD"
+    },
+    {
+      "id": "71bf9bc4-cd62-482a-aee5-5d790cdba811",
+      "slug": "city-of-boerne",
+      "name": "Boerne Parks & Recreation",
+      "displayName": "Boerne"
+    },
+    {
+      "id": "521bbba9-a5ed-4efe-b296-354f9b3dffcb",
+      "slug": "carmichael-district",
+      "name": "Carmichael Recreation and Park District",
+      "displayName": "Carmichael"
+    },
+    {
+      "id": "de370d91-868b-4f7b-bf23-3694749661a5",
+      "slug": "chicorec",
+      "name": "Chico Area Recreation & Park District",
+      "displayName": "Chico"
+    },
+    {
+      "id": "b715f06b-920a-4562-ae7f-7df1477626c2",
+      "slug": "city-of-battle-ground",
+      "name": "City of Battle Ground",
+      "displayName": "Battle Ground"
+    },
+    {
+      "id": "6b278573-001f-48c9-9ee8-c47ddd66be7e",
+      "slug": "city-of-belmont",
+      "name": "City of Belmont",
+      "displayName": "Belmont"
+    },
+    {
+      "id": "86cb6718-c7a4-4639-9f8b-1495f0dc9969",
+      "slug": "city-of-belton",
+      "name": "City of Belton",
+      "displayName": "Belton"
+    },
+    {
+      "id": "3f3678a6-64c1-4578-9f73-b679421e5d93",
+      "slug": "city-of-brisbane",
+      "name": "City of Brisbane",
+      "displayName": "Brisbane"
+    },
+    {
+      "id": "5aef2fa7-2999-45ed-afc7-0b884196e426",
+      "slug": "city-of-buffalo",
+      "name": "City of Buffalo",
+      "displayName": "Buffalo"
+    },
+    {
+      "id": "f4338fa8-009b-49eb-9a2b-16ca4688694a",
+      "slug": "city-of-easton",
+      "name": "City of Easton",
+      "displayName": "Easton"
+    },
+    {
+      "id": "6bc65b55-27e4-4447-9c07-22c98c8dd99b",
+      "slug": "emeryville",
+      "name": "City of Emeryville",
+      "displayName": "Emeryville"
+    },
+    {
+      "id": "2a118b52-99af-42f3-9727-d9b46b8d31e4",
+      "slug": "city-of-euclid",
+      "name": "City of Euclid Parks & Recreation",
+      "displayName": null
+    },
+    {
+      "id": "4660c917-4004-442a-871a-9dc47bf7a0d9",
+      "slug": "folsom",
+      "name": "City of Folsom",
+      "displayName": "Folsom"
+    },
+    {
+      "id": "0ed32868-3135-4252-9f73-5d126ce9dd28",
+      "slug": "foster-city",
+      "name": "City of Foster City",
+      "displayName": "Foster City"
+    },
+    {
+      "id": "37478841-ab2a-48ce-8176-9197b719edd4",
+      "slug": "city-of-jeffersonville",
+      "name": "City of Jeffersonville",
+      "displayName": "Jeffersonville"
+    },
+    {
+      "id": "ff965a2b-7746-4de9-8b41-402927cb5879",
+      "slug": "city-of-lewisburg",
+      "name": "City of Lewisburg",
+      "displayName": "Parks and Recreation"
+    },
+    {
+      "id": "893418ff-9f0a-4721-bcbb-4169b3ff586a",
+      "slug": "lincoln",
+      "name": "City of Lincoln",
+      "displayName": "Lincoln"
+    },
+    {
+      "id": "567a9923-f5ea-4421-a718-6afb7e56f531",
+      "slug": "city-of-lockhart",
+      "name": "City of Lockhart",
+      "displayName": "Lockhart"
+    },
+    {
+      "id": "baa12a2d-b31b-4900-85a1-e6f634f0a3ce",
+      "slug": "city-of-madeira-beach",
+      "name": "City of Madeira Beach",
+      "displayName": "City of Madeira Beach"
+    },
+    {
+      "id": "14e26ada-ac6c-48ec-ad75-0590daaa4d71",
+      "slug": "city-of-madison",
+      "name": "City of Madison, Indiana",
+      "displayName": "Madison"
+    },
+    {
+      "id": "844620a6-c3d2-4a70-ac3e-1c6e5b76a49f",
+      "slug": "city-of-malibu",
+      "name": "City of Malibu",
+      "displayName": "Malibu"
+    },
+    {
+      "id": "bc94a100-8adb-4303-90cb-7c4714c22751",
+      "slug": "city-of-menifee",
+      "name": "City of Menifee",
+      "displayName": "Menifee"
+    },
+    {
+      "id": "8659d664-45b0-4d6a-9199-2cc4cf3dec98",
+      "slug": "city-of-miamisburg",
+      "name": "City of Miamisburg",
+      "displayName": "Miamisburg"
+    },
+    {
+      "id": "8a8a4fb1-c184-4196-a878-75c775ce6252",
+      "slug": "city-of-midland",
+      "name": "City of Midland",
+      "displayName": "Midland"
+    },
+    {
+      "id": "9e09ae73-fa05-408a-a6fb-8981c77b4866",
+      "slug": "city-of-milford",
+      "name": "City of Milford",
+      "displayName": "Milford"
+    },
+    {
+      "id": "b3db98c3-24ff-47ca-b9fa-74dee9b48f41",
+      "slug": "city-of-mountain-view",
+      "name": "City of Mountain View",
+      "displayName": "Mountain View"
+    },
+    {
+      "id": "f64a9263-0fe8-4f90-8015-67b23c546e14",
+      "slug": "city-of-natchez",
+      "name": "City of Natchez",
+      "displayName": "Natchez"
+    },
+    {
+      "id": "574923bd-9e7b-43e0-9e5f-7ce256189cbf",
+      "slug": "city-of-norman",
+      "name": "City of Norman",
+      "displayName": "Norman"
+    },
+    {
+      "id": "5aa9686e-f5f7-49af-bf2d-3be6f6257013",
+      "slug": "city-of-piedmont",
+      "name": "City of Piedmont",
+      "displayName": "Piedmont"
+    },
+    {
+      "id": "893ec924-beb3-4162-b1f3-ee0e3abbcd80",
+      "slug": "rocklin",
+      "name": "City of Rocklin",
+      "displayName": "Rocklin"
+    },
+    {
+      "id": "efc0724c-8f32-481a-bab3-fc19c724f3a7",
+      "slug": "city-of-smyrna",
+      "name": "City of Smyrna",
+      "displayName": "Smyrna"
+    },
+    {
+      "id": "4246b144-a4e2-4bf1-bb7f-a89f47d71973",
+      "slug": "city-of-torrance",
+      "name": "City of Torrance",
+      "displayName": "Torrance"
+    },
+    {
+      "id": "bc7afe82-0054-4bed-b77d-787a79a9018e",
+      "slug": "city-of-tullahoma",
+      "name": "City of Tullahoma",
+      "displayName": "Tullahoma Parks and Recreation"
+    },
+    {
+      "id": "77f2ce37-f91e-4e12-a1a3-c894525029e5",
+      "slug": "city-of-watsonville",
+      "name": "City of Watsonville",
+      "displayName": "Watsonville"
+    },
+    {
+      "id": "7d22bf62-060a-4881-9821-9dea6a0538d6",
+      "slug": "city-of-west-sacramento",
+      "name": "City of West Sacramento Parks & Recreation",
+      "displayName": "West Sacramento"
+    },
+    {
+      "id": "460566d3-3a51-4387-a7a0-0b010923e40d",
+      "slug": "town-of-clarksville",
+      "name": "Clarksville Parks",
+      "displayName": "Clarksville"
+    },
+    {
+      "id": "0312ebc8-40de-4fc8-a737-8afa26334e13",
+      "slug": "douglas-county-nv",
+      "name": "Douglas County Parks and Recreation",
+      "displayName": "DCPR"
+    },
+    {
+      "id": "1f1b6f1d-d0c4-4912-b4a2-077d1786ab20",
+      "slug": "jurupa-area-recreation-and-park-district",
+      "name": "Jurupa Area Recreation & Park District",
+      "displayName": "Jurupa"
+    },
+    {
+      "id": "ef946698-1e71-4159-b814-f89df3d2e7d4",
+      "slug": "lake-county",
+      "name": "Lake County",
+      "displayName": "Lake County"
+    },
+    {
+      "id": "c193567f-9503-4635-a134-f72b5db556b6",
+      "slug": "mashantucket-pequot-tribal-nation",
+      "name": "Mashantucket Pequot Tribal Nation",
+      "displayName": "Mashantucket Pequot"
+    },
+    {
+      "id": "49e96608-4c1d-4c7e-896f-e2bfeed850f4",
+      "slug": "mission-oaks-rpd",
+      "name": "Mission Oaks Recreation and Park District",
+      "displayName": "Mission Oaks"
+    },
+    {
+      "id": "8146fb39-04ec-4a06-89c7-e82f3cd808f3",
+      "slug": "norris",
+      "name": "Norris Recreation Center",
+      "displayName": "Norris"
+    },
+    {
+      "id": "52efcded-a5e8-4dbf-8a45-100f70170de0",
+      "slug": "pleasant-hill",
+      "name": "Pleasant Hill",
+      "displayName": "Pleasant Hill"
+    },
+    {
+      "id": "5b5a3779-da76-4b83-9229-17de9c525dc0",
+      "slug": "pueblo-county",
+      "name": "Pueblo County",
+      "displayName": "Pueblo County"
+    },
+    {
+      "id": "fe152712-f0bf-41df-892f-5edad45d9168",
+      "slug": "putnam-county",
+      "name": "Putnam County",
+      "displayName": "Putnam County"
+    },
+    {
+      "id": "90cab301-360d-4c01-9a88-0a67ecd6a9d2",
+      "slug": "sacramento-county",
+      "name": "Sacramento County",
+      "displayName": "Sacramento County"
+    },
+    {
+      "id": "17380e28-7e02-4b52-82c5-fab18557fd7a",
+      "slug": "san-francisco-rec-park",
+      "name": "San Francisco Rec & Park",
+      "displayName": "San Francisco"
+    },
+    {
+      "id": "fb18eb41-fb20-4fd6-be60-36c89b854c0e",
+      "slug": "santacruzcounty",
+      "name": "Santa Cruz County",
+      "displayName": "Santa Cruz County"
+    },
+    {
+      "id": "2dcbb832-c8b3-44c6-a729-703ee275d996",
+      "slug": "sebastopol",
+      "name": "Sebastopol Community Cultural Center",
+      "displayName": "Sebastopol Community Center"
+    },
+    {
+      "id": "75f2dc57-00c4-4d35-a8aa-f0caf1e8f354",
+      "slug": "sunrise-pickleball-club",
+      "name": "Sunrise Pickleball Club",
+      "displayName": "Sunrise Pickleball Club"
+    },
+    {
+      "id": "88c4af4a-3961-407d-bcd6-7ae01af60920",
+      "slug": "sunrise-rpd",
+      "name": "Sunrise Recreation and Park District",
+      "displayName": "Sunrise"
+    },
+    {
+      "id": "2d147f38-068c-409e-890d-a8acc88d8079",
+      "slug": "the-ranch",
+      "name": "The Ranch",
+      "displayName": "The Ranch"
+    },
+    {
+      "id": "8cd659f6-db45-44f6-817d-3082bd98aacf",
+      "slug": "town-of-corte-madera",
+      "name": "Town of Corte Madera",
+      "displayName": "Corte Madera"
+    },
+    {
+      "id": "a6aef5df-f742-41a2-9088-1fb6d48c3cb1",
+      "slug": "town-of-danvers",
+      "name": "Town of Danvers",
+      "displayName": "Danvers"
+    },
+    {
+      "id": "9acfb33a-4114-4f0f-be3c-2eb0a3930550",
+      "slug": "prescott-valley",
+      "name": "Town of Prescott Valley",
+      "displayName": "Prescott Valley"
+    },
+    {
+      "id": "8f24ee66-e9a6-40a4-afbb-27efe8ef64d5",
+      "slug": "town-of-reading",
+      "name": "Town of Reading",
+      "displayName": "Reading"
+    },
+    {
+      "id": "0a9c47af-b4c3-4601-ab0f-d2f401bb787a",
+      "slug": "town-of-shrewsbury",
+      "name": "Town of Shrewsbury",
+      "displayName": "Shrewsbury"
+    },
+    {
+      "id": "ee3c6fb6-ddc6-479f-bf26-f112ea714e09",
+      "slug": "town-of-taylor",
+      "name": "Town of Taylor",
+      "displayName": "Taylor"
+    },
+    {
+      "id": "d781690b-c5a0-43c5-8443-9ae43899528c",
+      "slug": "watertown",
+      "name": "Watertown Recreation",
+      "displayName": "Watertown"
+    },
+    {
+      "id": "83006fa1-fdaf-4f47-a4e1-a184e15f3527",
+      "slug": "city-of-west-haven",
+      "name": "West Haven Parks and Recreation",
+      "displayName": "West Haven"
+    },
+    {
+      "id": "1c80a358-74c2-477d-aa0b-87bb2d0514b3",
+      "slug": "town-of-windham",
+      "name": "Windham, Maine Parks & Recreation",
+      "displayName": "Windham"
+    }
+  ],
+  "coreMetrics": [
+    {
+      "key": "programs",
+      "label": "Programs",
+      "icon": "📋",
+      "description": "Program templates configured"
+    },
+    {
+      "key": "registrations",
+      "label": "Registrations",
+      "icon": "✅",
+      "description": "Total bookings / enrollments"
+    },
+    {
+      "key": "memberships",
+      "label": "Memberships",
+      "icon": "🪪",
+      "description": "Memberships sold/configured"
+    },
+    {
+      "key": "passes",
+      "label": "Punch Passes",
+      "icon": "🎟️",
+      "description": "Punch-card / visit passes"
+    },
+    {
+      "key": "facilities",
+      "label": "Facilities",
+      "icon": "🏟️",
+      "description": "Reservable facilities, courts & sites"
+    },
+    {
+      "key": "reservations",
+      "label": "Reservations",
+      "icon": "📅",
+      "description": "Facility/court reservations made"
+    }
+  ],
+  "usage": {
+    "apex-park-and-recreation-district": {
+      "programs": 563,
+      "registrations": 86174,
+      "memberships": 2562,
+      "passes": 4636,
+      "facilities": 328,
+      "reservations": 76885
+    },
+    "city-of-boerne": {
+      "programs": 46,
+      "registrations": 2233,
+      "memberships": 350,
+      "passes": 1,
+      "facilities": 46,
+      "reservations": 3475
+    },
+    "carmichael-district": {
+      "programs": 0,
+      "registrations": 71,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 12,
+      "reservations": 139
+    },
+    "chicorec": {
+      "programs": 152,
+      "registrations": 12390,
+      "memberships": 1350,
+      "passes": 21,
+      "facilities": 141,
+      "reservations": 14928
+    },
+    "city-of-battle-ground": {
+      "programs": 0,
+      "registrations": 419,
+      "memberships": 96,
+      "passes": 0,
+      "facilities": 7,
+      "reservations": 1591
+    },
+    "city-of-belmont": {
+      "programs": null,
+      "registrations": null,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 10,
+      "reservations": 13436
+    },
+    "city-of-belton": {
+      "programs": 41,
+      "registrations": 3976,
+      "memberships": 134,
+      "passes": 3,
+      "facilities": 33,
+      "reservations": 619
+    },
+    "city-of-brisbane": {
+      "programs": 22,
+      "registrations": 807,
+      "memberships": 111,
+      "passes": 0,
+      "facilities": 3,
+      "reservations": 1674
+    },
+    "city-of-buffalo": {
+      "programs": 39,
+      "registrations": 1153,
+      "memberships": 2679,
+      "passes": 0,
+      "facilities": null,
+      "reservations": null
+    },
+    "city-of-easton": {
+      "programs": 11,
+      "registrations": 835,
+      "memberships": 587,
+      "passes": 1,
+      "facilities": 23,
+      "reservations": 2545
+    },
+    "emeryville": {
+      "programs": 133,
+      "registrations": 9776,
+      "memberships": 3087,
+      "passes": 2330,
+      "facilities": 113,
+      "reservations": 14546
+    },
+    "city-of-euclid": {
+      "programs": 11,
+      "registrations": 301,
+      "memberships": 688,
+      "passes": 0,
+      "facilities": 21,
+      "reservations": 1206
+    },
+    "folsom": {
+      "programs": 39,
+      "registrations": 2291,
+      "memberships": 487,
+      "passes": 0,
+      "facilities": 36,
+      "reservations": 4226
+    },
+    "foster-city": {
+      "programs": 5,
+      "registrations": 4581,
+      "memberships": 569,
+      "passes": 0,
+      "facilities": 13,
+      "reservations": 498
+    },
+    "city-of-jeffersonville": {
+      "programs": 21,
+      "registrations": 4237,
+      "memberships": 2613,
+      "passes": 0,
+      "facilities": 74,
+      "reservations": 1835
+    },
+    "city-of-lewisburg": {
+      "programs": 25,
+      "registrations": 101,
+      "memberships": null,
+      "passes": null,
+      "facilities": 41,
+      "reservations": 463
+    },
+    "lincoln": {
+      "programs": null,
+      "registrations": null,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 24,
+      "reservations": 4293
+    },
+    "city-of-lockhart": {
+      "programs": 0,
+      "registrations": 417,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 9,
+      "reservations": 437
+    },
+    "city-of-madeira-beach": {
+      "programs": 24,
+      "registrations": 1932,
+      "memberships": 322,
+      "passes": 0,
+      "facilities": 39,
+      "reservations": 2017
+    },
+    "city-of-madison": {
+      "programs": 79,
+      "registrations": 1600,
+      "memberships": 473,
+      "passes": 523,
+      "facilities": 25,
+      "reservations": 3425
+    },
+    "city-of-malibu": {
+      "programs": 70,
+      "registrations": 8743,
+      "memberships": 500,
+      "passes": 646,
+      "facilities": 19,
+      "reservations": 4090
+    },
+    "city-of-menifee": {
+      "programs": 175,
+      "registrations": 13413,
+      "memberships": 3468,
+      "passes": 0,
+      "facilities": 94,
+      "reservations": 7074
+    },
+    "city-of-miamisburg": {
+      "programs": 0,
+      "registrations": 1468,
+      "memberships": null,
+      "passes": null,
+      "facilities": 15,
+      "reservations": 4800
+    },
+    "city-of-midland": {
+      "programs": 8,
+      "registrations": 2423,
+      "memberships": 1092,
+      "passes": 728,
+      "facilities": 124,
+      "reservations": 13088
+    },
+    "city-of-milford": {
+      "programs": 0,
+      "registrations": 17360,
+      "memberships": 994,
+      "passes": 0,
+      "facilities": 33,
+      "reservations": 18617
+    },
+    "city-of-mountain-view": {
+      "programs": 24,
+      "registrations": 3,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 26,
+      "reservations": 3565
+    },
+    "city-of-natchez": {
+      "programs": 7,
+      "registrations": 225,
+      "memberships": 216,
+      "passes": 1,
+      "facilities": 41,
+      "reservations": 54
+    },
+    "city-of-norman": {
+      "programs": 10,
+      "registrations": 84,
+      "memberships": null,
+      "passes": null,
+      "facilities": 402,
+      "reservations": 7208
+    },
+    "city-of-piedmont": {
+      "programs": 22,
+      "registrations": 5578,
+      "memberships": 6385,
+      "passes": 826,
+      "facilities": 25,
+      "reservations": 2996
+    },
+    "rocklin": {
+      "programs": 95,
+      "registrations": 1612,
+      "memberships": 896,
+      "passes": 0,
+      "facilities": 22,
+      "reservations": 3125
+    },
+    "city-of-smyrna": {
+      "programs": 106,
+      "registrations": 12751,
+      "memberships": 3023,
+      "passes": 19,
+      "facilities": 94,
+      "reservations": 4588
+    },
+    "city-of-torrance": {
+      "programs": 609,
+      "registrations": 63204,
+      "memberships": 13322,
+      "passes": 659,
+      "facilities": 411,
+      "reservations": 67420
+    },
+    "city-of-tullahoma": {
+      "programs": 11,
+      "registrations": 123,
+      "memberships": 1559,
+      "passes": 0,
+      "facilities": 48,
+      "reservations": 284
+    },
+    "city-of-watsonville": {
+      "programs": 15,
+      "registrations": 119,
+      "memberships": 147,
+      "passes": 0,
+      "facilities": 13,
+      "reservations": 2497
+    },
+    "city-of-west-sacramento": {
+      "programs": 78,
+      "registrations": 18639,
+      "memberships": 8937,
+      "passes": 2249,
+      "facilities": 163,
+      "reservations": 6903
+    },
+    "town-of-clarksville": {
+      "programs": 30,
+      "registrations": 1847,
+      "memberships": 1170,
+      "passes": 23549,
+      "facilities": 21,
+      "reservations": 2849
+    },
+    "douglas-county-nv": {
+      "programs": 66,
+      "registrations": 357,
+      "memberships": null,
+      "passes": null,
+      "facilities": 190,
+      "reservations": 5492
+    },
+    "jurupa-area-recreation-and-park-district": {
+      "programs": 90,
+      "registrations": 3922,
+      "memberships": 3264,
+      "passes": 0,
+      "facilities": 100,
+      "reservations": 9368
+    },
+    "lake-county": {
+      "programs": 6,
+      "registrations": 285,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 19,
+      "reservations": 138
+    },
+    "mashantucket-pequot-tribal-nation": {
+      "programs": 36,
+      "registrations": 276,
+      "memberships": 275,
+      "passes": 0,
+      "facilities": 13,
+      "reservations": 354
+    },
+    "mission-oaks-rpd": {
+      "programs": 25,
+      "registrations": 59,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 18,
+      "reservations": 1
+    },
+    "norris": {
+      "programs": 0,
+      "registrations": 937,
+      "memberships": 157,
+      "passes": 0,
+      "facilities": 10,
+      "reservations": 3819
+    },
+    "pleasant-hill": {
+      "programs": 70,
+      "registrations": 3281,
+      "memberships": 1081,
+      "passes": 2766,
+      "facilities": 66,
+      "reservations": 2070
+    },
+    "pueblo-county": {
+      "programs": 23,
+      "registrations": 1716,
+      "memberships": null,
+      "passes": null,
+      "facilities": 1303,
+      "reservations": 340809
+    },
+    "putnam-county": {
+      "programs": 22,
+      "registrations": 650,
+      "memberships": 4,
+      "passes": 0,
+      "facilities": 57,
+      "reservations": 1336
+    },
+    "sacramento-county": {
+      "programs": 47,
+      "registrations": 2072,
+      "memberships": 0,
+      "passes": 2,
+      "facilities": 139,
+      "reservations": 3082
+    },
+    "san-francisco-rec-park": {
+      "programs": 209,
+      "registrations": 357842,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 114,
+      "reservations": 403744
+    },
+    "santacruzcounty": {
+      "programs": 103,
+      "registrations": 5816,
+      "memberships": 1523,
+      "passes": 0,
+      "facilities": 251,
+      "reservations": 9230
+    },
+    "sebastopol": {
+      "programs": 29,
+      "registrations": 1198,
+      "memberships": 5,
+      "passes": 0,
+      "facilities": 11,
+      "reservations": 5544
+    },
+    "sunrise-pickleball-club": {
+      "programs": 35,
+      "registrations": 797,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 11,
+      "reservations": 2335
+    },
+    "sunrise-rpd": {
+      "programs": 26,
+      "registrations": 35,
+      "memberships": 1,
+      "passes": 0,
+      "facilities": 8,
+      "reservations": 4020
+    },
+    "the-ranch": {
+      "programs": 41,
+      "registrations": 5794,
+      "memberships": 1495,
+      "passes": 140,
+      "facilities": 14,
+      "reservations": 7072
+    },
+    "town-of-corte-madera": {
+      "programs": 32,
+      "registrations": 5342,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 10,
+      "reservations": 16501
+    },
+    "town-of-danvers": {
+      "programs": 130,
+      "registrations": 7436,
+      "memberships": 2012,
+      "passes": 269,
+      "facilities": 72,
+      "reservations": 6927
+    },
+    "prescott-valley": {
+      "programs": 74,
+      "registrations": 5962,
+      "memberships": 1153,
+      "passes": 0,
+      "facilities": 120,
+      "reservations": 8475
+    },
+    "town-of-reading": {
+      "programs": 101,
+      "registrations": 4708,
+      "memberships": null,
+      "passes": null,
+      "facilities": 80,
+      "reservations": 901
+    },
+    "town-of-shrewsbury": {
+      "programs": 158,
+      "registrations": 3179,
+      "memberships": 1710,
+      "passes": 504,
+      "facilities": 152,
+      "reservations": 3997
+    },
+    "town-of-taylor": {
+      "programs": 67,
+      "registrations": 4620,
+      "memberships": 465,
+      "passes": 0,
+      "facilities": 22,
+      "reservations": 1568
+    },
+    "watertown": {
+      "programs": 142,
+      "registrations": 8653,
+      "memberships": 2042,
+      "passes": 0,
+      "facilities": 128,
+      "reservations": 7727
+    },
+    "city-of-west-haven": {
+      "programs": 103,
+      "registrations": 3419,
+      "memberships": 1954,
+      "passes": 46,
+      "facilities": 118,
+      "reservations": 4700
+    },
+    "town-of-windham": {
+      "programs": 127,
+      "registrations": 4706,
+      "memberships": 1578,
+      "passes": 15,
+      "facilities": 54,
+      "reservations": 3996
+    }
+  },
+  "featureCategories": [
+    "Registration & Eligibility",
+    "Forms & Waivers",
+    "Programs & Scheduling",
+    "Memberships & Passes",
+    "Facilities & Rentals",
+    "Payments & Pricing",
+    "Integrations & Admin",
+    "Communications",
+    "Leagues & Teams",
+    "Store & POS"
+  ],
+  "features": [
+    {
+      "key": "age_eligibility",
+      "name": "Age Eligibility on Sections",
+      "category": "Registration & Eligibility",
+      "description": "Restricting who can register for a section based on a minimum/maximum age.",
+      "signal": "eligibility_rule.attribute_name (value 'age' or 'date_of_birth') with eligibility_rule.comparison_operator/attribute_value, linked to a section via eligibility_rule_group_lookup.section_id; section.age_evaluation_type governs how the age date is resolved",
+      "adoption_definition": "Has >=1 section with an age-based eligibility rule attached (an eligibility_rule whose attribute is age/date_of_birth, joined through eligibility_rule_group_lookup.section_id)",
+      "measure_question": "How many of this organization's sections have an age minimum or maximum eligibility requirement, and how many sections does it have in total?"
+    },
+    {
+      "key": "grade_eligibility",
+      "name": "Grade Eligibility on Sections",
+      "category": "Registration & Eligibility",
+      "description": "Restricting section registration to specific school grade levels.",
+      "signal": "eligibility_rule.attribute_name = 'grade' (with attribute_value/comparison_operator), linked to a section via eligibility_rule_group_lookup.section_id",
+      "adoption_definition": "Has >=1 section with a grade-based eligibility rule attached",
+      "measure_question": "How many of this organization's sections have a grade-level eligibility requirement, and how many sections total?"
+    },
+    {
+      "key": "residency_eligibility",
+      "name": "Residency-Based Eligibility Zones",
+      "category": "Registration & Eligibility",
+      "description": "Auto-assigning residents to a group (for resident pricing/access) using ZIP-code or geographic-polygon zones.",
+      "signal": "table: residency_zipcode_group (zip_code, group_id); table: residency_polygon_group (geometry, group_id); table: organization_residency_transfer",
+      "adoption_definition": "Has >=1 residency_zipcode_group or residency_polygon_group defined",
+      "measure_question": "How many residency zones (ZIP-code groups plus polygon groups) has this organization defined?"
+    },
+    {
+      "key": "prerequisites",
+      "name": "Enrollment Prerequisites",
+      "category": "Registration & Eligibility",
+      "description": "Requiring participants to meet a prior condition (segment membership) before they can enroll in a section.",
+      "signal": "table: prereq (prereq.section_id, prereq.segment_id, prereq.segment_query, prereq.activated_at)",
+      "adoption_definition": "Has >=1 active prereq row (activated_at is not null)",
+      "measure_question": "How many of this organization's sections have an enrollment prerequisite configured, and how many sections total?"
+    },
+    {
+      "key": "registration_windows",
+      "name": "Scheduled Registration Windows",
+      "category": "Registration & Eligibility",
+      "description": "Opening and closing registration for a section at specific scheduled times.",
+      "signal": "table: registration_window (opens_at, closes_at, section_id, type)",
+      "adoption_definition": "Has >=1 registration_window row",
+      "measure_question": "How many of this organization's sections have a scheduled registration window (open/close times), and how many sections total?"
+    },
+    {
+      "key": "group_early_access_windows",
+      "name": "Member Early-Access Registration Windows",
+      "category": "Registration & Eligibility",
+      "description": "Giving a specific member group early or exclusive registration access via a group-scoped window.",
+      "signal": "registration_window.type = 'group' with registration_window.group_id set (not null)",
+      "adoption_definition": "Has >=1 registration_window with type='group' and a group_id",
+      "measure_question": "How many registration windows are restricted to a specific member group, and how many registration windows are there in total?"
+    },
+    {
+      "key": "restricted_registration_mode",
+      "name": "Invite-Only / Restricted Registration",
+      "category": "Registration & Eligibility",
+      "description": "Setting sections to a registration mode other than open, such as invite-only or waitlist-only.",
+      "signal": "section.registration_mode (values other than 'open', e.g. invite_only, waitlist); session.registration_mode override",
+      "adoption_definition": "Has >=1 section whose registration_mode is not 'open'",
+      "measure_question": "How many sections have a registration mode other than open (e.g. invite-only or waitlist-only), and how many sections total?"
+    },
+    {
+      "key": "waitlist",
+      "name": "Section Waitlists",
+      "category": "Registration & Eligibility",
+      "description": "Allowing participants to join a waitlist when a section is full.",
+      "signal": "section.waitlist_config (JSONB, e.g. {\"enabled\": true, \"maxSize\": 20}); section.waitlist_override; table: waitlist (participant_user_id, section_id)",
+      "adoption_definition": "Has >=1 section with waitlist_config enabled, or >=1 waitlist entry",
+      "measure_question": "How many of this organization's sections have a waitlist enabled, and how many sections total?"
+    },
+    {
+      "key": "required_participant_info",
+      "name": "Required Participant Info",
+      "category": "Registration & Eligibility",
+      "description": "Requiring certain profile attributes to be filled in before a participant can register.",
+      "signal": "section.required_info_config (JSONB describing required profile attributes)",
+      "adoption_definition": "Has >=1 section with required_info_config set (not null)",
+      "measure_question": "How many sections have required participant info configured, and how many sections total?"
+    },
+    {
+      "key": "custom_booking_questions",
+      "name": "Custom Booking Questions",
+      "category": "Registration & Eligibility",
+      "description": "Collecting custom per-registration answers (e.g. t-shirt size, dietary needs) via program-level booking questions.",
+      "signal": "table: default_booking_question (program_id, data JSONB); table: booking_question_response",
+      "adoption_definition": "Has >=1 default_booking_question configured, or >=1 booking_question_response collected",
+      "measure_question": "How many of this organization's programs have custom booking questions configured, and how many programs total?"
+    },
+    {
+      "key": "custom_forms",
+      "name": "Custom Forms",
+      "category": "Forms & Waivers",
+      "description": "Building dynamic custom forms attached to sections, sites, or products to collect structured responses.",
+      "signal": "table: form (schema JSONB); table: form_lookup (section_id/site/product); table: form_submission",
+      "adoption_definition": "Has >=1 form defined",
+      "measure_question": "How many custom forms has this organization created, and how many form submissions has it collected?"
+    },
+    {
+      "key": "waivers_contracts",
+      "name": "Waivers & Legal Contracts",
+      "category": "Forms & Waivers",
+      "description": "Requiring participants to sign waivers or legal contracts (e.g. on booking).",
+      "signal": "table: contract_version (type = 'waiver' or 'terms_of_service', requirement, effective_datetime)",
+      "adoption_definition": "Has >=1 contract_version row",
+      "measure_question": "How many waiver/contract versions has this organization set up?"
+    },
+    {
+      "key": "form_on_file_reuse",
+      "name": "Reusable Forms On File",
+      "category": "Forms & Waivers",
+      "description": "Letting participants reuse a previously submitted form instead of re-filling it each time.",
+      "signal": "form_lookup.use_form_on_file = true",
+      "adoption_definition": "Has >=1 form_lookup with use_form_on_file = true",
+      "measure_question": "How many of this organization's form attachments are set to reuse a form on file, and how many form attachments total?"
+    },
+    {
+      "key": "guests_allowed",
+      "name": "Guest Participation",
+      "category": "Programs & Scheduling",
+      "description": "Allowing non-member guests to join program sessions, often at a separate guest price.",
+      "signal": "program.allow_guests = true (with program.guest_price)",
+      "adoption_definition": "Has >=1 program with allow_guests = true",
+      "measure_question": "How many of this organization's programs allow guest participants, and how many programs total?"
+    },
+    {
+      "key": "skill_levels",
+      "name": "Skill-Level Tagging",
+      "category": "Programs & Scheduling",
+      "description": "Assigning a recommended/required skill level to programs or sections.",
+      "signal": "program.recommended_level; section.skill_level; session.skill_level; program.enforce_recommended_level",
+      "adoption_definition": "Has >=1 section with skill_level set (not null)",
+      "measure_question": "How many sections have a skill level set, and how many sections total?"
+    },
+    {
+      "key": "addons",
+      "name": "Add-On Products",
+      "category": "Programs & Scheduling",
+      "description": "Offering optional or required add-on products alongside a section, site, or activity.",
+      "signal": "table: addon (product_id, is_required, min_quantity, max_quantity, pricing_strategy)",
+      "adoption_definition": "Has >=1 addon row",
+      "measure_question": "How many add-on products has this organization configured, and how many of those are required add-ons?"
+    },
+    {
+      "key": "seasons",
+      "name": "Seasons",
+      "category": "Programs & Scheduling",
+      "description": "Grouping sections into named time periods (e.g. Spring 2025) with templated defaults.",
+      "signal": "table: season (name, start_date, end_date, section_template JSONB); table: section_season",
+      "adoption_definition": "Has >=1 season defined",
+      "measure_question": "How many seasons has this organization created, and how many sections are assigned to a season?"
+    },
+    {
+      "key": "instructors",
+      "name": "Instructor Profiles & Private Lessons",
+      "category": "Programs & Scheduling",
+      "description": "Maintaining instructor profiles, including instructors who offer private lessons.",
+      "signal": "table: instructor (user_id, can_teach_private_lessons, is_pro, is_contractor); table: instructor_reservation_request",
+      "adoption_definition": "Has >=1 instructor profile",
+      "measure_question": "How many instructor profiles has this organization set up, and how many of them offer private lessons?"
+    },
+    {
+      "key": "instructor_certifications",
+      "name": "Instructor Certifications",
+      "category": "Programs & Scheduling",
+      "description": "Tracking instructor credentials and their expiration for compliance.",
+      "signal": "table: instructor_certification (name, expires_at, instructor_id)",
+      "adoption_definition": "Has >=1 instructor_certification row",
+      "measure_question": "How many instructor certifications are recorded, and how many instructors does the organization have?"
+    },
+    {
+      "key": "memberships",
+      "name": "Memberships",
+      "category": "Memberships & Passes",
+      "description": "Selling recurring or term memberships that grant access and pricing benefits.",
+      "signal": "group_schema.type = 'membership'; table: membership (group_id, status, start_at, end_at); table: membership_user",
+      "adoption_definition": "Has >=1 membership record or >=1 membership-type group_schema",
+      "measure_question": "How many memberships has this organization issued, and how many are currently active (status = 'active')?"
+    },
+    {
+      "key": "auto_renew_memberships",
+      "name": "Auto-Renewing Memberships",
+      "category": "Memberships & Passes",
+      "description": "Memberships that automatically renew via recurring Stripe billing.",
+      "signal": "group_schema.auto_renewal = true; membership.stripe_subscription_id; membership.next_renewal_at",
+      "adoption_definition": "Has >=1 membership with a stripe_subscription_id or next_renewal_at set, or a group_schema with auto_renewal = true",
+      "measure_question": "How many of this organization's memberships are set to auto-renew (have a Stripe subscription), and how many memberships total?"
+    },
+    {
+      "key": "passes",
+      "name": "Passes / Punch Passes",
+      "category": "Memberships & Passes",
+      "description": "Selling multi-use passes (e.g. 10-visit punch cards) with defined coverage and expiry.",
+      "signal": "table: pass_schema (start_mechanism, end_mechanism, config e.g. totalUses); table: pass; table: pass_user",
+      "adoption_definition": "Has >=1 pass_schema defined",
+      "measure_question": "How many pass types (pass schemas) has this organization set up, and how many passes have been issued?"
+    },
+    {
+      "key": "benefit_rules",
+      "name": "Group/Pass Benefit Rules",
+      "category": "Memberships & Passes",
+      "description": "Defining the access or pricing-discount benefits that a membership group or pass grants.",
+      "signal": "table: benefit_rule (type, access_config JSONB, pricing_config JSONB, group_id, pass_schema_id); table: benefit_usage",
+      "adoption_definition": "Has >=1 benefit_rule configured",
+      "measure_question": "How many benefit rules has this organization configured, and how many of them are pricing-discount benefits (type = 'pricing_discount')?"
+    },
+    {
+      "key": "physical_access_devices",
+      "name": "Physical Access Control Devices",
+      "category": "Memberships & Passes",
+      "description": "Using door scanners/readers to grant physical entry via membership or pass.",
+      "signal": "table: physical_access_device (seam_device_id); table: physical_access_device_scan_event (access, membership_id, pass_id)",
+      "adoption_definition": "Has >=1 physical_access_device registered",
+      "measure_question": "How many physical access control devices (door scanners) has this organization registered?"
+    },
+    {
+      "key": "facility_rentals",
+      "name": "Facility Rentals",
+      "category": "Facilities & Rentals",
+      "description": "Renting out facilities/spaces to customers via rental agreements.",
+      "signal": "table: facility_rental (status, booking_type); booking.type = 'facility_rental'",
+      "adoption_definition": "Has >=1 facility_rental record",
+      "measure_question": "How many facility rentals has this organization created, and how many locations does it have?"
+    },
+    {
+      "key": "rental_applications",
+      "name": "Rental Applications",
+      "category": "Facilities & Rentals",
+      "description": "Requiring an application (with approval flow) before a facility can be rented at a site.",
+      "signal": "site_rental_application_configuration.rental_application_enabled = true; table: rental_application",
+      "adoption_definition": "Has >=1 site with rental_application_enabled = true, or >=1 rental_application",
+      "measure_question": "How many sites have rental applications enabled, and how many sites (courts) does the organization have in total?"
+    },
+    {
+      "key": "instant_booking",
+      "name": "Instant Booking",
+      "category": "Facilities & Rentals",
+      "description": "Letting customers instantly confirm court/site reservations without admin approval.",
+      "signal": "court.is_instant_bookable = true; table: site_instant_booking_configuration",
+      "adoption_definition": "Has >=1 court with is_instant_bookable = true, or >=1 site_instant_booking_configuration",
+      "measure_question": "How many of this organization's sites/courts are instant-bookable, and how many sites total?"
+    },
+    {
+      "key": "reservation_buffers",
+      "name": "Reservation Buffer Times",
+      "category": "Facilities & Rentals",
+      "description": "Enforcing a gap between back-to-back reservations on a court, or at a location.",
+      "signal": "court.buffer_minutes_between_reservations > 0; court.reservation_buffer_minutes_override; location.reservation_buffer",
+      "adoption_definition": "Has >=1 court with a nonzero buffer_minutes_between_reservations (or override), or a location with reservation_buffer set",
+      "measure_question": "How many courts have a buffer time between reservations set (greater than zero), and how many courts total?"
+    },
+    {
+      "key": "security_deposits",
+      "name": "Security Deposits",
+      "category": "Facilities & Rentals",
+      "description": "Collecting refundable security/damage deposits on facility rentals.",
+      "signal": "table: deposit (amount_cents, deposit_type, amount_retained_cents, amount_returned_cents)",
+      "adoption_definition": "Has >=1 deposit record",
+      "measure_question": "How many security deposits has this organization collected, and how many facility rentals does it have?"
+    },
+    {
+      "key": "rental_permits",
+      "name": "Facility Rental Permits",
+      "category": "Facilities & Rentals",
+      "description": "Issuing official permits for facility rentals.",
+      "signal": "table: facility_rental_permit (status, issued_at, permit_holder_name)",
+      "adoption_definition": "Has >=1 facility_rental_permit record",
+      "measure_question": "How many facility rental permits has this organization issued, and how many facility rentals does it have?"
+    },
+    {
+      "key": "group_reservation_windows",
+      "name": "Member Reservation-Window Overrides",
+      "category": "Facilities & Rentals",
+      "description": "Giving specific member groups different court booking windows or duration limits.",
+      "signal": "table: site_reservation_window (group_id, max_hours, min_hours, release_time_local)",
+      "adoption_definition": "Has >=1 site_reservation_window override",
+      "measure_question": "How many group-specific reservation-window overrides has this organization set up, and how many sites (courts) does it have?"
+    },
+    {
+      "key": "discount_codes",
+      "name": "Discount / Promo Codes",
+      "category": "Payments & Pricing",
+      "description": "Offering promo codes with usage limits and validity windows.",
+      "signal": "table: discount_code (code, pricing_adjustment JSONB, is_active, max_total_redemptions); table: discount_redemption",
+      "adoption_definition": "Has >=1 discount_code created",
+      "measure_question": "How many discount/promo codes has this organization created, and how many redemptions have been recorded?"
+    },
+    {
+      "key": "payment_plans",
+      "name": "Payment Plans / Installments",
+      "category": "Payments & Pricing",
+      "description": "Letting customers pay for a registration in scheduled installments.",
+      "signal": "section.available_payment_plans (JSONB PaymentPlanSpec[]); table: payment_plan_installment; order.flow = 'installment'",
+      "adoption_definition": "Has >=1 section with available_payment_plans set, or >=1 payment_plan_installment",
+      "measure_question": "How many of this organization's sections offer a payment plan (installments), and how many sections total?"
+    },
+    {
+      "key": "gift_cards",
+      "name": "Gift Cards",
+      "category": "Payments & Pricing",
+      "description": "Selling gift cards that create stored-value accounts for later redemption.",
+      "signal": "table: gift_card_product (value_cents, expiration_policy); stored_value_account.gift_card_product_id",
+      "adoption_definition": "Has >=1 gift_card_product configured",
+      "measure_question": "How many gift card products has this organization configured, and how many gift card accounts have been issued?"
+    },
+    {
+      "key": "scholarships",
+      "name": "Scholarships / Financial Aid",
+      "category": "Payments & Pricing",
+      "description": "Granting scholarship stored-value to help recipients pay for programs.",
+      "signal": "table: scholarship (value_cents, expiration_policy); stored_value_account.scholarship_id",
+      "adoption_definition": "Has >=1 scholarship defined",
+      "measure_question": "How many scholarship programs has this organization set up, and how many scholarship awards (stored value accounts) have been granted?"
+    },
+    {
+      "key": "store_credit",
+      "name": "Store Credit / Account Credit",
+      "category": "Payments & Pricing",
+      "description": "Maintaining per-user account credit balances that can be applied to purchases.",
+      "signal": "table: credit_account (balance); table: credit (amount); payment.payment_method_type = 'organizationCredit'",
+      "adoption_definition": "Has >=1 credit_account with a nonzero balance, or >=1 credit transaction",
+      "measure_question": "How many of this organization's users have a store-credit account with a nonzero balance, and how many credit accounts total?"
+    },
+    {
+      "key": "structured_refund_policies",
+      "name": "Structured Refund Policies",
+      "category": "Payments & Pricing",
+      "description": "Applying automated time-based refund rules to bookings.",
+      "signal": "table: structured_refund_policy (rules JSONB, paused); section.structured_refund_policy_id; section.structured_refund_policy_paused",
+      "adoption_definition": "Has >=1 structured_refund_policy defined, or >=1 section with structured_refund_policy_id set",
+      "measure_question": "How many sections have a structured refund policy applied, and how many sections total?"
+    },
+    {
+      "key": "group_pricing_tiers",
+      "name": "Member / Group Pricing Tiers",
+      "category": "Payments & Pricing",
+      "description": "Charging different prices to specific member groups (e.g. resident vs non-resident pricing).",
+      "signal": "section_price.group_id (not null = group-restricted tier); section_price.type (e.g. group_member, early_bird)",
+      "adoption_definition": "Has >=1 section_price with a group_id set",
+      "measure_question": "How many sections have a group-specific (member) price tier, and how many sections have any custom price tier at all?"
+    },
+    {
+      "key": "tax_collection",
+      "name": "Tax Collection",
+      "category": "Payments & Pricing",
+      "description": "Applying sales tax to products or court reservations.",
+      "signal": "product.tax_bps > 0; court.tax_bps > 0",
+      "adoption_definition": "Has >=1 product or court with tax_bps greater than zero",
+      "measure_question": "How many products and courts have a nonzero tax rate configured, and how many products/courts are there in total?"
+    },
+    {
+      "key": "cash_check_payments",
+      "name": "Cash & Check Payments",
+      "category": "Payments & Pricing",
+      "description": "Accepting in-person cash or check payments (beyond card/online).",
+      "signal": "payment.payment_method_type IN ('cash','check'); payment.cash_tendered_cents; payment.check_number",
+      "adoption_definition": "Has >=1 payment with payment_method_type of cash or check",
+      "measure_question": "How many payments has this organization taken by cash or check, and how many payments total?"
+    },
+    {
+      "key": "gl_accounting",
+      "name": "GL Accounting Configuration",
+      "category": "Integrations & Admin",
+      "description": "Categorizing revenue into a chart of general-ledger accounts for finance reporting.",
+      "signal": "table: gl_account (name, gl_code); table: gl_config (revenue-type to GL-account mappings); program.gl_account_id / court.gl_account_id / section.gl_account_id",
+      "adoption_definition": "Has >=1 gl_account defined (chart of accounts populated)",
+      "measure_question": "How many general-ledger accounts has this organization set up in its chart of accounts?"
+    },
+    {
+      "key": "sms_messaging",
+      "name": "SMS Messaging",
+      "category": "Communications",
+      "description": "Sending SMS messages to users (marketing and/or transactional).",
+      "signal": "organization_sms_config.marketing_sms_number / transactional_sms_number (set); message.channel = 'sms'; message_delivery.segments/cost_cents",
+      "adoption_definition": "Has an organization_sms_config with an SMS number set, or >=1 message with channel = 'sms'",
+      "measure_question": "How many SMS messages has this organization sent (channel = 'sms'), and how many messages has it sent in total across all channels?"
+    },
+    {
+      "key": "email_messaging",
+      "name": "Email Messaging / Campaigns",
+      "category": "Communications",
+      "description": "Sending email messages/campaigns to users and tracking delivery.",
+      "signal": "message.channel = 'email'; table: message_delivery (delivered_at, first_opened_at, open_count)",
+      "adoption_definition": "Has >=1 message with channel = 'email'",
+      "measure_question": "How many email messages has this organization sent, and how many total email deliveries (recipients) do those represent?"
+    },
+    {
+      "key": "custom_email_domains",
+      "name": "Custom Sending Email Domains",
+      "category": "Communications",
+      "description": "Sending email from the org's own verified custom domain rather than a default.",
+      "signal": "table: organization_email_domain (domain, type, status)",
+      "adoption_definition": "Has >=1 organization_email_domain configured",
+      "measure_question": "How many custom email domains has this organization set up, and how many of them are verified (status = 'verified')?"
+    },
+    {
+      "key": "notification_subscriptions",
+      "name": "Notification Subscription Types",
+      "category": "Communications",
+      "description": "Defining custom notification subscription categories users can opt in/out of.",
+      "signal": "table: subscription (name, opt_in_by_default); notification_preference.subscription_id",
+      "adoption_definition": "Has >=1 non-archived subscription type defined",
+      "measure_question": "How many notification subscription types has this organization created?"
+    },
+    {
+      "key": "audience_segments",
+      "name": "Audience Segments",
+      "category": "Communications",
+      "description": "Building dynamic user segments for targeted messaging and eligibility.",
+      "signal": "table: segment (configuration JSONB, archived_at)",
+      "adoption_definition": "Has >=1 non-archived segment defined",
+      "measure_question": "How many audience segments has this organization created?"
+    },
+    {
+      "key": "competitions_leagues",
+      "name": "Competitions / Leagues",
+      "category": "Leagues & Teams",
+      "description": "Running leagues, tournaments, or round-robins with teams and matches.",
+      "signal": "table: competition (type league/tournament); table: competition_section; table: competition_event; table: competition_team",
+      "adoption_definition": "Has >=1 competition defined",
+      "measure_question": "How many competitions (leagues/tournaments) has this organization created, and how many teams exist across them?"
+    },
+    {
+      "key": "storefront_products",
+      "name": "Public Storefront Products",
+      "category": "Store & POS",
+      "description": "Publishing products for sale in the public online storefront.",
+      "signal": "product.display_in_store = true; product.publish_to_public = true",
+      "adoption_definition": "Has >=1 product with display_in_store or publish_to_public = true",
+      "measure_question": "How many products are published to the public storefront, and how many products does the organization have in total?"
+    },
+    {
+      "key": "pos_desk_locations",
+      "name": "POS Desk Locations",
+      "category": "Store & POS",
+      "description": "Processing in-person point-of-sale transactions at physical desk/till locations.",
+      "signal": "table: desk_location (name, enforce_access_control); transaction_event.desk_location_id; table: product_desk_location",
+      "adoption_definition": "Has >=1 desk_location configured",
+      "measure_question": "How many POS desk locations has this organization set up, and how many transactions were processed at a desk?"
+    },
+    {
+      "key": "cash_reconciliation",
+      "name": "Cash Reconciliation Reports",
+      "category": "Store & POS",
+      "description": "Reconciling cash drawers with over/short reporting and deposit slips.",
+      "signal": "table: cash_summary_report (total_cash_amount, expected_amount, short_over_amount, deposit_slip)",
+      "adoption_definition": "Has >=1 cash_summary_report",
+      "measure_question": "How many cash reconciliation reports has this organization created?"
+    },
+    {
+      "key": "custom_staff_roles",
+      "name": "Custom Staff Roles & Permissions",
+      "category": "Integrations & Admin",
+      "description": "Defining custom staff roles with granular can_* permissions and assigning them to users.",
+      "signal": "table: organization_role (can_* permission flags); table: organization_user_role; table: organization_user",
+      "adoption_definition": "Has >=1 organization_role defined and assigned via organization_user_role",
+      "measure_question": "How many custom staff roles has this organization created, and how many staff users have a role assigned?"
+    },
+    {
+      "key": "alternate_identities",
+      "name": "Alternate IDs / External System Integration",
+      "category": "Integrations & Admin",
+      "description": "Storing external-system identifiers (e.g. IMLeagues) against users for cross-system integration.",
+      "signal": "table: user_alternate_identity (source, source_id, alternate_id)",
+      "adoption_definition": "Has >=1 user_alternate_identity row",
+      "measure_question": "How many users have an alternate identity from an external system, and from how many distinct sources?"
+    },
+    {
+      "key": "crm_household_notes",
+      "name": "CRM / Household Notes",
+      "category": "Integrations & Admin",
+      "description": "Staff keeping CRM-style admin notes on households.",
+      "signal": "table: household_note (message, household_id); organization_role.can_manage_crm",
+      "adoption_definition": "Has >=1 household_note created",
+      "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?"
+    }
+  ],
+  "adoption": {},
+  "notes": "Core usage counts verified against live DB (each number required a real preview_query execution). null = count could not be verified for that org/metric. Feature-adoption measurements pending."
+}

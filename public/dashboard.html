@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rec · Feature Usage by Organization</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
+    --line: #e2e8f0; --brand: #0f6f5c; --brand-2: #0d5c99;
+    --good: #16a34a; --warn: #d97706; --bad: #dc2626; --none: #cbd5e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+  a { color: var(--brand-2); text-decoration: none; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+  header.top { background: linear-gradient(135deg, #0f6f5c 0%, #0d5c99 100%); color: #fff; padding: 22px 24px; }
+  header.top .inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header.top h1 { font-size: 20px; margin: 0; font-weight: 700; letter-spacing: .2px; }
+  header.top .sub { opacity: .85; font-size: 13px; }
+  .badge-live { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin: 20px 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+  .card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .card .v { font-size: 26px; font-weight: 800; margin-top: 2px; }
+  .card .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 2px rgba(16,24,40,.04); overflow: hidden; margin-bottom: 22px; }
+  .panel h2 { font-size: 15px; margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .panel h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  th { background: #f8fafc; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; cursor: pointer; user-select: none; }
+  th.org, td.org { text-align: left; position: sticky; left: 0; background: var(--card); font-weight: 600; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+  th.org { background: #f8fafc; z-index: 2; }
+  tr:hover td { background: #f1f5f9; }
+  tr:hover td.org { background: #f1f5f9; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .zero { color: var(--none); }
+  .pill { display: inline-block; min-width: 34px; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 12px; text-align: center; }
+  .search { margin: 0 16px 12px; padding: 8px 12px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+  .crumb { font-size: 13px; margin: 16px 0 4px; }
+  .org-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 6px 0 16px; }
+  .org-h h2 { font-size: 22px; margin: 0; border: 0; padding: 0; }
+  .org-h .slug { color: var(--muted); font-size: 13px; }
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; padding: 14px 16px; }
+  .feat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; }
+  .feat .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex: none; }
+  .feat .nm { font-weight: 600; font-size: 13px; }
+  .feat .ds { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .cat-h { padding: 10px 16px 0; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .note { padding: 30px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  @media (max-width: 640px) { .wrap { padding: 12px 10px 40px; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  const e = React.createElement;
+  const { useState, useEffect, useMemo } = React;
+
+  const fmt = (n) => n == null ? "—" : Number(n).toLocaleString("en-US");
+
+  // heat color for a value within a column's max (log scale so big orgs don't wash everyone out)
+  function heat(v, max) {
+    if (v == null) return { background: "#f8fafc", color: "#94a3b8" };
+    if (v === 0)   return { background: "#fff", color: "#cbd5e1" };
+    const t = Math.log(1 + v) / Math.log(1 + (max || 1));
+    const alpha = 0.08 + t * 0.55;
+    return { background: `rgba(15,111,92,${alpha.toFixed(3)})`, color: t > 0.6 ? "#fff" : "#0f3d33", fontWeight: 600 };
+  }
+
+  function useRoute() {
+    const parse = () => {
+      const m = location.pathname.match(/^\/org\/([^/]+)/) || (location.hash.match(/^#\/org\/([^/]+)/));
+      return m ? { view: "org", slug: decodeURIComponent(m[1]) } : { view: "all" };
+    };
+    const [route, setRoute] = useState(parse);
+    useEffect(() => {
+      const onPop = () => setRoute(parse());
+      window.addEventListener("popstate", onPop);
+      window.addEventListener("hashchange", onPop);
+      return () => { window.removeEventListener("popstate", onPop); window.removeEventListener("hashchange", onPop); };
+    }, []);
+    const nav = (path) => { history.pushState(null, "", path); setRoute(parse()); window.scrollTo(0, 0); };
+    return [route, nav];
+  }
+
+  function SummaryCards({ data }) {
+    const slugs = Object.keys(data.usage || {});
+    const totals = {};
+    for (const m of data.coreMetrics) totals[m.key] = slugs.reduce((s, sl) => s + (data.usage[sl]?.[m.key] || 0), 0);
+    const featureCount = (data.features || []).length;
+    return e("div", { className: "cards" },
+      e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"), e("div", { className: "v" }, data.orgs.length), e("div", { className: "d" }, slugs.length + " with usage data")),
+      e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"), e("div", { className: "v" }, featureCount || data.coreMetrics.length), e("div", { className: "d" }, featureCount ? "adoption signals" : "core modules")),
+      data.coreMetrics.slice(0, 4).map(m =>
+        e("div", { className: "card", key: m.key }, e("div", { className: "k" }, m.icon + " " + m.label), e("div", { className: "v" }, fmt(totals[m.key])), e("div", { className: "d" }, "across all orgs"))
+      )
+    );
+  }
+
+  function AllOrgs({ data, nav }) {
+    const [q, setQ] = useState("");
+    const [sort, setSort] = useState({ key: "name", dir: 1 });
+    const metrics = data.coreMetrics;
+
+    const rows = useMemo(() => {
+      let rows = data.orgs.map(o => ({ ...o, u: data.usage[o.slug] || null }));
+      if (q) { const s = q.toLowerCase(); rows = rows.filter(r => (r.name + " " + (r.displayName || "") + " " + r.slug).toLowerCase().includes(s)); }
+      rows.sort((a, b) => {
+        if (sort.key === "name") return a.name.localeCompare(b.name) * sort.dir;
+        const av = a.u?.[sort.key], bv = b.u?.[sort.key];
+        return ((av == null ? -1 : av) - (bv == null ? -1 : bv)) * -sort.dir;
+      });
+      return rows;
+    }, [data, q, sort]);
+
+    const maxes = useMemo(() => {
+      const m = {};
+      for (const met of metrics) m[met.key] = Math.max(1, ...Object.values(data.usage || {}).map(u => u?.[met.key] || 0));
+      return m;
+    }, [data]);
+
+    const clickSort = (key) => setSort(s => ({ key, dir: s.key === key ? -s.dir : 1 }));
+    const arrow = (key) => sort.key === key ? (sort.dir === 1 ? " ↑" : " ↓") : "";
+
+    return e(React.Fragment, null,
+      e(SummaryCards, { data }),
+      e("div", { className: "panel" },
+        e("h2", null, "📊 Feature usage by organization ",
+          e("span", { className: "hint" }, "click a column to sort · click an org to drill in")),
+        e("input", { className: "search", placeholder: "Filter organizations…", value: q, onChange: ev => setQ(ev.target.value) }),
+        e("div", { className: "tablewrap" },
+          e("table", null,
+            e("thead", null, e("tr", null,
+              e("th", { className: "org", onClick: () => clickSort("name") }, "Organization" + arrow("name")),
+              metrics.map(m => e("th", { key: m.key, onClick: () => clickSort(m.key), title: m.description }, m.icon + " " + m.label + arrow(m.key)))
+            )),
+            e("tbody", null, rows.map(r =>
+              e("tr", { key: r.slug, style: { cursor: "pointer" }, onClick: () => nav("/org/" + r.slug) },
+                e("td", { className: "org", title: r.name }, r.displayName || r.name),
+                metrics.map(m => {
+                  const v = r.u ? r.u[m.key] : null;
+                  return e("td", { key: m.key, className: "num" },
+                    e("span", { className: "pill", style: heat(v, maxes[m.key]) }, fmt(v)));
+                })
+              )
+            ))
+          )
+        ),
+        !rows.length && e("div", { className: "note" }, "No organizations match.")
+      ),
+      (data.features || []).length > 0 && e(AdoptionMatrix, { data, nav })
+    );
+  }
+
+  function AdoptionMatrix({ data, nav }) {
+    // org × feature adoption heat-grid, grouped by category
+    const feats = data.features;
+    const cats = data.featureCategories && data.featureCategories.length
+      ? data.featureCategories
+      : [...new Set(feats.map(f => f.category))];
+    return e("div", { className: "panel" },
+      e("h2", null, "🧩 Feature adoption matrix ", e("span", { className: "hint" }, "● adopted · ○ not using")),
+      e("div", { className: "tablewrap" },
+        e("table", null,
+          e("thead", null, e("tr", null,
+            e("th", { className: "org" }, "Organization"),
+            feats.map(f => e("th", { key: f.key, title: f.name + " — " + (f.description || "") },
+              (f.short || f.name).slice(0, 14)))
+          )),
+          e("tbody", null, data.orgs.map(o => {
+            const a = (data.adoption || {})[o.slug] || {};
+            return e("tr", { key: o.slug, style: { cursor: "pointer" }, onClick: () => nav("/org/" + o.slug) },
+              e("td", { className: "org" }, o.displayName || o.name),
+              feats.map(f => {
+                const st = a[f.key];
+                const on = st && st.adopted;
+                return e("td", { key: f.key, style: { textAlign: "center", color: on ? "var(--good)" : "var(--none)", fontSize: 15 }, title: st?.detail || "" }, on ? "●" : "○");
+              })
+            );
+          }))
+        )
+      )
+    );
+  }
+
+  function OrgView({ data, slug, nav }) {
+    const org = data.orgs.find(o => o.slug === slug);
+    if (!org) return e("div", { className: "note" }, "Unknown organization: " + slug);
+    const u = data.usage[slug];
+    const a = (data.adoption || {})[slug] || {};
+    const feats = data.features || [];
+    const cats = [...new Set(feats.map(f => f.category))];
+    return e(React.Fragment, null,
+      e("div", { className: "crumb" }, e("a", { href: "/", onClick: (ev) => { ev.preventDefault(); nav("/"); } }, "← All organizations")),
+      e("div", { className: "org-h" },
+        e("h2", null, org.name),
+        e("span", { className: "slug" }, "rec.us/" + org.slug)),
+      e("div", { className: "cards" }, data.coreMetrics.map(m =>
+        e("div", { className: "card", key: m.key },
+          e("div", { className: "k" }, m.icon + " " + m.label),
+          e("div", { className: "v" }, fmt(u ? u[m.key] : null)),
+          e("div", { className: "d" }, m.description))
+      )),
+      feats.length ? e("div", { className: "panel" },
+        e("h2", null, "🧩 Feature adoption"),
+        cats.map(cat => e(React.Fragment, { key: cat },
+          e("div", { className: "cat-h" }, cat),
+          e("div", { className: "feat-grid" }, feats.filter(f => f.category === cat).map(f => {
+            const st = a[f.key]; const on = st && st.adopted;
+            return e("div", { className: "feat", key: f.key, title: f.adoption_definition || "" },
+              e("div", { className: "dot", style: { background: on ? "var(--good)" : st ? "var(--none)" : "#f1f5f9", border: st ? "none" : "1px dashed var(--none)" } }),
+              e("div", null,
+                e("div", { className: "nm" }, f.name),
+                e("div", { className: "ds" }, st ? (st.detail || (on ? "In use" : "Not using")) : "Not yet measured")));
+          }))
+        ))
+      ) : e("div", { className: "panel" }, e("div", { className: "note" }, "Feature-adoption signals are being collected — check back soon."))
+    );
+  }
+
+  function App() {
+    const [data, setData] = useState(null);
+    const [err, setErr] = useState(null);
+    const [route, nav] = useRoute();
+    useEffect(() => {
+      fetch("/api/data").then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(setData).catch(er => setErr(String(er)));
+    }, []);
+    return e(React.Fragment, null,
+      e("header", { className: "top" }, e("div", { className: "inner" },
+        e("h1", { style: { cursor: "pointer" }, onClick: () => nav("/") }, "Rec · Feature Usage by Organization"),
+        e("span", { className: "badge-live" }, "Live rec.us data"),
+        data && e("span", { className: "sub" }, "snapshot " + new Date(data.generatedAt).toLocaleString())
+      )),
+      e("div", { className: "wrap" },
+        err ? e("div", { className: "note" }, "Failed to load data: " + err) :
+        !data ? e("div", { className: "note" }, "Loading…") :
+        route.view === "org" ? e(OrgView, { data, slug: route.slug, nav }) : e(AllOrgs, { data, nav }),
+        e("div", { className: "foot" }, "Data source: rec.us production database, snapshot via Rec Staff MCP. Counts reflect active/non-archived records at snapshot time.")
+      )
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+})();
+</script>
+</body>
+</html>
