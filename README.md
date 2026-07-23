@@ -6,6 +6,13 @@ using, from core module volume (programs, registrations, memberships,
 passes, facilities, reservations) down to optional feature adoption
 (age eligibility on sections, SMS messaging, waitlists, and so on).
 
+## Live URL
+
+Deployed dashboard (Railway): <https://org-features-production.up.railway.app/>
+
+The root path is the all-orgs view; append `/org/<slug>` for a single-org
+drill-in (e.g. <https://org-features-production.up.railway.app/org/carmichael-district>).
+
 ## Views
 
 - **`/`** — all-orgs dashboard: sortable usage heat-table across every
