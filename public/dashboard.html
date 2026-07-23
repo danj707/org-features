@@ -47,6 +47,16 @@
   .score-lg { display: inline-flex; align-items: baseline; gap: 6px; }
   .score-lg .pct { font-size: 26px; font-weight: 800; }
   .score-lg .of { font-size: 12px; color: var(--muted); }
+  .catlist { padding: 10px 16px 16px; display: grid; gap: 10px; }
+  .catrow { display: grid; grid-template-columns: 230px 1fr 52px; align-items: center; gap: 12px; }
+  .catrow .cname { font-size: 13px; font-weight: 600; line-height: 1.25; }
+  .catrow .cname small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+  .cbar { position: relative; height: 22px; border-radius: 999px; background: #eef2f7; overflow: hidden; }
+  .cbar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
+  .catrow .cpct { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 13px; }
+  .catrow.unmeasured .cbar { background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 6px, #e9eef4 6px, #e9eef4 12px); }
+  .cat-h .cbadge { font-weight: 700; color: var(--brand); background: rgba(15,111,92,.10); border-radius: 999px; padding: 1px 8px; font-size: 11px; margin-left: 8px; letter-spacing: 0; }
+  @media (max-width: 640px) { .catrow { grid-template-columns: 1fr; gap: 4px; } .catrow .cpct { text-align: left; } }
   .search { margin: 0 16px 12px; padding: 8px 12px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
   .crumb { font-size: 13px; margin: 16px 0 4px; }
   .org-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 6px 0 16px; }
@@ -117,6 +127,79 @@
     return e("span", { className: "scorebar", title: `${score.adopted} of ${score.total} measured features adopted` },
       e("i", { style: { width: Math.max(score.pct, 4) + "%", background: scoreFill(score.pct) } }),
       e("b", { style: { color: score.pct > 52 ? "#fff" : "#0f3d33" } }, score.pct + "%")
+    );
+  }
+
+  // The feature keys within one category that actually carry an adoption signal.
+  function categoryMeasuredKeys(data, cat) {
+    const measured = new Set(measuredKeys(data));
+    return (data.features || []).filter(f => f.category === cat && measured.has(f.key)).map(f => f.key);
+  }
+
+  // Fleet-wide adoption score for a category: adopted ÷ total org-feature cells
+  // across every org, over just the measured features in that category. Equivalent
+  // to the average per-org adoption rate of the category's measured features.
+  function categoryScores(data) {
+    const cats = data.featureCategories && data.featureCategories.length
+      ? data.featureCategories
+      : [...new Set((data.features || []).map(f => f.category))];
+    const orgs = data.orgs || [];
+    return cats.map(cat => {
+      const catFeatures = (data.features || []).filter(f => f.category === cat);
+      const mkeys = categoryMeasuredKeys(data, cat);
+      let total = 0, adopted = 0;
+      for (const o of orgs) {
+        const a = (data.adoption || {})[o.slug] || {};
+        for (const k of mkeys) {
+          const st = a[k];
+          if (!st) continue;
+          total++;
+          if (st.adopted) adopted++;
+        }
+      }
+      return {
+        category: cat,
+        measuredCount: mkeys.length,
+        catalogCount: catFeatures.length,
+        pct: total ? Math.round((adopted / total) * 100) : null,
+        adopted, total
+      };
+    });
+  }
+
+  // One org's adoption score for a single category (measured features only).
+  function orgCategoryScore(data, slug, cat) {
+    const a = (data.adoption || {})[slug] || {};
+    let total = 0, adopted = 0;
+    for (const k of categoryMeasuredKeys(data, cat)) {
+      const st = a[k];
+      if (!st) continue;
+      total++;
+      if (st.adopted) adopted++;
+    }
+    return total ? { pct: Math.round((adopted / total) * 100), adopted, total } : null;
+  }
+
+  function CategoryAdoption({ data }) {
+    const scores = categoryScores(data);
+    const measured = scores.filter(s => s.pct != null).sort((a, b) => b.pct - a.pct);
+    const unmeasured = scores.filter(s => s.pct == null);
+    if (!measured.length) return null;
+    const basis = (s) => s.pct == null
+      ? "not yet measured"
+      : (s.measuredCount < s.catalogCount
+          ? `${s.measuredCount} of ${s.catalogCount} features measured`
+          : `${s.measuredCount} feature${s.measuredCount > 1 ? "s" : ""}`);
+    const row = (s) => e("div", { className: "catrow" + (s.pct == null ? " unmeasured" : ""), key: s.category },
+      e("div", { className: "cname" }, s.category, e("small", null, basis(s))),
+      e("div", { className: "cbar", title: s.pct == null ? "No features in this category measured yet" : `${s.adopted} of ${s.total} org-feature cells adopted across all orgs` },
+        s.pct != null && e("i", { style: { width: Math.max(s.pct, 2) + "%", background: scoreFill(s.pct) } })),
+      e("div", { className: "cpct", style: { color: s.pct == null ? "var(--none)" : "inherit" } }, s.pct == null ? "—" : s.pct + "%")
+    );
+    return e("div", { className: "panel" },
+      e("h2", null, "🗂️ Adoption by feature category ",
+        e("span", { className: "hint" }, "share of each category's measured features adopted across all orgs")),
+      e("div", { className: "catlist" }, measured.map(row), unmeasured.map(row))
     );
   }
 
@@ -216,6 +299,7 @@
         ),
         !rows.length && e("div", { className: "note" }, "No organizations match.")
       ),
+      (data.features || []).length > 0 && e(CategoryAdoption, { data }),
       (data.features || []).length > 0 && e(AdoptionMatrix, { data, nav })
     );
   }
@@ -274,8 +358,9 @@
       )),
       feats.length ? e("div", { className: "panel" },
         e("h2", null, "🧩 Feature adoption"),
-        cats.map(cat => e(React.Fragment, { key: cat },
-          e("div", { className: "cat-h" }, cat),
+        cats.map(cat => { const cs = orgCategoryScore(data, slug, cat); return e(React.Fragment, { key: cat },
+          e("div", { className: "cat-h" }, cat,
+            cs && e("span", { className: "cbadge", title: cs.adopted + " of " + cs.total + " measured features in this category adopted" }, cs.pct + "%")),
           e("div", { className: "feat-grid" }, feats.filter(f => f.category === cat).map(f => {
             const st = a[f.key]; const on = st && st.adopted;
             return e("div", { className: "feat", key: f.key, title: f.adoption_definition || "" },
@@ -284,7 +369,7 @@
                 e("div", { className: "nm" }, f.name),
                 e("div", { className: "ds" }, st ? (st.detail || (on ? "In use" : "Not using")) : "Not yet measured")));
           }))
-        ))
+        )})
       ) : e("div", { className: "panel" }, e("div", { className: "note" }, "Feature-adoption signals are being collected — check back soon."))
     );
   }
