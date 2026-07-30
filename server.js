@@ -34,6 +34,10 @@ function loadSnapshot() {
     try {
       const raw = JSON.parse(fs.readFileSync(file, "utf8"));
       raw._file = file === VOLUME_FILE && file !== BAKED_FILE ? "volume" : "baked";
+      // When the snapshot file itself last changed — distinct from generatedAt
+      // (the time the data was baked), so the UI can tell "same file as before"
+      // from "a fresh snapshot was dropped in".
+      try { raw._fileModifiedAt = fs.statSync(file).mtime.toISOString(); } catch { /* non-fatal */ }
       return raw;
     } catch { /* try next */ }
   }
@@ -51,7 +55,9 @@ app.get("/api/data", (_req, res) => {
   // Re-read lazily so a volume-dropped refresh is picked up without restart
   _snapshot = loadSnapshot() || _snapshot;
   if (!_snapshot) return res.status(503).json({ error: "no snapshot baked yet" });
-  res.setHeader("Cache-Control", "no-cache");
+  // no-store so the dashboard's Refresh button always reaches the server rather
+  // than being served a cached copy by the browser or an intermediary.
+  res.setHeader("Cache-Control", "no-store, must-revalidate");
   res.json(_snapshot);
 });
 

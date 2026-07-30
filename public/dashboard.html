@@ -22,6 +22,16 @@
   header.top h1 { font-size: 20px; margin: 0; font-weight: 700; letter-spacing: .2px; }
   header.top .sub { opacity: .85; font-size: 13px; }
   .badge-live { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  .badge-stale { background: rgba(217,119,6,.28); border: 1px solid rgba(255,255,255,.5); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+  header.top .spacer { flex: 1 1 auto; }
+  .btn-refresh { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45); color: #fff; border-radius: 999px; padding: 5px 13px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .btn-refresh:hover:not(:disabled) { background: rgba(255,255,255,.30); }
+  .btn-refresh:disabled { opacity: .65; cursor: default; }
+  .btn-refresh .ico { display: inline-block; }
+  .btn-refresh .ico.spin { animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .refresh-note { flex-basis: 100%; font-size: 12px; opacity: .92; display: flex; align-items: flex-start; gap: 6px; }
+  .refresh-note.warnish { color: #ffe9c7; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin: 20px 0; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
   .card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
@@ -289,25 +299,83 @@
     );
   }
 
+  const DAY_MS = 86400000;
+  const STALE_AFTER_DAYS = 7;
+
+  function ageInDays(iso) {
+    const t = Date.parse(iso);
+    return isNaN(t) ? null : Math.floor((Date.now() - t) / DAY_MS);
+  }
+
+  function agePhrase(days) {
+    if (days == null) return "";
+    if (days <= 0) return "today";
+    if (days === 1) return "1 day old";
+    return days + " days old";
+  }
+
   function App() {
     const [data, setData] = useState(null);
     const [err, setErr] = useState(null);
+    const [busy, setBusy] = useState(false);
+    const [status, setStatus] = useState(null); // result of a manual refresh
     const [route, nav] = useRoute();
-    useEffect(() => {
-      fetch("/api/data").then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(setData).catch(er => setErr(String(er)));
-    }, []);
+
+    // Re-read the snapshot from the server. `manual` drives the button's busy
+    // state and the outcome message. Note this re-checks for a *newer snapshot
+    // file* — it cannot re-query production, since the deployed server has no
+    // database access (the snapshot is baked offline via the Rec Staff MCP).
+    const load = (manual) => {
+      if (manual) { setBusy(true); setStatus(null); }
+      const prev = data && data.generatedAt;
+      return fetch("/api/data?t=" + Date.now(), { cache: "no-store" })
+        .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(d => {
+          setData(d); setErr(null);
+          if (manual) {
+            setStatus(prev && d.generatedAt === prev
+              ? { kind: "same", text: "Already showing the newest snapshot on the server (" + new Date(d.generatedAt).toLocaleDateString() + "). Production data is baked offline — see below." }
+              : { kind: "new", text: "Loaded a newer snapshot: " + new Date(d.generatedAt).toLocaleString() });
+          }
+        })
+        .catch(er => {
+          if (manual) setStatus({ kind: "err", text: "Refresh failed: " + er });
+          else setErr(String(er));
+        })
+        .finally(() => { if (manual) setBusy(false); });
+    };
+
+    useEffect(() => { load(false); }, []);
+
+    const days = data ? ageInDays(data.generatedAt) : null;
+    const stale = days != null && days >= STALE_AFTER_DAYS;
+
     return e(React.Fragment, null,
       e("header", { className: "top" }, e("div", { className: "inner" },
         e("h1", { style: { cursor: "pointer" }, onClick: () => nav("/") }, "Rec · Feature Usage by Organization"),
         e("span", { className: "badge-live" }, "Live rec.us data"),
-        data && e("span", { className: "sub" }, "snapshot " + new Date(data.generatedAt).toLocaleString())
+        data && e("span", { className: "sub" },
+          "snapshot " + new Date(data.generatedAt).toLocaleString() + " · " + agePhrase(days)),
+        data && stale && e("span", { className: "badge-stale", title: "Snapshot is " + days + " days old — re-bake it for current numbers" }, "⚠ Stale"),
+        e("span", { className: "spacer" }),
+        e("button", {
+          className: "btn-refresh", onClick: () => load(true), disabled: busy,
+          title: "Re-check the server for a newer data snapshot. This does not re-query production — the snapshot is baked offline via the Rec Staff MCP."
+        }, e("span", { className: "ico" + (busy ? " spin" : "") }, "⟳"), busy ? "Refreshing…" : "Refresh data"),
+        status && e("span", { className: "refresh-note" + (status.kind === "same" || status.kind === "err" ? " warnish" : "") },
+          e("span", null, status.kind === "new" ? "✅" : status.kind === "err" ? "⚠" : "ℹ"),
+          e("span", null, status.text))
       )),
       e("div", { className: "wrap" },
         err ? e("div", { className: "note" }, "Failed to load data: " + err) :
         !data ? e("div", { className: "note" }, "Loading…") :
         route.view === "org" ? e(OrgView, { data, slug: route.slug, nav }) : e(AllOrgs, { data, nav }),
-        e("div", { className: "foot" }, "Data source: rec.us production database, snapshot via Rec Staff MCP. Counts reflect active/non-archived records at snapshot time.")
+        e("div", { className: "foot" },
+          e("div", null, "Data source: rec.us production database, snapshot via Rec Staff MCP. Counts reflect active/non-archived records at snapshot time."),
+          e("div", { style: { marginTop: 4 } },
+            "Refresh re-reads the snapshot from the server (picking up a newer file dropped in ",
+            e("code", null, "DATA_DIR"),
+            "). It cannot re-query production directly — the deployed app has no database access, so new numbers require re-baking the snapshot via the Rec Staff MCP."))
       )
     );
   }
