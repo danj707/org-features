@@ -55,9 +55,25 @@ app.get("/api/data", (_req, res) => {
   res.json(_snapshot);
 });
 
-const PAGE = path.join(__dirname, "public", "dashboard.html");
+// PS dashboard (Account Health / Bug Management / CX Reporting) — separate
+// baked snapshot, same volume-override rules as the features snapshot.
+const PS_BAKED  = path.join(__dirname, "data", "ps-data.json");
+const PS_VOLUME = path.join(DATA_DIR, "ps-data.json");
+app.get("/api/ps-data", (_req, res) => {
+  for (const file of [PS_VOLUME, PS_BAKED]) {
+    try {
+      res.setHeader("Cache-Control", "no-cache");
+      return res.json(JSON.parse(fs.readFileSync(file, "utf8")));
+    } catch { /* try next */ }
+  }
+  res.status(503).json({ error: "no PS snapshot baked yet" });
+});
+
+const PAGE    = path.join(__dirname, "public", "dashboard.html");
+const PS_PAGE = path.join(__dirname, "public", "ps.html");
 app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
+app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/org/:id"], (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));
 
