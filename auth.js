@@ -1,0 +1,217 @@
+/**
+ * Auth for the PS dashboard — self-contained, no new dependencies.
+ *
+ * Model: users sign up with the shared signup code (SIGNUP_CODE env var) and
+ * choose their own password. The first account created becomes an admin;
+ * admins can promote/demote/deactivate users from /ps/admin. Passwords are
+ * scrypt-hashed; sessions are HMAC-signed cookies (SESSION_SECRET env var).
+ *
+ * Users live in users.json under DATA_DIR — on Railway that must be a
+ * mounted volume or accounts reset on redeploy.
+ */
+
+const crypto = require("crypto");
+const fs     = require("fs");
+const path   = require("path");
+
+const SESSION_COOKIE = "ps_session";
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+const SIGNUP_CODE    = process.env.SIGNUP_CODE || "";
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
+if (!process.env.SESSION_SECRET) {
+  console.warn("[auth] SESSION_SECRET not set — sessions will not survive a restart");
+}
+if (!SIGNUP_CODE) {
+  console.warn("[auth] SIGNUP_CODE not set — signups are disabled until it is configured");
+}
+
+// ---------- user store ----------
+
+let USERS_FILE = null;
+function init(dataDir) {
+  USERS_FILE = path.join(dataDir, "users.json");
+}
+function loadUsers() {
+  try { return JSON.parse(fs.readFileSync(USERS_FILE, "utf8")).users || []; }
+  catch { return []; }
+}
+function saveUsers(users) {
+  fs.mkdirSync(path.dirname(USERS_FILE), { recursive: true });
+  const tmp = USERS_FILE + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify({ users }, null, 2));
+  fs.renameSync(tmp, USERS_FILE); // atomic so a crash can't corrupt the store
+}
+
+// ---------- password hashing ----------
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+function verifyPassword(password, stored) {
+  const [salt, hash] = String(stored).split(":");
+  if (!salt || !hash) return false;
+  const candidate = crypto.scryptSync(password, salt, 64);
+  const expected  = Buffer.from(hash, "hex");
+  return candidate.length === expected.length && crypto.timingSafeEqual(candidate, expected);
+}
+
+// ---------- sessions (signed cookie, no server-side state) ----------
+
+function b64url(buf) { return Buffer.from(buf).toString("base64url"); }
+function sign(payload) {
+  return crypto.createHmac("sha256", SESSION_SECRET).update(payload).digest("base64url");
+}
+function makeSession(userId) {
+  const payload = b64url(JSON.stringify({ u: userId, e: Date.now() + SESSION_TTL_MS }));
+  return `${payload}.${sign(payload)}`;
+}
+function readSession(cookieHeader) {
+  const m = /(?:^|;\s*)ps_session=([^;]+)/.exec(cookieHeader || "");
+  if (!m) return null;
+  const [payload, sig] = m[1].split(".");
+  if (!payload || !sig) return null;
+  const expected = sign(payload);
+  const a = Buffer.from(sig), b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (!data.u || data.e < Date.now()) return null;
+    return data.u;
+  } catch { return null; }
+}
+function sessionCookie(value, maxAgeMs) {
+  const secure = process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT_NAME ? "; Secure" : "";
+  return `${SESSION_COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${Math.floor(maxAgeMs / 1000)}${secure}`;
+}
+
+// ---------- brute-force damping (in-memory, per identifier) ----------
+
+const attempts = new Map(); // key -> {count, until}
+function throttled(key) {
+  const a = attempts.get(key);
+  return a && a.count >= 8 && Date.now() < a.until;
+}
+function recordFailure(key) {
+  const a = attempts.get(key) || { count: 0, until: 0 };
+  a.count += 1;
+  a.until = Date.now() + 15 * 60 * 1000;
+  attempts.set(key, a);
+}
+function clearFailures(key) { attempts.delete(key); }
+
+// ---------- middleware ----------
+
+function currentUser(req) {
+  const uid = readSession(req.headers.cookie);
+  if (!uid) return null;
+  const user = loadUsers().find(u => u.id === uid);
+  return user && user.active ? user : null;
+}
+
+function requireAuth(req, res, next) {
+  const user = currentUser(req);
+  if (!user) {
+    if (req.path.startsWith("/api/")) return res.status(401).json({ error: "not signed in" });
+    return res.redirect("/login");
+  }
+  req.user = user;
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.user || req.user.role !== "admin") return res.status(403).json({ error: "admin only" });
+  next();
+}
+
+// ---------- routes ----------
+
+function mountRoutes(app) {
+  app.post("/api/auth/signup", (req, res) => {
+    const { name, email, password, code } = req.body || {};
+    if (!SIGNUP_CODE) return res.status(503).json({ error: "Signups are not configured yet (SIGNUP_CODE unset)." });
+    if (!name || !email || !password) return res.status(400).json({ error: "Name, email, and password are required." });
+    if (String(password).length < 8) return res.status(400).json({ error: "Password must be at least 8 characters." });
+    const codeBuf = Buffer.from(String(code || "")), expect = Buffer.from(SIGNUP_CODE);
+    if (codeBuf.length !== expect.length || !crypto.timingSafeEqual(codeBuf, expect)) {
+      recordFailure("signup:" + req.ip);
+      return res.status(403).json({ error: "That signup code isn't right." });
+    }
+    if (throttled("signup:" + req.ip)) return res.status(429).json({ error: "Too many attempts — try again later." });
+
+    const users = loadUsers();
+    const emailNorm = String(email).trim().toLowerCase();
+    if (users.some(u => u.email === emailNorm)) return res.status(409).json({ error: "An account with that email already exists." });
+    const user = {
+      id: crypto.randomUUID(),
+      email: emailNorm,
+      name: String(name).trim().slice(0, 80),
+      passHash: hashPassword(password),
+      role: users.length === 0 ? "admin" : "user", // first account bootstraps as admin
+      active: true,
+      createdAt: new Date().toISOString(),
+    };
+    users.push(user);
+    saveUsers(users);
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id), SESSION_TTL_MS));
+    res.json({ ok: true, user: publicUser(user) });
+  });
+
+  app.post("/api/auth/login", (req, res) => {
+    const { email, password } = req.body || {};
+    const emailNorm = String(email || "").trim().toLowerCase();
+    const key = "login:" + emailNorm;
+    if (throttled(key)) return res.status(429).json({ error: "Too many attempts — try again in a few minutes." });
+    const user = loadUsers().find(u => u.email === emailNorm);
+    if (!user || !verifyPassword(String(password || ""), user.passHash)) {
+      recordFailure(key);
+      return res.status(401).json({ error: "Wrong email or password." });
+    }
+    if (!user.active) return res.status(403).json({ error: "This account has been deactivated." });
+    clearFailures(key);
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id), SESSION_TTL_MS));
+    res.json({ ok: true, user: publicUser(user) });
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    res.setHeader("Set-Cookie", sessionCookie("", 0));
+    res.json({ ok: true });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    const user = currentUser(req);
+    if (!user) return res.status(401).json({ error: "not signed in" });
+    res.json({ user: publicUser(user) });
+  });
+
+  // ----- admin: user management -----
+  app.get("/api/admin/users", requireAuth, requireAdmin, (_req, res) => {
+    res.json({ users: loadUsers().map(publicUser) });
+  });
+
+  app.post("/api/admin/users/:id", requireAuth, requireAdmin, (req, res) => {
+    const users = loadUsers();
+    const user = users.find(u => u.id === req.params.id);
+    if (!user) return res.status(404).json({ error: "no such user" });
+    const { role, active } = req.body || {};
+    if (role !== undefined) {
+      if (!["admin", "user"].includes(role)) return res.status(400).json({ error: "role must be admin or user" });
+      user.role = role;
+    }
+    if (active !== undefined) user.active = !!active;
+    // never let the last active admin lock everyone out
+    if (!users.some(u => u.active && u.role === "admin")) {
+      return res.status(400).json({ error: "there must be at least one active admin" });
+    }
+    saveUsers(users);
+    res.json({ ok: true, user: publicUser(user) });
+  });
+}
+
+function publicUser(u) {
+  return { id: u.id, email: u.email, name: u.name, role: u.role, active: u.active, createdAt: u.createdAt };
+}
+
+module.exports = { init, mountRoutes, requireAuth, requireAdmin, currentUser };

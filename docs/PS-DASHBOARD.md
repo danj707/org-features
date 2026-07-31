@@ -92,8 +92,32 @@ approved.
    timestamps. Which flavor do you want?
 3. **Account set**: HubSpot companies with an Account Status (60) is the row
    set. Right universe, or should prospects (Discovery) be hidden by default?
-4. **Access**: this Railway app is public-by-URL today. Bug titles + health
-   flags are more sensitive than adoption counts — worth a shared password or
-   Railway private networking before this goes wide?
+4. ~~**Access**~~ — resolved: `/ps*` now sits behind auth (see below).
 5. **Intercom**: worth building the per-org conversation aggregation (slower,
    more API calls), or is HubSpot engagement enough for v1?
+
+## Access control
+
+All `/ps*` pages and `/api/ps-data` require a signed-in user. The public
+adoption dashboard (`/`) stays open.
+
+- **Signup**: anyone with the team signup code (`SIGNUP_CODE` env var — the
+  "shared password") can create an account at `/login` and choose their own
+  password. Passwords are scrypt-hashed; nothing is stored in plaintext.
+- **Roles**: `admin` and `user`. The first account created becomes admin;
+  admins get an **Admin → Users** page to promote/demote/deactivate anyone.
+  The server refuses to remove the last active admin. Today `user` = view
+  dashboards, `admin` = also manage users; new tiers slot into the same
+  role check as pages start needing them.
+- **Sessions**: 30-day HMAC-signed cookies (`SESSION_SECRET` env var),
+  HttpOnly + Secure, with per-account login throttling.
+- **Storage**: `users.json` in `DATA_DIR` — a Railway volume is mounted at
+  `/data` so accounts survive redeploys. `data/users.json` is gitignored.
+
+**Toward multi-tenancy**: partner-facing logins are the natural v3 — add an
+`orgSlug` to a user (a "partner" role), scope `/api/ps-data` responses to
+that org's slice, and the account drill-in becomes their self-serve status
+page. The auth plumbing built here (roles, per-user records, gated APIs) is
+the foundation that needs; what's missing is per-org response filtering and
+a partner-safe subset of the data (they shouldn't see other orgs' bugs or
+internal health flags).

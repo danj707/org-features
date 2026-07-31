@@ -19,6 +19,7 @@ const express     = require("express");
 const compression = require("compression");
 const fs          = require("fs");
 const path        = require("path");
+const auth        = require("./auth");
 
 const app  = express();
 const PORT = process.env.PORT || 3200;
@@ -44,6 +45,9 @@ let _snapshot = loadSnapshot();
 console.log(`[data] DATA_DIR=${DATA_DIR} snapshot=${_snapshot ? `${_snapshot._file} (generated ${_snapshot.generatedAt || "?"})` : "MISSING"}`);
 
 app.use(compression());
+app.use(express.json());
+auth.init(DATA_DIR);
+auth.mountRoutes(app);
 
 app.get("/healthz", (_req, res) => res.json({ ok: true, snapshot: !!_snapshot }));
 
@@ -57,9 +61,11 @@ app.get("/api/data", (_req, res) => {
 
 // PS dashboard (Account Health / Bug Management / CX Reporting) — separate
 // baked snapshot, same volume-override rules as the features snapshot.
+// Everything PS-related sits behind auth: bug titles and account health
+// flags are internal. The adoption dashboard (/) stays public.
 const PS_BAKED  = path.join(__dirname, "data", "ps-data.json");
 const PS_VOLUME = path.join(DATA_DIR, "ps-data.json");
-app.get("/api/ps-data", (_req, res) => {
+app.get("/api/ps-data", auth.requireAuth, (_req, res) => {
   for (const file of [PS_VOLUME, PS_BAKED]) {
     try {
       res.setHeader("Cache-Control", "no-cache");
@@ -69,11 +75,13 @@ app.get("/api/ps-data", (_req, res) => {
   res.status(503).json({ error: "no PS snapshot baked yet" });
 });
 
-const PAGE    = path.join(__dirname, "public", "dashboard.html");
-const PS_PAGE = path.join(__dirname, "public", "ps.html");
+const PAGE       = path.join(__dirname, "public", "dashboard.html");
+const PS_PAGE    = path.join(__dirname, "public", "ps.html");
+const LOGIN_PAGE = path.join(__dirname, "public", "login.html");
 app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
-app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/org/:id"], (_req, res) => res.sendFile(PS_PAGE));
+app.get("/login", (req, res) => auth.currentUser(req) ? res.redirect("/ps") : res.sendFile(LOGIN_PAGE));
+app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/admin", "/ps/org/:id"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));
 
