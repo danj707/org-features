@@ -106,6 +106,7 @@
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
     if (p.startsWith("/ps/reporting")) return { page: "reporting" };
+    if (p.startsWith("/ps/admin")) return { page: "admin" };
     const m = p.match(/^\/ps\/org\/(.+)$/);
     if (m) return { page: "org", id: decodeURIComponent(m[1]) };
     return { page: "health" };
@@ -334,19 +335,52 @@
         e("div", { className: "note" }, "Team-level reporting lands here: launches per quarter, bug time-spent WoW, Intercom support-case volume by type, NPS. Tell Claude what to prioritize.")));
   }
 
+  // ---------------- Admin · user management ----------------
+  function Admin({ me }) {
+    const [users, setUsers] = useState(null);
+    const [err, setErr] = useState("");
+    const load = () => fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users || []));
+    useEffect(() => { load(); }, []);
+    const update = (id, patch) => {
+      setErr("");
+      fetch("/api/admin/users/" + id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) })
+        .then(r => r.json().then(d => { if (!r.ok) setErr(d.error || "update failed"); load(); }));
+    };
+    if (!users) return e("div", { className: "note" }, "Loading…");
+    return e("div", { className: "panel" },
+      e("h2", null, "Users", e("span", { className: "hint" }, "admins can view everything and manage users; users can view dashboards")),
+      err ? e("div", { className: "note", style: { color: "#dc2626" } }, err) : null,
+      e("div", { className: "tablewrap" }, e("table", null,
+        e("thead", null, e("tr", null, e("th", { className: "l" }, "Name"), e("th", { className: "l" }, "Email"), e("th", { className: "l" }, "Role"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Joined"))),
+        e("tbody", null, users.map(u => e("tr", { key: u.id },
+          e("td", { className: "name" }, u.name, u.id === me.id ? e("span", { className: "hint" }, " (you)") : null),
+          e("td", { className: "l" }, u.email),
+          e("td", { className: "l" }, e("select", { value: u.role, disabled: u.id === me.id, onChange: ev => update(u.id, { role: ev.target.value }) },
+            e("option", { value: "user" }, "user"), e("option", { value: "admin" }, "admin"))),
+          e("td", { className: "l" }, e("label", { className: "chk" },
+            e("input", { type: "checkbox", checked: u.active, disabled: u.id === me.id, onChange: ev => update(u.id, { active: ev.target.checked }) }), u.active ? "active" : "deactivated")),
+          e("td", { className: "l", style: { color: "#64748b" } }, (u.createdAt || "").slice(0, 10))))))));
+  }
+
   function App() {
     const [data, setData] = useState(null);
+    const [me, setMe] = useState(null);
     const [r, setR] = useState(route());
     useEffect(() => {
-      fetch("/api/ps-data").then(x => x.json()).then(setData);
+      fetch("/api/auth/me").then(x => {
+        if (x.status === 401) { location.href = "/login"; return null; }
+        return x.json();
+      }).then(d => d && setMe(d.user));
+      fetch("/api/ps-data").then(x => x.status === 401 ? null : x.json()).then(d => d && setData(d));
       const f = () => setR(route());
       window.addEventListener("popstate", f);
       return () => window.removeEventListener("popstate", f);
     }, []);
-    if (!data) return e("div", { className: "note" }, "Loading…");
+    const signOut = () => fetch("/api/auth/logout", { method: "POST" }).then(() => location.href = "/login");
+    if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launches and team-level metrics"], org: ["Account Health", "Account drill-in"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launches and team-level metrics"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),
@@ -356,13 +390,18 @@
         item("/ps/reporting", "CX Reporting", r.page === "reporting"),
         e("div", { className: "sec" }, "Platform"),
         e("a", { className: "item", href: "/" }, "Org Features →"),
-        e("div", { className: "foot" }, "Snapshot " + new Date(data.generatedAt).toLocaleString() + " · refreshed daily")),
+        me.role === "admin" ? e(React.Fragment, null, e("div", { className: "sec" }, "Admin"), item("/ps/admin", "Users", r.page === "admin")) : null,
+        e("div", { className: "foot" },
+          e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
+          e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
+          e("div", { style: { marginTop: 8 } }, "Snapshot " + new Date(data.generatedAt).toLocaleString() + " · refreshed daily"))),
       e("main", null,
         e("header", { className: "top" }, e("h1", null, titles[r.page][0]), e("div", { className: "sub" }, titles[r.page][1])),
         e("div", { className: "wrap" },
           r.page === "health" ? e(Health, { data }) :
           r.page === "org" ? e(Org, { data, id: r.id }) :
           r.page === "bugs" ? e(Bugs, { data }) :
+          r.page === "admin" ? e(Admin, { me }) :
           e(Reporting, { data }),
           e("div", { className: "foot" }, "Sources: Linear (bugs + customer tags) · HubSpot (status, health, engagement) · Airtable (feature requests) · rec prod replica (adoption). Intercom interactions/NPS not wired yet."))));
   }
