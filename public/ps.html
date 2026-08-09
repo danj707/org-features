@@ -509,7 +509,7 @@
 
       // Gantt
       e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
-        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 260px)" } },
+        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
           e("div", { style: { minWidth: LABEL_W + TIMELINE_W } },
 
             // Header row: months with launch counts + ACV
@@ -532,8 +532,9 @@
                           e("span", { style: { fontSize: 9, color: "#475569", lineHeight: 1 } }, "ACV"))) : null));
                 }))),
 
-            // Owner breakdown row
-            e("div", { style: { display: "flex", borderBottom: "2px solid #334155", position: "sticky", top: HEADER_H, zIndex: 19, background: "#162032" } },
+            // Owner breakdown row — scrolls away with the content (not sticky)
+            // so vertical space goes to launch rows once you scroll.
+            e("div", { style: { display: "flex", borderBottom: "2px solid #334155", background: "#162032" } },
               e("div", { style: { position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: OWNER_ROW_H, borderRight: "1px solid #334155", background: "#162032", display: "flex", alignItems: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
                 e("span", { style: upper }, "By Owner")),
               e("div", { style: { position: "relative", width: TIMELINE_W, height: OWNER_ROW_H, flexShrink: 0 } },
