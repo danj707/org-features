@@ -51,7 +51,7 @@
   th.l, td.l { text-align: left; }
   td.name { text-align: left; font-weight: 600; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
   td.wraptxt { white-space: normal; min-width: 260px; max-width: 480px; }
-  tr:hover td { background: #f1f5f9; }
+  .tablewrap tr:hover td { background: #f1f5f9; }
   td.num { font-variant-numeric: tabular-nums; }
   .zero { color: var(--none); }
   .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 11.5px; }
@@ -311,28 +311,327 @@
         filtered.length === 0 ? e("div", { className: "note" }, "No bugs match — good sign, or loosen the filters.") : null));
   }
 
-  // ---------------- CX Reporting (launch Gantt) ----------------
-  function Reporting({ data }) {
-    const launched = data.accounts.filter(a => a.closeDate && a.status).slice()
-      .sort((x, y) => new Date(x.closeDate) - new Date(y.closeDate));
-    const min = launched.length ? new Date(launched[0].closeDate) : new Date();
-    const max = new Date();
-    const span = Math.max(1, max - min);
-    const COLORS = { "Launched R&R": "#16a34a", "Launched Pilot": "#4ade80", "Configuration": "#f59e0b", "Discovery": "#93c5fd", "Delayed/Deferred": "#dc2626" };
-    return e(React.Fragment, null,
-      e("div", { className: "panel" },
-        e("h2", null, "Launch timeline ", e("span", { className: "tag-sample" }, "stand-in data"),
-          e("span", { className: "hint" }, "bar = close date → today, colored by current account status. Real launch dates live on HubSpot deals — wiring that is a v2 task.")),
-        e("div", { className: "gantt" }, launched.map(a => {
-          const left = ((new Date(a.closeDate) - min) / span) * 100;
-          return e("div", { className: "grow", key: a.hubspotId },
-            e("div", { className: "nm" }, a.name),
-            e("div", { className: "gbar" }, e("i", { style: { left: left + "%", right: 0, background: COLORS[a.status] || "#94a3b8" } })));
-        })),
-        e("div", { className: "legend" }, Object.entries(COLORS).map(([k, v]) => e("span", { key: k }, e("i", { style: { background: v } }), k)))),
-      e("div", { className: "panel" },
-        e("h2", null, "Coming next"),
-        e("div", { className: "note" }, "Team-level reporting lands here: launches per quarter, bug time-spent WoW, Intercom support-case volume by type, NPS. Tell Claude what to prioritize.")));
+  // ---------------- CX Reporting (launch pipeline gantt) ----------------
+  // Data: /api/launches — baked daily from the Airtable Services view by
+  // scripts/refresh/bake-launches.js, live-refreshable via the button.
+  const GANTT_STAGES = ["Sales Hand Off", "Discovery", "Partnership Kick Off", "Configuration", "Launch Marketing and Operations", "Go-Live Support"];
+  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Discovery": "#8b5cf6", "Partnership Kick Off": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b" };
+  const LOE_WEIGHT = { "Very Large": 4, "Large": 3, "Medium": 2, "Small": 1 };
+  const KNOWN_OWNER_COLORS = { "Michael Kehoe": "#f97316", "Maddie Pellman": "#ec4899", "Lindsay Keare": "#8b5cf6", "Dan Jenner": "#06b6d4", "Lionel Nyange": "#10b981", "Ankur Lal": "#e11d48", "Teddy Noll": "#a3e635" };
+  const OWNER_PALETTE = ["#fbbf24", "#38bdf8", "#c084fc", "#34d399", "#fb7185", "#a78bfa"];
+  const pd = (d) => new Date(d + "T00:00:00");
+  const fmtMoney = (n) => n >= 1000 ? "$" + (n / 1000).toFixed(0) + "k" : n ? "$" + n : "—";
+  const fmtACV = (n) => !n ? "—" : n >= 1000000 ? "$" + (n / 1000000).toFixed(1) + "M" : "$" + (n / 1000).toFixed(0) + "k";
+  const fmtDay = (s) => s ? pd(s).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
+
+  function Reporting() {
+    const [snap, setSnap] = useState(null);
+    const [loadErr, setLoadErr] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
+    const [refreshErr, setRefreshErr] = useState("");
+    useEffect(() => {
+      fetch("/api/launches").then(r => r.json().then(d => {
+        if (!r.ok) setLoadErr(d.error || "failed to load launches"); else setSnap(d);
+      })).catch(() => setLoadErr("failed to load launches"));
+    }, []);
+    const refresh = () => {
+      setRefreshing(true); setRefreshErr("");
+      fetch("/api/launches/refresh", { method: "POST" })
+        .then(r => r.json().then(d => { if (!r.ok) setRefreshErr(d.error || "refresh failed"); else setSnap(d); }))
+        .catch(() => setRefreshErr("refresh failed"))
+        .then(() => setRefreshing(false));
+    };
+    if (loadErr) return e("div", { className: "panel" }, e("div", { className: "note" }, loadErr));
+    if (!snap) return e("div", { className: "note" }, "Loading…");
+    return e(LaunchGantt, { snap, onRefresh: refresh, refreshing, refreshErr });
+  }
+
+  function GanttFilter({ label, value, options, onChange }) {
+    return e("div", { style: { display: "flex", alignItems: "center", gap: 4 } },
+      e("span", { style: { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" } }, label + ":"),
+      e("select", {
+        value, onChange: (ev) => onChange(ev.target.value),
+        style: { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, color: "#e2e8f0", padding: "3px 8px", fontSize: 12, cursor: "pointer", outline: "none" },
+      }, options.map(o => e("option", { key: o, value: o }, o))));
+  }
+
+  function LaunchGantt({ snap, onRefresh, refreshing, refreshErr }) {
+    const services = snap.services || [];
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+
+    const [ownerFilter, setOwnerFilter] = useState("All");
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [categoryFilter, setCategoryFilter] = useState("All");
+    const [sortBy, setSortBy] = useState("regLaunch");
+    const [hoveredId, setHoveredId] = useState(null);
+    const [tooltip, setTooltip] = useState(null);
+
+    // Owners, categories, statuses derive from the data so new hires and new
+    // Airtable options show up without a code change.
+    const namedOwners = useMemo(() => {
+      const set = new Set(Object.keys(KNOWN_OWNER_COLORS));
+      services.forEach(s => { if (s.owner) set.add(s.owner); });
+      return [...set].filter(o => services.some(s => s.owner === o) || KNOWN_OWNER_COLORS[o]).sort();
+    }, [services]);
+    const ownerColor = useMemo(() => {
+      const map = { ...KNOWN_OWNER_COLORS, "": "#94a3b8", "Unassigned": "#94a3b8" };
+      let i = 0;
+      namedOwners.forEach(o => { if (!map[o]) map[o] = OWNER_PALETTE[i++ % OWNER_PALETTE.length]; });
+      return map;
+    }, [namedOwners]);
+    const categories = useMemo(() => ["All", ...new Set(services.map(s => s.category).filter(Boolean))], [services]);
+    const statuses = useMemo(() => ["All", ...new Set(services.map(s => s.status).filter(Boolean))], [services]);
+
+    // Time range spans every dated service, independent of filters.
+    const dated = services.filter(s => s.start);
+    const minDate = dated.length ? new Date(Math.min(...dated.map(s => pd(s.start)))) : new Date(today);
+    const maxDate = new Date(Math.max(...dated.filter(s => s.end).map(s => pd(s.end)), ...dated.map(s => pd(s.start)), today));
+    minDate.setDate(1);
+    maxDate.setMonth(maxDate.getMonth() + 1, 1);
+    const totalDays = Math.max(1, (maxDate - minDate) / 86400000);
+    const px = (date) => ((pd(date) - minDate) / 86400000 / totalDays) * 100;
+    const todayPx = ((today - minDate) / 86400000 / totalDays) * 100;
+
+    let data = services.filter(s => {
+      if (ownerFilter !== "All") {
+        if (ownerFilter === "Unassigned" && s.owner !== "") return false;
+        if (ownerFilter !== "Unassigned" && s.owner !== ownerFilter) return false;
+      }
+      if (statusFilter !== "All" && s.status !== statusFilter) return false;
+      if (categoryFilter !== "All" && s.category !== categoryFilter) return false;
+      return true;
+    });
+    data = [...data].sort((a, b) => {
+      if (sortBy === "regLaunch") return (a.regLaunch || "9999").localeCompare(b.regLaunch || "9999");
+      if (sortBy === "start") return (a.start || "9999").localeCompare(b.start || "9999");
+      if (sortBy === "owner") return (a.owner || "").localeCompare(b.owner || "");
+      if (sortBy === "stage") return GANTT_STAGES.indexOf(a.stage) - GANTT_STAGES.indexOf(b.stage);
+      if (sortBy === "acv") return (b.acv || 0) - (a.acv || 0);
+      if (sortBy === "loe") return (LOE_WEIGHT[b.loe] || 0) - (LOE_WEIGHT[a.loe] || 0);
+      return 0;
+    });
+    const rows = data.filter(s => s.start); // undated services can't be drawn
+
+    // Month headers reflect the filtered set.
+    const months = [];
+    { let cur = new Date(minDate);
+      while (cur < maxDate) {
+        const label = cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+        const left = ((cur - minDate) / 86400000 / totalDays) * 100;
+        const nextMonth = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+        const width = ((Math.min(nextMonth, maxDate) - cur) / 86400000 / totalDays) * 100;
+        const monthStart = new Date(cur), monthEnd = new Date(nextMonth - 1);
+        const active = rows.filter(s => {
+          const st = pd(s.start), en = s.end ? pd(s.end) : maxDate;
+          return st <= monthEnd && en >= monthStart;
+        });
+        const breakdown = namedOwners.map(o => {
+          const owned = active.filter(s => s.owner === o);
+          return { owner: o, count: owned.length, acv: owned.reduce((t, s) => t + (s.acv || 0), 0) };
+        }).filter(b => b.count);
+        const unassigned = active.filter(s => !s.owner);
+        if (unassigned.length) breakdown.push({ owner: "Unassigned", count: unassigned.length, acv: unassigned.reduce((t, s) => t + (s.acv || 0), 0) });
+        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown });
+        cur = nextMonth;
+      } }
+    const maxActive = Math.max(...months.map(m => m.activeCount), 1);
+
+    const ROW_H = 36, LABEL_W = 350, HEADER_H = 80, OWNER_ROW_H = 170;
+    const TIMELINE_W = Math.max(months.length * 160, 800);
+    const upper = { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" };
+
+    // Quarterly revenue + QTD stats work off regLaunch across ALL services.
+    const withReg = services.filter(s => s.regLaunch);
+    const qKeyOf = (d) => d.getFullYear() + "-Q" + (Math.floor(d.getMonth() / 3) + 1);
+    const quarters = [...new Set(withReg.map(s => qKeyOf(pd(s.regLaunch))))].sort();
+    const qBounds = (key) => {
+      const [yr, q] = key.split("-Q");
+      const m0 = (parseInt(q) - 1) * 3;
+      return { start: new Date(parseInt(yr), m0, 1), end: new Date(parseInt(yr), m0 + 3, 0), label: key.replace("-", " ") };
+    };
+    const inQ = (s, key) => { const { start, end } = qBounds(key); const rl = pd(s.regLaunch); return rl >= start && rl <= end; };
+    const currentQKey = qKeyOf(today);
+    const qStart = qBounds(currentQKey).start, qEnd = qBounds(currentQKey).end;
+    const qtdLaunched = withReg.filter(s => { const rl = pd(s.regLaunch); return rl >= qStart && rl <= today; });
+    const qtdForecast = withReg.filter(s => inQ(s, currentQKey));
+    const sumACV = (list) => list.reduce((t, s) => t + (s.acv || 0), 0);
+    const revOwners = namedOwners.filter(o => quarters.some(k => withReg.some(s => s.owner === o && inQ(s, k))));
+
+    const refreshedAt = snap.generatedAt ? new Date(snap.generatedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "?";
+
+    return e("div", { style: { fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#0f172a", borderRadius: 12, color: "#e2e8f0", padding: 20, border: "1px solid #334155" } },
+
+      // Header: title, freshness, refresh button, filters, sort
+      e("div", { style: { marginBottom: 20 } },
+        e("div", { style: { display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8, flexWrap: "wrap" } },
+          e("h2", { style: { margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: "-0.5px", color: "#f8fafc", border: "none", padding: 0 } }, "Launch Pipeline"),
+          e("span", { style: { fontSize: 13, color: "#64748b", fontWeight: 500 } },
+            data.length + " services · $" + (sumACV(data) / 1000000).toFixed(1) + "M ACV"),
+          e("span", { style: { marginLeft: "auto", fontSize: 11.5, color: "#64748b" } }, "Data as of " + refreshedAt + " · re-bakes daily ~6am ET"),
+          e("button", {
+            onClick: onRefresh, disabled: refreshing,
+            title: snap.refreshAvailable === false ? "Live refresh needs AIRTABLE_API_KEY on the server; until then this button will report it's unconfigured." : "Pull the latest from the Airtable Services view",
+            style: { background: refreshing ? "#334155" : "#0ea5e9", color: "#fff", border: "none", borderRadius: 7, padding: "5px 14px", fontSize: 12.5, fontWeight: 700, cursor: refreshing ? "wait" : "pointer" },
+          }, refreshing ? "Refreshing…" : "↻ Refresh now")),
+        refreshErr ? e("div", { style: { fontSize: 12, color: "#fca5a5", marginBottom: 8 } }, refreshErr) : null,
+        e("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+          e(GanttFilter, { label: "Owner", value: ownerFilter, options: ["All", ...namedOwners, "Unassigned"], onChange: setOwnerFilter }),
+          e(GanttFilter, { label: "Status", value: statusFilter, options: statuses, onChange: setStatusFilter }),
+          e(GanttFilter, { label: "Category", value: categoryFilter, options: categories, onChange: setCategoryFilter }),
+          e("div", { style: { marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" } },
+            e("span", { style: { fontSize: 12, color: "#64748b" } }, "Sort:"),
+            [["regLaunch", "Launch Date"], ["start", "Start"], ["owner", "Owner"], ["stage", "Stage"], ["acv", "ACV"], ["loe", "LOE"]].map(([v, l]) =>
+              e("button", {
+                key: v, onClick: () => setSortBy(v),
+                style: { background: sortBy === v ? "#334155" : "transparent", border: "1px solid", borderColor: sortBy === v ? "#475569" : "#1e293b", borderRadius: 6, color: sortBy === v ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: sortBy === v ? 600 : 400 } }, l))))),
+
+      // Stage legend
+      e("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 } },
+        GANTT_STAGES.map(s => e("div", { key: s, style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
+          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: GANTT_STAGE_COLORS[s] } }), s)),
+        e("div", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
+          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: "#ef4444" } }), "Delayed")),
+
+      // Gantt
+      e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
+        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 260px)" } },
+          e("div", { style: { minWidth: LABEL_W + TIMELINE_W } },
+
+            // Header row: months with launch counts + ACV
+            e("div", { style: { display: "flex", borderBottom: "1px solid #334155", position: "sticky", top: 0, zIndex: 20, background: "#1e293b" } },
+              e("div", { style: { position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: HEADER_H, borderRight: "1px solid #334155", background: "#1e293b", display: "flex", alignItems: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
+                e("span", { style: upper }, "Service")),
+              e("div", { style: { position: "relative", width: TIMELINE_W, height: HEADER_H, flexShrink: 0 } },
+                months.map((m, i) => {
+                  const countColor = m.activeCount >= 12 ? "#f59e0b" : m.activeCount >= 8 ? "#38bdf8" : m.activeCount >= 4 ? "#94a3b8" : "#475569";
+                  return e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingLeft: 8, paddingRight: 6, overflow: "hidden" } },
+                    e("div", { style: { position: "absolute", bottom: 0, left: 0, width: (m.activeCount / maxActive) * 100 + "%", height: 3, background: countColor, borderRadius: "0 2px 0 0", opacity: 0.7 } }),
+                    e("div", { style: { display: "flex", flexDirection: "column", gap: 3, paddingBottom: 9 } },
+                      e("span", { style: { fontSize: 10, color: "#64748b", fontWeight: 600, whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.04em" } }, m.label),
+                      m.activeCount > 0 ? e(React.Fragment, null,
+                        e("div", { style: { display: "flex", alignItems: "baseline", gap: 3 } },
+                          e("span", { style: { fontSize: 15, fontWeight: 700, color: countColor, lineHeight: 1 } }, m.activeCount),
+                          e("span", { style: { fontSize: 9, color: "#475569", lineHeight: 1 } }, "active")),
+                        e("div", { style: { display: "flex", alignItems: "baseline", gap: 3 } },
+                          e("span", { style: { fontSize: 11, fontWeight: 600, color: "#34d399", lineHeight: 1 } }, fmtACV(m.activeACV)),
+                          e("span", { style: { fontSize: 9, color: "#475569", lineHeight: 1 } }, "ACV"))) : null));
+                }))),
+
+            // Owner breakdown row
+            e("div", { style: { display: "flex", borderBottom: "2px solid #334155", position: "sticky", top: HEADER_H, zIndex: 19, background: "#162032" } },
+              e("div", { style: { position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: OWNER_ROW_H, borderRight: "1px solid #334155", background: "#162032", display: "flex", alignItems: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
+                e("span", { style: upper }, "By Owner")),
+              e("div", { style: { position: "relative", width: TIMELINE_W, height: OWNER_ROW_H, flexShrink: 0 } },
+                months.map((m, i) =>
+                  e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", overflow: "hidden", padding: "7px 8px 6px 8px" } },
+                    e("div", { style: { fontSize: 9, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, whiteSpace: "nowrap" } }, m.label),
+                    m.breakdown.length === 0 ? e("span", { style: { fontSize: 9, color: "#334155" } }, "—") :
+                      e("table", { style: { width: "100%", borderCollapse: "collapse", tableLayout: "fixed" } },
+                        e("thead", null, e("tr", null,
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "left", padding: "0 4px 3px 0", borderBottom: "1px solid #1e293b", overflow: "hidden", background: "transparent", position: "static" } }, "Owner"),
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "center", padding: "0 4px 3px 0", borderBottom: "1px solid #1e293b", width: 22, background: "transparent", position: "static" } }, "#"),
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "right", paddingBottom: 3, borderBottom: "1px solid #1e293b", width: 46, background: "transparent", position: "static" } }, "ACV"))),
+                        e("tbody", null, m.breakdown.map((o, ri) =>
+                          e("tr", { key: o.owner, style: { background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                            e("td", { style: { padding: "3px 4px 2px 0", overflow: "hidden", border: "none", textAlign: "left" } },
+                              e("div", { style: { display: "flex", alignItems: "center", gap: 4, overflow: "hidden" } },
+                                e("div", { style: { width: 5, height: 5, borderRadius: "50%", background: ownerColor[o.owner] || "#94a3b8", flexShrink: 0 } }),
+                                e("span", { style: { fontSize: 9, color: "#cbd5e1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 } }, o.owner === "Unassigned" ? "Unassigned" : o.owner.split(" ")[0]))),
+                            e("td", { style: { fontSize: 10, fontWeight: 700, color: ownerColor[o.owner] || "#94a3b8", textAlign: "center", padding: "3px 4px 2px 0", lineHeight: 1, border: "none" } }, o.count),
+                            e("td", { style: { fontSize: 9, fontWeight: 600, color: "#34d399", textAlign: "right", padding: "3px 0 2px", whiteSpace: "nowrap", lineHeight: 1, border: "none" } }, fmtACV(o.acv)))))))))),
+
+            // Data rows
+            rows.map((row, i) => {
+              const pxLeft = (px(row.start) / 100) * TIMELINE_W;
+              const pxRight = row.end ? (px(row.end) / 100) * TIMELINE_W : TIMELINE_W;
+              const barWidth = Math.max(pxRight - pxLeft, 2);
+              const regPx = row.regLaunch ? (px(row.regLaunch) / 100) * TIMELINE_W : -1;
+              const color = row.status === "Delayed" ? "#ef4444" : row.status === "At Risk" ? "#991b1b" : GANTT_STAGE_COLORS[row.stage] || "#6366f1";
+              const isHovered = hoveredId === row.id;
+              const rowBg = isHovered ? "#293548" : i % 2 === 0 ? "#1e293b" : "#182032";
+              return e("div", {
+                key: row.id || row.name, style: { display: "flex", height: ROW_H, background: rowBg, borderBottom: "1px solid #334155" },
+                onMouseEnter: () => setHoveredId(row.id), onMouseLeave: () => { setHoveredId(null); setTooltip(null); } },
+                e("div", { style: { position: "sticky", left: 0, zIndex: 10, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, borderRight: "1px solid #334155", background: rowBg, display: "flex", alignItems: "center", paddingLeft: 12, paddingRight: 8, gap: 8, overflow: "hidden" } },
+                  e("div", { style: { width: 6, height: 6, borderRadius: "50%", background: ownerColor[row.owner] || "#94a3b8", flexShrink: 0 } }),
+                  e("div", { style: { overflow: "hidden" } },
+                    e("div", { style: { fontSize: 12.5, fontWeight: 500, color: "#e2e8f0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, row.name),
+                    e("div", { style: { fontSize: 10.5, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, (row.owner || "Unassigned") + " · " + fmtMoney(row.acv)))),
+                e("div", { style: { position: "relative", width: TIMELINE_W, flexShrink: 0, overflow: "hidden" } },
+                  months.map((m, mi) => e("div", { key: mi, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, top: 0, bottom: 0, borderRight: "1px solid #1a2540" } })),
+                  todayPx >= 0 && todayPx <= 100 ? e("div", { style: { position: "absolute", left: (todayPx / 100) * TIMELINE_W, top: 0, bottom: 0, width: 1, background: "rgba(248,250,252,0.25)", zIndex: 2 } }) : null,
+                  e("div", {
+                    style: { position: "absolute", left: pxLeft, width: barWidth, top: "22%", height: "56%", background: color, borderRadius: 4, opacity: isHovered ? 1 : 0.85, zIndex: 3, cursor: "pointer", display: "flex", alignItems: "center", overflow: "hidden", paddingLeft: 6 },
+                    onMouseMove: (ev) => { const rect = ev.currentTarget.getBoundingClientRect(); setTooltip({ row, x: rect.left, y: rect.top }); } },
+                    e("span", { style: { fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.9)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, row.loe)),
+                  row.regLaunch && regPx >= 0 && regPx <= TIMELINE_W ?
+                    e("div", { style: { position: "absolute", left: regPx, top: "50%", transform: "translate(-50%, -50%) rotate(45deg)", width: 8, height: 8, background: "#f8fafc", border: "2px solid " + color, zIndex: 6, borderRadius: 1 } }) : null));
+            }))),
+
+        // Footer: stage counts
+        e("div", { style: { borderTop: "1px solid #334155", padding: "10px 16px", display: "flex", gap: 24, background: "#162032", fontSize: 12, flexWrap: "wrap" } },
+          GANTT_STAGES.map(stage => {
+            const count = rows.filter(s => s.stage === stage).length;
+            return count ? e("div", { key: stage, style: { display: "flex", alignItems: "center", gap: 6 } },
+              e("div", { style: { width: 8, height: 8, borderRadius: 2, background: GANTT_STAGE_COLORS[stage] } }),
+              e("span", { style: { color: "#94a3b8" } }, stage + ":"),
+              e("span", { style: { color: "#e2e8f0", fontWeight: 600 } }, count)) : null;
+          }),
+          e("div", { style: { marginLeft: "auto", color: "#64748b" } }, "◆ = Reg. Launch Date"),
+          data.length > rows.length ? e("div", { style: { color: "#64748b" } }, (data.length - rows.length) + " service(s) hidden — no start date in Airtable") : null)),
+
+      // Quarterly revenue by owner
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 } }, "Revenue by Owner · By Quarter"),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "auto" } },
+          e("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12 } },
+            e("thead", null, e("tr", { style: { borderBottom: "1px solid #334155" } },
+              e("th", { style: { padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", width: 150, borderRight: "1px solid #1e293b", background: "transparent", position: "static" } }, "Owner"),
+              quarters.map(k => e("th", { key: k, style: { padding: "10px 16px", textAlign: "right", fontSize: 11, fontWeight: 600, color: k === currentQKey ? "#38bdf8" : "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.05)" : "transparent", position: "static" } },
+                qBounds(k).label,
+                k === currentQKey ? e("span", { style: { display: "block", fontSize: 9, color: "#475569", fontWeight: 400, textTransform: "none", letterSpacing: 0 } }, "current") : null)))),
+            e("tbody", null,
+              revOwners.map((owner, ri) =>
+                e("tr", { key: owner, style: { borderBottom: "1px solid #1e293b", background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                  e("td", { style: { padding: "9px 16px", borderRight: "1px solid #1e293b", textAlign: "left", borderBottom: "none" } },
+                    e("div", { style: { display: "flex", alignItems: "center", gap: 7 } },
+                      e("div", { style: { width: 7, height: 7, borderRadius: "50%", background: ownerColor[owner], flexShrink: 0 } }),
+                      e("span", { style: { fontSize: 12, color: "#cbd5e1", fontWeight: 500 } }, owner))),
+                  quarters.map(k => {
+                    const val = sumACV(withReg.filter(s => s.owner === owner && inQ(s, k)));
+                    return e("td", { key: k, style: { padding: "9px 16px", textAlign: "right", fontSize: 12, fontWeight: val ? 600 : 400, color: val ? ownerColor[owner] : "#334155", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.04)" : "transparent", borderBottom: "none" } }, fmtACV(val));
+                  }))),
+              e("tr", { style: { borderTop: "1px solid #334155", background: "rgba(255,255,255,0.03)" } },
+                e("td", { style: { padding: "9px 16px", fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b", textAlign: "left", borderBottom: "none" } }, "Total"),
+                quarters.map(k => e("td", { key: k, style: { padding: "9px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#f8fafc", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.06)" : "transparent", borderBottom: "none" } }, fmtACV(sumACV(withReg.filter(s => inQ(s, k))))))))))),
+
+      // QTD stats
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 } },
+          "Q" + (Math.floor(today.getMonth() / 3) + 1) + " " + today.getFullYear() + " · Quarter to Date"),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "hidden" } },
+          [["Today", e("span", { style: { color: "#f8fafc", fontWeight: 500 } }, today.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }))],
+           ["QTD Launched Revenue", e(React.Fragment, null,
+              e("span", { style: { fontSize: 18, fontWeight: 700, color: "#34d399" } }, fmtACV(sumACV(qtdLaunched))),
+              e("span", { style: { fontSize: 11, color: "#475569", marginLeft: 8 } }, qtdLaunched.length + " service" + (qtdLaunched.length !== 1 ? "s" : "") + " launched " + qStart.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "–" + today.toLocaleDateString("en-US", { month: "short", day: "numeric" })))],
+           ["Forecasted to Launch", e(React.Fragment, null,
+              e("span", { style: { fontSize: 18, fontWeight: 700, color: "#38bdf8" } }, fmtACV(sumACV(qtdForecast))),
+              e("span", { style: { fontSize: 11, color: "#475569", marginLeft: 8 } }, qtdForecast.length + " service" + (qtdForecast.length !== 1 ? "s" : "") + " · " + qStart.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "–" + qEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" })))]]
+          .map(([label, value], i, arr) =>
+            e("div", { key: label, style: { display: "flex", borderBottom: i < arr.length - 1 ? "1px solid #1e293b" : "none" } },
+              e("div", { style: { width: 220, minWidth: 220, padding: "10px 16px", fontSize: 12, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b" } }, label),
+              e("div", { style: { flex: 1, padding: "10px 16px", fontSize: 13, color: "#e2e8f0" } }, value))))),
+
+      // Tooltip
+      tooltip ? e("div", { style: { position: "fixed", left: Math.min(tooltip.x + 12, window.innerWidth - 260), top: Math.max(8, tooltip.y - 160), background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: "12px 14px", zIndex: 100, width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", pointerEvents: "none" } },
+        e("div", { style: { fontWeight: 600, fontSize: 13, color: "#f8fafc", marginBottom: 8, lineHeight: 1.3 } }, tooltip.row.name),
+        e("div", { style: { display: "grid", gridTemplateColumns: "auto 1fr", gap: "4px 10px", fontSize: 12 } },
+          [["Owner", tooltip.row.owner || "Unassigned"], ["Stage", tooltip.row.stage], ["Category", tooltip.row.category || "—"],
+           ["Start", fmtDay(tooltip.row.start)], ["Reg. Launch", fmtDay(tooltip.row.regLaunch)], ["End", fmtDay(tooltip.row.end)],
+           ["LOE", tooltip.row.loe || "—"], ["ACV", fmtMoney(tooltip.row.acv)], ["Status", tooltip.row.status || "—"]]
+          .flatMap(([k, v]) => [
+            e("span", { key: k + "k", style: { color: "#64748b" } }, k),
+            e("span", { key: k + "v", style: { color: k === "Status" ? (tooltip.row.status === "On Track" ? "#10b981" : "#ef4444") : "#e2e8f0", fontWeight: k === "Status" ? 600 : 400 } }, v)]))) : null);
   }
 
   // ---------------- Admin · user management ----------------
@@ -380,7 +679,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launches and team-level metrics"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services view"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),
