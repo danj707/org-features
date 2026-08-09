@@ -103,21 +103,44 @@ app.get("/api/launches", auth.requireAuth, (_req, res) => {
   res.json({ ...snap, refreshAvailable: !!process.env.AIRTABLE_API_KEY });
 });
 
+async function refreshLaunches() {
+  const snap = await launchesBake.bake(process.env.AIRTABLE_API_KEY);
+  _launchCache = snap;
+  if (LAUNCH_VOLUME !== LAUNCH_BAKED) {
+    try { fs.writeFileSync(LAUNCH_VOLUME, JSON.stringify(snap, null, 2)); } catch { /* volume may be absent/read-only */ }
+  }
+  return snap;
+}
+
 app.post("/api/launches/refresh", auth.requireAuth, async (_req, res) => {
   if (!process.env.AIRTABLE_API_KEY) {
     return res.status(503).json({ error: "Live refresh isn't configured: set AIRTABLE_API_KEY on the server. Data still refreshes with the daily bake." });
   }
   try {
-    const snap = await launchesBake.bake(process.env.AIRTABLE_API_KEY);
-    _launchCache = snap;
-    if (LAUNCH_VOLUME !== LAUNCH_BAKED) {
-      try { fs.writeFileSync(LAUNCH_VOLUME, JSON.stringify(snap, null, 2)); } catch { /* volume may be absent/read-only */ }
-    }
-    res.json({ ...snap, refreshAvailable: true });
+    res.json({ ...(await refreshLaunches()), refreshAvailable: true });
   } catch (err) {
     res.status(502).json({ error: `Airtable refresh failed: ${err.message}` });
   }
 });
+
+// Daily self-refresh: the launches snapshot re-bakes on boot when stale
+// (each morning's data-refresh commit redeploys the app, so this fires
+// daily ~6am ET), plus an hourly staleness backstop in case a deploy
+// doesn't happen. No cron or external job needed.
+if (process.env.AIRTABLE_API_KEY) {
+  const ageHours = () => {
+    const snap = loadLaunches();
+    return snap && snap.generatedAt ? (Date.now() - new Date(snap.generatedAt)) / 36e5 : Infinity;
+  };
+  const maybeRefresh = (threshold) => {
+    if (ageHours() < threshold) return;
+    refreshLaunches()
+      .then(s => console.log(`[launches] self-refreshed: ${s.services.length} services`))
+      .catch(err => console.error(`[launches] self-refresh failed: ${err.message}`));
+  };
+  setTimeout(() => maybeRefresh(6), 15 * 1000);            // on boot, if >6h stale
+  setInterval(() => maybeRefresh(25), 60 * 60 * 1000);     // hourly backstop, if >25h stale
+}
 
 const PAGE       = path.join(__dirname, "public", "dashboard.html");
 const PS_PAGE    = path.join(__dirname, "public", "ps.html");

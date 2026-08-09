@@ -315,7 +315,10 @@
   // Data: /api/launches — baked daily from the Airtable Services view by
   // scripts/refresh/bake-launches.js, live-refreshable via the button.
   const GANTT_STAGES = ["Sales Hand Off", "Discovery", "Partnership Kick Off", "Configuration", "Launch Marketing and Operations", "Go-Live Support"];
-  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Discovery": "#8b5cf6", "Partnership Kick Off": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b" };
+  // Launched/Delayed are baked into the snapshot but hidden by default —
+  // the gantt is about upcoming launches; toggles bring them back.
+  const GANTT_STAGE_ORDER = [...GANTT_STAGES, "Launched", "Delayed"];
+  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Discovery": "#8b5cf6", "Partnership Kick Off": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b", "Launched": "#475569", "Delayed": "#7f1d1d" };
   const LOE_WEIGHT = { "Very Large": 4, "Large": 3, "Medium": 2, "Small": 1 };
   const KNOWN_OWNER_COLORS = { "Michael Kehoe": "#f97316", "Maddie Pellman": "#ec4899", "Lindsay Keare": "#8b5cf6", "Dan Jenner": "#06b6d4", "Lionel Nyange": "#10b981", "Ankur Lal": "#e11d48", "Teddy Noll": "#a3e635" };
   const OWNER_PALETTE = ["#fbbf24", "#38bdf8", "#c084fc", "#34d399", "#fb7185", "#a78bfa"];
@@ -362,6 +365,8 @@
     const [ownerFilter, setOwnerFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("All");
     const [categoryFilter, setCategoryFilter] = useState("All");
+    const [showLaunched, setShowLaunched] = useState(false); // stage "Launched" hidden by default
+    const [showDelayed, setShowDelayed] = useState(false);   // stage "Delayed" hidden by default
     const [sortBy, setSortBy] = useState("regLaunch");
     const [hoveredId, setHoveredId] = useState(null);
     const [tooltip, setTooltip] = useState(null);
@@ -382,17 +387,9 @@
     const categories = useMemo(() => ["All", ...new Set(services.map(s => s.category).filter(Boolean))], [services]);
     const statuses = useMemo(() => ["All", ...new Set(services.map(s => s.status).filter(Boolean))], [services]);
 
-    // Time range spans every dated service, independent of filters.
-    const dated = services.filter(s => s.start);
-    const minDate = dated.length ? new Date(Math.min(...dated.map(s => pd(s.start)))) : new Date(today);
-    const maxDate = new Date(Math.max(...dated.filter(s => s.end).map(s => pd(s.end)), ...dated.map(s => pd(s.start)), today));
-    minDate.setDate(1);
-    maxDate.setMonth(maxDate.getMonth() + 1, 1);
-    const totalDays = Math.max(1, (maxDate - minDate) / 86400000);
-    const px = (date) => ((pd(date) - minDate) / 86400000 / totalDays) * 100;
-    const todayPx = ((today - minDate) / 86400000 / totalDays) * 100;
-
     let data = services.filter(s => {
+      if (!showLaunched && s.stage === "Launched") return false;
+      if (!showDelayed && s.stage === "Delayed") return false;
       if (ownerFilter !== "All") {
         if (ownerFilter === "Unassigned" && s.owner !== "") return false;
         if (ownerFilter !== "Unassigned" && s.owner !== ownerFilter) return false;
@@ -405,12 +402,22 @@
       if (sortBy === "regLaunch") return (a.regLaunch || "9999").localeCompare(b.regLaunch || "9999");
       if (sortBy === "start") return (a.start || "9999").localeCompare(b.start || "9999");
       if (sortBy === "owner") return (a.owner || "").localeCompare(b.owner || "");
-      if (sortBy === "stage") return GANTT_STAGES.indexOf(a.stage) - GANTT_STAGES.indexOf(b.stage);
+      if (sortBy === "stage") return GANTT_STAGE_ORDER.indexOf(a.stage) - GANTT_STAGE_ORDER.indexOf(b.stage);
       if (sortBy === "acv") return (b.acv || 0) - (a.acv || 0);
       if (sortBy === "loe") return (LOE_WEIGHT[b.loe] || 0) - (LOE_WEIGHT[a.loe] || 0);
       return 0;
     });
     const rows = data.filter(s => s.start); // undated services can't be drawn
+
+    // Time range spans the visible rows, so hiding Launched/Delayed keeps
+    // the timeline focused on the upcoming pipeline.
+    const minDate = rows.length ? new Date(Math.min(...rows.map(s => pd(s.start)))) : new Date(today);
+    const maxDate = new Date(Math.max(...rows.filter(s => s.end).map(s => pd(s.end)), ...rows.map(s => pd(s.start)), today));
+    minDate.setDate(1);
+    maxDate.setMonth(maxDate.getMonth() + 1, 1);
+    const totalDays = Math.max(1, (maxDate - minDate) / 86400000);
+    const px = (date) => ((pd(date) - minDate) / 86400000 / totalDays) * 100;
+    const todayPx = ((today - minDate) / 86400000 / totalDays) * 100;
 
     // Month headers reflect the filtered set.
     const months = [];
@@ -478,6 +485,13 @@
           e(GanttFilter, { label: "Owner", value: ownerFilter, options: ["All", ...namedOwners, "Unassigned"], onChange: setOwnerFilter }),
           e(GanttFilter, { label: "Status", value: statusFilter, options: statuses, onChange: setStatusFilter }),
           e(GanttFilter, { label: "Category", value: categoryFilter, options: categories, onChange: setCategoryFilter }),
+          e("span", { style: { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginLeft: 6 } }, "Include:"),
+          [["Launched", showLaunched, setShowLaunched], ["Delayed", showDelayed, setShowDelayed]].map(([label, on, set]) =>
+            e("button", {
+              key: label, onClick: () => set(!on),
+              title: on ? "Hiding " + label + "-stage services returns the chart to upcoming launches" : "Show services in the " + label + " stage (hidden by default)",
+              style: { background: on ? "#334155" : "transparent", border: "1px solid", borderColor: on ? "#475569" : "#1e293b", borderRadius: 6, color: on ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: on ? 600 : 400 } },
+              (on ? "✓ " : "") + label)),
           e("div", { style: { marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" } },
             e("span", { style: { fontSize: 12, color: "#64748b" } }, "Sort:"),
             [["regLaunch", "Launch Date"], ["start", "Start"], ["owner", "Owner"], ["stage", "Stage"], ["acv", "ACV"], ["loe", "LOE"]].map(([v, l]) =>
@@ -485,12 +499,13 @@
                 key: v, onClick: () => setSortBy(v),
                 style: { background: sortBy === v ? "#334155" : "transparent", border: "1px solid", borderColor: sortBy === v ? "#475569" : "#1e293b", borderRadius: 6, color: sortBy === v ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: sortBy === v ? 600 : 400 } }, l))))),
 
-      // Stage legend
+      // Stage legend (only stages present in the visible rows)
       e("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 } },
-        GANTT_STAGES.map(s => e("div", { key: s, style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
-          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: GANTT_STAGE_COLORS[s] } }), s)),
+        GANTT_STAGE_ORDER.filter(s => rows.some(r => r.stage === s)).map(s =>
+          e("div", { key: s, style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
+            e("div", { style: { width: 10, height: 10, borderRadius: 2, background: GANTT_STAGE_COLORS[s] } }), s === "Launched" || s === "Delayed" ? s + " (stage)" : s)),
         e("div", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
-          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: "#ef4444" } }), "Delayed")),
+          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: "#ef4444" } }), "Delayed (status)")),
 
       // Gantt
       e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
@@ -570,7 +585,7 @@
 
         // Footer: stage counts
         e("div", { style: { borderTop: "1px solid #334155", padding: "10px 16px", display: "flex", gap: 24, background: "#162032", fontSize: 12, flexWrap: "wrap" } },
-          GANTT_STAGES.map(stage => {
+          GANTT_STAGE_ORDER.map(stage => {
             const count = rows.filter(s => s.stage === stage).length;
             return count ? e("div", { key: stage, style: { display: "flex", alignItems: "center", gap: 6 } },
               e("div", { style: { width: 8, height: 8, borderRadius: 2, background: GANTT_STAGE_COLORS[stage] } }),
@@ -679,7 +694,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services view"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),

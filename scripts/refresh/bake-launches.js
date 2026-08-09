@@ -1,18 +1,17 @@
 /**
  * Bake the launch-pipeline snapshot (data/launches-data.json) from Airtable.
  *
- * Source of truth: the Services table in the Partner Management base,
- * scoped to the launch-pipeline view — the same view the CX team curates:
- *   https://airtable.com/apph3ijsChF7vzVFU/tbldMzOCKLs2xErip/viwvTxWRJvzcBKni4
- * Using the view (rather than a hardcoded filter) means the team controls
- * which services appear on the dashboard by editing the view in Airtable.
+ * Source of truth: the FULL Services table in the Partner Management base
+ * (https://airtable.com/apph3ijsChF7vzVFU/tbldMzOCKLs2xErip). All stages are
+ * baked — including Launched and Delayed — and the dashboard filters
+ * client-side (Launched/Delayed hidden by default, toggleable), so the
+ * quarterly revenue and QTD numbers can count completed launches.
  *
  * Two consumers:
- *   - CLI (the ~6am daily refresh Routine):
- *       AIRTABLE_API_KEY=pat... node scripts/refresh/bake-launches.js
- *     writes data/launches-data.json for commit alongside the features bake.
- *   - server.js requires { bake } to power POST /api/launches/refresh —
- *     the dashboard's refresh button — using the same key from the
+ *   - CLI: AIRTABLE_API_KEY=pat... node scripts/refresh/bake-launches.js
+ *     writes data/launches-data.json.
+ *   - server.js requires { bake } to power POST /api/launches/refresh (the
+ *     dashboard's refresh button) and the daily self-refresh, using the
  *     AIRTABLE_API_KEY env var on Railway.
  *
  * The key needs read scope (data.records:read) on the base only.
@@ -20,7 +19,6 @@
 
 const BASE_ID  = "apph3ijsChF7vzVFU";
 const TABLE_ID = "tbldMzOCKLs2xErip"; // Services
-const VIEW_ID  = "viwvTxWRJvzcBKni4"; // launch-pipeline view (active stages)
 
 // Airtable pipeline stages carry a " (Module Launch)" suffix; the dashboard
 // shows the bare stage name.
@@ -52,7 +50,6 @@ async function bake(apiKey) {
   let offset;
   do {
     const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`);
-    url.searchParams.set("view", VIEW_ID);
     url.searchParams.set("pageSize", "100");
     if (offset) url.searchParams.set("offset", offset);
     const res = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
@@ -67,12 +64,12 @@ async function bake(apiKey) {
 
   return {
     generatedAt: new Date().toISOString(),
-    source: `Airtable Services table (base ${BASE_ID}, view ${VIEW_ID}) — launch pipeline`,
+    source: `Airtable Services table (base ${BASE_ID}, all stages) — launch pipeline`,
     services,
   };
 }
 
-module.exports = { bake, normalizeRecord, BASE_ID, TABLE_ID, VIEW_ID };
+module.exports = { bake, normalizeRecord, BASE_ID, TABLE_ID };
 
 if (require.main === module) {
   const fs = require("fs");
