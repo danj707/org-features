@@ -75,6 +75,50 @@ app.get("/api/ps-data", auth.requireAuth, (_req, res) => {
   res.status(503).json({ error: "no PS snapshot baked yet" });
 });
 
+// Launch pipeline (CX Reporting gantt) — baked from the Airtable Services
+// view by scripts/refresh/bake-launches.js. Same volume-override rules.
+// POST /api/launches/refresh re-bakes live from Airtable when the server
+// has an AIRTABLE_API_KEY (Railway env var); the result is cached in
+// memory and written to the volume when one is mounted.
+const launchesBake  = require("./scripts/refresh/bake-launches");
+const LAUNCH_BAKED  = path.join(__dirname, "data", "launches-data.json");
+const LAUNCH_VOLUME = path.join(DATA_DIR, "launches-data.json");
+let _launchCache = null;
+
+function loadLaunches() {
+  let best = _launchCache;
+  for (const file of [LAUNCH_VOLUME, LAUNCH_BAKED]) {
+    try {
+      const snap = JSON.parse(fs.readFileSync(file, "utf8"));
+      if (!best || String(snap.generatedAt) > String(best.generatedAt)) best = snap;
+    } catch { /* try next */ }
+  }
+  return best;
+}
+
+app.get("/api/launches", auth.requireAuth, (_req, res) => {
+  const snap = loadLaunches();
+  if (!snap) return res.status(503).json({ error: "no launches snapshot baked yet" });
+  res.setHeader("Cache-Control", "no-cache");
+  res.json({ ...snap, refreshAvailable: !!process.env.AIRTABLE_API_KEY });
+});
+
+app.post("/api/launches/refresh", auth.requireAuth, async (_req, res) => {
+  if (!process.env.AIRTABLE_API_KEY) {
+    return res.status(503).json({ error: "Live refresh isn't configured: set AIRTABLE_API_KEY on the server. Data still refreshes with the daily bake." });
+  }
+  try {
+    const snap = await launchesBake.bake(process.env.AIRTABLE_API_KEY);
+    _launchCache = snap;
+    if (LAUNCH_VOLUME !== LAUNCH_BAKED) {
+      try { fs.writeFileSync(LAUNCH_VOLUME, JSON.stringify(snap, null, 2)); } catch { /* volume may be absent/read-only */ }
+    }
+    res.json({ ...snap, refreshAvailable: true });
+  } catch (err) {
+    res.status(502).json({ error: `Airtable refresh failed: ${err.message}` });
+  }
+});
+
 const PAGE       = path.join(__dirname, "public", "dashboard.html");
 const PS_PAGE    = path.join(__dirname, "public", "ps.html");
 const LOGIN_PAGE = path.join(__dirname, "public", "login.html");
