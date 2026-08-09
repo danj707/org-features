@@ -27,17 +27,20 @@ below is what it does today and how it grows into the real thing.
   avoidance, filters (team / priority / reporter / has-account), age
   highlighting, account chips, click-through to Linear to tag more customers,
   8-week created-WoW trend.
-- **CX Reporting** — the Launch Pipeline gantt: every active service from
-  the Airtable Services view (owner, stage, LOE, status, ACV, start /
-  reg-launch / end dates), with per-month active counts + ACV, an owner
-  breakdown, revenue-by-owner-by-quarter, and QTD launched/forecast stats.
-  Data comes from `data/launches-data.json`, baked by
-  `scripts/refresh/bake-launches.js` from the Airtable view
-  (`apph3ijsChF7vzVFU/tbldMzOCKLs2xErip/viwvTxWRJvzcBKni4`) — the team
-  controls what appears by editing that view. Refreshes with the daily
-  ~6am bake, or on demand via the page's **Refresh now** button
-  (`POST /api/launches/refresh`), which requires `AIRTABLE_API_KEY` set
-  on the server (read-only PAT scoped to the base).
+- **CX Reporting** — the Launch Pipeline gantt: services from the Airtable
+  Services table (owner, stage, LOE, status, ACV, start / reg-launch / end
+  dates), with per-month active counts + ACV, an owner breakdown,
+  revenue-by-owner-by-quarter, and QTD launched/forecast stats. The full
+  table is baked (all stages) so revenue math can count completed launches;
+  the gantt itself defaults to upcoming work — **Launched and Delayed
+  stages are hidden unless toggled on** via the Include pills.
+  Data lives in `data/launches-data.json`, baked by
+  `scripts/refresh/bake-launches.js` (Airtable REST, `AIRTABLE_API_KEY`).
+  Freshness has three layers, all needing only the Railway env var:
+  the server **self-refreshes on boot** when the snapshot is >6h old
+  (each morning's data-refresh deploy triggers this ~6am ET), an **hourly
+  staleness backstop** re-bakes if >25h old, and the page's **Refresh now**
+  button (`POST /api/launches/refresh`) pulls on demand.
 
 ## Data model
 
