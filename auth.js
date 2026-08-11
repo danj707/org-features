@@ -82,7 +82,9 @@ function findByResetToken(users, token) {
 // Reset links are emailed via Resend when RESEND_API_KEY is set (same key
 // the rental-report service uses; rec.us is the verified sending domain).
 // Without a key the admin just copies the link out of the UI.
-async function sendResetEmail(user, resetUrl, issuedByName) {
+// requestedBy is the issuing admin's name, or null for a self-service
+// "forgot password" request — the wording adapts.
+async function sendResetEmail(user, resetUrl, requestedBy) {
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
@@ -94,7 +96,7 @@ async function sendResetEmail(user, resetUrl, issuedByName) {
         <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a2333">
           <h2 style="font-size:18px">rec · PS dashboard</h2>
           <p>Hi ${user.name},</p>
-          <p>${issuedByName} generated a password reset link for your PS dashboard account (${user.email}).</p>
+          <p>${requestedBy ? `${requestedBy} generated a password reset link for your PS dashboard account (${user.email}).` : `A password reset was requested for your PS dashboard account (${user.email}).`}</p>
           <p style="margin:24px 0"><a href="${resetUrl}" style="background:#0f6f5c;color:#fff;padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700">Set a new password</a></p>
           <p style="color:#64748b;font-size:13px">The link works once and expires in 60 minutes. If you didn't expect this, you can ignore it — your current password keeps working until the link is used.</p>
         </div>`,
@@ -232,6 +234,33 @@ function mountRoutes(app) {
     const user = currentUser(req);
     if (!user) return res.status(401).json({ error: "not signed in" });
     res.json({ user: publicUser(user) });
+  });
+
+  // ----- password reset (self-service: emails yourself a link) -----
+  app.post("/api/auth/forgot", async (req, res) => {
+    const emailNorm = String((req.body || {}).email || "").trim().toLowerCase();
+    if (!emailNorm) return res.status(400).json({ error: "Enter your email." });
+    if (!RESEND_API_KEY) return res.status(503).json({ error: "Self-serve reset isn't set up on this server — ask an admin to send you a reset link." });
+    const ipKey = "forgot:" + req.ip, emailKey = "forgot:" + emailNorm;
+    if (throttled(ipKey) || throttled(emailKey)) return res.status(429).json({ error: "Too many attempts — try again in a few minutes." });
+    recordFailure(ipKey); recordFailure(emailKey);
+    // same reply whether or not the account exists, so the form can't be
+    // used to probe which emails are registered
+    const generic = { ok: true, message: "If that email has an account, a reset link is on its way. It expires in 60 minutes." };
+    const users = loadUsers();
+    const user = users.find(u => u.email === emailNorm);
+    if (!user || !user.active) return res.json(generic);
+    const token = crypto.randomBytes(32).toString("base64url");
+    user.reset = { hash: hashToken(token), expires: Date.now() + RESET_TTL_MS, issuedBy: "self" };
+    saveUsers(users);
+    const proto = req.headers["x-forwarded-proto"] || req.protocol || "https";
+    try {
+      await sendResetEmail(user, `${proto}://${req.headers.host}/reset?token=${token}`, null);
+    } catch (err) {
+      console.error(`[auth] forgot-password email to ${emailNorm} failed: ${err.message}`);
+      return res.status(502).json({ error: "Couldn't send the email just now — try again, or ask an admin for a reset link." });
+    }
+    res.json(generic);
   });
 
   // ----- password reset (link minted by an admin, redeemed here) -----
