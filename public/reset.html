@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rec · PS Dashboard — Reset password</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<style>
+  :root { --ink:#1a2333; --muted:#64748b; --line:#e2e8f0; --brand:#0f6f5c; --brand-2:#0d5c99; --bad:#dc2626; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+         min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background: linear-gradient(135deg,#0f6f5c 0%,#0d5c99 100%); color:var(--ink); }
+  .box { background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.25); width:380px; max-width:92vw; padding:28px 28px 24px; }
+  h1 { font-size:19px; margin:0 0 2px; } .sub { color:var(--muted); font-size:13px; margin-bottom:18px; }
+  label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:12px 0 4px; }
+  input { width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+  input:focus { outline:2px solid #0f6f5c33; border-color:var(--brand); }
+  input:disabled { background:#f8fafc; color:var(--muted); }
+  .go { width:100%; margin-top:18px; padding:11px; background:var(--brand); color:#fff; border:0; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+  .go:disabled { opacity:.6; }
+  .err { color:var(--bad); font-size:12.5px; margin-top:10px; min-height:16px; }
+  .hint { color:var(--muted); font-size:11.5px; margin-top:14px; text-align:center; }
+  .dead { text-align:center; padding:8px 0 4px; color:var(--muted); font-size:13.5px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>rec · PS dashboard</h1>
+  <div class="sub">Reset your password</div>
+  <div id="checking" class="dead">Checking your reset link…</div>
+  <div id="dead" class="dead" style="display:none"></div>
+  <form id="f" onsubmit="return go(event)" style="display:none">
+    <label>Account</label><input id="email" disabled>
+    <label>New password</label><input id="password" type="password" autocomplete="new-password" minlength="8" placeholder="at least 8 characters" required>
+    <label>Confirm new password</label><input id="confirm" type="password" autocomplete="new-password" minlength="8" required>
+    <button class="go" id="btn">Set new password</button>
+    <div class="err" id="err"></div>
+  </form>
+  <div class="hint"><a href="/login">Back to sign in</a></div>
+</div>
+<script>
+  const token = new URLSearchParams(location.search).get("token") || "";
+  const show = id => ["checking", "dead", "f"].forEach(x => document.getElementById(x).style.display = x === id ? "" : "none");
+  function die(msg) { document.getElementById("dead").textContent = msg; show("dead"); }
+  (async () => {
+    if (!token) return die("This page needs a reset link — ask a dashboard admin to generate one for you.");
+    try {
+      const r = await fetch("/api/auth/reset-password/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+      const d = await r.json();
+      if (!r.ok) return die(d.error || "That reset link is invalid or has expired.");
+      document.getElementById("email").value = d.email;
+      show("f");
+      document.getElementById("password").focus();
+    } catch { die("Network error — reload to try again."); }
+  })();
+  async function go(ev) {
+    ev.preventDefault();
+    const btn = document.getElementById("btn"), err = document.getElementById("err");
+    const password = document.getElementById("password").value;
+    if (password !== document.getElementById("confirm").value) { err.textContent = "Passwords don't match."; return false; }
+    btn.disabled = true; err.textContent = "";
+    try {
+      const r = await fetch("/api/auth/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, password }) });
+      const d = await r.json();
+      if (!r.ok) { err.textContent = d.error || "Something went wrong."; btn.disabled = false; return false; }
+      location.href = "/ps";
+    } catch { err.textContent = "Network error — try again."; btn.disabled = false; }
+    return false;
+  }
+</script>
+</body>
+</html>

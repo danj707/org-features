@@ -654,6 +654,7 @@
   function Admin({ me }) {
     const [users, setUsers] = useState(null);
     const [err, setErr] = useState("");
+    const [reset, setReset] = useState(null); // {id, name, url, minutes, copied}
     const load = () => fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users || []));
     useEffect(() => { load(); }, []);
     const update = (id, patch) => {
@@ -661,12 +662,35 @@
       fetch("/api/admin/users/" + id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) })
         .then(r => r.json().then(d => { if (!r.ok) setErr(d.error || "update failed"); load(); }));
     };
+    const resetPw = (u) => {
+      setErr("");
+      fetch("/api/admin/users/" + u.id + "/reset-password", { method: "POST" })
+        .then(r => r.json().then(d => {
+          if (!r.ok) { setErr(d.error || "reset failed"); return; }
+          setReset({ id: u.id, name: u.name, email: u.email, url: d.resetUrl, minutes: d.expiresInMinutes, emailSent: d.emailSent, emailError: d.emailError, copied: false });
+          load();
+        }))
+        .catch(() => setErr("network error — try again"));
+    };
+    const copyReset = () => {
+      navigator.clipboard.writeText(reset.url).then(() => setReset({ ...reset, copied: true }));
+    };
     if (!users) return e("div", { className: "note" }, "Loading…");
     return e("div", { className: "panel" },
       e("h2", null, "Users", e("span", { className: "hint" }, "admins can view everything and manage users; users can view dashboards")),
       err ? e("div", { className: "note", style: { color: "#dc2626" } }, err) : null,
+      reset ? e("div", { style: { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px", margin: "0 0 14px", fontSize: 13 } },
+        e("div", { style: { marginBottom: 6 } }, e("b", null, "Reset link for " + reset.name),
+          reset.emailSent ? " — emailed to " + reset.email + " ✓. Link below in case you'd rather send it yourself."
+            : reset.emailError ? " — email failed (" + reset.emailError + "), send the link to them directly."
+            : " — send it to them directly.",
+          " It works once and expires in " + reset.minutes + " minutes; generating a new one replaces it."),
+        e("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
+          e("code", { style: { flex: 1, background: "#fff", border: "1px solid #d1fae5", borderRadius: 7, padding: "6px 9px", fontSize: 11.5, overflowX: "auto", whiteSpace: "nowrap" } }, reset.url),
+          e("button", { onClick: copyReset, style: { background: reset.copied ? "#166534" : "#0f6f5c", color: "#fff", border: "none", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 } }, reset.copied ? "Copied ✓" : "Copy"),
+          e("button", { onClick: () => setReset(null), title: "Dismiss", style: { background: "transparent", color: "#64748b", border: "none", fontSize: 15, cursor: "pointer", flexShrink: 0 } }, "✕"))) : null,
       e("div", { className: "tablewrap" }, e("table", null,
-        e("thead", null, e("tr", null, e("th", { className: "l" }, "Name"), e("th", { className: "l" }, "Email"), e("th", { className: "l" }, "Role"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Joined"))),
+        e("thead", null, e("tr", null, e("th", { className: "l" }, "Name"), e("th", { className: "l" }, "Email"), e("th", { className: "l" }, "Role"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Joined"), e("th", { className: "l" }, "Password"))),
         e("tbody", null, users.map(u => e("tr", { key: u.id },
           e("td", { className: "name" }, u.name, u.id === me.id ? e("span", { className: "hint" }, " (you)") : null),
           e("td", { className: "l" }, u.email),
@@ -674,7 +698,11 @@
             e("option", { value: "user" }, "user"), e("option", { value: "admin" }, "admin"))),
           e("td", { className: "l" }, e("label", { className: "chk" },
             e("input", { type: "checkbox", checked: u.active, disabled: u.id === me.id, onChange: ev => update(u.id, { active: ev.target.checked }) }), u.active ? "active" : "deactivated")),
-          e("td", { className: "l", style: { color: "#64748b" } }, (u.createdAt || "").slice(0, 10))))))));
+          e("td", { className: "l", style: { color: "#64748b" } }, (u.createdAt || "").slice(0, 10)),
+          e("td", { className: "l" },
+            e("button", { onClick: () => resetPw(u), disabled: !u.active, title: u.active ? "Generate a one-time reset link to send to " + u.name : "Reactivate the account first",
+              style: { background: u.active ? "#fff" : "#f8fafc", color: u.active ? "#0f6f5c" : "#94a3b8", border: "1px solid " + (u.active ? "#0f6f5c55" : "#e2e8f0"), borderRadius: 7, padding: "4px 10px", fontSize: 12, fontWeight: 600, cursor: u.active ? "pointer" : "default" } }, "Reset password"),
+            u.resetPending ? e("span", { className: "hint", title: "An unused reset link is outstanding for this user" }, " link pending") : null)))))));
   }
 
   function App() {

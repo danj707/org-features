@@ -145,9 +145,11 @@ if (process.env.AIRTABLE_API_KEY) {
 const PAGE       = path.join(__dirname, "public", "dashboard.html");
 const PS_PAGE    = path.join(__dirname, "public", "ps.html");
 const LOGIN_PAGE = path.join(__dirname, "public", "login.html");
+const RESET_PAGE = path.join(__dirname, "public", "reset.html");
 app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
 app.get("/login", (req, res) => auth.currentUser(req) ? res.redirect("/ps") : res.sendFile(LOGIN_PAGE));
+app.get("/reset", (_req, res) => res.sendFile(RESET_PAGE));
 app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/admin", "/ps/org/:id"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));

@@ -16,8 +16,12 @@ const path   = require("path");
 
 const SESSION_COOKIE = "ps_session";
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const RESET_TTL_MS   = 60 * 60 * 1000;           // reset links live 1 hour
 
 const SIGNUP_CODE    = process.env.SIGNUP_CODE || "";
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const FROM_EMAIL     = process.env.FROM_EMAIL || "reports@rec.us";
+const FROM_NAME      = process.env.FROM_NAME || "Rec PS Dashboard";
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 if (!process.env.SESSION_SECRET) {
   console.warn("[auth] SESSION_SECRET not set — sessions will not survive a restart");
@@ -58,14 +62,55 @@ function verifyPassword(password, stored) {
   return candidate.length === expected.length && crypto.timingSafeEqual(candidate, expected);
 }
 
+// ---------- password reset tokens (admin-issued, one-time, short-lived) ----------
+
+function hashToken(token) {
+  return crypto.createHash("sha256").update(String(token)).digest("hex");
+}
+function findByResetToken(users, token) {
+  if (!token) return null;
+  const h = Buffer.from(hashToken(token));
+  const user = users.find(u => {
+    if (!u.reset || !u.reset.hash) return false;
+    const stored = Buffer.from(String(u.reset.hash));
+    return stored.length === h.length && crypto.timingSafeEqual(stored, h);
+  });
+  if (!user || user.reset.expires < Date.now()) return null;
+  return user;
+}
+
+// Reset links are emailed via Resend when RESEND_API_KEY is set (same key
+// the rental-report service uses; rec.us is the verified sending domain).
+// Without a key the admin just copies the link out of the UI.
+async function sendResetEmail(user, resetUrl, issuedByName) {
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: user.email,
+      subject: "Reset your PS dashboard password",
+      html: `
+        <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a2333">
+          <h2 style="font-size:18px">rec · PS dashboard</h2>
+          <p>Hi ${user.name},</p>
+          <p>${issuedByName} generated a password reset link for your PS dashboard account (${user.email}).</p>
+          <p style="margin:24px 0"><a href="${resetUrl}" style="background:#0f6f5c;color:#fff;padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700">Set a new password</a></p>
+          <p style="color:#64748b;font-size:13px">The link works once and expires in 60 minutes. If you didn't expect this, you can ignore it — your current password keeps working until the link is used.</p>
+        </div>`,
+    }),
+  });
+  if (!resp.ok) throw new Error(`Resend ${resp.status}: ${(await resp.text()).slice(0, 200)}`);
+}
+
 // ---------- sessions (signed cookie, no server-side state) ----------
 
 function b64url(buf) { return Buffer.from(buf).toString("base64url"); }
 function sign(payload) {
   return crypto.createHmac("sha256", SESSION_SECRET).update(payload).digest("base64url");
 }
-function makeSession(userId) {
-  const payload = b64url(JSON.stringify({ u: userId, e: Date.now() + SESSION_TTL_MS }));
+function makeSession(userId, sessionVersion) {
+  const payload = b64url(JSON.stringify({ u: userId, v: sessionVersion || 0, e: Date.now() + SESSION_TTL_MS }));
   return `${payload}.${sign(payload)}`;
 }
 function readSession(cookieHeader) {
@@ -79,7 +124,7 @@ function readSession(cookieHeader) {
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString());
     if (!data.u || data.e < Date.now()) return null;
-    return data.u;
+    return { userId: data.u, version: data.v || 0 };
   } catch { return null; }
 }
 function sessionCookie(value, maxAgeMs) {
@@ -105,10 +150,13 @@ function clearFailures(key) { attempts.delete(key); }
 // ---------- middleware ----------
 
 function currentUser(req) {
-  const uid = readSession(req.headers.cookie);
-  if (!uid) return null;
-  const user = loadUsers().find(u => u.id === uid);
-  return user && user.active ? user : null;
+  const sess = readSession(req.headers.cookie);
+  if (!sess) return null;
+  const user = loadUsers().find(u => u.id === sess.userId);
+  if (!user || !user.active) return null;
+  // sv bumps on password reset, so cookies issued before the reset die
+  if ((user.sv || 0) !== sess.version) return null;
+  return user;
 }
 
 function requireAuth(req, res, next) {
@@ -171,7 +219,7 @@ function mountRoutes(app) {
     }
     if (!user.active) return res.status(403).json({ error: "This account has been deactivated." });
     clearFailures(key);
-    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id), SESSION_TTL_MS));
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id, user.sv), SESSION_TTL_MS));
     res.json({ ok: true, user: publicUser(user) });
   });
 
@@ -184,6 +232,36 @@ function mountRoutes(app) {
     const user = currentUser(req);
     if (!user) return res.status(401).json({ error: "not signed in" });
     res.json({ user: publicUser(user) });
+  });
+
+  // ----- password reset (link minted by an admin, redeemed here) -----
+  app.post("/api/auth/reset-password/check", (req, res) => {
+    if (throttled("reset:" + req.ip)) return res.status(429).json({ error: "Too many attempts — try again later." });
+    const user = findByResetToken(loadUsers(), (req.body || {}).token);
+    if (!user || !user.active) {
+      recordFailure("reset:" + req.ip);
+      return res.status(400).json({ error: "That reset link is invalid or has expired — ask an admin for a fresh one." });
+    }
+    res.json({ ok: true, email: user.email, name: user.name });
+  });
+
+  app.post("/api/auth/reset-password", (req, res) => {
+    const { token, password } = req.body || {};
+    if (throttled("reset:" + req.ip)) return res.status(429).json({ error: "Too many attempts — try again later." });
+    if (String(password || "").length < 8) return res.status(400).json({ error: "Password must be at least 8 characters." });
+    const users = loadUsers();
+    const user = findByResetToken(users, token);
+    if (!user || !user.active) {
+      recordFailure("reset:" + req.ip);
+      return res.status(400).json({ error: "That reset link is invalid or has expired — ask an admin for a fresh one." });
+    }
+    user.passHash = hashPassword(String(password));
+    delete user.reset;                 // one-time: the link dies on use
+    user.sv = (user.sv || 0) + 1;      // every previously issued session cookie stops working
+    saveUsers(users);
+    clearFailures("login:" + user.email);
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id, user.sv), SESSION_TTL_MS));
+    res.json({ ok: true, user: publicUser(user) });
   });
 
   // ----- admin: user management -----
@@ -208,10 +286,38 @@ function mountRoutes(app) {
     saveUsers(users);
     res.json({ ok: true, user: publicUser(user) });
   });
+
+  app.post("/api/admin/users/:id/reset-password", requireAuth, requireAdmin, async (req, res) => {
+    const users = loadUsers();
+    const user = users.find(u => u.id === req.params.id);
+    if (!user) return res.status(404).json({ error: "no such user" });
+    if (!user.active) return res.status(400).json({ error: "reactivate the account before resetting its password" });
+    const token = crypto.randomBytes(32).toString("base64url");
+    user.reset = { hash: hashToken(token), expires: Date.now() + RESET_TTL_MS, issuedBy: req.user.id };
+    saveUsers(users);
+    const proto = req.headers["x-forwarded-proto"] || req.protocol || "https";
+    const resetUrl = `${proto}://${req.headers.host}/reset?token=${token}`;
+    let emailSent = false, emailError = null;
+    if (RESEND_API_KEY) {
+      try { await sendResetEmail(user, resetUrl, req.user.name); emailSent = true; }
+      catch (err) { emailError = err.message; }
+    }
+    res.json({
+      ok: true,
+      resetUrl,
+      expiresInMinutes: Math.round(RESET_TTL_MS / 60000),
+      emailSent,
+      emailError,
+      user: publicUser(user),
+    });
+  });
 }
 
 function publicUser(u) {
-  return { id: u.id, email: u.email, name: u.name, role: u.role, active: u.active, createdAt: u.createdAt };
+  return {
+    id: u.id, email: u.email, name: u.name, role: u.role, active: u.active, createdAt: u.createdAt,
+    resetPending: !!(u.reset && u.reset.expires > Date.now()),
+  };
 }
 
 module.exports = { init, mountRoutes, requireAuth, requireAdmin, currentUser };
