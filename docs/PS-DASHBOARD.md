@@ -132,6 +132,11 @@ adoption dashboard (`/`) stays open.
   previously issued cookie stops working. Generating a new link replaces
   any outstanding one; deactivated accounts can't be reset (reactivate
   first). Redemption attempts are IP-throttled like logins.
+  Self-service too: **Forgot your password?** on `/login` emails a reset
+  link to the account's address (`POST /api/auth/forgot`). The reply is
+  the same whether or not the email is registered, so the form can't
+  probe for accounts; requests are throttled per-IP and per-email, and it
+  requires `RESEND_API_KEY` (without it, only the admin flow exists).
 - **Sessions**: 30-day HMAC-signed cookies (`SESSION_SECRET` env var),
   HttpOnly + Secure, with per-account login throttling. Cookies carry a
   per-user session version that invalidates on password reset.

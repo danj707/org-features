@@ -36,12 +36,12 @@
   <form id="f" onsubmit="return go(event)">
     <div id="fld-name" style="display:none"><label>Name</label><input id="name" autocomplete="name" placeholder="Dan Jenner"></div>
     <label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@rec.us" required>
-    <label>Password</label><input id="password" type="password" autocomplete="current-password" required>
+    <div id="fld-password"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div>
     <div id="fld-code" style="display:none"><label>Team signup code</label><input id="code" placeholder="ask Dan for the code"></div>
     <button class="go" id="btn">Sign in</button>
     <div class="err" id="err"></div>
   </form>
-  <div class="hint">New here? Create an account with the team signup code.<br>Looking for the public adoption dashboard? <a href="/">It's here</a>.</div>
+  <div class="hint"><a href="#" id="forgot" onclick="setMode(mode === 'forgot' ? 'login' : 'forgot'); return false">Forgot your password?</a><br>New here? Create an account with the team signup code.<br>Looking for the public adoption dashboard? <a href="/">It's here</a>.</div>
 </div>
 <script>
   let mode = "login";
@@ -51,18 +51,20 @@
     document.getElementById("t-signup").className = m === "signup" ? "on" : "";
     document.getElementById("fld-name").style.display = m === "signup" ? "" : "none";
     document.getElementById("fld-code").style.display = m === "signup" ? "" : "none";
-    document.getElementById("btn").textContent = m === "signup" ? "Create account" : "Sign in";
+    document.getElementById("fld-password").style.display = m === "forgot" ? "none" : "";
+    document.getElementById("password").required = m !== "forgot";
+    document.getElementById("btn").textContent = m === "signup" ? "Create account" : m === "forgot" ? "Email me a reset link" : "Sign in";
+    document.getElementById("forgot").textContent = m === "forgot" ? "Back to sign in" : "Forgot your password?";
     document.getElementById("password").autocomplete = m === "signup" ? "new-password" : "current-password";
-    document.getElementById("err").textContent = "";
+    const err = document.getElementById("err");
+    err.textContent = ""; err.style.color = "";
   }
   async function go(ev) {
     ev.preventDefault();
     const btn = document.getElementById("btn"), err = document.getElementById("err");
-    btn.disabled = true; err.textContent = "";
-    const body = {
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value,
-    };
+    btn.disabled = true; err.textContent = ""; err.style.color = "";
+    const body = { email: document.getElementById("email").value };
+    if (mode !== "forgot") body.password = document.getElementById("password").value;
     if (mode === "signup") {
       body.name = document.getElementById("name").value;
       body.code = document.getElementById("code").value;
@@ -71,6 +73,7 @@
       const r = await fetch("/api/auth/" + mode, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const d = await r.json();
       if (!r.ok) { err.textContent = d.error || "Something went wrong."; btn.disabled = false; return; }
+      if (mode === "forgot") { err.style.color = "#0f6f5c"; err.textContent = d.message; btn.disabled = false; return; }
       location.href = "/ps";
     } catch { err.textContent = "Network error — try again."; btn.disabled = false; }
     return false;
