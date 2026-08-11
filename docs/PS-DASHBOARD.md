@@ -121,15 +121,17 @@ adoption dashboard (`/`) stays open.
   The server refuses to remove the last active admin. Today `user` = view
   dashboards, `admin` = also manage users; new tiers slot into the same
   role check as pages start needing them.
-- **Password reset**: admin-initiated, no email infrastructure needed. On
-  **Admin → Users** each row has a **Reset password** button that mints a
-  one-time link (`/reset?token=…`, 1-hour expiry, sha256-hashed at rest);
-  the admin copies it and sends it to the user over Slack/email, and the
-  user picks a new password at `/reset`. Redeeming the link bumps the
-  account's session version, so every previously issued cookie stops
-  working. Generating a new link replaces any outstanding one; deactivated
-  accounts can't be reset (reactivate first). Redemption attempts are
-  IP-throttled like logins.
+- **Password reset**: admin-initiated. On **Admin → Users** each row has a
+  **Reset password** button that mints a one-time link (`/reset?token=…`,
+  1-hour expiry, sha256-hashed at rest) and — when `RESEND_API_KEY` is set —
+  emails it straight to the user via Resend (`FROM_EMAIL`/`FROM_NAME`,
+  defaulting to `reports@rec.us`, the Resend-verified domain; the key is a
+  Railway reference to the rental-report service's). The link is also shown
+  in the UI to copy/send manually, which is the whole flow when no key is
+  configured. Redeeming it bumps the account's session version, so every
+  previously issued cookie stops working. Generating a new link replaces
+  any outstanding one; deactivated accounts can't be reset (reactivate
+  first). Redemption attempts are IP-throttled like logins.
 - **Sessions**: 30-day HMAC-signed cookies (`SESSION_SECRET` env var),
   HttpOnly + Secure, with per-account login throttling. Cookies carry a
   per-user session version that invalidates on password reset.

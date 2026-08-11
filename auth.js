@@ -19,6 +19,9 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const RESET_TTL_MS   = 60 * 60 * 1000;           // reset links live 1 hour
 
 const SIGNUP_CODE    = process.env.SIGNUP_CODE || "";
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const FROM_EMAIL     = process.env.FROM_EMAIL || "reports@rec.us";
+const FROM_NAME      = process.env.FROM_NAME || "Rec PS Dashboard";
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 if (!process.env.SESSION_SECRET) {
   console.warn("[auth] SESSION_SECRET not set — sessions will not survive a restart");
@@ -74,6 +77,30 @@ function findByResetToken(users, token) {
   });
   if (!user || user.reset.expires < Date.now()) return null;
   return user;
+}
+
+// Reset links are emailed via Resend when RESEND_API_KEY is set (same key
+// the rental-report service uses; rec.us is the verified sending domain).
+// Without a key the admin just copies the link out of the UI.
+async function sendResetEmail(user, resetUrl, issuedByName) {
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: user.email,
+      subject: "Reset your PS dashboard password",
+      html: `
+        <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a2333">
+          <h2 style="font-size:18px">rec · PS dashboard</h2>
+          <p>Hi ${user.name},</p>
+          <p>${issuedByName} generated a password reset link for your PS dashboard account (${user.email}).</p>
+          <p style="margin:24px 0"><a href="${resetUrl}" style="background:#0f6f5c;color:#fff;padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700">Set a new password</a></p>
+          <p style="color:#64748b;font-size:13px">The link works once and expires in 60 minutes. If you didn't expect this, you can ignore it — your current password keeps working until the link is used.</p>
+        </div>`,
+    }),
+  });
+  if (!resp.ok) throw new Error(`Resend ${resp.status}: ${(await resp.text()).slice(0, 200)}`);
 }
 
 // ---------- sessions (signed cookie, no server-side state) ----------
@@ -260,7 +287,7 @@ function mountRoutes(app) {
     res.json({ ok: true, user: publicUser(user) });
   });
 
-  app.post("/api/admin/users/:id/reset-password", requireAuth, requireAdmin, (req, res) => {
+  app.post("/api/admin/users/:id/reset-password", requireAuth, requireAdmin, async (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.id === req.params.id);
     if (!user) return res.status(404).json({ error: "no such user" });
@@ -269,10 +296,18 @@ function mountRoutes(app) {
     user.reset = { hash: hashToken(token), expires: Date.now() + RESET_TTL_MS, issuedBy: req.user.id };
     saveUsers(users);
     const proto = req.headers["x-forwarded-proto"] || req.protocol || "https";
+    const resetUrl = `${proto}://${req.headers.host}/reset?token=${token}`;
+    let emailSent = false, emailError = null;
+    if (RESEND_API_KEY) {
+      try { await sendResetEmail(user, resetUrl, req.user.name); emailSent = true; }
+      catch (err) { emailError = err.message; }
+    }
     res.json({
       ok: true,
-      resetUrl: `${proto}://${req.headers.host}/reset?token=${token}`,
+      resetUrl,
       expiresInMinutes: Math.round(RESET_TTL_MS / 60000),
+      emailSent,
+      emailError,
       user: publicUser(user),
     });
   });

@@ -667,7 +667,7 @@
       fetch("/api/admin/users/" + u.id + "/reset-password", { method: "POST" })
         .then(r => r.json().then(d => {
           if (!r.ok) { setErr(d.error || "reset failed"); return; }
-          setReset({ id: u.id, name: u.name, url: d.resetUrl, minutes: d.expiresInMinutes, copied: false });
+          setReset({ id: u.id, name: u.name, email: u.email, url: d.resetUrl, minutes: d.expiresInMinutes, emailSent: d.emailSent, emailError: d.emailError, copied: false });
           load();
         }))
         .catch(() => setErr("network error — try again"));
@@ -680,7 +680,11 @@
       e("h2", null, "Users", e("span", { className: "hint" }, "admins can view everything and manage users; users can view dashboards")),
       err ? e("div", { className: "note", style: { color: "#dc2626" } }, err) : null,
       reset ? e("div", { style: { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px", margin: "0 0 14px", fontSize: 13 } },
-        e("div", { style: { marginBottom: 6 } }, e("b", null, "Reset link for " + reset.name), " — send it to them directly. It works once and expires in " + reset.minutes + " minutes; generating a new one replaces it."),
+        e("div", { style: { marginBottom: 6 } }, e("b", null, "Reset link for " + reset.name),
+          reset.emailSent ? " — emailed to " + reset.email + " ✓. Link below in case you'd rather send it yourself."
+            : reset.emailError ? " — email failed (" + reset.emailError + "), send the link to them directly."
+            : " — send it to them directly.",
+          " It works once and expires in " + reset.minutes + " minutes; generating a new one replaces it."),
         e("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
           e("code", { style: { flex: 1, background: "#fff", border: "1px solid #d1fae5", borderRadius: 7, padding: "6px 9px", fontSize: 11.5, overflowX: "auto", whiteSpace: "nowrap" } }, reset.url),
           e("button", { onClick: copyReset, style: { background: reset.copied ? "#166534" : "#0f6f5c", color: "#fff", border: "none", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 } }, reset.copied ? "Copied ✓" : "Copy"),
