@@ -16,6 +16,7 @@ const path   = require("path");
 
 const SESSION_COOKIE = "ps_session";
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const RESET_TTL_MS   = 60 * 60 * 1000;           // reset links live 1 hour
 
 const SIGNUP_CODE    = process.env.SIGNUP_CODE || "";
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
@@ -58,14 +59,31 @@ function verifyPassword(password, stored) {
   return candidate.length === expected.length && crypto.timingSafeEqual(candidate, expected);
 }
 
+// ---------- password reset tokens (admin-issued, one-time, short-lived) ----------
+
+function hashToken(token) {
+  return crypto.createHash("sha256").update(String(token)).digest("hex");
+}
+function findByResetToken(users, token) {
+  if (!token) return null;
+  const h = Buffer.from(hashToken(token));
+  const user = users.find(u => {
+    if (!u.reset || !u.reset.hash) return false;
+    const stored = Buffer.from(String(u.reset.hash));
+    return stored.length === h.length && crypto.timingSafeEqual(stored, h);
+  });
+  if (!user || user.reset.expires < Date.now()) return null;
+  return user;
+}
+
 // ---------- sessions (signed cookie, no server-side state) ----------
 
 function b64url(buf) { return Buffer.from(buf).toString("base64url"); }
 function sign(payload) {
   return crypto.createHmac("sha256", SESSION_SECRET).update(payload).digest("base64url");
 }
-function makeSession(userId) {
-  const payload = b64url(JSON.stringify({ u: userId, e: Date.now() + SESSION_TTL_MS }));
+function makeSession(userId, sessionVersion) {
+  const payload = b64url(JSON.stringify({ u: userId, v: sessionVersion || 0, e: Date.now() + SESSION_TTL_MS }));
   return `${payload}.${sign(payload)}`;
 }
 function readSession(cookieHeader) {
@@ -79,7 +97,7 @@ function readSession(cookieHeader) {
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString());
     if (!data.u || data.e < Date.now()) return null;
-    return data.u;
+    return { userId: data.u, version: data.v || 0 };
   } catch { return null; }
 }
 function sessionCookie(value, maxAgeMs) {
@@ -105,10 +123,13 @@ function clearFailures(key) { attempts.delete(key); }
 // ---------- middleware ----------
 
 function currentUser(req) {
-  const uid = readSession(req.headers.cookie);
-  if (!uid) return null;
-  const user = loadUsers().find(u => u.id === uid);
-  return user && user.active ? user : null;
+  const sess = readSession(req.headers.cookie);
+  if (!sess) return null;
+  const user = loadUsers().find(u => u.id === sess.userId);
+  if (!user || !user.active) return null;
+  // sv bumps on password reset, so cookies issued before the reset die
+  if ((user.sv || 0) !== sess.version) return null;
+  return user;
 }
 
 function requireAuth(req, res, next) {
@@ -171,7 +192,7 @@ function mountRoutes(app) {
     }
     if (!user.active) return res.status(403).json({ error: "This account has been deactivated." });
     clearFailures(key);
-    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id), SESSION_TTL_MS));
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id, user.sv), SESSION_TTL_MS));
     res.json({ ok: true, user: publicUser(user) });
   });
 
@@ -184,6 +205,36 @@ function mountRoutes(app) {
     const user = currentUser(req);
     if (!user) return res.status(401).json({ error: "not signed in" });
     res.json({ user: publicUser(user) });
+  });
+
+  // ----- password reset (link minted by an admin, redeemed here) -----
+  app.post("/api/auth/reset-password/check", (req, res) => {
+    if (throttled("reset:" + req.ip)) return res.status(429).json({ error: "Too many attempts — try again later." });
+    const user = findByResetToken(loadUsers(), (req.body || {}).token);
+    if (!user || !user.active) {
+      recordFailure("reset:" + req.ip);
+      return res.status(400).json({ error: "That reset link is invalid or has expired — ask an admin for a fresh one." });
+    }
+    res.json({ ok: true, email: user.email, name: user.name });
+  });
+
+  app.post("/api/auth/reset-password", (req, res) => {
+    const { token, password } = req.body || {};
+    if (throttled("reset:" + req.ip)) return res.status(429).json({ error: "Too many attempts — try again later." });
+    if (String(password || "").length < 8) return res.status(400).json({ error: "Password must be at least 8 characters." });
+    const users = loadUsers();
+    const user = findByResetToken(users, token);
+    if (!user || !user.active) {
+      recordFailure("reset:" + req.ip);
+      return res.status(400).json({ error: "That reset link is invalid or has expired — ask an admin for a fresh one." });
+    }
+    user.passHash = hashPassword(String(password));
+    delete user.reset;                 // one-time: the link dies on use
+    user.sv = (user.sv || 0) + 1;      // every previously issued session cookie stops working
+    saveUsers(users);
+    clearFailures("login:" + user.email);
+    res.setHeader("Set-Cookie", sessionCookie(makeSession(user.id, user.sv), SESSION_TTL_MS));
+    res.json({ ok: true, user: publicUser(user) });
   });
 
   // ----- admin: user management -----
@@ -208,10 +259,30 @@ function mountRoutes(app) {
     saveUsers(users);
     res.json({ ok: true, user: publicUser(user) });
   });
+
+  app.post("/api/admin/users/:id/reset-password", requireAuth, requireAdmin, (req, res) => {
+    const users = loadUsers();
+    const user = users.find(u => u.id === req.params.id);
+    if (!user) return res.status(404).json({ error: "no such user" });
+    if (!user.active) return res.status(400).json({ error: "reactivate the account before resetting its password" });
+    const token = crypto.randomBytes(32).toString("base64url");
+    user.reset = { hash: hashToken(token), expires: Date.now() + RESET_TTL_MS, issuedBy: req.user.id };
+    saveUsers(users);
+    const proto = req.headers["x-forwarded-proto"] || req.protocol || "https";
+    res.json({
+      ok: true,
+      resetUrl: `${proto}://${req.headers.host}/reset?token=${token}`,
+      expiresInMinutes: Math.round(RESET_TTL_MS / 60000),
+      user: publicUser(user),
+    });
+  });
 }
 
 function publicUser(u) {
-  return { id: u.id, email: u.email, name: u.name, role: u.role, active: u.active, createdAt: u.createdAt };
+  return {
+    id: u.id, email: u.email, name: u.name, role: u.role, active: u.active, createdAt: u.createdAt,
+    resetPending: !!(u.reset && u.reset.expires > Date.now()),
+  };
 }
 
 module.exports = { init, mountRoutes, requireAuth, requireAdmin, currentUser };

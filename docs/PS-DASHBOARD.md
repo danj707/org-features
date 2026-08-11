@@ -121,8 +121,18 @@ adoption dashboard (`/`) stays open.
   The server refuses to remove the last active admin. Today `user` = view
   dashboards, `admin` = also manage users; new tiers slot into the same
   role check as pages start needing them.
+- **Password reset**: admin-initiated, no email infrastructure needed. On
+  **Admin → Users** each row has a **Reset password** button that mints a
+  one-time link (`/reset?token=…`, 1-hour expiry, sha256-hashed at rest);
+  the admin copies it and sends it to the user over Slack/email, and the
+  user picks a new password at `/reset`. Redeeming the link bumps the
+  account's session version, so every previously issued cookie stops
+  working. Generating a new link replaces any outstanding one; deactivated
+  accounts can't be reset (reactivate first). Redemption attempts are
+  IP-throttled like logins.
 - **Sessions**: 30-day HMAC-signed cookies (`SESSION_SECRET` env var),
-  HttpOnly + Secure, with per-account login throttling.
+  HttpOnly + Secure, with per-account login throttling. Cookies carry a
+  per-user session version that invalidates on password reset.
 - **Storage**: `users.json` in `DATA_DIR` — a Railway volume is mounted at
   `/data` so accounts survive redeploys. `data/users.json` is gitignored.
 
