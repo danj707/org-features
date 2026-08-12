@@ -28,8 +28,19 @@ drill-in (e.g. <https://org-features-production.up.railway.app/org/carmichael-di
 
 The deployed server has **no direct database access**. The snapshot in
 `data/features-data.json` is baked from the live rec.us production database
-via the Rec Staff MCP and committed. Refreshing the numbers = re-baking the
-snapshot and pushing.
+and committed. Refreshing the numbers = re-baking the snapshot and pushing
+to `main` (Railway auto-deploys).
+
+Bakes run against the **Rec-Prod-ReadReplica** database via the Metabase
+MCP connection (fleet-wide grouped SQL — one query covers every org). The
+Rec Staff MCP was the original source, but its query sandbox now points at
+a non-production database, so Metabase is the reliable path. The metric
+definitions (live/non-deleted filters, active statuses, per-feature adoption
+signals) are documented in the snapshot's `notes` field and in each feature's
+`adoption_definition`.
+
+A scheduled Claude Code Routine re-bakes the snapshot daily at ~6am ET and
+pushes it to `main`, so the dashboard refreshes automatically each morning.
 
 The **adoption score** shown per organization is the share of *measured*
 features (`measuredFeatures`, currently 14 of the 53-feature catalog) that

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rec · PS Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<script src="/vendor/react.production.min.js"></script>
+<script src="/vendor/react-dom.production.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
+    --line: #e2e8f0; --brand: #0f6f5c; --brand-2: #0d5c99;
+    --good: #16a34a; --warn: #d97706; --bad: #dc2626; --none: #cbd5e1;
+    --nav: #10233d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+  a { color: var(--brand-2); text-decoration: none; }
+  .layout { display: flex; min-height: 100vh; }
+  nav.side { width: 216px; flex: none; background: var(--nav); color: #cbd5e1; padding: 18px 0; position: sticky; top: 0; height: 100vh; }
+  nav.side .logo { color: #fff; font-weight: 800; font-size: 16px; padding: 4px 18px 14px; letter-spacing: .3px; }
+  nav.side .logo span { color: #6ee7b7; }
+  nav.side .sec { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: #64748b; padding: 14px 18px 6px; }
+  nav.side a.item { display: block; padding: 9px 18px; color: #cbd5e1; font-size: 13.5px; font-weight: 600; border-left: 3px solid transparent; }
+  nav.side a.item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  nav.side a.item.active { background: rgba(255,255,255,.08); color: #fff; border-left-color: #6ee7b7; }
+  nav.side a.item .cnt { float: right; background: rgba(255,255,255,.12); border-radius: 999px; font-size: 11px; padding: 1px 8px; }
+  nav.side .foot { position: absolute; bottom: 14px; left: 18px; right: 12px; font-size: 11px; color: #64748b; }
+  main { flex: 1; min-width: 0; }
+  header.top { background: linear-gradient(135deg, #0f6f5c 0%, #0d5c99 100%); color: #fff; padding: 18px 24px; }
+  header.top h1 { font-size: 19px; margin: 0 0 2px; }
+  header.top .sub { opacity: .85; font-size: 12.5px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 18px 22px 60px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 4px 0 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+  .card .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .card .v { font-size: 24px; font-weight: 800; margin-top: 2px; }
+  .card .d { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 2px rgba(16,24,40,.04); overflow: hidden; margin-bottom: 20px; }
+  .panel h2 { font-size: 15px; margin: 0; padding: 13px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .panel h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--line); background: #fbfcfe; }
+  .filters input[type=text] { flex: 1 1 220px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+  .filters select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; background: #fff; color: var(--ink); }
+  .filters label.chk { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted); padding: 6px 4px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  th { background: #f8fafc; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; cursor: pointer; user-select: none; z-index: 1; }
+  th.l, td.l { text-align: left; }
+  td.name { text-align: left; font-weight: 600; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
+  td.wraptxt { white-space: normal; min-width: 260px; max-width: 480px; }
+  .tablewrap tr:hover td { background: #f1f5f9; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .zero { color: var(--none); }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 11.5px; }
+  .pill.p1 { background: #fee2e2; color: #b91c1c; }
+  .pill.p2 { background: #ffedd5; color: #c2410c; }
+  .pill.p3 { background: #fef9c3; color: #a16207; }
+  .pill.p4 { background: #e2e8f0; color: #475569; }
+  .pill.p0 { background: #f1f5f9; color: #94a3b8; }
+  .pill.status { background: #e0f2fe; color: #075985; }
+  .pill.neg { background: #fee2e2; color: #b91c1c; font-weight: 600; }
+  .pill.pos { background: #dcfce7; color: #166534; font-weight: 600; }
+  .pill.frdev { background: #fce7f3; color: #9d174d; }
+  .pill.frroad { background: #dcfce7; color: #166534; }
+  .pill.frreq { background: #cffafe; color: #155e75; }
+  .chip { display: inline-block; background: #eef2f7; border: 1px solid var(--line); color: #334155; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px 1px 0; }
+  .scorebar { position: relative; display: inline-flex; align-items: center; width: 92px; height: 18px; border-radius: 999px; background: #eef2f7; overflow: hidden; vertical-align: middle; }
+  .scorebar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
+  .scorebar > b { position: relative; width: 100%; text-align: center; font-size: 10.5px; font-weight: 700; }
+  .spark { display: inline-flex; align-items: flex-end; gap: 2px; height: 22px; }
+  .spark i { width: 7px; background: #93c5fd; border-radius: 2px 2px 0 0; min-height: 2px; }
+  .spark i.hot { background: #3b82f6; }
+  .note { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 13.5px; }
+  .crumb { font-size: 13px; margin: 2px 0 10px; }
+  .org-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 4px 0 14px; }
+  .org-h h2 { font-size: 21px; margin: 0; }
+  .org-h .links { font-size: 12.5px; }
+  .tag-sample { background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+  .gantt { padding: 14px 16px; }
+  .grow { display: grid; grid-template-columns: 190px 1fr; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 12px; }
+  .grow .nm { text-align: right; padding-right: 8px; color: #334155; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gbar { position: relative; height: 16px; background: #f1f5f9; border-radius: 4px; }
+  .gbar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; opacity: .85; }
+  .legend { display: flex; gap: 14px; padding: 0 16px 12px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  @media (max-width: 860px) { nav.side { display: none; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function () {
+  const e = React.createElement;
+  const { useState, useEffect, useMemo } = React;
+  const fmt = (n) => n == null ? "—" : Number(n).toLocaleString("en-US");
+  const days = (iso) => iso ? Math.round((Date.now() - new Date(iso)) / 864e5) : null;
+
+  const STATUS_ORDER = ["Launched R&R","Launched Pilot","Configuration","Discovery","Delayed/Deferred"];
+  const PRI_CLASS = { "Urgent": "p1", "High": "p2", "Medium": "p3", "Low": "p4", "No priority": "p0" };
+
+  function route() {
+    const p = location.pathname;
+    if (p.startsWith("/ps/bugs")) return { page: "bugs" };
+    if (p.startsWith("/ps/reporting")) return { page: "reporting" };
+    if (p.startsWith("/ps/admin")) return { page: "admin" };
+    const m = p.match(/^\/ps\/org\/(.+)$/);
+    if (m) return { page: "org", id: decodeURIComponent(m[1]) };
+    return { page: "health" };
+  }
+  function nav(to) { history.pushState({}, "", to); window.dispatchEvent(new Event("popstate")); }
+  function link(href, children, cls) {
+    return e("a", { href, className: cls, onClick: (ev) => { ev.preventDefault(); nav(href); } }, children);
+  }
+
+  function scoreColor(p) { return p >= 70 ? "#16a34a" : p >= 40 ? "#d97706" : "#dc2626"; }
+  function ScoreBar({ pct }) {
+    if (pct == null) return e("span", { className: "zero" }, "not on rec");
+    return e("span", { className: "scorebar" },
+      e("i", { style: { width: pct + "%", background: scoreColor(pct), opacity: .25 } }),
+      e("b", null, pct + "%"));
+  }
+  function Spark({ series }) {
+    const max = Math.max(1, ...series.map(s => s.count));
+    return e("span", { className: "spark", title: series.map(s => `${s.month}: ${s.count}`).join("\n") },
+      series.map((s, i) => e("i", { key: i, className: s.count === max && max > 0 ? "hot" : "", style: { height: Math.max(2, (s.count / max) * 22) + "px" } })));
+  }
+  function HealthPills({ reasons }) {
+    if (!reasons || !reasons.length) return e("span", { className: "zero" }, "—");
+    return reasons.map((r, i) => e("span", { key: i, className: "pill " + (r.startsWith("P-") ? "pos" : "neg"), style: { marginRight: 3 } }, r.replace(/^[PN]-/, "")));
+  }
+
+  // ---------------- Account Health (all accounts) ----------------
+  function Health({ data }) {
+    const [q, setQ] = useState("");
+    const [status, setStatus] = useState("");
+    const [health, setHealth] = useState("");
+    const [sort, setSort] = useState(["openBugCount", -1]);
+    const accounts = data.accounts;
+
+    const filtered = useMemo(() => {
+      let rows = accounts.filter(a =>
+        (!q || a.name.toLowerCase().includes(q.toLowerCase())) &&
+        (!status || a.status === status) &&
+        (!health || (health === "flagged" ? a.healthReasons.some(r => r.startsWith("N-")) : !a.healthReasons.some(r => r.startsWith("N-")))));
+      const [k, dir] = sort;
+      const get = (a) => k === "featureRequests" ? a.featureRequests.total : k === "name" ? a.name.toLowerCase() : (a[k] ?? -1);
+      return rows.slice().sort((x, y) => (get(x) < get(y) ? -1 : get(x) > get(y) ? 1 : 0) * dir);
+    }, [accounts, q, status, health, sort]);
+
+    const th = (label, key, cls) => e("th", { className: cls, onClick: () => setSort(s => [key, s[0] === key ? -s[1] : -1]) },
+      label + (sort[0] === key ? (sort[1] < 0 ? " ↓" : " ↑") : ""));
+
+    const flagged = accounts.filter(a => a.healthReasons.some(r => r.startsWith("N-"))).length;
+    const launched = accounts.filter(a => (a.status || "").startsWith("Launched")).length;
+    const openBugs = data.bugs.length;
+
+    return e(React.Fragment, null,
+      e("div", { className: "cards" },
+        e("div", { className: "card" }, e("div", { className: "k" }, "Accounts"), e("div", { className: "v" }, accounts.length), e("div", { className: "d" }, launched + " launched")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Health-flagged"), e("div", { className: "v", style: { color: flagged ? "#dc2626" : undefined } }, flagged), e("div", { className: "d" }, "accounts with negative reasons")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Open bugs (all)"), e("div", { className: "v" }, openBugs), e("div", { className: "d" }, data.bugs.filter(b => b.customers.length).length + " tagged to accounts")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Feature requests"), e("div", { className: "v" }, data.featureRequests.length), e("div", { className: "d" }, data.featureRequests.filter(r => r.status === "In Development").length + " in development"))),
+      e("div", { className: "panel" },
+        e("h2", null, "Account health", e("span", { className: "hint" }, "one row per account · click a column to sort · click an account to drill in")),
+        e("div", { className: "filters" },
+          e("input", { type: "text", placeholder: "Search accounts…", value: q, onChange: ev => setQ(ev.target.value) }),
+          e("select", { value: status, onChange: ev => setStatus(ev.target.value) },
+            e("option", { value: "" }, "All statuses"),
+            STATUS_ORDER.map(s => e("option", { key: s, value: s }, s))),
+          e("select", { value: health, onChange: ev => setHealth(ev.target.value) },
+            e("option", { value: "" }, "All health"),
+            e("option", { value: "flagged" }, "Flagged (negative)"),
+            e("option", { value: "ok" }, "No negative flags"))),
+        e("div", { className: "tablewrap" },
+          e("table", null,
+            e("thead", null, e("tr", null,
+              th("Account", "name", "l"), th("Status", "status", "l"), e("th", { className: "l" }, "Health signals"),
+              th("Adoption", "adoptionScore"), th("Open bugs", "openBugCount"), e("th", null, "Reports/mo (6m)"),
+              th("Feat. req.", "featureRequests"), th("Contacted", "timesContacted"), th("Last touch", "lastContacted"))),
+            e("tbody", null, filtered.map(a => e("tr", { key: a.hubspotId },
+              e("td", { className: "name" }, link("/ps/org/" + a.hubspotId, a.name)),
+              e("td", { className: "l" }, a.status ? e("span", { className: "pill status" }, a.status) : "—"),
+              e("td", { className: "l", style: { whiteSpace: "normal", maxWidth: 260 } }, e(HealthPills, { reasons: a.healthReasons })),
+              e("td", null, e(ScoreBar, { pct: a.adoptionScore })),
+              e("td", { className: "num" }, a.openBugCount ? e("b", null, a.openBugCount) : e("span", { className: "zero" }, "0")),
+              e("td", null, e(Spark, { series: a.bugsMonthly })),
+              e("td", { className: "num" },
+                a.featureRequests.total === 0 ? e("span", { className: "zero" }, "0") :
+                e("span", null,
+                  a.featureRequests.inDevelopment ? e("span", { className: "pill frdev", title: "In development" }, a.featureRequests.inDevelopment) : null, " ",
+                  a.featureRequests.onRoadmap ? e("span", { className: "pill frroad", title: "On the roadmap" }, a.featureRequests.onRoadmap) : null, " ",
+                  a.featureRequests.requested ? e("span", { className: "pill frreq", title: "Requested" }, a.featureRequests.requested) : null)),
+              e("td", { className: "num" }, fmt(a.timesContacted)),
+              e("td", { className: "num", title: a.lastContacted || "" }, a.lastContacted ? days(a.lastContacted) + "d ago" : "—")))))),
+        e("div", { className: "legend" },
+          e("span", null, e("i", { style: { background: "#fce7f3" } }), "in development"),
+          e("span", null, e("i", { style: { background: "#dcfce7" } }), "on roadmap"),
+          e("span", null, e("i", { style: { background: "#cffafe" } }), "requested"),
+          e("span", null, "Reports/mo = customer reports attached to Linear issues (bugs + requests)"))));
+  }
+
+  // ---------------- Account drill-in ----------------
+  function Org({ data, id }) {
+    const a = data.accounts.find(x => String(x.hubspotId) === String(id));
+    if (!a) return e("div", { className: "note" }, "Account not found.");
+    const names = new Set((a.linearCustomerNames || []).map(n => n.toLowerCase()));
+    const bugs = data.bugs.filter(b => b.customers.some(c => names.has(c.toLowerCase())));
+    const nrm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(w => !["city","of","town","parks","park","and","recreation","rec","district","the","ca","tx","ma","me","ok","nv","in","az","ct","wa","mo","fl","va","co","il","oh"].includes(w)).join(" ");
+    const frs = data.featureRequests.filter(r => r.customers.some(c => nrm(c) === nrm(a.name)));
+    return e(React.Fragment, null,
+      e("div", { className: "crumb" }, link("/ps", "← Account health")),
+      e("div", { className: "org-h" },
+        e("h2", null, a.name),
+        a.status ? e("span", { className: "pill status" }, a.status) : null,
+        e("span", { className: "links" },
+          e("a", { href: a.hubspotUrl, target: "_blank" }, "HubSpot ↗"), "  ·  ",
+          a.recSlug ? e("a", { href: "/org/" + a.recSlug, target: "_blank" }, "Feature adoption ↗") : "not on rec platform")),
+      e("div", { className: "cards" },
+        e("div", { className: "card" }, e("div", { className: "k" }, "Adoption score"), e("div", { className: "v" }, a.adoptionScore != null ? a.adoptionScore + "%" : "—"), e("div", { className: "d" }, "of measured features")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Open bugs"), e("div", { className: "v" }, bugs.length), e("div", { className: "d" }, "attached via Linear customers")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Feature requests"), e("div", { className: "v" }, frs.length), e("div", { className: "d" }, frs.filter(r => r.status === "In Development").length + " in dev · " + frs.filter(r => r.status === "On the Roadmap").length + " roadmap")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Engagement"), e("div", { className: "v" }, fmt(a.timesContacted)), e("div", { className: "d" }, "touches · last " + (a.lastContacted ? days(a.lastContacted) + "d ago" : "—"))),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Health"), e("div", { className: "v", style: { fontSize: 15, fontWeight: 600, marginTop: 8 } }, e(HealthPills, { reasons: a.healthReasons })))),
+      e("div", { className: "panel" },
+        e("h2", null, "Open bugs — partner update view", e("span", { className: "hint" }, "the standard template for partner-facing bug status")),
+        bugs.length === 0 ? e("div", { className: "note" }, "No open bugs currently attached to this account in Linear.") :
+        e("div", { className: "tablewrap" }, e("table", null,
+          e("thead", null, e("tr", null, e("th", { className: "l" }, "Bug"), e("th", { className: "l" }, "Priority"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Team"), e("th", null, "Age"), e("th", { className: "l" }, "Also affects"))),
+          e("tbody", null, bugs.map(b => e("tr", { key: b.id },
+            e("td", { className: "wraptxt l" }, e("a", { href: b.url, target: "_blank" }, e("b", null, b.id), " ", b.title)),
+            e("td", { className: "l" }, e("span", { className: "pill " + PRI_CLASS[b.priority] }, b.priority)),
+            e("td", { className: "l" }, b.status),
+            e("td", { className: "l" }, b.team),
+            e("td", { className: "num" }, b.ageDays + "d"),
+            e("td", { className: "l" }, b.customers.filter(c => !names.has(c.toLowerCase())).map((c, i) => e("span", { key: i, className: "chip" }, c)))))))),
+      ),
+      e("div", { className: "panel" },
+        e("h2", null, "Feature requests"),
+        frs.length === 0 ? e("div", { className: "note" }, "No feature requests linked to this account in Airtable.") :
+        e("div", { className: "tablewrap" }, e("table", null,
+          e("thead", null, e("tr", null, e("th", { className: "l" }, "Request"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Priority"), e("th", { className: "l" }, "Target"), e("th", null, "Also requested by"))),
+          e("tbody", null, frs.map(r => e("tr", { key: r.reqId },
+            e("td", { className: "wraptxt l" }, e("a", { href: r.airtableUrl, target: "_blank" }, r.title)),
+            e("td", { className: "l" }, e("span", { className: "pill " + (r.status === "In Development" ? "frdev" : r.status === "On the Roadmap" ? "frroad" : "frreq") }, r.status)),
+            e("td", { className: "l" }, r.priority || "—"),
+            e("td", { className: "l" }, r.targetQuarter || (r.targetDate || "—")),
+            e("td", { className: "num" }, Math.max(0, r.customers.length - 1)))))))));
+  }
+
+  // ---------------- Bug Management ----------------
+  function Bugs({ data }) {
+    const [q, setQ] = useState("");
+    const [team, setTeam] = useState("");
+    const [pri, setPri] = useState("");
+    const [who, setWho] = useState("");
+    const [onlyCust, setOnlyCust] = useState(false);
+    const bugs = data.bugs;
+    const teams = [...new Set(bugs.map(b => b.team))].sort();
+    const reporters = [...new Set(bugs.map(b => b.createdBy).filter(Boolean))].sort();
+
+    const filtered = bugs.filter(b =>
+      (!q || (b.title + " " + b.id + " " + b.customers.join(" ")).toLowerCase().includes(q.toLowerCase())) &&
+      (!team || b.team === team) && (!pri || b.priority === pri) &&
+      (!who || b.createdBy === who) && (!onlyCust || b.customers.length > 0));
+
+    // WoW created counts, last 8 weeks
+    const wow = useMemo(() => {
+      const weeks = [];
+      const now = new Date();
+      const day = 864e5;
+      for (let i = 7; i >= 0; i--) {
+        const end = new Date(now - i * 7 * day);
+        const start = new Date(end - 7 * day);
+        weeks.push({ label: (start.getMonth() + 1) + "/" + start.getDate(), count: bugs.filter(b => { const t = new Date(b.createdAt); return t >= start && t < end; }).length });
+      }
+      return weeks;
+    }, [bugs]);
+
+    const urgent = bugs.filter(b => b.priority === "Urgent").length;
+    const week = bugs.filter(b => b.ageDays != null && b.ageDays <= 7).length;
+
+    return e(React.Fragment, null,
+      e("div", { className: "cards" },
+        e("div", { className: "card" }, e("div", { className: "k" }, "Open bugs"), e("div", { className: "v" }, bugs.length), e("div", { className: "d" }, "labeled Bug in Linear, not done/canceled")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Urgent"), e("div", { className: "v", style: { color: urgent ? "#dc2626" : undefined } }, urgent), e("div", { className: "d" }, bugs.filter(b => b.priority === "High").length + " high")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "New this week"), e("div", { className: "v" }, week), e("div", { className: "d" }, "created in last 7 days")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Tagged to accounts"), e("div", { className: "v" }, bugs.filter(b => b.customers.length).length), e("div", { className: "d" }, "have ≥1 Linear customer attached")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Created WoW"), e("div", { className: "v", style: { paddingTop: 4 } }, e(Spark, { series: wow.map(w => ({ month: w.label, count: w.count })) })), e("div", { className: "d" }, "8-week trend"))),
+      e("div", { className: "panel" },
+        e("h2", null, "Open bugs", e("span", { className: "hint" }, "search before filing — avoid duplicates · click through to Linear to tag more customers")),
+        e("div", { className: "filters" },
+          e("input", { type: "text", placeholder: "Search title, ID, account… (dupe check)", value: q, onChange: ev => setQ(ev.target.value) }),
+          e("select", { value: team, onChange: ev => setTeam(ev.target.value) }, e("option", { value: "" }, "All teams"), teams.map(t => e("option", { key: t, value: t }, t))),
+          e("select", { value: pri, onChange: ev => setPri(ev.target.value) }, e("option", { value: "" }, "All priorities"), ["Urgent", "High", "Medium", "Low", "No priority"].map(p => e("option", { key: p, value: p }, p))),
+          e("select", { value: who, onChange: ev => setWho(ev.target.value) }, e("option", { value: "" }, "All reporters"), reporters.map(r => e("option", { key: r, value: r }, r))),
+          e("label", { className: "chk" }, e("input", { type: "checkbox", checked: onlyCust, onChange: ev => setOnlyCust(ev.target.checked) }), "has account")),
+        e("div", { className: "tablewrap" }, e("table", null,
+          e("thead", null, e("tr", null, e("th", { className: "l" }, "Bug"), e("th", { className: "l" }, "Priority"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Team"), e("th", null, "Age"), e("th", { className: "l" }, "Accounts"), e("th", { className: "l" }, "Reporter"))),
+          e("tbody", null, filtered.map(b => e("tr", { key: b.id },
+            e("td", { className: "wraptxt l" }, e("a", { href: b.url, target: "_blank", title: "Open in Linear (tag customers there)" }, e("b", null, b.id), " ", b.title)),
+            e("td", { className: "l" }, e("span", { className: "pill " + PRI_CLASS[b.priority] }, b.priority)),
+            e("td", { className: "l" }, b.status),
+            e("td", { className: "l" }, b.team),
+            e("td", { className: "num", style: b.ageDays > 90 ? { color: "#dc2626", fontWeight: 700 } : null }, b.ageDays + "d"),
+            e("td", { className: "l", style: { whiteSpace: "normal", maxWidth: 240 } }, b.customers.length ? b.customers.map((c, i) => e("span", { key: i, className: "chip" }, c)) : e("span", { className: "zero" }, "—")),
+            e("td", { className: "l", style: { color: "#64748b" } }, b.createdBy || "—")))))),
+        filtered.length === 0 ? e("div", { className: "note" }, "No bugs match — good sign, or loosen the filters.") : null));
+  }
+
+  // ---------------- CX Reporting (launch pipeline gantt) ----------------
+  // Data: /api/launches — baked daily from the Airtable Services view by
+  // scripts/refresh/bake-launches.js, live-refreshable via the button.
+  const GANTT_STAGES = ["Sales Hand Off", "Discovery", "Partnership Kick Off", "Configuration", "Launch Marketing and Operations", "Go-Live Support"];
+  // Launched/Delayed are baked into the snapshot but hidden by default —
+  // the gantt is about upcoming launches; toggles bring them back.
+  const GANTT_STAGE_ORDER = [...GANTT_STAGES, "Launched", "Delayed"];
+  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Discovery": "#8b5cf6", "Partnership Kick Off": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b", "Launched": "#475569", "Delayed": "#7f1d1d" };
+  const LOE_WEIGHT = { "Very Large": 4, "Large": 3, "Medium": 2, "Small": 1 };
+  const KNOWN_OWNER_COLORS = { "Michael Kehoe": "#f97316", "Maddie Pellman": "#ec4899", "Lindsay Keare": "#8b5cf6", "Dan Jenner": "#06b6d4", "Lionel Nyange": "#10b981", "Ankur Lal": "#e11d48", "Teddy Noll": "#a3e635" };
+  const OWNER_PALETTE = ["#fbbf24", "#38bdf8", "#c084fc", "#34d399", "#fb7185", "#a78bfa"];
+  const pd = (d) => new Date(d + "T00:00:00");
+  const fmtMoney = (n) => n >= 1000 ? "$" + (n / 1000).toFixed(0) + "k" : n ? "$" + n : "—";
+  const fmtACV = (n) => !n ? "—" : n >= 1000000 ? "$" + (n / 1000000).toFixed(1) + "M" : "$" + (n / 1000).toFixed(0) + "k";
+  const fmtDay = (s) => s ? pd(s).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
+
+  function Reporting() {
+    const [snap, setSnap] = useState(null);
+    const [loadErr, setLoadErr] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
+    const [refreshErr, setRefreshErr] = useState("");
+    useEffect(() => {
+      fetch("/api/launches").then(r => r.json().then(d => {
+        if (!r.ok) setLoadErr(d.error || "failed to load launches"); else setSnap(d);
+      })).catch(() => setLoadErr("failed to load launches"));
+    }, []);
+    const refresh = () => {
+      setRefreshing(true); setRefreshErr("");
+      fetch("/api/launches/refresh", { method: "POST" })
+        .then(r => r.json().then(d => { if (!r.ok) setRefreshErr(d.error || "refresh failed"); else setSnap(d); }))
+        .catch(() => setRefreshErr("refresh failed"))
+        .then(() => setRefreshing(false));
+    };
+    if (loadErr) return e("div", { className: "panel" }, e("div", { className: "note" }, loadErr));
+    if (!snap) return e("div", { className: "note" }, "Loading…");
+    return e(LaunchGantt, { snap, onRefresh: refresh, refreshing, refreshErr });
+  }
+
+  function GanttFilter({ label, value, options, onChange }) {
+    return e("div", { style: { display: "flex", alignItems: "center", gap: 4 } },
+      e("span", { style: { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" } }, label + ":"),
+      e("select", {
+        value, onChange: (ev) => onChange(ev.target.value),
+        style: { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, color: "#e2e8f0", padding: "3px 8px", fontSize: 12, cursor: "pointer", outline: "none" },
+      }, options.map(o => e("option", { key: o, value: o }, o))));
+  }
+
+  function LaunchGantt({ snap, onRefresh, refreshing, refreshErr }) {
+    const services = snap.services || [];
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+
+    const [ownerFilter, setOwnerFilter] = useState("All");
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [categoryFilter, setCategoryFilter] = useState("All");
+    const [showLaunched, setShowLaunched] = useState(false); // stage "Launched" hidden by default
+    const [showDelayed, setShowDelayed] = useState(false);   // stage "Delayed" hidden by default
+    const [sortBy, setSortBy] = useState("regLaunch");
+    const [hoveredId, setHoveredId] = useState(null);
+    const [tooltip, setTooltip] = useState(null);
+
+    // Owners, categories, statuses derive from the data so new hires and new
+    // Airtable options show up without a code change.
+    const namedOwners = useMemo(() => {
+      const set = new Set(Object.keys(KNOWN_OWNER_COLORS));
+      services.forEach(s => { if (s.owner) set.add(s.owner); });
+      return [...set].filter(o => services.some(s => s.owner === o) || KNOWN_OWNER_COLORS[o]).sort();
+    }, [services]);
+    const ownerColor = useMemo(() => {
+      const map = { ...KNOWN_OWNER_COLORS, "": "#94a3b8", "Unassigned": "#94a3b8" };
+      let i = 0;
+      namedOwners.forEach(o => { if (!map[o]) map[o] = OWNER_PALETTE[i++ % OWNER_PALETTE.length]; });
+      return map;
+    }, [namedOwners]);
+    const categories = useMemo(() => ["All", ...new Set(services.map(s => s.category).filter(Boolean))], [services]);
+    const statuses = useMemo(() => ["All", ...new Set(services.map(s => s.status).filter(Boolean))], [services]);
+
+    let data = services.filter(s => {
+      if (!showLaunched && s.stage === "Launched") return false;
+      if (!showDelayed && s.stage === "Delayed") return false;
+      if (ownerFilter !== "All") {
+        if (ownerFilter === "Unassigned" && s.owner !== "") return false;
+        if (ownerFilter !== "Unassigned" && s.owner !== ownerFilter) return false;
+      }
+      if (statusFilter !== "All" && s.status !== statusFilter) return false;
+      if (categoryFilter !== "All" && s.category !== categoryFilter) return false;
+      return true;
+    });
+    data = [...data].sort((a, b) => {
+      if (sortBy === "regLaunch") return (a.regLaunch || "9999").localeCompare(b.regLaunch || "9999");
+      if (sortBy === "start") return (a.start || "9999").localeCompare(b.start || "9999");
+      if (sortBy === "owner") return (a.owner || "").localeCompare(b.owner || "");
+      if (sortBy === "stage") return GANTT_STAGE_ORDER.indexOf(a.stage) - GANTT_STAGE_ORDER.indexOf(b.stage);
+      if (sortBy === "acv") return (b.acv || 0) - (a.acv || 0);
+      if (sortBy === "loe") return (LOE_WEIGHT[b.loe] || 0) - (LOE_WEIGHT[a.loe] || 0);
+      return 0;
+    });
+    const rows = data.filter(s => s.start); // undated services can't be drawn
+
+    // Time range spans the visible rows, so hiding Launched/Delayed keeps
+    // the timeline focused on the upcoming pipeline.
+    const minDate = rows.length ? new Date(Math.min(...rows.map(s => pd(s.start)))) : new Date(today);
+    const maxDate = new Date(Math.max(...rows.filter(s => s.end).map(s => pd(s.end)), ...rows.map(s => pd(s.start)), today));
+    minDate.setDate(1);
+    maxDate.setMonth(maxDate.getMonth() + 1, 1);
+    const totalDays = Math.max(1, (maxDate - minDate) / 86400000);
+    const px = (date) => ((pd(date) - minDate) / 86400000 / totalDays) * 100;
+    const todayPx = ((today - minDate) / 86400000 / totalDays) * 100;
+
+    // Month headers reflect the filtered set.
+    const months = [];
+    { let cur = new Date(minDate);
+      while (cur < maxDate) {
+        const label = cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+        const left = ((cur - minDate) / 86400000 / totalDays) * 100;
+        const nextMonth = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+        const width = ((Math.min(nextMonth, maxDate) - cur) / 86400000 / totalDays) * 100;
+        const monthStart = new Date(cur), monthEnd = new Date(nextMonth - 1);
+        const active = rows.filter(s => {
+          const st = pd(s.start), en = s.end ? pd(s.end) : maxDate;
+          return st <= monthEnd && en >= monthStart;
+        });
+        const breakdown = namedOwners.map(o => {
+          const owned = active.filter(s => s.owner === o);
+          return { owner: o, count: owned.length, acv: owned.reduce((t, s) => t + (s.acv || 0), 0) };
+        }).filter(b => b.count);
+        const unassigned = active.filter(s => !s.owner);
+        if (unassigned.length) breakdown.push({ owner: "Unassigned", count: unassigned.length, acv: unassigned.reduce((t, s) => t + (s.acv || 0), 0) });
+        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown });
+        cur = nextMonth;
+      } }
+    const maxActive = Math.max(...months.map(m => m.activeCount), 1);
+
+    const ROW_H = 36, LABEL_W = 350, HEADER_H = 80, OWNER_ROW_H = 170;
+    const TIMELINE_W = Math.max(months.length * 160, 800);
+    const upper = { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" };
+
+    // Quarterly revenue + QTD stats work off regLaunch across ALL services.
+    const withReg = services.filter(s => s.regLaunch);
+    const qKeyOf = (d) => d.getFullYear() + "-Q" + (Math.floor(d.getMonth() / 3) + 1);
+    const quarters = [...new Set(withReg.map(s => qKeyOf(pd(s.regLaunch))))].sort();
+    const qBounds = (key) => {
+      const [yr, q] = key.split("-Q");
+      const m0 = (parseInt(q) - 1) * 3;
+      return { start: new Date(parseInt(yr), m0, 1), end: new Date(parseInt(yr), m0 + 3, 0), label: key.replace("-", " ") };
+    };
+    const inQ = (s, key) => { const { start, end } = qBounds(key); const rl = pd(s.regLaunch); return rl >= start && rl <= end; };
+    const currentQKey = qKeyOf(today);
+    const qStart = qBounds(currentQKey).start, qEnd = qBounds(currentQKey).end;
+    const qtdLaunched = withReg.filter(s => { const rl = pd(s.regLaunch); return rl >= qStart && rl <= today; });
+    const qtdForecast = withReg.filter(s => inQ(s, currentQKey));
+    const sumACV = (list) => list.reduce((t, s) => t + (s.acv || 0), 0);
+    const revOwners = namedOwners.filter(o => quarters.some(k => withReg.some(s => s.owner === o && inQ(s, k))));
+
+    const refreshedAt = snap.generatedAt ? new Date(snap.generatedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "?";
+
+    return e("div", { style: { fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#0f172a", borderRadius: 12, color: "#e2e8f0", padding: 20, border: "1px solid #334155" } },
+
+      // Header: title, freshness, refresh button, filters, sort
+      e("div", { style: { marginBottom: 20 } },
+        e("div", { style: { display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8, flexWrap: "wrap" } },
+          e("h2", { style: { margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: "-0.5px", color: "#f8fafc", border: "none", padding: 0 } }, "Launch Pipeline"),
+          e("span", { style: { fontSize: 13, color: "#64748b", fontWeight: 500 } },
+            data.length + " services · $" + (sumACV(data) / 1000000).toFixed(1) + "M ACV"),
+          e("span", { style: { marginLeft: "auto", fontSize: 11.5, color: "#64748b" } }, "Data as of " + refreshedAt + " · re-bakes daily ~6am ET"),
+          e("button", {
+            onClick: onRefresh, disabled: refreshing,
+            title: snap.refreshAvailable === false ? "Live refresh needs AIRTABLE_API_KEY on the server; until then this button will report it's unconfigured." : "Pull the latest from the Airtable Services view",
+            style: { background: refreshing ? "#334155" : "#0ea5e9", color: "#fff", border: "none", borderRadius: 7, padding: "5px 14px", fontSize: 12.5, fontWeight: 700, cursor: refreshing ? "wait" : "pointer" },
+          }, refreshing ? "Refreshing…" : "↻ Refresh now")),
+        refreshErr ? e("div", { style: { fontSize: 12, color: "#fca5a5", marginBottom: 8 } }, refreshErr) : null,
+        e("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
+          e(GanttFilter, { label: "Owner", value: ownerFilter, options: ["All", ...namedOwners, "Unassigned"], onChange: setOwnerFilter }),
+          e(GanttFilter, { label: "Status", value: statusFilter, options: statuses, onChange: setStatusFilter }),
+          e(GanttFilter, { label: "Category", value: categoryFilter, options: categories, onChange: setCategoryFilter }),
+          e("span", { style: { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginLeft: 6 } }, "Include:"),
+          [["Launched", showLaunched, setShowLaunched], ["Delayed", showDelayed, setShowDelayed]].map(([label, on, set]) =>
+            e("button", {
+              key: label, onClick: () => set(!on),
+              title: on ? "Hiding " + label + "-stage services returns the chart to upcoming launches" : "Show services in the " + label + " stage (hidden by default)",
+              style: { background: on ? "#334155" : "transparent", border: "1px solid", borderColor: on ? "#475569" : "#1e293b", borderRadius: 6, color: on ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: on ? 600 : 400 } },
+              (on ? "✓ " : "") + label)),
+          e("div", { style: { marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" } },
+            e("span", { style: { fontSize: 12, color: "#64748b" } }, "Sort:"),
+            [["regLaunch", "Launch Date"], ["start", "Start"], ["owner", "Owner"], ["stage", "Stage"], ["acv", "ACV"], ["loe", "LOE"]].map(([v, l]) =>
+              e("button", {
+                key: v, onClick: () => setSortBy(v),
+                style: { background: sortBy === v ? "#334155" : "transparent", border: "1px solid", borderColor: sortBy === v ? "#475569" : "#1e293b", borderRadius: 6, color: sortBy === v ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: sortBy === v ? 600 : 400 } }, l))))),
+
+      // Stage legend (only stages present in the visible rows)
+      e("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 } },
+        GANTT_STAGE_ORDER.filter(s => rows.some(r => r.stage === s)).map(s =>
+          e("div", { key: s, style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
+            e("div", { style: { width: 10, height: 10, borderRadius: 2, background: GANTT_STAGE_COLORS[s] } }), s === "Launched" || s === "Delayed" ? s + " (stage)" : s)),
+        e("div", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8" } },
+          e("div", { style: { width: 10, height: 10, borderRadius: 2, background: "#ef4444" } }), "Delayed (status)")),
+
+      // Gantt
+      e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
+        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
+          e("div", { style: { minWidth: LABEL_W + TIMELINE_W } },
+
+            // Header row: months with launch counts + ACV
+            e("div", { style: { display: "flex", borderBottom: "1px solid #334155", position: "sticky", top: 0, zIndex: 20, background: "#1e293b" } },
+              e("div", { style: { position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: HEADER_H, borderRight: "1px solid #334155", background: "#1e293b", display: "flex", alignItems: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
+                e("span", { style: upper }, "Service")),
+              e("div", { style: { position: "relative", width: TIMELINE_W, height: HEADER_H, flexShrink: 0 } },
+                months.map((m, i) => {
+                  const countColor = m.activeCount >= 12 ? "#f59e0b" : m.activeCount >= 8 ? "#38bdf8" : m.activeCount >= 4 ? "#94a3b8" : "#475569";
+                  return e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingLeft: 8, paddingRight: 6, overflow: "hidden" } },
+                    e("div", { style: { position: "absolute", bottom: 0, left: 0, width: (m.activeCount / maxActive) * 100 + "%", height: 3, background: countColor, borderRadius: "0 2px 0 0", opacity: 0.7 } }),
+                    e("div", { style: { display: "flex", flexDirection: "column", gap: 3, paddingBottom: 9 } },
+                      e("span", { style: { fontSize: 10, color: "#64748b", fontWeight: 600, whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.04em" } }, m.label),
+                      m.activeCount > 0 ? e(React.Fragment, null,
+                        e("div", { style: { display: "flex", alignItems: "baseline", gap: 3 } },
+                          e("span", { style: { fontSize: 15, fontWeight: 700, color: countColor, lineHeight: 1 } }, m.activeCount),
+                          e("span", { style: { fontSize: 9, color: "#475569", lineHeight: 1 } }, "active")),
+                        e("div", { style: { display: "flex", alignItems: "baseline", gap: 3 } },
+                          e("span", { style: { fontSize: 11, fontWeight: 600, color: "#34d399", lineHeight: 1 } }, fmtACV(m.activeACV)),
+                          e("span", { style: { fontSize: 9, color: "#475569", lineHeight: 1 } }, "ACV"))) : null));
+                }))),
+
+            // Owner breakdown row — scrolls away with the content (not sticky)
+            // so vertical space goes to launch rows once you scroll.
+            e("div", { style: { display: "flex", borderBottom: "2px solid #334155", background: "#162032" } },
+              e("div", { style: { position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: OWNER_ROW_H, borderRight: "1px solid #334155", background: "#162032", display: "flex", alignItems: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
+                e("span", { style: upper }, "By Owner")),
+              e("div", { style: { position: "relative", width: TIMELINE_W, height: OWNER_ROW_H, flexShrink: 0 } },
+                months.map((m, i) =>
+                  e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", overflow: "hidden", padding: "7px 8px 6px 8px" } },
+                    e("div", { style: { fontSize: 9, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, whiteSpace: "nowrap" } }, m.label),
+                    m.breakdown.length === 0 ? e("span", { style: { fontSize: 9, color: "#334155" } }, "—") :
+                      e("table", { style: { width: "100%", borderCollapse: "collapse", tableLayout: "fixed" } },
+                        e("thead", null, e("tr", null,
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "left", padding: "0 4px 3px 0", borderBottom: "1px solid #1e293b", overflow: "hidden", background: "transparent", position: "static" } }, "Owner"),
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "center", padding: "0 4px 3px 0", borderBottom: "1px solid #1e293b", width: 22, background: "transparent", position: "static" } }, "#"),
+                          e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "right", paddingBottom: 3, borderBottom: "1px solid #1e293b", width: 46, background: "transparent", position: "static" } }, "ACV"))),
+                        e("tbody", null, m.breakdown.map((o, ri) =>
+                          e("tr", { key: o.owner, style: { background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                            e("td", { style: { padding: "3px 4px 2px 0", overflow: "hidden", border: "none", textAlign: "left" } },
+                              e("div", { style: { display: "flex", alignItems: "center", gap: 4, overflow: "hidden" } },
+                                e("div", { style: { width: 5, height: 5, borderRadius: "50%", background: ownerColor[o.owner] || "#94a3b8", flexShrink: 0 } }),
+                                e("span", { style: { fontSize: 9, color: "#cbd5e1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 } }, o.owner === "Unassigned" ? "Unassigned" : o.owner.split(" ")[0]))),
+                            e("td", { style: { fontSize: 10, fontWeight: 700, color: ownerColor[o.owner] || "#94a3b8", textAlign: "center", padding: "3px 4px 2px 0", lineHeight: 1, border: "none" } }, o.count),
+                            e("td", { style: { fontSize: 9, fontWeight: 600, color: "#34d399", textAlign: "right", padding: "3px 0 2px", whiteSpace: "nowrap", lineHeight: 1, border: "none" } }, fmtACV(o.acv)))))))))),
+
+            // Data rows
+            rows.map((row, i) => {
+              const pxLeft = (px(row.start) / 100) * TIMELINE_W;
+              const pxRight = row.end ? (px(row.end) / 100) * TIMELINE_W : TIMELINE_W;
+              const barWidth = Math.max(pxRight - pxLeft, 2);
+              const regPx = row.regLaunch ? (px(row.regLaunch) / 100) * TIMELINE_W : -1;
+              const color = row.status === "Delayed" ? "#ef4444" : row.status === "At Risk" ? "#991b1b" : GANTT_STAGE_COLORS[row.stage] || "#6366f1";
+              const isHovered = hoveredId === row.id;
+              const rowBg = isHovered ? "#293548" : i % 2 === 0 ? "#1e293b" : "#182032";
+              return e("div", {
+                key: row.id || row.name, style: { display: "flex", height: ROW_H, background: rowBg, borderBottom: "1px solid #334155" },
+                onMouseEnter: () => setHoveredId(row.id), onMouseLeave: () => { setHoveredId(null); setTooltip(null); } },
+                e("div", { style: { position: "sticky", left: 0, zIndex: 10, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, borderRight: "1px solid #334155", background: rowBg, display: "flex", alignItems: "center", paddingLeft: 12, paddingRight: 8, gap: 8, overflow: "hidden" } },
+                  e("div", { style: { width: 6, height: 6, borderRadius: "50%", background: ownerColor[row.owner] || "#94a3b8", flexShrink: 0 } }),
+                  e("div", { style: { overflow: "hidden" } },
+                    e("div", { style: { fontSize: 12.5, fontWeight: 500, color: "#e2e8f0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, row.name),
+                    e("div", { style: { fontSize: 10.5, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, (row.owner || "Unassigned") + " · " + fmtMoney(row.acv)))),
+                e("div", { style: { position: "relative", width: TIMELINE_W, flexShrink: 0, overflow: "hidden" } },
+                  months.map((m, mi) => e("div", { key: mi, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, top: 0, bottom: 0, borderRight: "1px solid #1a2540" } })),
+                  todayPx >= 0 && todayPx <= 100 ? e("div", { style: { position: "absolute", left: (todayPx / 100) * TIMELINE_W, top: 0, bottom: 0, width: 1, background: "rgba(248,250,252,0.25)", zIndex: 2 } }) : null,
+                  e("div", {
+                    style: { position: "absolute", left: pxLeft, width: barWidth, top: "22%", height: "56%", background: color, borderRadius: 4, opacity: isHovered ? 1 : 0.85, zIndex: 3, cursor: "pointer", display: "flex", alignItems: "center", overflow: "hidden", paddingLeft: 6 },
+                    onMouseMove: (ev) => { const rect = ev.currentTarget.getBoundingClientRect(); setTooltip({ row, x: rect.left, y: rect.top }); } },
+                    e("span", { style: { fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.9)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, row.loe)),
+                  row.regLaunch && regPx >= 0 && regPx <= TIMELINE_W ?
+                    e("div", { style: { position: "absolute", left: regPx, top: "50%", transform: "translate(-50%, -50%) rotate(45deg)", width: 8, height: 8, background: "#f8fafc", border: "2px solid " + color, zIndex: 6, borderRadius: 1 } }) : null));
+            }))),
+
+        // Footer: stage counts
+        e("div", { style: { borderTop: "1px solid #334155", padding: "10px 16px", display: "flex", gap: 24, background: "#162032", fontSize: 12, flexWrap: "wrap" } },
+          GANTT_STAGE_ORDER.map(stage => {
+            const count = rows.filter(s => s.stage === stage).length;
+            return count ? e("div", { key: stage, style: { display: "flex", alignItems: "center", gap: 6 } },
+              e("div", { style: { width: 8, height: 8, borderRadius: 2, background: GANTT_STAGE_COLORS[stage] } }),
+              e("span", { style: { color: "#94a3b8" } }, stage + ":"),
+              e("span", { style: { color: "#e2e8f0", fontWeight: 600 } }, count)) : null;
+          }),
+          e("div", { style: { marginLeft: "auto", color: "#64748b" } }, "◆ = Reg. Launch Date"),
+          data.length > rows.length ? e("div", { style: { color: "#64748b" } }, (data.length - rows.length) + " service(s) hidden — no start date in Airtable") : null)),
+
+      // Quarterly revenue by owner
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 } }, "Revenue by Owner · By Quarter"),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "auto" } },
+          e("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12 } },
+            e("thead", null, e("tr", { style: { borderBottom: "1px solid #334155" } },
+              e("th", { style: { padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", width: 150, borderRight: "1px solid #1e293b", background: "transparent", position: "static" } }, "Owner"),
+              quarters.map(k => e("th", { key: k, style: { padding: "10px 16px", textAlign: "right", fontSize: 11, fontWeight: 600, color: k === currentQKey ? "#38bdf8" : "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.05)" : "transparent", position: "static" } },
+                qBounds(k).label,
+                k === currentQKey ? e("span", { style: { display: "block", fontSize: 9, color: "#475569", fontWeight: 400, textTransform: "none", letterSpacing: 0 } }, "current") : null)))),
+            e("tbody", null,
+              revOwners.map((owner, ri) =>
+                e("tr", { key: owner, style: { borderBottom: "1px solid #1e293b", background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                  e("td", { style: { padding: "9px 16px", borderRight: "1px solid #1e293b", textAlign: "left", borderBottom: "none" } },
+                    e("div", { style: { display: "flex", alignItems: "center", gap: 7 } },
+                      e("div", { style: { width: 7, height: 7, borderRadius: "50%", background: ownerColor[owner], flexShrink: 0 } }),
+                      e("span", { style: { fontSize: 12, color: "#cbd5e1", fontWeight: 500 } }, owner))),
+                  quarters.map(k => {
+                    const val = sumACV(withReg.filter(s => s.owner === owner && inQ(s, k)));
+                    return e("td", { key: k, style: { padding: "9px 16px", textAlign: "right", fontSize: 12, fontWeight: val ? 600 : 400, color: val ? ownerColor[owner] : "#334155", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.04)" : "transparent", borderBottom: "none" } }, fmtACV(val));
+                  }))),
+              e("tr", { style: { borderTop: "1px solid #334155", background: "rgba(255,255,255,0.03)" } },
+                e("td", { style: { padding: "9px 16px", fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b", textAlign: "left", borderBottom: "none" } }, "Total"),
+                quarters.map(k => e("td", { key: k, style: { padding: "9px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#f8fafc", borderRight: "1px solid #1e293b", background: k === currentQKey ? "rgba(56,189,248,0.06)" : "transparent", borderBottom: "none" } }, fmtACV(sumACV(withReg.filter(s => inQ(s, k))))))))))),
+
+      // QTD stats
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 } },
+          "Q" + (Math.floor(today.getMonth() / 3) + 1) + " " + today.getFullYear() + " · Quarter to Date"),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "hidden" } },
+          [["Today", e("span", { style: { color: "#f8fafc", fontWeight: 500 } }, today.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }))],
+           ["QTD Launched Revenue", e(React.Fragment, null,
+              e("span", { style: { fontSize: 18, fontWeight: 700, color: "#34d399" } }, fmtACV(sumACV(qtdLaunched))),
+              e("span", { style: { fontSize: 11, color: "#475569", marginLeft: 8 } }, qtdLaunched.length + " service" + (qtdLaunched.length !== 1 ? "s" : "") + " launched " + qStart.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "–" + today.toLocaleDateString("en-US", { month: "short", day: "numeric" })))],
+           ["Forecasted to Launch", e(React.Fragment, null,
+              e("span", { style: { fontSize: 18, fontWeight: 700, color: "#38bdf8" } }, fmtACV(sumACV(qtdForecast))),
+              e("span", { style: { fontSize: 11, color: "#475569", marginLeft: 8 } }, qtdForecast.length + " service" + (qtdForecast.length !== 1 ? "s" : "") + " · " + qStart.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "–" + qEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" })))]]
+          .map(([label, value], i, arr) =>
+            e("div", { key: label, style: { display: "flex", borderBottom: i < arr.length - 1 ? "1px solid #1e293b" : "none" } },
+              e("div", { style: { width: 220, minWidth: 220, padding: "10px 16px", fontSize: 12, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b" } }, label),
+              e("div", { style: { flex: 1, padding: "10px 16px", fontSize: 13, color: "#e2e8f0" } }, value))))),
+
+      // Tooltip
+      tooltip ? e("div", { style: { position: "fixed", left: Math.min(tooltip.x + 12, window.innerWidth - 260), top: Math.max(8, tooltip.y - 160), background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: "12px 14px", zIndex: 100, width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", pointerEvents: "none" } },
+        e("div", { style: { fontWeight: 600, fontSize: 13, color: "#f8fafc", marginBottom: 8, lineHeight: 1.3 } }, tooltip.row.name),
+        e("div", { style: { display: "grid", gridTemplateColumns: "auto 1fr", gap: "4px 10px", fontSize: 12 } },
+          [["Owner", tooltip.row.owner || "Unassigned"], ["Stage", tooltip.row.stage], ["Category", tooltip.row.category || "—"],
+           ["Start", fmtDay(tooltip.row.start)], ["Reg. Launch", fmtDay(tooltip.row.regLaunch)], ["End", fmtDay(tooltip.row.end)],
+           ["LOE", tooltip.row.loe || "—"], ["ACV", fmtMoney(tooltip.row.acv)], ["Status", tooltip.row.status || "—"]]
+          .flatMap(([k, v]) => [
+            e("span", { key: k + "k", style: { color: "#64748b" } }, k),
+            e("span", { key: k + "v", style: { color: k === "Status" ? (tooltip.row.status === "On Track" ? "#10b981" : "#ef4444") : "#e2e8f0", fontWeight: k === "Status" ? 600 : 400 } }, v)]))) : null);
+  }
+
+  // ---------------- Admin · user management ----------------
+  function Admin({ me }) {
+    const [users, setUsers] = useState(null);
+    const [err, setErr] = useState("");
+    const [reset, setReset] = useState(null); // {id, name, url, minutes, copied}
+    const load = () => fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users || []));
+    useEffect(() => { load(); }, []);
+    const update = (id, patch) => {
+      setErr("");
+      fetch("/api/admin/users/" + id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) })
+        .then(r => r.json().then(d => { if (!r.ok) setErr(d.error || "update failed"); load(); }));
+    };
+    const resetPw = (u) => {
+      setErr("");
+      fetch("/api/admin/users/" + u.id + "/reset-password", { method: "POST" })
+        .then(r => r.json().then(d => {
+          if (!r.ok) { setErr(d.error || "reset failed"); return; }
+          setReset({ id: u.id, name: u.name, email: u.email, url: d.resetUrl, minutes: d.expiresInMinutes, emailSent: d.emailSent, emailError: d.emailError, copied: false });
+          load();
+        }))
+        .catch(() => setErr("network error — try again"));
+    };
+    const copyReset = () => {
+      navigator.clipboard.writeText(reset.url).then(() => setReset({ ...reset, copied: true }));
+    };
+    if (!users) return e("div", { className: "note" }, "Loading…");
+    return e("div", { className: "panel" },
+      e("h2", null, "Users", e("span", { className: "hint" }, "admins can view everything and manage users; users can view dashboards")),
+      err ? e("div", { className: "note", style: { color: "#dc2626" } }, err) : null,
+      reset ? e("div", { style: { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px", margin: "0 0 14px", fontSize: 13 } },
+        e("div", { style: { marginBottom: 6 } }, e("b", null, "Reset link for " + reset.name),
+          reset.emailSent ? " — emailed to " + reset.email + " ✓. Link below in case you'd rather send it yourself."
+            : reset.emailError ? " — email failed (" + reset.emailError + "), send the link to them directly."
+            : " — send it to them directly.",
+          " It works once and expires in " + reset.minutes + " minutes; generating a new one replaces it."),
+        e("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
+          e("code", { style: { flex: 1, background: "#fff", border: "1px solid #d1fae5", borderRadius: 7, padding: "6px 9px", fontSize: 11.5, overflowX: "auto", whiteSpace: "nowrap" } }, reset.url),
+          e("button", { onClick: copyReset, style: { background: reset.copied ? "#166534" : "#0f6f5c", color: "#fff", border: "none", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 } }, reset.copied ? "Copied ✓" : "Copy"),
+          e("button", { onClick: () => setReset(null), title: "Dismiss", style: { background: "transparent", color: "#64748b", border: "none", fontSize: 15, cursor: "pointer", flexShrink: 0 } }, "✕"))) : null,
+      e("div", { className: "tablewrap" }, e("table", null,
+        e("thead", null, e("tr", null, e("th", { className: "l" }, "Name"), e("th", { className: "l" }, "Email"), e("th", { className: "l" }, "Role"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Joined"), e("th", { className: "l" }, "Password"))),
+        e("tbody", null, users.map(u => e("tr", { key: u.id },
+          e("td", { className: "name" }, u.name, u.id === me.id ? e("span", { className: "hint" }, " (you)") : null),
+          e("td", { className: "l" }, u.email),
+          e("td", { className: "l" }, e("select", { value: u.role, disabled: u.id === me.id, onChange: ev => update(u.id, { role: ev.target.value }) },
+            e("option", { value: "user" }, "user"), e("option", { value: "admin" }, "admin"))),
+          e("td", { className: "l" }, e("label", { className: "chk" },
+            e("input", { type: "checkbox", checked: u.active, disabled: u.id === me.id, onChange: ev => update(u.id, { active: ev.target.checked }) }), u.active ? "active" : "deactivated")),
+          e("td", { className: "l", style: { color: "#64748b" } }, (u.createdAt || "").slice(0, 10)),
+          e("td", { className: "l" },
+            e("button", { onClick: () => resetPw(u), disabled: !u.active, title: u.active ? "Generate a one-time reset link to send to " + u.name : "Reactivate the account first",
+              style: { background: u.active ? "#fff" : "#f8fafc", color: u.active ? "#0f6f5c" : "#94a3b8", border: "1px solid " + (u.active ? "#0f6f5c55" : "#e2e8f0"), borderRadius: 7, padding: "4px 10px", fontSize: 12, fontWeight: 600, cursor: u.active ? "pointer" : "default" } }, "Reset password"),
+            u.resetPending ? e("span", { className: "hint", title: "An unused reset link is outstanding for this user" }, " link pending") : null)))))));
+  }
+
+  function App() {
+    const [data, setData] = useState(null);
+    const [me, setMe] = useState(null);
+    const [r, setR] = useState(route());
+    useEffect(() => {
+      fetch("/api/auth/me").then(x => {
+        if (x.status === 401) { location.href = "/login"; return null; }
+        return x.json();
+      }).then(d => d && setMe(d.user));
+      fetch("/api/ps-data").then(x => x.status === 401 ? null : x.json()).then(d => d && setData(d));
+      const f = () => setR(route());
+      window.addEventListener("popstate", f);
+      return () => window.removeEventListener("popstate", f);
+    }, []);
+    const signOut = () => fetch("/api/auth/logout", { method: "POST" }).then(() => location.href = "/login");
+    if (!data || !me) return e("div", { className: "note" }, "Loading…");
+
+    const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
+    return e("div", { className: "layout" },
+      e("nav", { className: "side" },
+        e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),
+        e("div", { className: "sec" }, "Partner success"),
+        item("/ps", "Account Health", r.page === "health" || r.page === "org"),
+        item("/ps/bugs", "Bug Management", r.page === "bugs", data.bugs.length),
+        item("/ps/reporting", "CX Reporting", r.page === "reporting"),
+        e("div", { className: "sec" }, "Platform"),
+        e("a", { className: "item", href: "/" }, "Org Features →"),
+        me.role === "admin" ? e(React.Fragment, null, e("div", { className: "sec" }, "Admin"), item("/ps/admin", "Users", r.page === "admin")) : null,
+        e("div", { className: "foot" },
+          e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
+          e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
+          e("div", { style: { marginTop: 8 } }, "Snapshot " + new Date(data.generatedAt).toLocaleString() + " · refreshed daily"))),
+      e("main", null,
+        e("header", { className: "top" }, e("h1", null, titles[r.page][0]), e("div", { className: "sub" }, titles[r.page][1])),
+        e("div", { className: "wrap" },
+          r.page === "health" ? e(Health, { data }) :
+          r.page === "org" ? e(Org, { data, id: r.id }) :
+          r.page === "bugs" ? e(Bugs, { data }) :
+          r.page === "admin" ? e(Admin, { me }) :
+          e(Reporting, { data }),
+          e("div", { className: "foot" }, "Sources: Linear (bugs + customer tags) · HubSpot (status, health, engagement) · Airtable (feature requests) · rec prod replica (adoption). Intercom interactions/NPS not wired yet."))));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+})();
+</script>
+</body>
+</html>
