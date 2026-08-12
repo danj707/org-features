@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rec · Feature Usage by Organization</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="/vendor/react.production.min.js"></script>
+<script src="/vendor/react-dom.production.min.js"></script>
 <style>
   :root {
     --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
@@ -354,6 +354,7 @@
       e("header", { className: "top" }, e("div", { className: "inner" },
         e("h1", { style: { cursor: "pointer" }, onClick: () => nav("/") }, "Rec · Feature Usage by Organization"),
         e("span", { className: "badge-live" }, "Live rec.us data"),
+        e("a", { className: "badge-live", href: "/ps", style: { color: "#fff" } }, "PS Dashboard →"),
         data && e("span", { className: "sub" },
           "snapshot " + new Date(data.generatedAt).toLocaleString() + " · " + agePhrase(days)),
         data && stale && e("span", { className: "badge-stale", title: "Snapshot is " + days + " days old — re-bake it for current numbers" }, "⚠ Stale"),
