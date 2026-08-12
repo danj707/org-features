@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T10:06:20.657Z",
+  "generatedAt": "2026-08-12T10:06:41.077Z",
   "source": "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
   "status": "adoption-wave-1",
   "orgs": [
@@ -452,12 +452,12 @@
   ],
   "usage": {
     "apex-park-and-recreation-district": {
-      "programs": 599,
-      "registrations": 91430,
-      "memberships": 24330,
-      "passes": 4846,
+      "programs": 600,
+      "registrations": 91965,
+      "memberships": 24377,
+      "passes": 4867,
       "facilities": 330,
-      "reservations": 82280
+      "reservations": 82435
     },
     "carmichael-district": {
       "programs": 0,
@@ -469,43 +469,43 @@
     },
     "chicorec": {
       "programs": 167,
-      "registrations": 9036,
-      "memberships": 1300,
+      "registrations": 9108,
+      "memberships": 1301,
       "passes": 21,
       "facilities": 141,
-      "reservations": 16500
+      "reservations": 16529
     },
     "city-of-battle-ground": {
       "programs": 0,
-      "registrations": 437,
+      "registrations": 438,
       "memberships": 61,
       "passes": 0,
       "facilities": 7,
-      "reservations": 1829
+      "reservations": 1830
     },
     "city-of-belmont": {
       "programs": 1,
-      "registrations": 9732,
+      "registrations": 9764,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 14194
+      "reservations": 14234
     },
     "city-of-belton": {
       "programs": 41,
-      "registrations": 3802,
-      "memberships": 157,
+      "registrations": 3808,
+      "memberships": 160,
       "passes": 3,
       "facilities": 48,
-      "reservations": 665
+      "reservations": 675
     },
     "city-of-boerne": {
       "programs": 49,
-      "registrations": 2169,
-      "memberships": 360,
+      "registrations": 2181,
+      "memberships": 362,
       "passes": 0,
       "facilities": 46,
-      "reservations": 4271
+      "reservations": 4288
     },
     "city-of-brisbane": {
       "programs": 22,
@@ -517,35 +517,35 @@
     },
     "city-of-buffalo": {
       "programs": 27,
-      "registrations": 1212,
-      "memberships": 2811,
+      "registrations": 1218,
+      "memberships": 2829,
       "passes": 0,
       "facilities": 41,
-      "reservations": 2581
+      "reservations": 2584
     },
     "city-of-easton": {
       "programs": 13,
       "registrations": 840,
-      "memberships": 609,
+      "memberships": 610,
       "passes": 1,
       "facilities": 23,
       "reservations": 2386
     },
     "city-of-euclid": {
       "programs": 17,
-      "registrations": 310,
-      "memberships": 988,
+      "registrations": 311,
+      "memberships": 957,
       "passes": 0,
       "facilities": 21,
-      "reservations": 1208
+      "reservations": 1224
     },
     "city-of-hermosa-beach": {
       "programs": 34,
-      "registrations": 279,
-      "memberships": 937,
+      "registrations": 287,
+      "memberships": 967,
       "passes": 0,
       "facilities": 78,
-      "reservations": 3640
+      "reservations": 4328
     },
     "city-of-jeffersonville": {
       "programs": 22,
@@ -553,20 +553,20 @@
       "memberships": 2395,
       "passes": 0,
       "facilities": 74,
-      "reservations": 1928
+      "reservations": 1937
     },
     "city-of-joplin": {
       "programs": 20,
-      "registrations": 558,
+      "registrations": 567,
       "memberships": 204,
       "passes": 5,
       "facilities": 87,
-      "reservations": 309
+      "reservations": 311
     },
     "city-of-lewisburg": {
       "programs": 26,
       "registrations": 116,
-      "memberships": 329,
+      "memberships": 332,
       "passes": 0,
       "facilities": 40,
       "reservations": 475
@@ -581,59 +581,59 @@
     },
     "city-of-madeira-beach": {
       "programs": 24,
-      "registrations": 1994,
-      "memberships": 253,
+      "registrations": 1996,
+      "memberships": 258,
       "passes": 0,
       "facilities": 39,
-      "reservations": 2040
+      "reservations": 2042
     },
     "city-of-madison": {
       "programs": 83,
-      "registrations": 1747,
-      "memberships": 640,
-      "passes": 506,
+      "registrations": 1757,
+      "memberships": 642,
+      "passes": 505,
       "facilities": 25,
-      "reservations": 3486
+      "reservations": 3487
     },
     "city-of-malibu": {
       "programs": 78,
-      "registrations": 9256,
+      "registrations": 9290,
       "memberships": 551,
-      "passes": 122,
+      "passes": 121,
       "facilities": 19,
-      "reservations": 4577
+      "reservations": 4595
     },
     "city-of-menifee": {
       "programs": 177,
-      "registrations": 13667,
-      "memberships": 3589,
+      "registrations": 13759,
+      "memberships": 3604,
       "passes": 0,
       "facilities": 94,
-      "reservations": 8406
+      "reservations": 8691
     },
     "city-of-miamisburg": {
       "programs": 0,
-      "registrations": 1467,
+      "registrations": 1473,
       "memberships": 0,
       "passes": 0,
       "facilities": 15,
-      "reservations": 4993
+      "reservations": 4999
     },
     "city-of-midland": {
       "programs": 8,
-      "registrations": 2372,
-      "memberships": 1123,
+      "registrations": 2383,
+      "memberships": 1127,
       "passes": 533,
       "facilities": 124,
-      "reservations": 13789
+      "reservations": 13794
     },
     "city-of-milford": {
       "programs": 0,
-      "registrations": 14012,
+      "registrations": 14059,
       "memberships": 1025,
       "passes": 0,
       "facilities": 33,
-      "reservations": 25108
+      "reservations": 25182
     },
     "city-of-mountain-view": {
       "programs": 24,
@@ -645,123 +645,123 @@
     },
     "city-of-natchez": {
       "programs": 7,
-      "registrations": 242,
+      "registrations": 244,
       "memberships": 219,
       "passes": 2,
       "facilities": 41,
-      "reservations": 74
+      "reservations": 75
     },
     "city-of-norman": {
       "programs": 133,
-      "registrations": 9900,
+      "registrations": 9921,
       "memberships": 7694,
-      "passes": 11114,
+      "passes": 11124,
       "facilities": 402,
-      "reservations": 8829
+      "reservations": 8831
     },
     "city-of-piedmont": {
       "programs": 29,
-      "registrations": 7071,
-      "memberships": 6208,
+      "registrations": 7102,
+      "memberships": 6229,
       "passes": 790,
       "facilities": 35,
       "reservations": 4036
     },
     "city-of-smyrna": {
       "programs": 102,
-      "registrations": 13241,
-      "memberships": 3055,
+      "registrations": 13410,
+      "memberships": 3094,
       "passes": 42,
       "facilities": 99,
-      "reservations": 5381
+      "reservations": 5422
     },
     "city-of-torrance": {
       "programs": 660,
-      "registrations": 72105,
-      "memberships": 13955,
-      "passes": 386,
+      "registrations": 72228,
+      "memberships": 13971,
+      "passes": 385,
       "facilities": 411,
-      "reservations": 69045
+      "reservations": 69087
     },
     "city-of-tullahoma": {
       "programs": 11,
-      "registrations": 160,
-      "memberships": 1754,
+      "registrations": 172,
+      "memberships": 1769,
       "passes": 0,
       "facilities": 49,
       "reservations": 479
     },
     "city-of-watsonville": {
       "programs": 17,
-      "registrations": 123,
-      "memberships": 156,
+      "registrations": 126,
+      "memberships": 157,
       "passes": 0,
       "facilities": 13,
       "reservations": 2589
     },
     "city-of-west-haven": {
       "programs": 103,
-      "registrations": 3393,
-      "memberships": 1985,
+      "registrations": 3557,
+      "memberships": 2000,
       "passes": 49,
       "facilities": 118,
-      "reservations": 5081
+      "reservations": 5094
     },
     "city-of-west-sacramento": {
-      "programs": 84,
-      "registrations": 22333,
-      "memberships": 7286,
-      "passes": 399,
+      "programs": 86,
+      "registrations": 22391,
+      "memberships": 7291,
+      "passes": 403,
       "facilities": 169,
-      "reservations": 7378
+      "reservations": 7385
     },
     "douglas-county-nv": {
-      "programs": 75,
-      "registrations": 673,
-      "memberships": 796,
+      "programs": 76,
+      "registrations": 765,
+      "memberships": 989,
       "passes": 0,
       "facilities": 191,
-      "reservations": 7200
+      "reservations": 7244
     },
     "emeryville": {
       "programs": 133,
-      "registrations": 10483,
-      "memberships": 3149,
-      "passes": 1154,
+      "registrations": 10501,
+      "memberships": 3153,
+      "passes": 1153,
       "facilities": 113,
-      "reservations": 16099
+      "reservations": 16117
     },
     "essex-junction": {
-      "programs": 23,
+      "programs": 25,
       "registrations": 3,
       "memberships": 8,
       "passes": 0,
       "facilities": 17,
-      "reservations": 1146
+      "reservations": 1185
     },
     "folsom": {
       "programs": 39,
-      "registrations": 2383,
+      "registrations": 2384,
       "memberships": 514,
       "passes": 0,
       "facilities": 36,
-      "reservations": 4713
+      "reservations": 4715
     },
     "foster-city": {
       "programs": 5,
-      "registrations": 4855,
-      "memberships": 616,
+      "registrations": 4879,
+      "memberships": 619,
       "passes": 0,
       "facilities": 8,
-      "reservations": 6175
+      "reservations": 6200
     },
     "jurupa-area-recreation-and-park-district": {
       "programs": 93,
-      "registrations": 3739,
-      "memberships": 3344,
+      "registrations": 3750,
+      "memberships": 3345,
       "passes": 0,
       "facilities": 101,
-      "reservations": 9966
+      "reservations": 9860
     },
     "lake-county": {
       "programs": 6,
@@ -773,19 +773,19 @@
     },
     "lincoln": {
       "programs": 59,
-      "registrations": 2950,
+      "registrations": 2951,
       "memberships": 0,
       "passes": 0,
       "facilities": 24,
-      "reservations": 4519
+      "reservations": 4521
     },
     "littleton": {
-      "programs": 13,
-      "registrations": 161,
-      "memberships": 117,
+      "programs": 14,
+      "registrations": 210,
+      "memberships": 127,
       "passes": 0,
       "facilities": 56,
-      "reservations": 652
+      "reservations": 835
     },
     "mashantucket-pequot-tribal-nation": {
       "programs": 36,
@@ -805,47 +805,47 @@
     },
     "norris": {
       "programs": 0,
-      "registrations": 853,
-      "memberships": 124,
+      "registrations": 858,
+      "memberships": 125,
       "passes": 0,
       "facilities": 10,
-      "reservations": 5533
+      "reservations": 5546
     },
     "northern-door-sports-and-recreation": {
       "programs": 19,
-      "registrations": 108,
+      "registrations": 121,
       "memberships": 92,
       "passes": 20,
       "facilities": 22,
-      "reservations": 803
+      "reservations": 817
     },
     "pleasant-hill": {
       "programs": 70,
-      "registrations": 2621,
-      "memberships": 1103,
-      "passes": 109,
+      "registrations": 2622,
+      "memberships": 1104,
+      "passes": 97,
       "facilities": 67,
-      "reservations": 3328
+      "reservations": 3331
     },
     "prescott-valley": {
-      "programs": 82,
-      "registrations": 5698,
-      "memberships": 1200,
+      "programs": 83,
+      "registrations": 5744,
+      "memberships": 1203,
       "passes": 0,
       "facilities": 120,
-      "reservations": 9926
+      "reservations": 9973
     },
     "pueblo-county": {
       "programs": 22,
-      "registrations": 1753,
-      "memberships": 642,
-      "passes": 89,
+      "registrations": 1763,
+      "memberships": 643,
+      "passes": 88,
       "facilities": 21,
-      "reservations": 1536
+      "reservations": 1539
     },
     "putnam-county": {
       "programs": 22,
-      "registrations": 883,
+      "registrations": 900,
       "memberships": 0,
       "passes": 0,
       "facilities": 57,
@@ -853,39 +853,39 @@
     },
     "rocklin": {
       "programs": 95,
-      "registrations": 1498,
+      "registrations": 1500,
       "memberships": 914,
       "passes": 0,
       "facilities": 21,
-      "reservations": 3166
+      "reservations": 3168
     },
     "sacramento-county": {
       "programs": 47,
-      "registrations": 2212,
+      "registrations": 2225,
       "memberships": 0,
       "passes": 0,
       "facilities": 140,
-      "reservations": 3574
+      "reservations": 3571
     },
     "san-francisco-rec-park": {
       "programs": 211,
-      "registrations": 366016,
+      "registrations": 366380,
       "memberships": 0,
       "passes": 0,
       "facilities": 114,
-      "reservations": 546038
+      "reservations": 546449
     },
     "santacruzcounty": {
       "programs": 103,
-      "registrations": 6057,
-      "memberships": 1612,
+      "registrations": 6068,
+      "memberships": 1622,
       "passes": 0,
       "facilities": 251,
-      "reservations": 9325
+      "reservations": 9330
     },
     "sebastopol": {
       "programs": 55,
-      "registrations": 1151,
+      "registrations": 1155,
       "memberships": 6,
       "passes": 0,
       "facilities": 11,
@@ -893,7 +893,7 @@
     },
     "sunrise-pickleball-club": {
       "programs": 35,
-      "registrations": 704,
+      "registrations": 705,
       "memberships": 0,
       "passes": 0,
       "facilities": 11,
@@ -909,88 +909,88 @@
     },
     "the-dance-palace": {
       "programs": 6,
-      "registrations": 98,
+      "registrations": 101,
       "memberships": 5,
       "passes": 0,
       "facilities": 11,
-      "reservations": 1548
+      "reservations": 1553
     },
     "the-ranch": {
       "programs": 41,
-      "registrations": 7498,
-      "memberships": 1561,
+      "registrations": 7544,
+      "memberships": 1567,
       "passes": 85,
       "facilities": 14,
-      "reservations": 8235
+      "reservations": 8400
     },
     "town-of-clarksville": {
       "programs": 30,
-      "registrations": 1525,
-      "memberships": 941,
+      "registrations": 1527,
+      "memberships": 942,
       "passes": 55,
       "facilities": 21,
-      "reservations": 2858
+      "reservations": 2876
     },
     "town-of-corte-madera": {
       "programs": 0,
-      "registrations": 13422,
+      "registrations": 13457,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 19902
+      "reservations": 19945
     },
     "town-of-danvers": {
       "programs": 131,
-      "registrations": 7432,
+      "registrations": 7675,
       "memberships": 2042,
-      "passes": 301,
+      "passes": 304,
       "facilities": 72,
       "reservations": 8235
     },
     "town-of-reading": {
-      "programs": 115,
-      "registrations": 4860,
+      "programs": 116,
+      "registrations": 4873,
       "memberships": 647,
       "passes": 0,
       "facilities": 80,
-      "reservations": 927
+      "reservations": 928
     },
     "town-of-shrewsbury": {
       "programs": 168,
       "registrations": 3099,
-      "memberships": 1765,
+      "memberships": 1766,
       "passes": 2,
       "facilities": 153,
-      "reservations": 4068
+      "reservations": 4076
     },
     "town-of-taylor": {
       "programs": 67,
-      "registrations": 4936,
-      "memberships": 273,
+      "registrations": 4937,
+      "memberships": 275,
       "passes": 0,
       "facilities": 25,
-      "reservations": 1579
+      "reservations": 1581
     },
     "town-of-windham": {
       "programs": 121,
-      "registrations": 4882,
-      "memberships": 1605,
+      "registrations": 4891,
+      "memberships": 1607,
       "passes": 16,
       "facilities": 54,
-      "reservations": 4645
+      "reservations": 4647
     },
     "watertown": {
-      "programs": 159,
-      "registrations": 9645,
-      "memberships": 2110,
+      "programs": 160,
+      "registrations": 9678,
+      "memberships": 2123,
       "passes": 0,
       "facilities": 132,
-      "reservations": 9951
+      "reservations": 10056
     },
     "yerba-buena-gardens": {
       "programs": 46,
-      "registrations": 940,
-      "memberships": 255,
+      "registrations": 1012,
+      "memberships": 264,
       "passes": 0,
       "facilities": 7,
       "reservations": 457
@@ -1505,13 +1505,13 @@
     "apex-park-and-recreation-district": {
       "age_eligibility": {
         "adopted": true,
-        "count": 4152,
-        "detail": "4,152 sections with age rules"
+        "count": 4170,
+        "detail": "4,170 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 3340,
-        "detail": "3,340 sections with waitlist"
+        "count": 3355,
+        "detail": "3,355 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -1520,13 +1520,13 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 195539,
-        "detail": "195,539 emails sent"
+        "count": 214411,
+        "detail": "214,411 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 262,
-        "detail": "262 sections with plans"
+        "count": 263,
+        "detail": "263 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -1649,8 +1649,8 @@
     "chicorec": {
       "age_eligibility": {
         "adopted": true,
-        "count": 1378,
-        "detail": "1,378 sections with age rules"
+        "count": 1379,
+        "detail": "1,379 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -1659,8 +1659,8 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 2768,
-        "detail": "2,768 SMS sent"
+        "count": 2770,
+        "detail": "2,770 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
@@ -1694,8 +1694,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 35,
-        "detail": "35 forms"
+        "count": 36,
+        "detail": "36 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -1920,8 +1920,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 9,
-        "detail": "9 GL accounts"
+        "count": 10,
+        "detail": "10 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -2312,8 +2312,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 4,
-        "detail": "4 emails sent"
+        "count": 129,
+        "detail": "129 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2744,8 +2744,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 968,
-        "detail": "968 emails sent"
+        "count": 1154,
+        "detail": "1,154 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -2806,8 +2806,8 @@
       },
       "waitlist": {
         "adopted": true,
-        "count": 511,
-        "detail": "511 sections with waitlist"
+        "count": 513,
+        "detail": "513 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -2861,20 +2861,20 @@
       },
       "seasons": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 seasons"
+        "count": 6,
+        "detail": "6 seasons"
       },
       "competitions_leagues": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 leagues/competitions"
+        "count": 4,
+        "detail": "4 leagues/competitions"
       }
     },
     "city-of-menifee": {
       "age_eligibility": {
         "adopted": true,
-        "count": 631,
-        "detail": "631 sections with age rules"
+        "count": 632,
+        "detail": "632 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -2888,8 +2888,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 36907,
-        "detail": "36,907 emails sent"
+        "count": 36931,
+        "detail": "36,931 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3521,8 +3521,8 @@
     "city-of-torrance": {
       "age_eligibility": {
         "adopted": true,
-        "count": 3503,
-        "detail": "3,503 sections with age rules"
+        "count": 3504,
+        "detail": "3,504 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -3536,8 +3536,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 6484,
-        "detail": "6,484 emails sent"
+        "count": 6504,
+        "detail": "6,504 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3571,8 +3571,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 298,
-        "detail": "298 instant-bookable sites"
+        "count": 299,
+        "detail": "299 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -3612,9 +3612,9 @@
         "detail": "1,239 emails sent"
       },
       "payment_plans": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with plans"
       },
       "discount_codes": {
         "adopted": false,
@@ -3737,23 +3737,23 @@
     "city-of-west-haven": {
       "age_eligibility": {
         "adopted": true,
-        "count": 273,
-        "detail": "273 sections with age rules"
+        "count": 274,
+        "detail": "274 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 57,
-        "detail": "57 sections with waitlist"
+        "count": 59,
+        "detail": "59 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 5052,
-        "detail": "5,052 SMS sent"
+        "count": 5115,
+        "detail": "5,115 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 82296,
-        "detail": "82,296 emails sent"
+        "count": 82313,
+        "detail": "82,313 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3782,8 +3782,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 forms"
+        "count": 15,
+        "detail": "15 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -3809,13 +3809,13 @@
     "city-of-west-sacramento": {
       "age_eligibility": {
         "adopted": true,
-        "count": 759,
-        "detail": "759 sections with age rules"
+        "count": 761,
+        "detail": "761 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 515,
-        "detail": "515 sections with waitlist"
+        "count": 516,
+        "detail": "516 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3824,8 +3824,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 11036,
-        "detail": "11,036 emails sent"
+        "count": 11056,
+        "detail": "11,056 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3854,8 +3854,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 53,
-        "detail": "53 forms"
+        "count": 54,
+        "detail": "54 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -3881,13 +3881,13 @@
     "douglas-county-nv": {
       "age_eligibility": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 sections with age rules"
+        "count": 15,
+        "detail": "15 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 28,
-        "detail": "28 sections with waitlist"
+        "count": 29,
+        "detail": "29 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3896,8 +3896,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 290,
-        "detail": "290 emails sent"
+        "count": 291,
+        "detail": "291 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3926,13 +3926,13 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 forms"
+        "count": 19,
+        "detail": "19 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 103,
-        "detail": "103 instant-bookable sites"
+        "count": 102,
+        "detail": "102 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -3968,8 +3968,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 45216,
-        "detail": "45,216 emails sent"
+        "count": 45217,
+        "detail": "45,217 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -4025,13 +4025,13 @@
     "essex-junction": {
       "age_eligibility": {
         "adopted": true,
-        "count": 78,
-        "detail": "78 sections with age rules"
+        "count": 80,
+        "detail": "80 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 94,
-        "detail": "94 sections with waitlist"
+        "count": 101,
+        "detail": "101 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -4457,8 +4457,8 @@
     "littleton": {
       "age_eligibility": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 sections with age rules"
+        "count": 21,
+        "detail": "21 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -4759,9 +4759,9 @@
         "detail": "Not using"
       },
       "email_messaging": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 69,
+        "detail": "69 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -4889,8 +4889,8 @@
     "prescott-valley": {
       "age_eligibility": {
         "adopted": true,
-        "count": 337,
-        "detail": "337 sections with age rules"
+        "count": 338,
+        "detail": "338 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5321,8 +5321,8 @@
     "santacruzcounty": {
       "age_eligibility": {
         "adopted": true,
-        "count": 170,
-        "detail": "170 sections with age rules"
+        "count": 174,
+        "detail": "174 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5686,8 +5686,8 @@
       },
       "waitlist": {
         "adopted": true,
-        "count": 529,
-        "detail": "529 sections with waitlist"
+        "count": 532,
+        "detail": "532 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -5753,13 +5753,13 @@
     "town-of-clarksville": {
       "age_eligibility": {
         "adopted": true,
-        "count": 78,
-        "detail": "78 sections with age rules"
+        "count": 80,
+        "detail": "80 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 69,
-        "detail": "69 sections with waitlist"
+        "count": 70,
+        "detail": "70 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -5912,8 +5912,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 4203,
-        "detail": "4,203 emails sent"
+        "count": 4211,
+        "detail": "4,211 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -5969,8 +5969,8 @@
     "town-of-reading": {
       "age_eligibility": {
         "adopted": true,
-        "count": 259,
-        "detail": "259 sections with age rules"
+        "count": 260,
+        "detail": "260 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -6056,8 +6056,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 834,
-        "detail": "834 emails sent"
+        "count": 842,
+        "detail": "842 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -6128,8 +6128,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 2865,
-        "detail": "2,865 emails sent"
+        "count": 3227,
+        "detail": "3,227 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -6190,8 +6190,8 @@
       },
       "waitlist": {
         "adopted": true,
-        "count": 161,
-        "detail": "161 sections with waitlist"
+        "count": 162,
+        "detail": "162 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -6250,30 +6250,30 @@
       },
       "competitions_leagues": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 leagues/competitions"
+        "count": 3,
+        "detail": "3 leagues/competitions"
       }
     },
     "watertown": {
       "age_eligibility": {
         "adopted": true,
-        "count": 527,
-        "detail": "527 sections with age rules"
+        "count": 528,
+        "detail": "528 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 611,
-        "detail": "611 sections with waitlist"
+        "count": 612,
+        "detail": "612 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 2683,
-        "detail": "2,683 SMS sent"
+        "count": 2706,
+        "detail": "2,706 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 5233,
-        "detail": "5,233 emails sent"
+        "count": 5245,
+        "detail": "5,245 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -6307,8 +6307,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 35,
-        "detail": "35 instant-bookable sites"
+        "count": 34,
+        "detail": "34 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -6399,7 +6399,7 @@
       }
     }
   },
-  "notes": "Core usage + wave-1 adoption (14 of 53 catalog features) re-baked 2026-08-11 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.",
+  "notes": "Core usage + wave-1 adoption (14 of 53 catalog features) re-baked 2026-08-12 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.",
   "measuredFeatures": [
     "age_eligibility",
     "waitlist",
