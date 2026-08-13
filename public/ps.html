@@ -314,11 +314,15 @@
   // ---------------- CX Reporting (launch pipeline gantt) ----------------
   // Data: /api/launches — baked daily from the Airtable Services view by
   // scripts/refresh/bake-launches.js, live-refreshable via the button.
-  const GANTT_STAGES = ["Sales Hand Off", "Discovery", "Partnership Kick Off", "Configuration", "Launch Marketing and Operations", "Go-Live Support"];
+  // Pipeline order as the CX team runs it. Single source of truth for the
+  // legend, footer counts, sort-by-stage, and the ACV-by-stage table.
+  const GANTT_STAGES = ["Sales Hand Off", "Partnership Kick Off", "Discovery", "Configuration", "Launch Marketing and Operations", "Go-Live Support"];
   // Launched/Delayed are baked into the snapshot but hidden by default —
   // the gantt is about upcoming launches; toggles bring them back.
   const GANTT_STAGE_ORDER = [...GANTT_STAGES, "Launched", "Delayed"];
-  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Discovery": "#8b5cf6", "Partnership Kick Off": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b", "Launched": "#475569", "Delayed": "#7f1d1d" };
+  // Colors track pipeline position (cool early → warm at go-live), so they
+  // follow the order above rather than staying pinned to a stage name.
+  const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Partnership Kick Off": "#8b5cf6", "Discovery": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b", "Launched": "#475569", "Delayed": "#7f1d1d" };
   const LOE_WEIGHT = { "Very Large": 4, "Large": 3, "Medium": 2, "Small": 1 };
   const KNOWN_OWNER_COLORS = { "Michael Kehoe": "#f97316", "Maddie Pellman": "#ec4899", "Lindsay Keare": "#8b5cf6", "Dan Jenner": "#06b6d4", "Lionel Nyange": "#10b981", "Ankur Lal": "#e11d48", "Teddy Noll": "#a3e635" };
   const OWNER_PALETTE = ["#fbbf24", "#38bdf8", "#c084fc", "#34d399", "#fb7185", "#a78bfa"];
