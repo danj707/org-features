@@ -30,7 +30,8 @@ below is what it does today and how it grows into the real thing.
 - **CX Reporting** — the Launch Pipeline gantt: services from the Airtable
   Services table (owner, stage, LOE, status, ACV, start / reg-launch / end
   dates), with per-month active counts + ACV, an owner breakdown,
-  revenue-by-owner-by-quarter, and QTD launched/forecast stats. The full
+  revenue-by-owner-by-quarter, QTD launched/forecast stats, and an
+  ACV-by-pipeline-stage table (which follows the page's filters). The full
   table is baked (all stages) so revenue math can count completed launches;
   the gantt itself defaults to upcoming work — **Launched and Delayed
   stages are hidden unless toggled on** via the Include pills.

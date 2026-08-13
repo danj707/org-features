@@ -464,6 +464,26 @@
     const sumACV = (list) => list.reduce((t, s) => t + (s.acv || 0), 0);
     const revOwners = namedOwners.filter(o => quarters.some(k => withReg.some(s => s.owner === o && inQ(s, k))));
 
+    // ACV sitting in each pipeline stage. Follows the filters above (so the
+    // default view is the upcoming pipeline), and uses `data` rather than
+    // `rows` because a service holds ACV whether or not it has dates yet.
+    // The trailing catch-all keeps ACV from vanishing if Airtable gains a
+    // stage this dashboard doesn't know about.
+    const stageRollup = [
+      ...GANTT_STAGE_ORDER.map(stage => {
+        const inStage = data.filter(s => s.stage === stage);
+        return { stage, count: inStage.length, acv: sumACV(inStage), color: GANTT_STAGE_COLORS[stage] };
+      }),
+      (() => {
+        const rest = data.filter(s => !GANTT_STAGE_ORDER.includes(s.stage));
+        return { stage: "Other / unstaged", count: rest.length, acv: sumACV(rest), color: "#94a3b8" };
+      })(),
+    ].filter(r => r.count);
+    const stageTotalACV = sumACV(data);
+    const pctOfPipeline = (acv) => (stageTotalACV ? (acv / stageTotalACV) * 100 : 0);
+    const thCell = (align, width) => ({ padding: "10px 16px", textAlign: align, fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b", background: "transparent", position: "static", width });
+    const tdCell = (align) => ({ padding: "9px 16px", textAlign: align, borderRight: "1px solid #1e293b", borderBottom: "none" });
+
     const refreshedAt = snap.generatedAt ? new Date(snap.generatedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "?";
 
     return e("div", { style: { fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#0f172a", borderRadius: 12, color: "#e2e8f0", padding: 20, border: "1px solid #334155" } },
@@ -637,6 +657,40 @@
             e("div", { key: label, style: { display: "flex", borderBottom: i < arr.length - 1 ? "1px solid #1e293b" : "none" } },
               e("div", { style: { width: 220, minWidth: 220, padding: "10px 16px", fontSize: 12, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em", borderRight: "1px solid #1e293b" } }, label),
               e("div", { style: { flex: 1, padding: "10px 16px", fontSize: 13, color: "#e2e8f0" } }, value))))),
+
+      // ACV by pipeline stage
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" } },
+          "ACV by Pipeline Stage",
+          e("span", { style: { fontSize: 11, fontWeight: 400, color: "#64748b", textTransform: "none", letterSpacing: 0 } },
+            "follows the filters above · " + data.length + " service" + (data.length !== 1 ? "s" : "") + " · " + fmtACV(stageTotalACV) + " total")),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "auto" } },
+          e("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12 } },
+            e("thead", null, e("tr", { style: { borderBottom: "1px solid #334155" } },
+              e("th", { style: thCell("left", 260) }, "Stage"),
+              e("th", { style: thCell("right", 90) }, "Services"),
+              e("th", { style: thCell("right", 120) }, "ACV"),
+              e("th", { style: thCell("left") }, "Share of pipeline"))),
+            e("tbody", null,
+              stageRollup.map((r, ri) =>
+                e("tr", { key: r.stage, style: { borderBottom: "1px solid #1e293b", background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                  e("td", { style: tdCell("left") },
+                    e("div", { style: { display: "flex", alignItems: "center", gap: 7 } },
+                      e("div", { style: { width: 8, height: 8, borderRadius: 2, background: r.color, flexShrink: 0 } }),
+                      e("span", { style: { fontSize: 12, color: "#cbd5e1", fontWeight: 500 } }, r.stage))),
+                  e("td", { style: { ...tdCell("right"), color: "#94a3b8", fontVariantNumeric: "tabular-nums" } }, r.count),
+                  e("td", { style: { ...tdCell("right"), fontSize: 13, fontWeight: 700, color: r.acv ? "#34d399" : "#334155" } }, fmtACV(r.acv)),
+                  e("td", { style: tdCell("left") },
+                    e("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                      e("div", { style: { flex: 1, minWidth: 60, height: 8, background: "#0f172a", borderRadius: 999, overflow: "hidden" } },
+                        e("div", { style: { width: pctOfPipeline(r.acv) + "%", height: "100%", background: r.color, borderRadius: 999 } })),
+                      e("span", { style: { fontSize: 11, color: "#64748b", width: 32, textAlign: "right", flexShrink: 0, fontVariantNumeric: "tabular-nums" } }, Math.round(pctOfPipeline(r.acv)) + "%"))))),
+              e("tr", { style: { borderTop: "1px solid #334155", background: "rgba(255,255,255,0.03)" } },
+                e("td", { style: { ...tdCell("left"), fontSize: 11, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.06em" } }, "Total"),
+                e("td", { style: { ...tdCell("right"), color: "#e2e8f0", fontWeight: 600, fontVariantNumeric: "tabular-nums" } }, data.length),
+                e("td", { style: { ...tdCell("right"), fontSize: 13, fontWeight: 700, color: "#f8fafc" } }, fmtACV(stageTotalACV)),
+                e("td", { style: tdCell("left") })))),
+          stageRollup.length === 0 ? e("div", { style: { padding: "18px 16px", textAlign: "center", color: "#64748b", fontSize: 12.5 } }, "No services match the current filters.") : null)),
 
       // Tooltip
       tooltip ? e("div", { style: { position: "fixed", left: Math.min(tooltip.x + 12, window.innerWidth - 260), top: Math.max(8, tooltip.y - 160), background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: "12px 14px", zIndex: 100, width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", pointerEvents: "none" } },
