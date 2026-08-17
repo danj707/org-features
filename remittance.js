@@ -14,12 +14,19 @@
  * the adoption snapshot this is fetched live per request — an item log is
  * transactional and must not be served from a day-old bake.
  *
- * The generated CSV is a byte-for-byte match for the product's own Item Log
- * export: same 12 columns, same order, same value formatting. It was validated
- * against a real manual export (Chico, 2026-08-08 → 2026-08-15: 1,180 rows,
- * identical file). The card's SQL carries two non-obvious rules that make that
- * true — Transaction ID is the last 8 hex of transaction_event_batch_id, and a
- * zero amount renders "$0" not "$0.00" — so don't reformat values here.
+ * The generated CSV is a drop-in replacement for the product's own Item Log
+ * export: same 12 columns, same column order, same value formatting, same rows.
+ * Validated against a real manual export (Chico, 2026-08-08 → 2026-08-15):
+ * identical 1,180 rows and identical totals, methods and item-type counts.
+ * The card's SQL carries two non-obvious rules that make that true —
+ * Transaction ID is the last 8 hex of transaction_event_batch_id, and a zero
+ * amount renders "$0" not "$0.00" — so don't reformat values here.
+ *
+ * One deliberate difference: rows sharing the same timestamp can come out in a
+ * different sequence than the product's export. The product has no tie-break,
+ * so its own order isn't reproducible run to run; the card sorts by
+ * order_item_transaction_id within a timestamp so the same period always
+ * exports identically. Row content is unaffected.
  */
 
 const fs   = require("fs");
@@ -27,11 +34,11 @@ const path = require("path");
 
 const METABASE_URL = process.env.METABASE_URL || "https://rec.metabaseapp.com";
 
-// Public sharing UUID of Metabase card 19900. Set ITEM_LOG_UUID in Railway once
-// the card's public link is enabled (Share → Enable public link) and its
-// Start Date / End Date template tags are set to type Date. Until then the
-// report renders an explicit "not connected" state rather than failing.
-const ITEM_LOG_UUID = process.env.ITEM_LOG_UUID || "";
+// Public sharing UUID of Metabase card 19900 ("✅ Item Log Report"). Not a
+// secret — it's a public link — so it lives in code, with an env override for
+// pointing at a replacement card without a deploy. Empty ⇒ the report renders
+// an explicit "not connected" state rather than failing.
+const ITEM_LOG_UUID = process.env.ITEM_LOG_UUID || "4e02f94d-3658-4c67-b371-41dbbc677831";
 
 // Metabase's own query timeout is the real ceiling; this just stops a hung
 // socket from holding the response open forever.

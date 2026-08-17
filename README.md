@@ -45,15 +45,26 @@ remittance date, then click any organization's date to download that org's CSV.
 
 Unlike the baked dashboards this queries **Metabase live per request** — an item
 log is transactional, and a day-old snapshot would be wrong for finance. The
-generated CSV is a byte-for-byte match for the product's own Item Log export
-(same 12 columns, order, and value formatting), validated against a real manual
-export (Chico, 2026-08-08 → 2026-08-15: 1,180 rows, identical file).
+generated CSV is a drop-in replacement for the product's own Item Log export:
+same 12 columns, same order, same value formatting, same rows. Validated against
+a real manual export (Chico, 2026-08-08 → 2026-08-15) — identical 1,180 rows and
+identical totals, payment-method and item-type counts.
 
-**Config:** set `ITEM_LOG_UUID` to the public-link UUID of the shared Metabase
-card "✅ Item Log Report" (question 19900). Optional: `METABASE_URL`
+Rows sharing the same timestamp can appear in a different sequence than the
+product's export. The product has no tie-break, so its own order isn't
+reproducible run to run; this card sorts by `order_item_transaction_id` within a
+timestamp, so the same period always exports identically. Row content is
+unaffected — a set-comparison of the two files matches exactly.
+
+Live sign-off on the heaviest org (Apex, the busiest period): 9,866 rows in
+~7s, well inside the request timeout.
+
+**Config:** `ITEM_LOG_UUID` defaults in code to the public link of the shared
+Metabase card "✅ Item Log Report" (question 19900); set the env var only to
+point at a replacement card without a deploy. Optional: `METABASE_URL`
 (default `https://rec.metabaseapp.com`) and `ITEM_LOG_TIMEOUT_MS` (default
-120000). Without `ITEM_LOG_UUID` the page renders an explicit "not connected"
-state instead of failing.
+120000). With no UUID the page renders an explicit "not connected" state
+instead of failing.
 
 > **Metabase parameter ids are required.** This Metabase (v1.63) rejects a
 > public-card query whose `parameters` omit the card's parameter `id` — it 400s
