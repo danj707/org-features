@@ -747,39 +747,68 @@
     const orgs = snap.orgs.filter(o =>
       !q || (o.displayName + " " + o.name + " " + o.slug).toLowerCase().indexOf(q.toLowerCase()) !== -1);
 
+    const reports = snap.reports || [{ key: "itemlog", label: "Item log", configured: snap.configured }];
+    const unconfigured = reports.filter(r => !r.configured);
+
     function filenameFrom(resp) {
       const m = /filename="([^"]+)"/.exec(resp.headers.get("Content-Disposition") || "");
       return m ? m[1] : "";
     }
+    // Busy/error state is keyed per org+report so the two columns don't
+    // clobber each other's spinner when both are clicked.
+    function cellKey(org, report) { return org.id + ":" + report.key; }
 
-    function download(org) {
-      if (!snap.configured || !period || busy[org.id]) return;
-      setBusy(b => Object.assign({}, b, { [org.id]: true }));
-      setErrs(x => Object.assign({}, x, { [org.id]: "" }));
-      fetch("/api/remittance/csv?org=" + encodeURIComponent(org.id) + "&end=" + encodeURIComponent(period.end))
+    function csvUrl(org, report) {
+      return "/api/remittance/csv?org=" + encodeURIComponent(org.id)
+           + "&end=" + encodeURIComponent(period.end)
+           + "&report=" + encodeURIComponent(report.key);
+    }
+
+    function download(org, report) {
+      const k = cellKey(org, report);
+      if (!report.configured || !period || busy[k]) return;
+      setBusy(b => Object.assign({}, b, { [k]: true }));
+      setErrs(x => Object.assign({}, x, { [k]: "" }));
+      fetch(csvUrl(org, report))
         .then(r => r.ok ? r.blob().then(b => ({ b: b, name: filenameFrom(r) }))
                         : r.text().then(t => Promise.reject(new Error(t))))
         .then(function (out) {
           const url = URL.createObjectURL(out.b);
           const a = document.createElement("a");
           a.href = url;
-          a.download = out.name || ("item-log-" + org.slug + "-" + period.start + "-to-" + period.end + ".csv");
+          a.download = out.name || (report.key + "-" + org.slug + "-" + period.start + "-to-" + period.end + ".csv");
           document.body.appendChild(a);
           a.click();
           a.remove();
           URL.revokeObjectURL(url);
         })
-        .catch(err => setErrs(x => Object.assign({}, x, { [org.id]: String(err.message || err).slice(0, 180) })))
-        .then(() => setBusy(b => Object.assign({}, b, { [org.id]: false })));
+        .catch(err => setErrs(x => Object.assign({}, x, { [k]: String(err.message || err).slice(0, 180) })))
+        .then(() => setBusy(b => Object.assign({}, b, { [k]: false })));
+    }
+
+    // One cell per report: the period's dates as a download link, with the
+    // in-flight / error state underneath so it never shifts the table layout.
+    function reportCell(org, report) {
+      const k = cellKey(org, report);
+      return e("td", { key: report.key, className: "l" },
+        !report.configured || !period
+          ? e("span", { className: "zero" }, period ? period.start + " → " + period.end : "—")
+          : e("a", {
+              href: csvUrl(org, report),
+              onClick: (ev) => { ev.preventDefault(); download(org, report); },
+              style: { fontWeight: 600, color: "#0d5c99" },
+              title: "Download " + org.displayName + "'s " + report.label.toLowerCase() + " for " + period.label
+            }, period.start + " → " + period.end),
+        busy[k] ? e("div", { style: { fontSize: 11.5, color: "#64748b" } }, "Building…") : null,
+        errs[k] ? e("div", { style: { fontSize: 11.5, color: "#dc2626" } }, errs[k]) : null);
     }
 
     return e("div", null,
-      !snap.configured ? e("div", { className: "panel", style: { borderColor: "#fcd34d", background: "#fffbeb" } },
+      unconfigured.length ? e("div", { className: "panel", style: { borderColor: "#fcd34d", background: "#fffbeb" } },
         e("div", { style: { padding: "12px 16px", fontSize: 13, color: "#78350f" } },
-          e("b", null, "Not connected yet. "),
-          "The shared Item Log Metabase card needs its public link enabled and ",
-          e("code", null, "ITEM_LOG_UUID"),
-          " set on this server. Until then the dates below aren't clickable.")) : null,
+          e("b", null, unconfigured.map(r => r.label).join(" and ") + (unconfigured.length > 1 ? " aren't" : " isn't") + " connected yet. "),
+          "The shared Metabase card needs its public link enabled and its UUID set on this server. ",
+          "Until then that column's dates aren't clickable.")) : null,
 
       e("div", { className: "cards" },
         e("div", { className: "card" },
@@ -798,8 +827,8 @@
           e("div", { className: "d" }, "Today is " + fmtDay2(snap.today)))),
 
       e("div", { className: "panel" },
-        e("h2", null, "Item Log by organization",
-          e("span", { className: "hint" }, "click an org's date to download its CSV — the same file as the product's Item Log export")),
+        e("h2", null, "Exports by organization",
+          e("span", { className: "hint" }, "click a date to download that CSV — an exact duplicate of the product's own export")),
         e("div", { className: "filters" },
           e("label", { className: "chk" }, "Remittance date",
             e("select", { value: end, onChange: ev => setEnd(ev.target.value) },
@@ -810,23 +839,10 @@
           e("table", null,
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"),
-              e("th", { className: "l" }, "Item log"),
-              e("th", { className: "l" }, ""))),
+              reports.map(r => e("th", { key: r.key, className: "l" }, r.label)))),
             e("tbody", null, orgs.map(o => e("tr", { key: o.id },
               e("td", { className: "name", title: o.name }, o.displayName),
-              e("td", { className: "l" },
-                !snap.configured || !period
-                  ? e("span", { className: "zero" }, period ? period.start + " → " + period.end : "—")
-                  : e("a", {
-                      href: "/api/remittance/csv?org=" + encodeURIComponent(o.id) + "&end=" + encodeURIComponent(period.end),
-                      onClick: (ev) => { ev.preventDefault(); download(o); },
-                      style: { fontWeight: 600, color: "#0d5c99" },
-                      title: "Download " + o.displayName + "'s item log for " + period.label
-                    }, period.start + " → " + period.end)),
-              e("td", { className: "l", style: { color: "#64748b" } },
-                busy[o.id] ? "Building…"
-                  : errs[o.id] ? e("span", { style: { color: "#dc2626" } }, errs[o.id])
-                  : "")))))),
+              reports.map(r => reportCell(o, r))))))),
         e("div", { style: { padding: "10px 16px", fontSize: 12, color: "#64748b", borderTop: "1px solid var(--line)" } },
           orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule")));
   }

@@ -28,9 +28,18 @@ drill-in (e.g. <https://org-features-production.up.railway.app/org/carmichael-di
 
 ## Remittance (Finance › Remittance)
 
-Finance used to re-run the product's **Item Log** export by hand once per
-billing period, for every org. `/ps/remittance` replaces that: pick the ending
-remittance date, then click any organization's date to download that org's CSV.
+Finance used to re-run the product's **Item Log** and **Transaction Log**
+exports by hand once per billing period, for every org. `/ps/remittance`
+replaces that: pick the ending remittance date, then click any organization's
+date to download that CSV. One column per report:
+
+| Column | Grain | Card |
+|---|---|---|
+| Item log | one row per order-item transaction (line-item detail, 12 columns) | 19900 |
+| Transaction log | one row per transaction event (cart totals + payment-method split, 24 columns) | 19933 |
+
+The two reconcile: Chico's 1,180 item-log lines for 2026-08-08 → 2026-08-15 roll
+up to exactly the 630 transactions in that period's transaction log.
 
 - **Billing periods** run 1–7, 8–15, 16–22, and 23–end of month. The report
   starts at the period ending **2026-08-15**.
@@ -43,28 +52,31 @@ remittance date, then click any organization's date to download that org's CSV.
 - Org names and ids come from the features snapshot, so every published org is
   covered automatically.
 
-Unlike the baked dashboards this queries **Metabase live per request** — an item
-log is transactional, and a day-old snapshot would be wrong for finance. The
-generated CSV is a drop-in replacement for the product's own Item Log export:
-same 12 columns, same order, same value formatting, same rows. Validated against
-a real manual export (Chico, 2026-08-08 → 2026-08-15) — identical 1,180 rows and
-identical totals, payment-method and item-type counts.
+Unlike the baked dashboards these query **Metabase live per request** — a
+transaction log is transactional, and a day-old snapshot would be wrong for
+finance. Each CSV is an exact duplicate of the product's own export: same
+columns, same order, same value formatting, same rows. Both were validated
+against real manual exports (Chico, 2026-08-08 → 2026-08-15):
+
+- **Item log** — 1,180 rows, every total and payment-method/item-type count identical.
+- **Transaction log** — 630 rows, all 24 columns identical by checksum, and the
+  full quoted CSV rows hash-identical to the manual file.
 
 Rows sharing the same timestamp can appear in a different sequence than the
 product's export. The product has no tie-break, so its own order isn't
-reproducible run to run; this card sorts by `order_item_transaction_id` within a
-timestamp, so the same period always exports identically. Row content is
-unaffected — a set-comparison of the two files matches exactly.
+reproducible run to run; these cards sort deterministically within a timestamp so
+the same period always exports identically. Row content is unaffected — a
+set-comparison of the files matches exactly.
 
-Live sign-off on the heaviest org (Apex, the busiest period): 9,866 rows in
-~7s, well inside the request timeout.
+Live sign-off on the heaviest org (Apex, the busiest period): 9,866 item-log rows
+in ~7s, well inside the request timeout.
 
-**Config:** `ITEM_LOG_UUID` defaults in code to the public link of the shared
-Metabase card "✅ Item Log Report" (question 19900); set the env var only to
-point at a replacement card without a deploy. Optional: `METABASE_URL`
-(default `https://rec.metabaseapp.com`) and `ITEM_LOG_TIMEOUT_MS` (default
-120000). With no UUID the page renders an explicit "not connected" state
-instead of failing.
+**Config:** `ITEM_LOG_UUID` and `TRANSACTION_LOG_UUID` hold the public-link UUIDs
+of cards 19900 and 19933. They default in code (a public link is not a secret);
+set the env vars only to point at replacement cards without a deploy. Optional:
+`METABASE_URL` (default `https://rec.metabaseapp.com`) and `ITEM_LOG_TIMEOUT_MS`
+(default 120000). A report with no UUID renders an explicit "not connected"
+state for its column and leaves the other one working.
 
 > **Metabase parameter ids are required.** This Metabase (v1.63) rejects a
 > public-card query whose `parameters` omit the card's parameter `id` — it 400s
