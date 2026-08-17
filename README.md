@@ -43,12 +43,22 @@ up to exactly the 630 transactions in that period's transaction log.
 
 - **Billing periods** run 1–7, 8–15, 16–22, and 23–end of month. The report
   starts at the period ending **2026-08-15**.
+- **Periods are generated, not listed.** The 1-7 / 8-15 / 16-22 / 23-EOM shape is
+  formulaic, so `remittance.js` generates every period from the start date up to
+  and including the one in progress. Nothing has to be added each week: the next
+  period appears on its own, and the page's default rolls over automatically.
+  Future periods aren't offered — there's nothing to export from a period that
+  hasn't started.
+- **The default is the period finance is working on**: the most recently *closed*
+  one. On Aug 23 that's Aug 16–22; the menu (newest first) flips back to any
+  prior period, with the in-progress one at the top marked *(in progress)*.
 - **Payment / ACH dates** come from the finance remittance schedule in
-  `data/remittance-schedule.json`. They're business-day driven rather than
-  formulaic, so **each new year has to be transcribed into that file** or the
-  date menu runs out of periods.
-- The page opens on whichever period is currently *due* — the most recently
-  closed one — and labels each period due / payment issued / still open.
+  `data/remittance-schedule.json`. Those are business-day driven rather than
+  formulaic, so each year has to be transcribed there. If a year is missing the
+  periods still list and still export — the pay/ACH cards just read "—" with a
+  "not in the schedule file yet" note, so **add next year's column when finance
+  publishes it** and nothing else changes.
+- Each period is labelled *export due* / *payment issued* / *still in progress*.
 - Org names and ids come from the features snapshot, so every published org is
   covered automatically.
 
@@ -62,11 +72,20 @@ against real manual exports (Chico, 2026-08-08 → 2026-08-15):
 - **Transaction log** — 630 rows, all 24 columns identical by checksum, and the
   full quoted CSV rows hash-identical to the manual file.
 
-Rows sharing the same timestamp can appear in a different sequence than the
-product's export. The product has no tie-break, so its own order isn't
-reproducible run to run; these cards sort deterministically within a timestamp so
-the same period always exports identically. Row content is unaffected — a
-set-comparison of the files matches exactly.
+**On "line for line".** Every line in the product's export appears in ours
+exactly once, and vice versa — verified as a multiset against the live cards, so
+no row is missing, duplicated, or altered. What can differ is the *sequence* of
+lines that share the same timestamp: 9 of 630 in the transaction log, 317 of
+1,180 in the item log, and in both cases every difference is a reordering inside
+one timestamp, never across one.
+
+That gap is not closable. The product emits no tie-break, so its own order is
+not reproducible run to run — re-running the same manual export can reorder those
+same lines. It was checked against `transaction_event_created_at`,
+`settled_at`, `epsio_id`, `order_id`, `transaction_event_id` and customer name,
+ascending and descending; none reproduces the file's order. These cards sort
+deterministically instead, so the same period always exports identically. If you
+need to diff an export against a historical file, compare them sorted.
 
 Live sign-off on the heaviest org (Apex, the busiest period): 9,866 item-log rows
 in ~7s, well inside the request timeout.

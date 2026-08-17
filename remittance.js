@@ -46,7 +46,7 @@ const METABASE_URL = process.env.METABASE_URL || "https://rec.metabaseapp.com";
 //   card 19900 — "✅ Item Log Report"
 //   card 19933 — "✅ Transaction Log Report"
 const ITEM_LOG_UUID        = process.env.ITEM_LOG_UUID        || "4e02f94d-3658-4c67-b371-41dbbc677831";
-const TRANSACTION_LOG_UUID = process.env.TRANSACTION_LOG_UUID || "";
+const TRANSACTION_LOG_UUID = process.env.TRANSACTION_LOG_UUID || "8198df2f-b4c6-4ee5-ac67-4e86cd8abd4c";
 
 // The reports offered per org, in column order on the dashboard.
 const REPORTS = {
@@ -94,12 +94,57 @@ function loadSchedule(dataDir) {
   return { years: {} };
 }
 
-/** Every period the report covers, oldest first. */
-function periods() {
-  const years = (_schedule && _schedule.years) || {};
-  return Object.keys(years).sort()
-    .flatMap(y => years[y])
-    .filter(p => p.end >= FIRST_PERIOD_END);
+const MONTHS = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
+const iso = (y, m, d) => `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+/**
+ * Billing periods themselves are formulaic — 1-7, 8-15, 16-22, 23-EOM — so they
+ * are GENERATED rather than read from the schedule file. Only the pay/ACH dates
+ * need transcribing, and those get merged in below when we have them.
+ *
+ * That split is what makes each new period show up on its own: nothing has to
+ * be added weekly, and when 2026's transcribed schedule runs out the report
+ * keeps listing periods (with pay/ACH blank) instead of dead-ending.
+ */
+function generatePeriods(year) {
+  const out = [];
+  for (let m = 1; m <= 12; m++) {
+    const eom = new Date(Date.UTC(year, m, 0)).getUTCDate();
+    for (const [s, e] of [[1,7],[8,15],[16,22],[23,eom]]) {
+      out.push({
+        label: `${MONTHS[m-1]} ${s}-${e}`,
+        start: iso(year, m, s),
+        end:   iso(year, m, e),
+        payBy: null, achStart: null, achEnd: null,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Every period the report covers, oldest first: from FIRST_PERIOD_END up to and
+ * including the one in progress today. Future periods are left out — there is
+ * nothing to export from a period that hasn't started.
+ */
+function periods(today = new Date().toISOString().slice(0, 10)) {
+  const firstYear = Number(FIRST_PERIOD_END.slice(0, 4));
+  const thisYear  = Number(today.slice(0, 4));
+  const byEnd = new Map();
+  for (let y = firstYear; y <= thisYear; y++) {
+    for (const p of generatePeriods(y)) byEnd.set(p.end, p);
+  }
+  // Merge the transcribed pay/ACH dates onto the generated periods.
+  for (const list of Object.values((_schedule && _schedule.years) || {})) {
+    for (const s of list) {
+      const p = byEnd.get(s.end);
+      if (p) Object.assign(p, { payBy: s.payBy, achStart: s.achStart, achEnd: s.achEnd, label: s.label || p.label });
+    }
+  }
+  return [...byEnd.values()]
+    .filter(p => p.end >= FIRST_PERIOD_END && p.start <= today)
+    .sort((a, b) => a.end < b.end ? -1 : a.end > b.end ? 1 : 0);
 }
 
 function findPeriod(end) {
@@ -113,7 +158,7 @@ function findPeriod(end) {
  * fall back to that first period so the page always has a selection.
  */
 function currentPeriod(today = new Date().toISOString().slice(0, 10)) {
-  const all = periods();
+  const all = periods(today);
   const closed = all.filter(p => p.end < today);
   return closed.length ? closed[closed.length - 1] : (all[0] || null);
 }
@@ -121,10 +166,14 @@ function currentPeriod(today = new Date().toISOString().slice(0, 10)) {
 /**
  *   due      — closed, payment not yet issued (the export is needed now)
  *   paid     — payment date has passed; ACH may still be landing
- *   upcoming — period hasn't closed yet
+ *   open     — period hasn't closed yet, so the data is still accumulating
+ *
+ * A period with no transcribed pay date can't be called due or paid, so it
+ * stays "due" once closed — finance still needs the export either way.
  */
 function periodStatus(p, today = new Date().toISOString().slice(0, 10)) {
-  if (p.end >= today) return "upcoming";
+  if (p.end >= today) return "open";
+  if (!p.payBy) return "due";
   return p.payBy >= today ? "due" : "paid";
 }
 
@@ -216,7 +265,11 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       reports: Object.values(REPORTS).map(r => ({ key: r.key, label: r.label, configured: !!r.uuid })),
       today,
       currentPeriodEnd: cur ? cur.end : null,
-      periods: periods().map(p => ({ ...p, status: periodStatus(p, today) })),
+      // Newest first: the period that's due sits at the top of the menu and
+      // flipping back to prior periods means going down the list.
+      periods: periods(today)
+        .map(p => ({ ...p, status: periodStatus(p, today) }))
+        .reverse(),
       orgs: loadOrgs(),
     });
   });

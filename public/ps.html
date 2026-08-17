@@ -738,11 +738,11 @@
 
     const period = snap.periods.find(p => p.end === end) || snap.periods[0];
     const STATUS = {
-      due:      { label: "Export due", cls: "p2" },
-      paid:     { label: "Payment issued", cls: "pos" },
-      upcoming: { label: "Period still open", cls: "p0" },
+      due:  { label: "Export due", cls: "p2" },
+      paid: { label: "Payment issued", cls: "pos" },
+      open: { label: "Still in progress", cls: "p0" },
     };
-    const st = (period && STATUS[period.status]) || STATUS.upcoming;
+    const st = (period && STATUS[period.status]) || STATUS.open;
 
     const orgs = snap.orgs.filter(o =>
       !q || (o.displayName + " " + o.name + " " + o.slug).toLowerCase().indexOf(q.toLowerCase()) !== -1);
@@ -817,10 +817,13 @@
           e("div", { className: "d" }, period ? period.start + " → " + period.end : "")),
         e("div", { className: "card" },
           e("div", { className: "k" }, "Rec issues payment by"),
-          e("div", { className: "v", style: { fontSize: 20 } }, period ? fmtDay2(period.payBy) : "—")),
+          e("div", { className: "v", style: { fontSize: 20 } }, period && period.payBy ? fmtDay2(period.payBy) : "—"),
+          period && !period.payBy
+            ? e("div", { className: "d" }, "not in the schedule file yet") : null),
         e("div", { className: "card" },
           e("div", { className: "k" }, "ACH expected"),
-          e("div", { className: "v", style: { fontSize: 20 } }, period ? fmtDay2(period.achStart) + " – " + fmtDay2(period.achEnd) : "—")),
+          e("div", { className: "v", style: { fontSize: 20 } },
+            period && period.achStart ? fmtDay2(period.achStart) + " – " + fmtDay2(period.achEnd) : "—")),
         e("div", { className: "card" },
           e("div", { className: "k" }, "Status"),
           e("div", { className: "v", style: { fontSize: 20 } }, e("span", { className: "pill " + st.cls }, st.label)),
@@ -832,8 +835,11 @@
         e("div", { className: "filters" },
           e("label", { className: "chk" }, "Remittance date",
             e("select", { value: end, onChange: ev => setEnd(ev.target.value) },
+              // Newest first (server-ordered): the due period is at the top,
+              // prior periods below it.
               snap.periods.map(p => e("option", { key: p.end, value: p.end },
-                fmtDay2(p.end) + " · " + p.label + (p.status === "due" ? "  (due)" : ""))))),
+                fmtDay2(p.end) + " · " + p.label
+                  + (p.status === "due" ? "  (due)" : p.status === "open" ? "  (in progress)" : ""))))),
           e("input", { type: "text", placeholder: "Filter organizations…", value: q, onChange: ev => setQ(ev.target.value) })),
         e("div", { className: "tablewrap" },
           e("table", null,
