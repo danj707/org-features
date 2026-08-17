@@ -5,6 +5,7 @@
  *   GET /                → all-orgs dashboard
  *   GET /org/:slug       → single-org drill-in (same page, client routing)
  *   GET /api/data        → baked data snapshot (orgs, metrics, features, adoption)
+ *   GET /api/remittance  → billing periods + orgs for the Remittance report
  *   GET /healthz         → liveness probe
  *
  * Data model: data/features-data.json is a snapshot baked from the live
@@ -20,6 +21,7 @@ const compression = require("compression");
 const fs          = require("fs");
 const path        = require("path");
 const auth        = require("./auth");
+const remittance  = require("./remittance");
 
 const app  = express();
 const PORT = process.env.PORT || 3200;
@@ -148,6 +150,21 @@ if (process.env.AIRTABLE_API_KEY) {
   setInterval(() => maybeRefresh(25), 60 * 60 * 1000);     // hourly backstop, if >25h stale
 }
 
+// Remittance — per-org Item Log exports by billing period. Unlike the baked
+// dashboards this queries Metabase live per request: an item log is
+// transactional and a day-old snapshot would be wrong for finance. Org names
+// and ids come from the features snapshot, so every published org is covered.
+remittance.mount(app, {
+  requireAuth: auth.requireAuth,
+  dataDir: DATA_DIR,
+  loadOrgs: () => {
+    _snapshot = loadSnapshot() || _snapshot;
+    return ((_snapshot && _snapshot.orgs) || [])
+      .map(o => ({ id: o.id, slug: o.slug, name: o.name, displayName: o.displayName || o.name }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  },
+});
+
 const PAGE       = path.join(__dirname, "public", "dashboard.html");
 const PS_PAGE    = path.join(__dirname, "public", "ps.html");
 const LOGIN_PAGE = path.join(__dirname, "public", "login.html");
@@ -156,7 +173,7 @@ app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
 app.get("/login", (req, res) => auth.currentUser(req) ? res.redirect("/ps") : res.sendFile(LOGIN_PAGE));
 app.get("/reset", (_req, res) => res.sendFile(RESET_PAGE));
-app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/admin", "/ps/org/:id"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
+app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/remittance", "/ps/admin", "/ps/org/:id"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));
 

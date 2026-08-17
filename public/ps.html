@@ -106,6 +106,7 @@
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
     if (p.startsWith("/ps/reporting")) return { page: "reporting" };
+    if (p.startsWith("/ps/remittance")) return { page: "remittance" };
     if (p.startsWith("/ps/admin")) return { page: "admin" };
     const m = p.match(/^\/ps\/org\/(.+)$/);
     if (m) return { page: "org", id: decodeURIComponent(m[1]) };
@@ -708,6 +709,135 @@
             e("span", { key: k + "v", style: { color: k === "Status" ? (tooltip.row.status === "On Track" ? "#10b981" : "#ef4444") : "#e2e8f0", fontWeight: k === "Status" ? 600 : 400 } }, v)]))) : null);
   }
 
+  // ---------------- Remittance · per-org Item Log exports ----------------
+  // Finance used to re-run the product's Item Log export by hand once per
+  // billing period, for every org. Here: pick the ending remittance date, then
+  // click any org's date to download that org's CSV.
+  //
+  // Downloads go through fetch rather than following the link so a slow
+  // Metabase query can show a per-row "Building…" state and any error stays
+  // inline — a plain <a> would navigate the dashboard away to an error page.
+  // The href is still a real URL so the row is copyable / open-in-new-tab-able.
+  function Remittance() {
+    const [snap, setSnap] = useState(null);
+    const [end, setEnd] = useState("");
+    const [q, setQ] = useState("");
+    const [busy, setBusy] = useState({});   // orgId → true while building
+    const [errs, setErrs] = useState({});   // orgId → message
+    const [loadErr, setLoadErr] = useState("");
+
+    useEffect(() => {
+      fetch("/api/remittance")
+        .then(r => r.ok ? r.json() : r.json().then(d => Promise.reject(new Error(d.error || "request failed"))))
+        .then(d => { setSnap(d); setEnd(d.currentPeriodEnd || (d.periods[0] && d.periods[0].end) || ""); })
+        .catch(err => setLoadErr(String(err.message || err)));
+    }, []);
+
+    if (loadErr) return e("div", { className: "note", style: { color: "#dc2626" } }, "Could not load remittance data: " + loadErr);
+    if (!snap) return e("div", { className: "note" }, "Loading…");
+
+    const period = snap.periods.find(p => p.end === end) || snap.periods[0];
+    const STATUS = {
+      due:      { label: "Export due", cls: "p2" },
+      paid:     { label: "Payment issued", cls: "pos" },
+      upcoming: { label: "Period still open", cls: "p0" },
+    };
+    const st = (period && STATUS[period.status]) || STATUS.upcoming;
+
+    const orgs = snap.orgs.filter(o =>
+      !q || (o.displayName + " " + o.name + " " + o.slug).toLowerCase().indexOf(q.toLowerCase()) !== -1);
+
+    function filenameFrom(resp) {
+      const m = /filename="([^"]+)"/.exec(resp.headers.get("Content-Disposition") || "");
+      return m ? m[1] : "";
+    }
+
+    function download(org) {
+      if (!snap.configured || !period || busy[org.id]) return;
+      setBusy(b => Object.assign({}, b, { [org.id]: true }));
+      setErrs(x => Object.assign({}, x, { [org.id]: "" }));
+      fetch("/api/remittance/csv?org=" + encodeURIComponent(org.id) + "&end=" + encodeURIComponent(period.end))
+        .then(r => r.ok ? r.blob().then(b => ({ b: b, name: filenameFrom(r) }))
+                        : r.text().then(t => Promise.reject(new Error(t))))
+        .then(function (out) {
+          const url = URL.createObjectURL(out.b);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = out.name || ("item-log-" + org.slug + "-" + period.start + "-to-" + period.end + ".csv");
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        })
+        .catch(err => setErrs(x => Object.assign({}, x, { [org.id]: String(err.message || err).slice(0, 180) })))
+        .then(() => setBusy(b => Object.assign({}, b, { [org.id]: false })));
+    }
+
+    return e("div", null,
+      !snap.configured ? e("div", { className: "panel", style: { borderColor: "#fcd34d", background: "#fffbeb" } },
+        e("div", { style: { padding: "12px 16px", fontSize: 13, color: "#78350f" } },
+          e("b", null, "Not connected yet. "),
+          "The shared Item Log Metabase card needs its public link enabled and ",
+          e("code", null, "ITEM_LOG_UUID"),
+          " set on this server. Until then the dates below aren't clickable.")) : null,
+
+      e("div", { className: "cards" },
+        e("div", { className: "card" },
+          e("div", { className: "k" }, "Billing period"),
+          e("div", { className: "v", style: { fontSize: 20 } }, period ? period.label : "—"),
+          e("div", { className: "d" }, period ? period.start + " → " + period.end : "")),
+        e("div", { className: "card" },
+          e("div", { className: "k" }, "Rec issues payment by"),
+          e("div", { className: "v", style: { fontSize: 20 } }, period ? fmtDay2(period.payBy) : "—")),
+        e("div", { className: "card" },
+          e("div", { className: "k" }, "ACH expected"),
+          e("div", { className: "v", style: { fontSize: 20 } }, period ? fmtDay2(period.achStart) + " – " + fmtDay2(period.achEnd) : "—")),
+        e("div", { className: "card" },
+          e("div", { className: "k" }, "Status"),
+          e("div", { className: "v", style: { fontSize: 20 } }, e("span", { className: "pill " + st.cls }, st.label)),
+          e("div", { className: "d" }, "Today is " + fmtDay2(snap.today)))),
+
+      e("div", { className: "panel" },
+        e("h2", null, "Item Log by organization",
+          e("span", { className: "hint" }, "click an org's date to download its CSV — the same file as the product's Item Log export")),
+        e("div", { className: "filters" },
+          e("label", { className: "chk" }, "Remittance date",
+            e("select", { value: end, onChange: ev => setEnd(ev.target.value) },
+              snap.periods.map(p => e("option", { key: p.end, value: p.end },
+                fmtDay2(p.end) + " · " + p.label + (p.status === "due" ? "  (due)" : ""))))),
+          e("input", { type: "text", placeholder: "Filter organizations…", value: q, onChange: ev => setQ(ev.target.value) })),
+        e("div", { className: "tablewrap" },
+          e("table", null,
+            e("thead", null, e("tr", null,
+              e("th", { className: "l" }, "Organization"),
+              e("th", { className: "l" }, "Item log"),
+              e("th", { className: "l" }, ""))),
+            e("tbody", null, orgs.map(o => e("tr", { key: o.id },
+              e("td", { className: "name", title: o.name }, o.displayName),
+              e("td", { className: "l" },
+                !snap.configured || !period
+                  ? e("span", { className: "zero" }, period ? period.start + " → " + period.end : "—")
+                  : e("a", {
+                      href: "/api/remittance/csv?org=" + encodeURIComponent(o.id) + "&end=" + encodeURIComponent(period.end),
+                      onClick: (ev) => { ev.preventDefault(); download(o); },
+                      style: { fontWeight: 600, color: "#0d5c99" },
+                      title: "Download " + o.displayName + "'s item log for " + period.label
+                    }, period.start + " → " + period.end)),
+              e("td", { className: "l", style: { color: "#64748b" } },
+                busy[o.id] ? "Building…"
+                  : errs[o.id] ? e("span", { style: { color: "#dc2626" } }, errs[o.id])
+                  : "")))))),
+        e("div", { style: { padding: "10px 16px", fontSize: 12, color: "#64748b", borderTop: "1px solid var(--line)" } },
+          orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule")));
+  }
+
+  function fmtDay2(iso) {
+    if (!iso) return "—";
+    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const p = String(iso).split("-");
+    return MON[Number(p[1]) - 1] + " " + Number(p[2]) + ", " + p[0];
+  }
+
   // ---------------- Admin · user management ----------------
   function Admin({ me }) {
     const [users, setUsers] = useState(null);
@@ -781,7 +911,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),
@@ -789,6 +919,8 @@
         item("/ps", "Account Health", r.page === "health" || r.page === "org"),
         item("/ps/bugs", "Bug Management", r.page === "bugs", data.bugs.length),
         item("/ps/reporting", "CX Reporting", r.page === "reporting"),
+        e("div", { className: "sec" }, "Finance"),
+        item("/ps/remittance", "Remittance", r.page === "remittance"),
         e("div", { className: "sec" }, "Platform"),
         e("a", { className: "item", href: "/" }, "Org Features →"),
         me.role === "admin" ? e(React.Fragment, null, e("div", { className: "sec" }, "Admin"), item("/ps/admin", "Users", r.page === "admin")) : null,
@@ -802,6 +934,7 @@
           r.page === "health" ? e(Health, { data }) :
           r.page === "org" ? e(Org, { data, id: r.id }) :
           r.page === "bugs" ? e(Bugs, { data }) :
+          r.page === "remittance" ? e(Remittance, null) :
           r.page === "admin" ? e(Admin, { me }) :
           e(Reporting, { data }),
           e("div", { className: "foot" }, "Sources: Linear (bugs + customer tags) · HubSpot (status, health, engagement) · Airtable (feature requests) · rec prod replica (adoption). Intercom interactions/NPS not wired yet."))));

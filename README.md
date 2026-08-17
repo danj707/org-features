@@ -23,6 +23,44 @@ drill-in (e.g. <https://org-features-production.up.railway.app/org/carmichael-di
 - **`/org/:slug`** — per-org drill-in: that organization's core usage plus
   a categorized feature-adoption checklist.
 - **`/api/data`** — the raw JSON snapshot behind the dashboard.
+- **`/ps/remittance`** — Finance › Remittance: per-org **Item Log** exports,
+  one billing period at a time (see below).
+
+## Remittance (Finance › Remittance)
+
+Finance used to re-run the product's **Item Log** export by hand once per
+billing period, for every org. `/ps/remittance` replaces that: pick the ending
+remittance date, then click any organization's date to download that org's CSV.
+
+- **Billing periods** run 1–7, 8–15, 16–22, and 23–end of month. The report
+  starts at the period ending **2026-08-15**.
+- **Payment / ACH dates** come from the finance remittance schedule in
+  `data/remittance-schedule.json`. They're business-day driven rather than
+  formulaic, so **each new year has to be transcribed into that file** or the
+  date menu runs out of periods.
+- The page opens on whichever period is currently *due* — the most recently
+  closed one — and labels each period due / payment issued / still open.
+- Org names and ids come from the features snapshot, so every published org is
+  covered automatically.
+
+Unlike the baked dashboards this queries **Metabase live per request** — an item
+log is transactional, and a day-old snapshot would be wrong for finance. The
+generated CSV is a byte-for-byte match for the product's own Item Log export
+(same 12 columns, order, and value formatting), validated against a real manual
+export (Chico, 2026-08-08 → 2026-08-15: 1,180 rows, identical file).
+
+**Config:** set `ITEM_LOG_UUID` to the public-link UUID of the shared Metabase
+card "✅ Item Log Report" (question 19900). Optional: `METABASE_URL`
+(default `https://rec.metabaseapp.com`) and `ITEM_LOG_TIMEOUT_MS` (default
+120000). Without `ITEM_LOG_UUID` the page renders an explicit "not connected"
+state instead of failing.
+
+> **Metabase parameter ids are required.** This Metabase (v1.63) rejects a
+> public-card query whose `parameters` omit the card's parameter `id` — it 400s
+> with a bare `"An error occurred."` in ~3ms, before running any SQL. So
+> `remittance.js` reads the parameter descriptors from the card itself
+> (`/api/public/card/<uuid>`, cached for an hour) and echoes their ids back.
+> Don't "simplify" that into a hardcoded parameter array.
 
 ## How the data works
 
