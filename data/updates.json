@@ -1,0 +1,38 @@
+{
+  "note": "The running update log shown at /ps/updates, newest first. Add an entry in the SAME commit as the change it describes, so it arrives reviewable in the diff rather than being reconstructed later from git log. Keep it partner-and-team readable: what changed and why it matters, not the file names.",
+  "updates": [
+    {
+      "date": "2026-09-07",
+      "title": "The Rec logo, a rename, and Org Features stops throwing you out of the dashboard",
+      "body": "Navigation cleanup, plus two new sections under Admin.",
+      "items": [
+        "The Rec mark is now in the top-left corner. It is the same asset the reporting project uses rather than a redrawn one, so the two internal surfaces look like the same product.",
+        "'PS dashboard' is now 'CX dashboard'. The label only — every /ps/... link anyone has bookmarked still works, and the data behind it is untouched.",
+        "Org Features is now a section INSIDE this dashboard. It used to be a plain link that navigated out of the app entirely, so the sidebar vanished and there was no way back. It reads the same public snapshot the standalone dashboard does, so the two cannot disagree about an adoption score, and clicking an organization expands its feature checklist in place rather than navigating away.",
+        "This page, and the 'How This Works' page describing how the project is put together.",
+        "The fleet adoption average is taken over the organizations we could actually score, not over all of them — an org the bake has not measured is not folded in as a zero."
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "title": "Postgres behind the scenes, and CI that actually runs",
+      "body": "Two structural changes. Neither changes a number on any page.",
+      "items": [
+        "User accounts now live in Postgres instead of on the server's attached disk. They are the only thing this app writes at runtime and the only thing it cannot rebuild — every snapshot can be re-baked, but a password nobody has a copy of is gone.",
+        "That is what lets the disk be detached later, which is what lets the service update without going offline for a minute each time. The reporting project made the same change yesterday and its deploys are now invisible to anyone using it.",
+        "It ships switched off: with no database configured the app behaves exactly as it did before, which the automated boot check proves on every commit.",
+        "CI now runs on every change: the code parses, the pages' inline React parses, the tests run, and the committed data snapshots are checked for valid JSON with the keys the pages read.",
+        "That last check matters most — the daily refresh commits a new snapshot straight to the live branch, so a broken bake used to be able to take the dashboard down with no code change. Now it fails the check instead of deploying."
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "title": "The daily refresh is running again",
+      "body": "The scheduled job that re-bakes the feature snapshot each morning had been paused since 23 August, so the dashboard had been serving 16-day-old numbers while claiming to refresh daily.",
+      "items": [
+        "Re-enabled and verified with a run rather than left to prove itself at 6am.",
+        "Worth knowing for next time: the dashboard gives no sign that its data is stale. The snapshot date is in the sidebar footer, and that is the only place it shows."
+      ]
+    }
+  ]
+}

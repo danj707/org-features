@@ -40,6 +40,7 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
     // PS surfaces must REFUSE without a session — the store change must not
     // have loosened anything.
     ["/api/ps-data", 401], ["/api/launches", 401], ["/api/store", 401],
+    ["/api/updates", 401],
   ];
   let failed = 0;
   for (const [p, want] of checks) {

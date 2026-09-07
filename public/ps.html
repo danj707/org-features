@@ -19,8 +19,15 @@
   a { color: var(--brand-2); text-decoration: none; }
   .layout { display: flex; min-height: 100vh; }
   nav.side { width: 216px; flex: none; background: var(--nav); color: #cbd5e1; padding: 18px 0; position: sticky; top: 0; height: 100vh; }
-  nav.side .logo { color: #fff; font-weight: 800; font-size: 16px; padding: 4px 18px 14px; letter-spacing: .3px; }
+  nav.side .logo { color: #fff; font-weight: 800; font-size: 16px; padding: 4px 18px 14px; letter-spacing: .3px;
+                   display: flex; align-items: center; gap: 8px; }
   nav.side .logo span { color: #6ee7b7; }
+  /* THE REAL REC MARK, not a redrawn one. This is the same asset the sibling
+     rental-report project embeds in its admin header, extracted to a file
+     here rather than inlined as a 4KB base64 string — it is cacheable and it
+     keeps this block readable. A guessed logo and a guessed brand colour is
+     how two of our own surfaces come to look like different products. */
+  nav.side .logo img { height: 24px; width: 24px; border-radius: 5px; flex: none; display: block; }
   nav.side .sec { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: #64748b; padding: 14px 18px 6px; }
   nav.side a.item { display: block; padding: 9px 18px; color: #cbd5e1; font-size: 13.5px; font-weight: 600; border-left: 3px solid transparent; }
   nav.side a.item:hover { background: rgba(255,255,255,.06); color: #fff; }
@@ -108,6 +115,9 @@
     if (p.startsWith("/ps/reporting")) return { page: "reporting" };
     if (p.startsWith("/ps/remittance")) return { page: "remittance" };
     if (p.startsWith("/ps/admin")) return { page: "admin" };
+    if (p.startsWith("/ps/features")) return { page: "features" };
+    if (p.startsWith("/ps/how")) return { page: "how" };
+    if (p.startsWith("/ps/updates")) return { page: "updates" };
     const m = p.match(/^\/ps\/org\/(.+)$/);
     if (m) return { page: "org", id: decodeURIComponent(m[1]) };
     return { page: "health" };
@@ -915,6 +925,217 @@
             u.resetPending ? e("span", { className: "hint", title: "An unused reset link is outstanding for this user" }, " link pending") : null)))))));
   }
 
+  /* ── ORG FEATURES, IN THE SHELL ──────────────────────────────────────────
+     Reads /api/data, the same public snapshot the standalone dashboard reads,
+     so there is ONE source and the two surfaces cannot disagree about an
+     adoption score. Rows expand in place rather than linking out: the whole
+     point of this view is that the nav item stops throwing you out of the
+     shell, and a drill-in that navigated away would reintroduce that. */
+  function Features() {
+    const [d, setD] = useState(null);
+    const [err, setErr] = useState(null);
+    const [q, setQ] = useState("");
+    const [open, setOpen] = useState(null);
+    useEffect(() => {
+      fetch("/api/data")
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
+        .then(setD).catch(e => setErr(e.message));
+    }, []);
+    if (err) return e("div", { className: "note" }, "Could not load the features snapshot: " + err);
+    if (!d) return e("div", { className: "note" }, "Loading feature adoption…");
+
+    const measured = (d.measuredFeatures || []).length;
+    const total = (d.features || []).length;
+    const byKey = {};
+    (d.features || []).forEach(f => { byKey[f.key || f.id || f.name] = f; });
+
+    const scoreOf = (slug) => {
+      const a = (d.adoption || {})[slug] || {};
+      const hits = (d.measuredFeatures || []).filter(k => {
+        const v = a[k];
+        return v && (v === true || v.adopted === true || Number(v.count) > 0);
+      }).length;
+      return measured ? Math.round((hits / measured) * 100) : null;
+    };
+
+    const rows = (d.orgs || [])
+      .map(o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} }))
+      .filter(r => !q || (r.o.displayName || r.o.name || "").toLowerCase().includes(q.toLowerCase()))
+      .sort((a, b) => (b.score == null ? -1 : b.score) - (a.score == null ? -1 : a.score));
+
+    /* THE FLEET AVERAGE IS OVER ORGS WE COULD SCORE, not over every org. An
+       org with no adoption record cannot be averaged in as a zero — that is
+       the "absent is not zero" rule, and folding them in would drag the fleet
+       number down with orgs the bake simply has not measured. */
+    const scored = rows.filter(r => r.score != null);
+    const avg = scored.length
+      ? Math.round(scored.reduce((s, r) => s + r.score, 0) / scored.length) : null;
+
+    const metricKeys = (d.coreMetrics || []).map(m => m.key || m.id).filter(Boolean);
+
+    return e("div", null,
+      e("div", { className: "cards" },
+        e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"),
+          e("div", { className: "v", "data-feat-orgs": rows.length }, rows.length)),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Fleet adoption"),
+          e("div", { className: "v", "data-feat-avg": avg == null ? "" : avg },
+            avg == null ? "—" : avg + "%"),
+          e("div", { className: "note" }, scored.length + " of " + rows.length + " scored")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Features measured"),
+          e("div", { className: "v" }, measured + " / " + total),
+          /* SAID OUT LOUD, because the denominator is the score. A reader
+             comparing 86% here against a future 60% needs to know the
+             denominator grew rather than the org regressed. */
+          e("div", { className: "note" }, "scores re-baseline as more are measured"))),
+      e("div", { className: "panel" },
+        e("div", { className: "filters" },
+          e("input", { placeholder: "Filter organizations…", value: q,
+                       onChange: ev => setQ(ev.target.value) })),
+        e("div", { className: "tablewrap" },
+          e("table", null,
+            e("thead", null, e("tr", null,
+              e("th", { className: "l" }, "Organization"),
+              e("th", null, "Adoption"),
+              ...metricKeys.map(k => e("th", { key: k }, (byKey[k] && byKey[k].label) || k)))),
+            e("tbody", null, ...rows.map(r => {
+              const isOpen = open === r.o.slug;
+              return e(React.Fragment, { key: r.o.slug },
+                e("tr", { onClick: () => setOpen(isOpen ? null : r.o.slug),
+                          style: { cursor: "pointer" }, "data-feat-row": r.o.slug },
+                  e("td", { className: "l" }, e("b", null, r.o.displayName || r.o.name),
+                    e("div", { className: "note" }, r.o.slug)),
+                  e("td", { "data-feat-score": r.score == null ? "" : r.score },
+                    r.score == null
+                      ? e("span", { className: "zero" }, "not measured")
+                      : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%")),
+                  ...metricKeys.map(k => e("td", { key: k },
+                    r.usage[k] == null ? e("span", { className: "zero" }, "—")
+                                       : Number(r.usage[k]).toLocaleString()))),
+                isOpen ? e("tr", { key: "x" }, e("td", { colSpan: 2 + metricKeys.length },
+                  e("div", { className: "note", "data-feat-open": r.o.slug },
+                    (d.measuredFeatures || []).map(k => {
+                      const a = ((d.adoption || {})[r.o.slug] || {})[k];
+                      const on = a && (a === true || a.adopted === true || Number(a.count) > 0);
+                      return e("span", { key: k, className: "chip",
+                                         style: { opacity: on ? 1 : .45 } },
+                        (on ? "● " : "○ ") + ((byKey[k] && byKey[k].label) || k));
+                    })))) : null);
+            }))))));
+  }
+
+  /* ── HOW THIS WORKS ──────────────────────────────────────────────────────
+     The diagram is an INLINE SVG rather than an image file, for the reason the
+     sibling project records: an architecture picture that cannot be edited in
+     the same commit as the architecture goes stale immediately, and a stale
+     diagram is worse than none because it is believed. */
+  function HowItWorks() {
+    const box = (x, y, w, h, title, sub, fill, stroke) => e("g", { key: title },
+      e("rect", { x, y, width: w, height: h, rx: 8, fill, stroke, strokeWidth: 1.5 }),
+      e("text", { x: x + w / 2, y: y + (sub ? 22 : 26), textAnchor: "middle",
+                  fontSize: 12.5, fontWeight: 700, fill: "#0f172a" }, title),
+      sub ? e("text", { x: x + w / 2, y: y + 39, textAnchor: "middle",
+                        fontSize: 10.5, fill: "#475569" }, sub) : null);
+    const arrow = (x1, y1, x2, y2, key) => e("line",
+      { key, x1, y1, x2, y2, stroke: "#94a3b8", strokeWidth: 1.5, markerEnd: "url(#ah)" });
+
+    return e("div", null,
+      e("div", { className: "panel" },
+        e("h3", null, "What this project is"),
+        e("p", null, "Two dashboards on one Express server. ",
+          e("b", null, "Org Features"), " tracks which rec.us capabilities each published " +
+          "organization actually uses, scored as a share of the features we have measured " +
+          "so far. ", e("b", null, "CX Dashboard"), " is the internal side — account health, " +
+          "bug management, the launch pipeline, and Finance's per-period remittance exports."),
+        e("p", null, "There is no build step. React 18 comes from a CDN with a vendored " +
+          "fallback, and each page is a single HTML file containing one Babel block — the " +
+          "same convention as the rental-report project."),
+        e("h3", null, "Where the numbers come from"),
+        e("p", null, "The deployed server has ", e("b", null, "no direct access to the rec.us database"),
+          ". Three snapshots are baked elsewhere and committed to the repo, and a scheduled " +
+          "Routine re-bakes the features snapshot every morning and pushes it to main, which " +
+          "Railway deploys. The one exception is ", e("b", null, "Remittance"), ", which queries " +
+          "Metabase live on every request — a transaction log is transactional, and a day-old " +
+          "snapshot handed to finance would be wrong."),
+        e("h3", null, "Where state lives"),
+        e("p", null, "User accounts are the only thing this app writes at runtime, and the only " +
+          "thing it cannot re-derive: every snapshot can be rebuilt by re-running a bake, but a " +
+          "password nobody holds a copy of is gone. Those accounts now live in Postgres, in a " +
+          "schema of their own so they cannot collide with the other services sharing that " +
+          "database. That is what allows the Railway volume to be detached and the service to " +
+          "roll on deploy instead of stopping."),
+        e("div", { style: { overflowX: "auto", marginTop: 14 }, "data-how-diagram": "1" },
+          e("svg", { viewBox: "0 0 860 470", width: "860", style: { maxWidth: "100%", height: "auto" },
+                     role: "img", "aria-label": "Architecture: sources bake snapshots into the repo, Railway serves them, Postgres holds accounts" },
+            e("defs", null, e("marker", { id: "ah", viewBox: "0 0 10 10", refX: 9, refY: 5,
+              markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" },
+              e("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "#94a3b8" }))),
+
+            e("text", { x: 12, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "SOURCES"),
+            box(12, 32, 150, 52, "rec prod replica", "via Metabase", "#eef6ff", "#93c5fd"),
+            box(12, 94, 150, 52, "Airtable", "services · requests", "#eef6ff", "#93c5fd"),
+            box(12, 156, 150, 52, "Linear · HubSpot", "bugs · accounts", "#eef6ff", "#93c5fd"),
+
+            e("text", { x: 232, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "BAKE"),
+            box(232, 32, 170, 176, "Scheduled Routine", "daily ~6am ET → commit", "#f5f3ff", "#c4b5fd"),
+
+            e("text", { x: 472, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "REPO"),
+            box(472, 32, 170, 176, "danj707/org-features", "3 snapshots committed", "#f0fdf4", "#86efac"),
+
+            e("text", { x: 12, y: 258, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "RUNTIME"),
+            box(232, 270, 170, 68, "Railway", "org-features service", "#fff7ed", "#fdba74"),
+            box(472, 270, 170, 68, "Postgres", "schema: orgfeatures", "#fef2f2", "#fca5a5"),
+            box(682, 270, 166, 68, "Metabase", "live, per request", "#eef6ff", "#93c5fd"),
+
+            box(232, 372, 170, 62, "Org Features", "public dashboard", "#f8fafc", "#cbd5e1"),
+            box(472, 372, 170, 62, "CX Dashboard", "auth-gated", "#f8fafc", "#cbd5e1"),
+
+            arrow(162, 58, 232, 100, "a1"),
+            arrow(162, 120, 232, 120, "a2"),
+            arrow(162, 182, 232, 140, "a3"),
+            arrow(402, 120, 472, 120, "a4"),
+            arrow(557, 208, 400, 270, "a5"),
+            arrow(402, 304, 472, 304, "a6"),
+            arrow(642, 304, 682, 304, "a7"),
+            arrow(300, 338, 300, 372, "a8"),
+            arrow(340, 338, 520, 372, "a9"),
+
+            e("text", { x: 12, y: 300, fontSize: 10.5, fill: "#475569" }, "accounts +"),
+            e("text", { x: 12, y: 314, fontSize: 10.5, fill: "#475569" }, "snapshot"),
+            e("text", { x: 12, y: 328, fontSize: 10.5, fill: "#475569" }, "overrides"),
+            e("text", { x: 682, y: 356, fontSize: 10, fill: "#64748b" }, "Remittance only"),
+            e("text", { x: 472, y: 356, fontSize: 10, fill: "#64748b" }, "accounts live here"))),
+        e("div", { className: "note", style: { marginTop: 10 } },
+          "Deploys: pushing to main builds on Railway and waits for this repo's CI check " +
+          "suites before releasing.")));
+  }
+
+  /* ── UPDATES ─────────────────────────────────────────────────────────────
+     Served from a committed file rather than typed into this page, so an entry
+     arrives in the same commit as the change it describes and is reviewable in
+     the diff. Newest first. */
+  function Updates() {
+    const [d, setD] = useState(null);
+    const [err, setErr] = useState(null);
+    useEffect(() => {
+      fetch("/api/updates")
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
+        .then(setD).catch(e => setErr(e.message));
+    }, []);
+    if (err) return e("div", { className: "note" }, "Could not load the update log: " + err);
+    if (!d) return e("div", { className: "note" }, "Loading updates…");
+    const items = (d.updates || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    if (!items.length) return e("div", { className: "note" }, "Nothing logged yet.");
+    return e("div", null, ...items.map((u, i) =>
+      e("div", { className: "panel", key: i, "data-update-entry": u.date },
+        e("div", { className: "note" }, u.date),
+        e("h3", { style: { margin: "2px 0 8px" } }, u.title),
+        u.body ? e("p", null, u.body) : null,
+        Array.isArray(u.items) && u.items.length
+          ? e("ul", { style: { margin: "6px 0 0 18px", padding: 0, fontSize: 13, lineHeight: 1.6 } },
+              ...u.items.map((it, j) => e("li", { key: j }, it)))
+          : null)));
+  }
+
   function App() {
     const [data, setData] = useState(null);
     const [me, setMe] = useState(null);
@@ -933,10 +1154,16 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
-        e("div", { className: "logo" }, "rec ", e("span", null, "· PS dashboard")),
+        /* Renamed PS -> CX at Dan's request. THE LABEL ONLY: the /ps/* routes,
+           ps.html and the ps-data snapshot key all keep their names, because
+           renaming those breaks every bookmark anyone holds and the store key
+           the snapshot is written under. */
+        e("div", { className: "logo" },
+          e("img", { src: "/rec-logo.jpg", alt: "rec", width: 24, height: 24 }),
+          e("span", null, "CX dashboard")),
         e("div", { className: "sec" }, "Partner success"),
         item("/ps", "Account Health", r.page === "health" || r.page === "org"),
         item("/ps/bugs", "Bug Management", r.page === "bugs", data.bugs.length),
@@ -944,8 +1171,16 @@
         e("div", { className: "sec" }, "Finance"),
         item("/ps/remittance", "Remittance", r.page === "remittance"),
         e("div", { className: "sec" }, "Platform"),
-        e("a", { className: "item", href: "/" }, "Org Features →"),
+        /* IN THE SHELL NOW. This was a plain <a href="/">, which is a FULL PAGE
+           navigation out of this app into dashboard.html — the sidebar
+           disappears and there is no way back. Every other item routes through
+           link() -> pushState and keeps the shell, so this one does too.
+           The standalone public dashboard at / is untouched and still works. */
+        item("/ps/features", "Org Features", r.page === "features"),
         me.role === "admin" ? e(React.Fragment, null, e("div", { className: "sec" }, "Admin"), item("/ps/admin", "Users", r.page === "admin")) : null,
+        e("div", { className: "sec" }, "About"),
+        item("/ps/how", "How This Works", r.page === "how"),
+        item("/ps/updates", "Updates", r.page === "updates"),
         e("div", { className: "foot" },
           e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
           e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
@@ -958,6 +1193,9 @@
           r.page === "bugs" ? e(Bugs, { data }) :
           r.page === "remittance" ? e(Remittance, null) :
           r.page === "admin" ? e(Admin, { me }) :
+          r.page === "features" ? e(Features, null) :
+          r.page === "how" ? e(HowItWorks, null) :
+          r.page === "updates" ? e(Updates, null) :
           e(Reporting, { data }),
           e("div", { className: "foot" }, "Sources: Linear (bugs + customer tags) · HubSpot (status, health, engagement) · Airtable (feature requests) · rec prod replica (adoption). Intercom interactions/NPS not wired yet."))));
   }

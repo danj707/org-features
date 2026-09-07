@@ -19,6 +19,7 @@ const REQUIRED = {
   "ps-data.json":       ["generatedAt", "accounts", "bugs", "featureRequests"],
   "launches-data.json": ["generatedAt", "services"],
   "remittance-schedule.json": ["years"],
+  "updates.json": ["updates"],
 };
 
 let failed = 0;
