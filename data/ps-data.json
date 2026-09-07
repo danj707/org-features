@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-31T01:50:39.126060+00:00",
+  "generatedAt": "2026-09-07T12:24:35.680Z",
   "sources": {
-    "bugs": "Linear \u2014 open issues labeled Bug (backlog/todo/in-progress/triage), customers attached via Linear customer needs",
-    "accounts": "HubSpot \u2014 companies with an Account Status, health reasons, contact activity",
-    "featureRequests": "Airtable \u2014 Sales Feature Requests base, CS Feature Requests table",
+    "bugs": "Linear — open issues labeled Bug (backlog/todo/in-progress/triage), customers attached via Linear customer needs. Org names are Linear customer names verbatim; that list holds near-duplicate records for some orgs.",
+    "accounts": "HubSpot — companies with an Account Status, health reasons, contact activity",
+    "featureRequests": "Airtable — Sales Feature Requests base, CS Feature Requests table",
     "adoption": "org-features snapshot (features-data.json)",
-    "intercom": "NOT WIRED YET \u2014 interactions/NPS pending (sample fields omitted)"
+    "intercom": "NOT WIRED YET — interactions/NPS pending (sample fields omitted)"
   },
   "accounts": [
     {
@@ -3163,86 +3163,9 @@
   ],
   "bugs": [
     {
-      "id": "PLA-1880",
-      "title": "Invoice/Payment Amount Showing Incorrect Price/Override Amount",
-      "team": "Platform",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-06-02T14:16:04.665Z",
-      "ageDays": 58,
-      "createdBy": "dan@rec.us",
-      "assignee": "Olivia Gosselin",
-      "url": "https://linear.app/team-rec/issue/PLA-1880/invoicepayment-amount-showing-incorrect-priceoverride-amount",
-      "customers": [
-        "Norman"
-      ]
-    },
-    {
-      "id": "PLA-2094",
-      "title": "Apex bug fix investigation: Canceled bookings that show a balance due but are not waivable via manage orders UI",
-      "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Apex",
-        "Bug"
-      ],
-      "createdAt": "2026-06-30T23:25:44.353Z",
-      "ageDays": 30,
-      "createdBy": "George Ashworth",
-      "assignee": "George Ashworth",
-      "url": "https://linear.app/team-rec/issue/PLA-2094/apex-bug-fix-investigation-canceled-bookings-that-show-a-balance-due",
-      "customers": []
-    },
-    {
-      "id": "PLA-2199",
-      "title": "Musco: User received an error when logging into Musco",
-      "team": "Platform",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-10T19:44:44.751Z",
-      "ageDays": 20,
-      "createdBy": "dan@rec.us",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2199/musco-user-received-an-error-when-logging-into-musco",
-      "customers": [
-        "Midland, TX"
-      ]
-    },
-    {
-      "id": "REC-10167",
-      "title": "[Bug] Accept-but-never-pay permanently locks both players out of matchmaking",
-      "team": "Eng",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-23T13:12:07.905Z",
-      "ageDays": 7,
-      "createdBy": "Scott Graham",
-      "assignee": "Scott Graham",
-      "url": "https://linear.app/team-rec/issue/REC-10167/bug-accept-but-never-pay-permanently-locks-both-players-out-of",
-      "customers": []
-    },
-    {
-      "id": "CON-819",
+      "id": "PLA-2441",
       "title": "Booked Users Not Showing Up Under Bookings (multiple sections)",
-      "team": "Consumer",
+      "team": "Platform",
       "status": "In Code Review",
       "statusType": "started",
       "priority": "Urgent",
@@ -3253,68 +3176,30 @@
         "Apex Stability"
       ],
       "createdAt": "2026-07-24T18:11:39.180Z",
-      "ageDays": 6,
+      "ageDays": 44,
       "createdBy": "dan@rec.us",
       "assignee": "Olivia Gosselin",
-      "url": "https://linear.app/team-rec/issue/CON-819/booked-users-not-showing-up-under-bookings-multiple-sections",
+      "url": "https://linear.app/team-rec/issue/PLA-2441/booked-users-not-showing-up-under-bookings-multiple-sections",
       "customers": [
         "Apex PRD"
       ]
     },
     {
-      "id": "CON-854",
-      "title": "Edit phone number option disappeared off user profiles?",
-      "team": "Consumer",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-29T13:46:01.919Z",
-      "ageDays": 1,
-      "createdBy": "dan@rec.us",
-      "assignee": "Kevin Liu",
-      "url": "https://linear.app/team-rec/issue/CON-854/edit-phone-number-option-disappeared-off-user-profiles",
-      "customers": [
-        "Apex PRD"
-      ]
-    },
-    {
-      "id": "CON-896",
-      "title": "P1 \u2014 Jeffersonville \u2014 JPYFL Football section \"Add to Cart\" button unresponsive",
-      "team": "Consumer",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "Urgent",
-      "priorityValue": 1,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-31T01:28:00.886Z",
-      "ageDays": 0,
-      "createdBy": "lionel",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-896/p1-jeffersonville-jpyfl-football-section-add-to-cart-button",
-      "customers": []
-    },
-    {
-      "id": "PLA-22",
-      "title": "Receipts for a cancelled section are not viewable and redirect to an error page",
+      "id": "PLA-2429",
+      "title": "[Bug] OAuth authorize leaks a live Firebase ID token to any attacker-supplied redirect_uri",
       "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Urgent",
+      "priorityValue": 1,
       "labels": [
         "Bug"
       ],
-      "createdAt": "2024-06-20T16:10:39.324Z",
-      "ageDays": 770,
-      "createdBy": "Elise Hudson",
-      "assignee": "George Ashworth",
-      "url": "https://linear.app/team-rec/issue/PLA-22/receipts-for-a-cancelled-section-are-not-viewable-and-redirect-to-an",
+      "createdAt": "2026-07-31T19:42:38.050Z",
+      "ageDays": 37,
+      "createdBy": "Brad Taylor",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2429/bug-oauth-authorize-leaks-a-live-firebase-id-token-to-any-attacker",
       "customers": []
     },
     {
@@ -3329,7 +3214,7 @@
         "Bug"
       ],
       "createdAt": "2024-06-25T17:57:59.436Z",
-      "ageDays": 765,
+      "ageDays": 803,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/DES-30/difficult-to-find-the-booking-in-admin-bookings-not-showing-in-user",
@@ -3348,7 +3233,7 @@
         "BE"
       ],
       "createdAt": "2024-07-15T17:44:05.242Z",
-      "ageDays": 745,
+      "ageDays": 783,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-1745/fix-bugs-in-order-search",
@@ -3367,7 +3252,7 @@
         "Bug"
       ],
       "createdAt": "2024-09-20T18:15:32.648Z",
-      "ageDays": 678,
+      "ageDays": 716,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-2221/add-retry-on-deadlock-behavior-to-acquirelocks-or-just-lock-the",
@@ -3385,7 +3270,7 @@
         "Bug"
       ],
       "createdAt": "2024-11-19T18:15:56.029Z",
-      "ageDays": 618,
+      "ageDays": 656,
       "createdBy": "Kael Lumen",
       "assignee": "Nicolas Gallinal",
       "url": "https://linear.app/team-rec/issue/REC-2687/resolved-security-deposit-does-not-display-as-resolved-in-ui",
@@ -3403,7 +3288,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-18T15:55:23.577Z",
-      "ageDays": 315,
+      "ageDays": 353,
       "createdBy": "paulo@rec.us",
       "assignee": "Michael Kehoe",
       "url": "https://linear.app/team-rec/issue/OPS-3674/bug-court-reservation-unable-to-view-receipt-via-reservations-page-and",
@@ -3421,7 +3306,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:59:09.621Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5835/homepage-experience-doesnt-make-sense",
@@ -3440,7 +3325,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-12-12T17:42:08.241Z",
-      "ageDays": 230,
+      "ageDays": 268,
       "createdBy": "paulo@rec.us",
       "assignee": "ankur@rec.us",
       "url": "https://linear.app/team-rec/issue/OPS-6677/customer-side-wrong-date-displayed-in-reservations-page-vs",
@@ -3459,29 +3344,10 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-01-09T18:54:50.786Z",
-      "ageDays": 202,
+      "ageDays": 240,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7841/fix-bookings-page-to-support-html-or-markdown-for-instructor-bios",
-      "customers": []
-    },
-    {
-      "id": "CON-242",
-      "title": "[Bug] Unlinking form from facility rental corrupts shared rental application submissions",
-      "team": "Consumer",
-      "status": "Paused",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "BE"
-      ],
-      "createdAt": "2026-03-17T02:14:01.368Z",
-      "ageDays": 135,
-      "createdBy": "Brad Taylor",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/CON-242/bug-unlinking-form-from-facility-rental-corrupts-shared-rental",
       "customers": []
     },
     {
@@ -3496,7 +3362,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-18T16:55:47.890Z",
-      "ageDays": 134,
+      "ageDays": 172,
       "createdBy": "dan@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-104/west-haven-sections-changed-from-non-session-registration-to-session",
@@ -3517,7 +3383,7 @@
         "Seen By Partners"
       ],
       "createdAt": "2026-03-18T19:57:59.237Z",
-      "ageDays": 134,
+      "ageDays": 172,
       "createdBy": "Michael Kehoe",
       "assignee": "Elias Arruda",
       "url": "https://linear.app/team-rec/issue/PLA-1508/get-a-something-went-wrong-when-clicking-to-manage-booking-from-user",
@@ -3529,15 +3395,15 @@
       "id": "PLA-1564",
       "title": "P1/2 (fix by EOW, we are good for remittance today) Certain account credit + card purchases not summing properly",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "High",
       "priorityValue": 2,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-03-25T17:28:29.483Z",
-      "ageDays": 127,
+      "ageDays": 165,
       "createdBy": "Lindsay Keare",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1564/p12-fix-by-eow-we-are-good-for-remittance-today-certain-account-credit",
@@ -3549,15 +3415,15 @@
       "id": "PLA-1591",
       "title": "GL Code Rollup In Product Slightly Off?",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "High",
       "priorityValue": 2,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-03-27T21:44:26.016Z",
-      "ageDays": 125,
+      "ageDays": 163,
       "createdBy": "dan@rec.us",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1591/gl-code-rollup-in-product-slightly-off",
@@ -3569,15 +3435,15 @@
       "id": "PLA-1602",
       "title": "Fix West Sac order db7aef1c: Stripe PI canceled but TE marked succeeded, scholarship funds trapped",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "High",
       "priorityValue": 2,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-03-30T18:23:13.395Z",
-      "ageDays": 122,
+      "ageDays": 160,
       "createdBy": "George Ashworth",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1602/fix-west-sac-order-db7aef1c-stripe-pi-canceled-but-te-marked-succeeded",
@@ -3595,32 +3461,11 @@
         "Bug"
       ],
       "createdAt": "2026-03-31T23:54:17.934Z",
-      "ageDays": 121,
+      "ageDays": 159,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1624/fix-emergency-subscription-missing-required-metadata-membershipid",
       "customers": []
-    },
-    {
-      "id": "PLA-2408",
-      "title": "Facility rental isn't grouping reservations with the same due date into a single payment",
-      "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "Apex Stability"
-      ],
-      "createdAt": "2026-04-13T23:04:49.947Z",
-      "ageDays": 108,
-      "createdBy": "Michael Kehoe",
-      "assignee": "Kael Lumen",
-      "url": "https://linear.app/team-rec/issue/PLA-2408/facility-rental-isnt-grouping-reservations-with-the-same-due-date-into",
-      "customers": [
-        "Apex PRD"
-      ]
     },
     {
       "id": "REC-9192",
@@ -3635,7 +3480,7 @@
         "Apex Stability"
       ],
       "createdAt": "2026-04-23T18:29:07.840Z",
-      "ageDays": 98,
+      "ageDays": 136,
       "createdBy": "Michael Kehoe",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-9192/balance-due-table-shows-a-due-date-that-is-offset-by-a-day-or-maybe",
@@ -3655,7 +3500,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-30T11:01:27.423Z",
-      "ageDays": 91,
+      "ageDays": 130,
       "createdBy": "dan@rec.us",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-226/synced-calendar-events-drop-off-calendar-bug-or-feature-improvement",
@@ -3675,7 +3520,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-07T00:34:19.195Z",
-      "ageDays": 85,
+      "ageDays": 123,
       "createdBy": "dan@rec.us",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-1769/staff-initiated-cancellations-not-surfacing-in-refund-review-queue",
@@ -3693,34 +3538,12 @@
         "Bug"
       ],
       "createdAt": "2026-06-07T10:51:22.949Z",
-      "ageDays": 53,
+      "ageDays": 92,
       "createdBy": "dan@rec.us",
       "assignee": "bart@rec.us",
       "url": "https://linear.app/team-rec/issue/CON-61/new-group-by-for-class-roster-breaks-sorting-rules-and-missing-age-on",
       "customers": [
         "Jeffersonville"
-      ]
-    },
-    {
-      "id": "CON-82",
-      "title": "Sticky Filters Broken on Programming/Sections",
-      "team": "Consumer",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "Apex",
-        "Apex Stability"
-      ],
-      "createdAt": "2026-06-09T16:13:29.108Z",
-      "ageDays": 51,
-      "createdBy": "dan@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-82/sticky-filters-broken-on-programmingsections",
-      "customers": [
-        "Apex PRD"
       ]
     },
     {
@@ -3735,7 +3558,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-19T00:14:23.805Z",
-      "ageDays": 42,
+      "ageDays": 80,
       "createdBy": "Lindsay Keare",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1977/p1p2-appears-that-there-are-no-journal-entries-generated-when-waiving",
@@ -3755,7 +3578,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-25T21:38:53.666Z",
-      "ageDays": 35,
+      "ageDays": 73,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-2045/authenticated-but-no-db-user-state-crashes-the-web-app-instead-of",
@@ -3773,31 +3596,11 @@
         "Bug"
       ],
       "createdAt": "2026-06-25T21:38:31.336Z",
-      "ageDays": 35,
+      "ageDays": 73,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-2044/signup-can-orphan-a-firebase-auth-account-with-no-rec-db-user-row",
       "customers": []
-    },
-    {
-      "id": "PLA-2054",
-      "title": "P2, [placeholder ticket] Additional bug detail on ledger discrepancies",
-      "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-06-26T23:53:03.024Z",
-      "ageDays": 34,
-      "createdBy": "Lindsay Keare",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-2054/p2-placeholder-ticket-additional-bug-detail-on-ledger-discrepancies",
-      "customers": [
-        "Apex PRD"
-      ]
     },
     {
       "id": "PLA-2050",
@@ -3811,71 +3614,12 @@
         "Bug"
       ],
       "createdAt": "2026-06-26T21:32:24.005Z",
-      "ageDays": 34,
+      "ageDays": 72,
       "createdBy": "dan@rec.us",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2050/invoices-20-header-information-missing-off-invoice-pdf",
       "customers": [
         "Smyrna"
-      ]
-    },
-    {
-      "id": "PLA-2097",
-      "title": "Musco: Incorrectly Showing an Option to add Lights to a site without them",
-      "team": "Platform",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-01T17:36:50.537Z",
-      "ageDays": 29,
-      "createdBy": "dan@rec.us",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2097/musco-incorrectly-showing-an-option-to-add-lights-to-a-site-without",
-      "customers": [
-        "Rec"
-      ]
-    },
-    {
-      "id": "PLA-2100",
-      "title": "[Bug] Block reservation hard-delete when a child order item has confirmed/pending payment",
-      "team": "Platform",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "BE",
-        "Bug"
-      ],
-      "createdAt": "2026-07-01T19:01:10.655Z",
-      "ageDays": 29,
-      "createdBy": "Brad Taylor",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2100/bug-block-reservation-hard-delete-when-a-child-order-item-has",
-      "customers": []
-    },
-    {
-      "id": "PLA-2107",
-      "title": "Musco: UN/PW passed in plain text, visible in dev console",
-      "team": "Platform",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-02T10:44:35.211Z",
-      "ageDays": 28,
-      "createdBy": "dan@rec.us",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2107/musco-unpw-passed-in-plain-text-visible-in-dev-console",
-      "customers": [
-        "Midland, TX"
       ]
     },
     {
@@ -3890,49 +3634,13 @@
         "Bug"
       ],
       "createdAt": "2026-07-06T15:14:05.309Z",
-      "ageDays": 24,
+      "ageDays": 62,
       "createdBy": "dan@rec.us",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2126/duplicate-sections-in-google-calendar-via-calendar-sync",
       "customers": [
         "Danvers, MA"
       ]
-    },
-    {
-      "id": "PLA-2253",
-      "title": "Bug: Updating a facility rental reservation doesn't update the gl code or accounting of the underlying item",
-      "team": "Platform",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-14T14:32:26.514Z",
-      "ageDays": 16,
-      "createdBy": "Kael Lumen",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-2253/bug-updating-a-facility-rental-reservation-doesnt-update-the-gl-code",
-      "customers": []
-    },
-    {
-      "id": "PLA-2248",
-      "title": "Cross-org IDOR: GET /admin/reservations leaks all orgs' reservations + lighting when organizationId is omitted",
-      "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-14T04:54:54.666Z",
-      "ageDays": 16,
-      "createdBy": "Brad Taylor",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2248/cross-org-idor-get-adminreservations-leaks-all-orgs-reservations",
-      "customers": []
     },
     {
       "id": "AI-160",
@@ -3946,119 +3654,16 @@
         "Bug"
       ],
       "createdAt": "2026-07-16T20:27:50.763Z",
-      "ageDays": 14,
+      "ageDays": 52,
       "createdBy": "John Whiting",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/AI-160/update-spacing-in-seb-responses",
       "customers": []
     },
     {
-      "id": "CON-782",
-      "title": "Segment Builder Crashes when Adding Too Many Sections",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-17T16:56:16.883Z",
-      "ageDays": 13,
-      "createdBy": "dan@rec.us",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-782/segment-builder-crashes-when-adding-too-many-sections",
-      "customers": [
-        "Norman"
-      ]
-    },
-    {
-      "id": "CON-801",
-      "title": "P2 Multiple partners - Activity tags on section public pages don't match template selection",
-      "team": "Consumer",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "Team Week"
-      ],
-      "createdAt": "2026-07-17T19:15:32.556Z",
-      "ageDays": 13,
-      "createdBy": "lionel",
-      "assignee": "Kathleen Lister",
-      "url": "https://linear.app/team-rec/issue/CON-801/p2-multiple-partners-activity-tags-on-section-public-pages-dont-match",
-      "customers": [
-        "Chicorec"
-      ]
-    },
-    {
-      "id": "CON-806",
-      "title": "Rental Application Notes: Where do they Go?",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "Team Week"
-      ],
-      "createdAt": "2026-07-20T23:05:47.866Z",
-      "ageDays": 10,
-      "createdBy": "dan@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-806/rental-application-notes-where-do-they-go",
-      "customers": [
-        "Apex PRD"
-      ]
-    },
-    {
-      "id": "CON-805",
-      "title": "Search Everything: Finding Archived Sections and not sorting chronologically",
-      "team": "Consumer",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug",
-        "Team Week"
-      ],
-      "createdAt": "2026-07-20T17:32:40.075Z",
-      "ageDays": 10,
-      "createdBy": "dan@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-805/search-everything-finding-archived-sections-and-not-sorting",
-      "customers": [
-        "Apex PRD"
-      ]
-    },
-    {
-      "id": "CON-840",
-      "title": "Bug: Error when trying to delete a session, saying it can't be deleted as it's booked (it isn't)",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-23T13:14:52.377Z",
-      "ageDays": 7,
-      "createdBy": "dan@rec.us",
-      "assignee": "mahon@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-840/bug-error-when-trying-to-delete-a-session-saying-it-cant-be-deleted-as",
-      "customers": [
-        "Norman"
-      ]
-    },
-    {
-      "id": "CON-830",
+      "id": "PLA-2440",
       "title": "Narrow the organization join in Epsio report views to prevent full-org recomputes",
-      "team": "Consumer",
+      "team": "Platform",
       "status": "In Code Review",
       "statusType": "started",
       "priority": "High",
@@ -4067,31 +3672,11 @@
         "Bug"
       ],
       "createdAt": "2026-07-27T22:32:46.182Z",
-      "ageDays": 3,
+      "ageDays": 41,
       "createdBy": "Kevin Liu",
       "assignee": "Olivia Gosselin",
-      "url": "https://linear.app/team-rec/issue/CON-830/narrow-the-organization-join-in-epsio-report-views-to-prevent-full-org",
+      "url": "https://linear.app/team-rec/issue/PLA-2440/narrow-the-organization-join-in-epsio-report-views-to-prevent-full-org",
       "customers": []
-    },
-    {
-      "id": "CON-838",
-      "title": "Org Admin User Doesn't have the 'Delete Section' option",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "High",
-      "priorityValue": 2,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-28T18:40:03.959Z",
-      "ageDays": 2,
-      "createdBy": "dan@rec.us",
-      "assignee": "Guilherme Sprorowski",
-      "url": "https://linear.app/team-rec/issue/CON-838/org-admin-user-doesnt-have-the-delete-section-option",
-      "customers": [
-        "Essex Junction"
-      ]
     },
     {
       "id": "PLA-2390",
@@ -4105,15 +3690,70 @@
         "Bug"
       ],
       "createdAt": "2026-07-29T00:29:56.832Z",
-      "ageDays": 2,
+      "ageDays": 40,
       "createdBy": "Kevin Liu",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-2390/processed-payment-not-reflected-in-table-dollar000-activity-entry-and",
       "customers": []
     },
     {
-      "id": "PLA-2389",
-      "title": "Instalment date mismatch on payment plan modal (off-by-one day)",
+      "id": "PLA-2460",
+      "title": "[Bug] Auth-middleware infrastructure failures are masked as 401 and reach Sentry nowhere",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "BE",
+        "Bug"
+      ],
+      "createdAt": "2026-08-03T17:54:17.461Z",
+      "ageDays": 34,
+      "createdBy": "Brad Taylor",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2460/bug-auth-middleware-infrastructure-failures-are-masked-as-401-and",
+      "customers": []
+    },
+    {
+      "id": "AI-244",
+      "title": "Seb on iPhone Safari: no visible way to reply after an initial query (input box hidden)",
+      "team": "AI",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-12T15:05:57.046Z",
+      "ageDays": 25,
+      "createdBy": "Teddy Noll",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/AI-244/seb-on-iphone-safari-no-visible-way-to-reply-after-an-initial-query",
+      "customers": []
+    },
+    {
+      "id": "PLA-2796",
+      "title": "Invoices 2.0: unreconciled overpayment is subtracted twice, understating Due — Torrance under-billing $40",
+      "team": "Platform",
+      "status": "Paused",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-21T05:18:40.922Z",
+      "ageDays": 17,
+      "createdBy": "Loris Lamarque",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2796/invoices-20-unreconciled-overpayment-is-subtracted-twice-understating",
+      "customers": []
+    },
+    {
+      "id": "PLA-2774",
+      "title": "as admin > making payment on overdue balance for household get 400 in console",
       "team": "Platform",
       "status": "In QA",
       "statusType": "started",
@@ -4122,35 +3762,72 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-29T00:29:55.058Z",
-      "ageDays": 2,
-      "createdBy": "Kevin Liu",
+      "createdAt": "2026-08-20T15:23:38.840Z",
+      "ageDays": 17,
+      "createdBy": "Sydney Tucker",
       "assignee": "Alex Berman",
-      "url": "https://linear.app/team-rec/issue/PLA-2389/instalment-date-mismatch-on-payment-plan-modal-off-by-one-day",
+      "url": "https://linear.app/team-rec/issue/PLA-2774/as-admin-making-payment-on-overdue-balance-for-household-get-400-in",
       "customers": []
     },
     {
-      "id": "CON-850",
-      "title": "P1 - Chico Class Roster PDF generation fails with unknown error",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "id": "PLA-2825",
+      "title": "Activity feed does not show \"auto pay turned off\" it only shows when one is turned on",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug",
+        "Product"
+      ],
+      "createdAt": "2026-08-25T16:12:15.268Z",
+      "ageDays": 12,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Alex Berman",
+      "url": "https://linear.app/team-rec/issue/PLA-2825/activity-feed-does-not-show-auto-pay-turned-off-it-only-shows-when-one",
+      "customers": []
+    },
+    {
+      "id": "PLA-2835",
+      "title": "Payment plan auto-pay status mismatch",
+      "team": "Platform",
+      "status": "Paused",
+      "statusType": "started",
       "priority": "High",
       "priorityValue": 2,
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-29T19:26:28.677Z",
-      "ageDays": 1,
-      "createdBy": "lionel",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-850/p1-chico-class-roster-pdf-generation-fails-with-unknown-error",
+      "createdAt": "2026-08-25T21:51:22.736Z",
+      "ageDays": 12,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Olivia Gosselin",
+      "url": "https://linear.app/team-rec/issue/PLA-2835/payment-plan-auto-pay-status-mismatch",
       "customers": []
     },
     {
-      "id": "CON-855",
-      "title": "Customer profile shows soft-deleted session date instead of current session after section reschedule",
-      "team": "Consumer",
+      "id": "PLA-2857",
+      "title": "Cash Out Report CSV export shows \"Invalid DateTime\" for Submitted column",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-27T01:05:04.151Z",
+      "ageDays": 11,
+      "createdBy": "Loris Lamarque",
+      "assignee": "Alex Berman",
+      "url": "https://linear.app/team-rec/issue/PLA-2857/cash-out-report-csv-export-shows-invalid-datetime-for-submitted-column",
+      "customers": []
+    },
+    {
+      "id": "PLA-2912",
+      "title": "Invoice deletion fails with 'Unknown error occurred'",
+      "team": "Platform",
       "status": "In Code Review",
       "statusType": "started",
       "priority": "High",
@@ -4158,18 +3835,16 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-29T05:57:55.533Z",
-      "ageDays": 1,
-      "createdBy": "Michael Kehoe",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-855/customer-profile-shows-soft-deleted-session-date-instead-of-current",
-      "customers": [
-        "Apex PRD"
-      ]
+      "createdAt": "2026-08-29T13:28:34.129Z",
+      "ageDays": 8,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Kael Lumen",
+      "url": "https://linear.app/team-rec/issue/PLA-2912/invoice-deletion-fails-with-unknown-error-occurred",
+      "customers": []
     },
     {
-      "id": "CON-858",
-      "title": "Detaching a form requirement from a facility rental cascade-deletes the customer's already-submitted file",
+      "id": "CON-1371",
+      "title": "Roster PDF: emergency contact name renders but phone number is blank for household-member contacts",
       "team": "Consumer",
       "status": "To Do",
       "statusType": "unstarted",
@@ -4178,18 +3853,18 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-30T13:50:47.490Z",
-      "ageDays": 0,
-      "createdBy": "dan@rec.us",
-      "assignee": "ankur@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-858/detaching-a-form-requirement-from-a-facility-rental-cascade-deletes",
+      "createdAt": "2026-08-31T17:07:24.336Z",
+      "ageDays": 6,
+      "createdBy": "Loris Lamarque",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1371/roster-pdf-emergency-contact-name-renders-but-phone-number-is-blank",
       "customers": [
-        "Jarupa Valley, CA"
+        "Smyrnaga"
       ]
     },
     {
-      "id": "PLA-2400",
-      "title": "Payment Plan shows as Pay in Full in Cart",
+      "id": "PLA-2947",
+      "title": "A canceled program enrollment never converges its obligation",
       "team": "Platform",
       "status": "To Do",
       "statusType": "unstarted",
@@ -4198,17 +3873,149 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-30T14:25:34.022Z",
-      "ageDays": 0,
-      "createdBy": "Sydney Tucker",
-      "assignee": "George Ashworth",
-      "url": "https://linear.app/team-rec/issue/PLA-2400/payment-plan-shows-as-pay-in-full-in-cart",
+      "createdAt": "2026-09-01T11:38:00.341Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2947/a-canceled-program-enrollment-never-converges-its-obligation",
       "customers": []
     },
     {
-      "id": "CON-859",
-      "title": "Can't scroll through entire list of participants for check-ins",
+      "id": "PLA-2936",
+      "title": "Confirmed reprice never reaches the GL for a non-plan-bearing item",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:08.488Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2936/confirmed-reprice-never-reaches-the-gl-for-a-non-plan-bearing-item",
+      "customers": []
+    },
+    {
+      "id": "PLA-2916",
+      "title": "Cancelling a facility rental reservation performs an irreversible installment waive with no legible confirmation, and the \"Waived\" line is customer-visible with no explanation",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-31T18:20:37.601Z",
+      "ageDays": 6,
+      "createdBy": "Loris Lamarque",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2916/cancelling-a-facility-rental-reservation-performs-an-irreversible",
+      "customers": [
+        "City of Torrance"
+      ]
+    },
+    {
+      "id": "PLA-2923",
+      "title": "[MAYBE] Invoices don't deduct cleared payments from amount owed shown",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-31T20:48:26.924Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2923/maybe-invoices-dont-deduct-cleared-payments-from-amount-owed-shown",
+      "customers": []
+    },
+    {
+      "id": "CON-1374",
+      "title": "Woodmen Hills Residency Application Program Bug -- Can't Add to Cart because of Uncompleted Forms",
       "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-31T19:17:50.277Z",
+      "ageDays": 6,
+      "createdBy": "maddie@rec.us",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1374/woodmen-hills-residency-application-program-bug-cant-add-to-cart",
+      "customers": [
+        "Woodmen Hills Metro District"
+      ]
+    },
+    {
+      "id": "CON-1424",
+      "title": "Org admin can't update instructor profile - receives error",
+      "team": "Consumer",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T18:40:25.529Z",
+      "ageDays": 5,
+      "createdBy": "dan@rec.us",
+      "assignee": "Long Nguyen",
+      "url": "https://linear.app/team-rec/issue/CON-1424/org-admin-cant-update-instructor-profile-receives-error",
+      "customers": [
+        "Needham, MA"
+      ]
+    },
+    {
+      "id": "PLA-2966",
+      "title": "Invite flow unclear: invite action not visible in users table, may not be enabled",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T19:08:16.841Z",
+      "ageDays": 5,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2966/invite-flow-unclear-invite-action-not-visible-in-users-table-may-not",
+      "customers": []
+    },
+    {
+      "id": "PLA-2967",
+      "title": "Staff SSO - configuring outlook issue",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T19:20:06.289Z",
+      "ageDays": 5,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2967/staff-sso-configuring-outlook-issue",
+      "customers": []
+    },
+    {
+      "id": "PLA-2984",
+      "title": "SSO Login: Timeout session of 10 mins not respected",
+      "team": "Platform",
       "status": "In Code Review",
       "statusType": "started",
       "priority": "High",
@@ -4216,13 +4023,189 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-30T14:31:31.548Z",
-      "ageDays": 0,
-      "createdBy": "dan@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-859/cant-scroll-through-entire-list-of-participants-for-check-ins",
+      "createdAt": "2026-09-02T17:01:55.549Z",
+      "ageDays": 4,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2984/sso-login-timeout-session-of-10-mins-not-respected",
+      "customers": []
+    },
+    {
+      "id": "PLA-2985",
+      "title": "Issue Identified- Section Hyperlinks Redirecting to Homepage",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T17:04:26.398Z",
+      "ageDays": 4,
+      "createdBy": "Teddy Noll",
+      "assignee": "Kevin Liu",
+      "url": "https://linear.app/team-rec/issue/PLA-2985/issue-identified-section-hyperlinks-redirecting-to-homepage",
       "customers": [
-        "Danvers, MA"
+        "City of Chico"
+      ]
+    },
+    {
+      "id": "PLA-2993",
+      "title": "Invoice due dates not transferring to user invoice pdf",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T17:44:18.088Z",
+      "ageDays": 4,
+      "createdBy": "Teddy Noll",
+      "assignee": "Kael Lumen",
+      "url": "https://linear.app/team-rec/issue/PLA-2993/invoice-due-dates-not-transferring-to-user-invoice-pdf",
+      "customers": [
+        "Chico",
+        "City of Chico"
+      ]
+    },
+    {
+      "id": "PLA-2998",
+      "title": "UI Bug when Refunding Cancelled Section for Selected Participants",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T21:35:08.627Z",
+      "ageDays": 4,
+      "createdBy": "Teddy Noll",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2998/ui-bug-when-refunding-cancelled-section-for-selected-participants",
+      "customers": [
+        "City of Torrance"
+      ]
+    },
+    {
+      "id": "PLA-3005",
+      "title": "Misleading Invoice amount in PDF generation",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T23:08:26.990Z",
+      "ageDays": 4,
+      "createdBy": "Teddy Noll",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-3005/misleading-invoice-amount-in-pdf-generation",
+      "customers": [
+        "Sebastopol"
+      ]
+    },
+    {
+      "id": "PLA-3018",
+      "title": "Unhelpful Error: when all items deleted from cart in one tab, checking out in the 2nd tab produces error",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-03T17:40:48.920Z",
+      "ageDays": 3,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Kael Lumen",
+      "url": "https://linear.app/team-rec/issue/PLA-3018/unhelpful-error-when-all-items-deleted-from-cart-in-one-tab-checking",
+      "customers": []
+    },
+    {
+      "id": "PLA-3024",
+      "title": "Test sign-in redirects to login page",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug",
+        "Improvement"
+      ],
+      "createdAt": "2026-09-03T20:09:46.289Z",
+      "ageDays": 3,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3024/test-sign-in-redirects-to-login-page",
+      "customers": []
+    },
+    {
+      "id": "PLA-3043",
+      "title": "Bulk refund leaves card-present refund stuck in `pending` — item shows fully refunded but customer not refunded (Euclid)",
+      "team": "Platform",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T21:50:53.643Z",
+      "ageDays": 2,
+      "createdBy": "dan@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-3043/bulk-refund-leaves-card-present-refund-stuck-in-pending-item-shows",
+      "customers": [
+        "City of Euclid"
+      ]
+    },
+    {
+      "id": "CON-1460",
+      "title": "Bug: Section filters can't be 'cleared', leading to a borked search",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T15:50:07.426Z",
+      "ageDays": 2,
+      "createdBy": "dan@rec.us",
+      "assignee": "Long Nguyen",
+      "url": "https://linear.app/team-rec/issue/CON-1460/bug-section-filters-cant-be-cleared-leading-to-a-borked-search",
+      "customers": [
+        "Rec"
+      ]
+    },
+    {
+      "id": "PLA-3045",
+      "title": "Sandbox Data showing up in Apex instructors view",
+      "team": "Platform",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "High",
+      "priorityValue": 2,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-05T19:30:56.439Z",
+      "ageDays": 1,
+      "createdBy": "Michael Kehoe",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-3045/sandbox-data-showing-up-in-apex-instructors-view",
+      "customers": [
+        "Apex PRD"
       ]
     },
     {
@@ -4238,7 +4221,7 @@
         "Bug"
       ],
       "createdAt": "2024-10-18T14:32:00.723Z",
-      "ageDays": 650,
+      "ageDays": 688,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-2448/popover-within-a-formfield-doesnt-work-in-firefox",
@@ -4258,7 +4241,7 @@
         "FE"
       ],
       "createdAt": "2025-03-25T18:10:47.800Z",
-      "ageDays": 492,
+      "ageDays": 530,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-398/user-bookings-list-in-admin-is-not-filtered-by-organization-id",
@@ -4277,28 +4260,10 @@
         "Bug"
       ],
       "createdAt": "2025-07-16T23:01:42.116Z",
-      "ageDays": 379,
+      "ageDays": 417,
       "createdBy": "Lindsay Keare",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-4560/p2-payment-plan-on-admin-side-forces-you-to-pay-full-price-if-booking",
-      "customers": []
-    },
-    {
-      "id": "REC-5250",
-      "title": "Replace all hard-coded colors with color variables",
-      "team": "Eng",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2025-08-26T16:35:01.699Z",
-      "ageDays": 338,
-      "createdBy": "betsy@rec.us",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/REC-5250/replace-all-hard-coded-colors-with-color-variables",
       "customers": []
     },
     {
@@ -4313,7 +4278,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-18T17:48:04.205Z",
-      "ageDays": 315,
+      "ageDays": 353,
       "createdBy": "paulo@rec.us",
       "assignee": "Michael Kehoe",
       "url": "https://linear.app/team-rec/issue/OPS-3676/bug-court-reservation-even-though-the-customer-canceled-his",
@@ -4332,7 +4297,7 @@
         "needs design"
       ],
       "createdAt": "2025-09-25T20:28:19.587Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5839/receipt-refund-history-section-has-messed-up-padding",
@@ -4350,7 +4315,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:53:47.148Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5832/location-calendar-pages-are-not-mobile-friendly",
@@ -4368,7 +4333,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T18:27:10.517Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5822/profile-easy-to-miss-add-household-members",
@@ -4386,7 +4351,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T18:15:38.918Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5815/discovery-filters-difficult-to-use",
@@ -4405,7 +4370,7 @@
         "Facilities & Reservations"
       ],
       "createdAt": "2025-10-07T20:04:59.847Z",
-      "ageDays": 296,
+      "ageDays": 334,
       "createdBy": "George Ashworth",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-288/fix-known-advisory-lock-deadlock-in-create-reservation-operation",
@@ -4424,7 +4389,7 @@
         "Bug"
       ],
       "createdAt": "2025-10-08T18:49:50.229Z",
-      "ageDays": 295,
+      "ageDays": 333,
       "createdBy": "Colin Bohn",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-6196/investigate-missed-reservation-canceled-event-for-user-cancellations",
@@ -4445,7 +4410,7 @@
         "Onboarding Task"
       ],
       "createdAt": "2025-10-16T21:11:14.117Z",
-      "ageDays": 287,
+      "ageDays": 325,
       "createdBy": "George Ashworth",
       "assignee": "Olivia Gosselin",
       "url": "https://linear.app/team-rec/issue/REC-6384/cash-out-table-non-removable-date-filters-confusingly-show-an-x",
@@ -4463,7 +4428,7 @@
         "Bug"
       ],
       "createdAt": "2025-10-27T17:00:15.039Z",
-      "ageDays": 276,
+      "ageDays": 314,
       "createdBy": "Long Nguyen",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-287/no-way-to-navigate-back-to-site-config-when-adding-a-new-form",
@@ -4482,7 +4447,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-06T19:08:29.340Z",
-      "ageDays": 236,
+      "ageDays": 274,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-423/add-pagination-to-household-profiles-to-handle-users-with-many",
@@ -4500,7 +4465,7 @@
         "Bug"
       ],
       "createdAt": "2026-01-22T22:06:23.250Z",
-      "ageDays": 189,
+      "ageDays": 227,
       "createdBy": "ankur@rec.us",
       "assignee": "mahon@rec.us",
       "url": "https://linear.app/team-rec/issue/CON-206/bug-bash-cant-add-household-members-in-the-participant-picker-when",
@@ -4519,7 +4484,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-02-07T03:14:15.942Z",
-      "ageDays": 173,
+      "ageDays": 212,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-8504/various-section-roster-bugs",
@@ -4527,7 +4492,7 @@
     },
     {
       "id": "CON-295",
-      "title": "[P2] Facility Rental \u2013 Bug Summary (Cancelled Reservation Workflow Edge Case)",
+      "title": "[P2] Facility Rental – Bug Summary (Cancelled Reservation Workflow Edge Case)",
       "team": "Consumer",
       "status": "Backlog",
       "statusType": "backlog",
@@ -4538,7 +4503,7 @@
         "Facilities & Reservations"
       ],
       "createdAt": "2026-02-13T19:44:32.792Z",
-      "ageDays": 167,
+      "ageDays": 205,
       "createdBy": "paulo@rec.us",
       "assignee": "Scott Graham",
       "url": "https://linear.app/team-rec/issue/CON-295/p2-facility-rental-bug-summary-cancelled-reservation-workflow-edge",
@@ -4556,7 +4521,7 @@
         "Bug"
       ],
       "createdAt": "2026-02-15T20:13:09.615Z",
-      "ageDays": 165,
+      "ageDays": 203,
       "createdBy": "Kevin Liu",
       "assignee": "Elias Arruda",
       "url": "https://linear.app/team-rec/issue/PLA-1325/user-unable-to-cancel-membership-online",
@@ -4574,7 +4539,7 @@
         "Bug"
       ],
       "createdAt": "2026-02-24T22:37:34.590Z",
-      "ageDays": 156,
+      "ageDays": 194,
       "createdBy": "dan@rec.us",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-1358/issue-refunding-a-user-for-purchase-made-on-cc-account-credit-the-case",
@@ -4586,15 +4551,15 @@
       "id": "PLA-1419",
       "title": "P2 (fix by EOW ideally), weird invisible account credit on transaction log and receipt",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "Medium",
       "priorityValue": 3,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-03-05T17:21:30.671Z",
-      "ageDays": 147,
+      "ageDays": 185,
       "createdBy": "Lindsay Keare",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1419/p2-fix-by-eow-ideally-weird-invisible-account-credit-on-transaction",
@@ -4615,7 +4580,7 @@
         "Refunds"
       ],
       "createdAt": "2026-03-12T01:01:09.319Z",
-      "ageDays": 141,
+      "ageDays": 179,
       "createdBy": "bart@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-8787/chat-icon-in-navigation-menu-partially-covering-rec-ai",
@@ -4623,17 +4588,17 @@
     },
     {
       "id": "PLA-1504",
-      "title": "Refund status reversal (succeeded \u2192 failed) does not un-confirm order item transactions",
+      "title": "Refund status reversal (succeeded → failed) does not un-confirm order item transactions",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "Medium",
       "priorityValue": 3,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-03-18T17:59:41.703Z",
-      "ageDays": 134,
+      "ageDays": 172,
       "createdBy": "George Ashworth",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1504/refund-status-reversal-succeeded-failed-does-not-un-confirm-order-item",
@@ -4651,7 +4616,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-27T17:49:28.704Z",
-      "ageDays": 125,
+      "ageDays": 163,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1578/show-user-friendly-error-when-voiding-a-payment-that-has-already",
@@ -4669,7 +4634,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-07T22:21:24.727Z",
-      "ageDays": 114,
+      "ageDays": 152,
       "createdBy": "dan@rec.us",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-1657/user-missing-classitem-information-from-receipt",
@@ -4689,7 +4654,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-10T13:45:39.871Z",
-      "ageDays": 111,
+      "ageDays": 149,
       "createdBy": "maddie@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-293/calendar-showing-a-different-court-than-what-was-actually-reserved",
@@ -4701,15 +4666,15 @@
       "id": "PLA-1694",
       "title": "P2, Laggy transactions not showing in logs til 2-3 days after transaction",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "Medium",
       "priorityValue": 3,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-04-13T23:56:10.778Z",
-      "ageDays": 108,
+      "ageDays": 146,
       "createdBy": "Lindsay Keare",
       "assignee": "George Ashworth",
       "url": "https://linear.app/team-rec/issue/PLA-1694/p2-laggy-transactions-not-showing-in-logs-til-2-3-days-after",
@@ -4727,7 +4692,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-15T20:35:28.858Z",
-      "ageDays": 106,
+      "ageDays": 144,
       "createdBy": "jimena@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-465/lesson-slots-are-appearing-duplicated-from-the-instructors-view",
@@ -4746,7 +4711,7 @@
         "BE"
       ],
       "createdAt": "2026-04-18T03:25:42.997Z",
-      "ageDays": 103,
+      "ageDays": 142,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-281/pre-existing-admindeletereservation-has-toctou-on-obstruction-check",
@@ -4766,7 +4731,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-21T17:48:37.613Z",
-      "ageDays": 100,
+      "ageDays": 138,
       "createdBy": "Olivia Gosselin",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1715/prevent-deletion-of-payment-methods-required-for-active-memberships-or",
@@ -4785,31 +4750,11 @@
         "FE"
       ],
       "createdAt": "2026-04-28T21:15:55.669Z",
-      "ageDays": 93,
+      "ageDays": 131,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-263/bug-investigate-rec-web-bae-session-timezone-not-found-in-use-sessions",
       "customers": []
-    },
-    {
-      "id": "CON-470",
-      "title": "Canceled by staff\" message doesn't specify who was canceled + cancellation missing from activity log",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-05-04T12:15:41.552Z",
-      "ageDays": 87,
-      "createdBy": "maddie@rec.us",
-      "assignee": "Guilherme Sprorowski",
-      "url": "https://linear.app/team-rec/issue/CON-470/canceled-by-staff-message-doesnt-specify-who-was-canceled-cancellation",
-      "customers": [
-        "West Sacramento, CA"
-      ]
     },
     {
       "id": "PLA-1781",
@@ -4823,7 +4768,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-08T18:32:02.201Z",
-      "ageDays": 83,
+      "ageDays": 121,
       "createdBy": "Michael Kehoe",
       "assignee": "Elias Arruda",
       "url": "https://linear.app/team-rec/issue/PLA-1781/balance-due-table-filtering",
@@ -4843,7 +4788,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-11T16:02:47.980Z",
-      "ageDays": 80,
+      "ageDays": 118,
       "createdBy": "ankur@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1785/payment-plan-installments-change-when-you-go-to-cart-click-price",
@@ -4861,7 +4806,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-12T23:17:13.914Z",
-      "ageDays": 79,
+      "ageDays": 117,
       "createdBy": "lionel",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-9364/bug-cart-box-blocks-navigation-buttons",
@@ -4880,7 +4825,7 @@
         "UX"
       ],
       "createdAt": "2026-05-14T20:35:05.112Z",
-      "ageDays": 77,
+      "ageDays": 115,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-9390/update-util-and-migrate-platform-to-follow-date-time-and-age",
@@ -4898,11 +4843,33 @@
         "Bug"
       ],
       "createdAt": "2026-05-28T16:34:44.188Z",
-      "ageDays": 63,
+      "ageDays": 101,
       "createdBy": "armand@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1891/auth-fix-password-reset-not-always-taking-effect",
       "customers": []
+    },
+    {
+      "id": "CON-82",
+      "title": "Sticky Filters Broken on Programming/Sections",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug",
+        "Apex",
+        "Apex Stability"
+      ],
+      "createdAt": "2026-06-09T16:13:29.108Z",
+      "ageDays": 89,
+      "createdBy": "dan@rec.us",
+      "assignee": "mahon@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-82/sticky-filters-broken-on-programmingsections",
+      "customers": [
+        "Apex PRD"
+      ]
     },
     {
       "id": "CON-224",
@@ -4916,7 +4883,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-17T05:33:39.264Z",
-      "ageDays": 43,
+      "ageDays": 82,
       "createdBy": "lionel",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-224/p2-jurupa-by-eow-synced-outlook-calendar-continues-syncing-events-even",
@@ -4937,7 +4904,7 @@
         "BE"
       ],
       "createdAt": "2026-06-19T10:13:59.507Z",
-      "ageDays": 41,
+      "ageDays": 80,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2051/bug-court-move-re-sync-an-in-flight-configure-can-recreate-the-old",
@@ -4955,7 +4922,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-22T22:22:04.310Z",
-      "ageDays": 38,
+      "ageDays": 76,
       "createdBy": "Birju Kadakia",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/AI-23/recent-chats-bar-doesnt-refresh-on-chat-create",
@@ -4973,47 +4940,10 @@
         "Bug"
       ],
       "createdAt": "2026-06-23T05:32:15.970Z",
-      "ageDays": 37,
+      "ageDays": 76,
       "createdBy": "lionel",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-292/p2-by-eow-user-received-unknown-discount-when-booking-for-facility",
-      "customers": []
-    },
-    {
-      "id": "PLA-2156",
-      "title": "[Bug] Failed delete-push during soft-delete strands a `synced` lighting row that permanently blocks disconnect/unmap",
-      "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "BE",
-        "Bug"
-      ],
-      "createdAt": "2026-07-07T00:41:02.176Z",
-      "ageDays": 24,
-      "createdBy": "Brad Taylor",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/PLA-2156/bug-failed-delete-push-during-soft-delete-strands-a-synced-lighting",
-      "customers": []
-    },
-    {
-      "id": "PLA-2161",
-      "title": "Price override: remove misleading 'issue a refund first' from price-below-paid error",
-      "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-07T20:41:32.077Z",
-      "ageDays": 23,
-      "createdBy": "Kevin Liu",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-2161/price-override-remove-misleading-issue-a-refund-first-from-price-below",
       "customers": []
     },
     {
@@ -5028,74 +4958,51 @@
         "Bug"
       ],
       "createdAt": "2026-07-15T17:16:54.312Z",
-      "ageDays": 15,
+      "ageDays": 53,
       "createdBy": "lionel",
       "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2287/p2-chico-scholarship-summary-add-total-expired-stat-card",
       "customers": [
-        "Chicorec"
+        "City of Chico"
       ]
     },
     {
-      "id": "AI-184",
-      "title": "Seb auto-emails leaking raw HTML into visible email body",
-      "team": "AI",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-17T19:32:32.711Z",
-      "ageDays": 13,
-      "createdBy": "lionel",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/AI-184/seb-auto-emails-leaking-raw-html-into-visible-email-body",
-      "customers": [
-        "City of Torrance"
-      ]
-    },
-    {
-      "id": "PLA-2354",
-      "title": "Not surfacing 'Phone Number' error when registering as Admin?",
-      "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-19T11:41:02.942Z",
-      "ageDays": 11,
-      "createdBy": "dan@rec.us",
-      "assignee": "Kevin Liu",
-      "url": "https://linear.app/team-rec/issue/PLA-2354/not-surfacing-phone-number-error-when-registering-as-admin",
-      "customers": [
-        "Rec"
-      ]
-    },
-    {
-      "id": "CON-809",
-      "title": "Admin can not add assignee in Rental tab",
+      "id": "CON-782",
+      "title": "Segment Builder Crashes when Adding Too Many Sections",
       "team": "Consumer",
-      "status": "In Code Review",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-07-17T16:56:16.883Z",
+      "ageDays": 51,
+      "createdBy": "dan@rec.us",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-782/segment-builder-crashes-when-adding-too-many-sections",
+      "customers": [
+        "Norman"
+      ]
+    },
+    {
+      "id": "PLA-2363",
+      "title": "P1/2 (should coordinate with PS on fix) Aging reports and payment plans reports not surfacing cancelled but unwaived",
+      "team": "Platform",
+      "status": "Paused",
       "statusType": "started",
       "priority": "Medium",
       "priorityValue": 3,
       "labels": [
-        "Bug",
-        "Team Week"
+        "Bug"
       ],
-      "createdAt": "2026-07-21T19:45:34.822Z",
-      "ageDays": 9,
-      "createdBy": "jennel.rossetti@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-809/admin-can-not-add-assignee-in-rental-tab",
-      "customers": [
-        "West Sacramento, CA"
-      ]
+      "createdAt": "2026-07-22T03:24:15.996Z",
+      "ageDays": 47,
+      "createdBy": "Lindsay Keare",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2363/p12-should-coordinate-with-ps-on-fix-aging-reports-and-payment-plans",
+      "customers": []
     },
     {
       "id": "PLA-2362",
@@ -5109,28 +5016,10 @@
         "Bug"
       ],
       "createdAt": "2026-07-22T03:02:18.348Z",
-      "ageDays": 8,
+      "ageDays": 47,
       "createdBy": "Lindsay Keare",
       "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2362/p2-differentiate-transaction-fees-and-ticket-fees-in-item-log-dropdown",
-      "customers": []
-    },
-    {
-      "id": "PLA-2363",
-      "title": "P1/2 (should coordinate with PS on fix) Aging reports and payment plans reports not surfacing cancelled but unwaived",
-      "team": "Platform",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-22T03:24:15.996Z",
-      "ageDays": 8,
-      "createdBy": "Lindsay Keare",
-      "assignee": "George Ashworth",
-      "url": "https://linear.app/team-rec/issue/PLA-2363/p12-should-coordinate-with-ps-on-fix-aging-reports-and-payment-plans",
       "customers": []
     },
     {
@@ -5145,157 +5034,15 @@
         "Bug"
       ],
       "createdAt": "2026-07-23T13:12:53.058Z",
-      "ageDays": 7,
+      "ageDays": 45,
       "createdBy": "Scott Graham",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-10174/bug-matcher-lost-race-cancel-orphans-the-just-created-reservation",
       "customers": []
     },
     {
-      "id": "CON-818",
-      "title": "Cancelled reservation showing on balance due table",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-24T00:23:53.397Z",
-      "ageDays": 7,
-      "createdBy": "Michael Kehoe",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-818/cancelled-reservation-showing-on-balance-due-table",
-      "customers": [
-        "Apex PRD"
-      ]
-    },
-    {
-      "id": "CON-839",
-      "title": "Admin can not generate roster to print",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-24T17:37:30.860Z",
-      "ageDays": 6,
-      "createdBy": "jennel.rossetti@rec.us",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-839/admin-can-not-generate-roster-to-print",
-      "customers": [
-        "Chicorec"
-      ]
-    },
-    {
-      "id": "CON-821",
-      "title": "Program Level defaults for 'Skill Level' not being Properly Assigned",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-26T12:17:18.098Z",
-      "ageDays": 4,
-      "createdBy": "dan@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-821/program-level-defaults-for-skill-level-not-being-properly-assigned",
-      "customers": [
-        "Glenview"
-      ]
-    },
-    {
-      "id": "CON-831",
-      "title": "\"Could not load user details\" error when emailing section roster participants",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug",
-        "FE",
-        "BE"
-      ],
-      "createdAt": "2026-07-27T23:26:34.983Z",
-      "ageDays": 3,
-      "createdBy": "Kevin Liu",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-831/could-not-load-user-details-error-when-emailing-section-roster",
-      "customers": [
-        "Douglasnv"
-      ]
-    },
-    {
-      "id": "CON-824",
-      "title": "Admin not capturing all attendee emails addresses for event.",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-27T17:34:03.118Z",
-      "ageDays": 3,
-      "createdBy": "jennel.rossetti@rec.us",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-824/admin-not-capturing-all-attendee-emails-addresses-for-event",
-      "customers": [
-        "City of Torrance"
-      ]
-    },
-    {
-      "id": "CON-837",
-      "title": "Bulk \"Delete Selected\" fails for facility-rental court-reservations; single-item delete works",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-28T20:58:57.504Z",
-      "ageDays": 2,
-      "createdBy": "Michael Kehoe",
-      "assignee": "armand@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-837/bulk-delete-selected-fails-for-facility-rental-court-reservations",
-      "customers": [
-        "Jurupa Valley, CA"
-      ]
-    },
-    {
-      "id": "CON-843",
-      "title": "P2 \u2014 Participant transfer blocked when destination section date has passed",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Medium",
-      "priorityValue": 3,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-29T03:44:55.751Z",
-      "ageDays": 1,
-      "createdBy": "lionel",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-843/p2-participant-transfer-blocked-when-destination-section-date-has",
-      "customers": [
-        "Malibucity"
-      ]
-    },
-    {
-      "id": "PLA-2401",
-      "title": "Booking payment issues: varied payment status for same booking payment plan",
+      "id": "PLA-2400",
+      "title": "Payment Plan shows as Pay in Full in Cart",
       "team": "Platform",
       "status": "To Do",
       "statusType": "unstarted",
@@ -5304,11 +5051,697 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-30T15:31:41.862Z",
-      "ageDays": 0,
+      "createdAt": "2026-07-30T14:25:34.022Z",
+      "ageDays": 38,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Olivia Gosselin",
+      "url": "https://linear.app/team-rec/issue/PLA-2400/payment-plan-shows-as-pay-in-full-in-cart",
+      "customers": []
+    },
+    {
+      "id": "PLA-2402",
+      "title": "Payment plan calculation and future functionality query",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug",
+        "usability"
+      ],
+      "createdAt": "2026-07-30T16:44:01.131Z",
+      "ageDays": 38,
       "createdBy": "Sydney Tucker",
       "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-2401/booking-payment-issues-varied-payment-status-for-same-booking-payment",
+      "url": "https://linear.app/team-rec/issue/PLA-2402/payment-plan-calculation-and-future-functionality-query",
+      "customers": []
+    },
+    {
+      "id": "PLA-2519",
+      "title": "[BUG] Instructor profile paints blank on entry, and fetches `me` twice",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-06T19:26:55.472Z",
+      "ageDays": 31,
+      "createdBy": "Brad Taylor",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2519/bug-instructor-profile-paints-blank-on-entry-and-fetches-me-twice",
+      "customers": []
+    },
+    {
+      "id": "PLA-2518",
+      "title": "[BUG] Migrated /app route guards bounce authenticated users to sign-in on any getMe failure",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-06T19:20:10.646Z",
+      "ageDays": 31,
+      "createdBy": "Brad Taylor",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2518/bug-migrated-app-route-guards-bounce-authenticated-users-to-sign-in-on",
+      "customers": []
+    },
+    {
+      "id": "CON-1011",
+      "title": "Duplicate areas on reservation details page",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-07T19:41:58.028Z",
+      "ageDays": 30,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1011/duplicate-areas-on-reservation-details-page",
+      "customers": []
+    },
+    {
+      "id": "CON-1068",
+      "title": "Claimable membership materialization silently fails when startAt is in the future",
+      "team": "Consumer",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-12T05:05:27.786Z",
+      "ageDays": 26,
+      "createdBy": "Kevin Liu",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1068/claimable-membership-materialization-silently-fails-when-startat-is-in",
+      "customers": []
+    },
+    {
+      "id": "REC-10283",
+      "title": "Facility Invoice with no due date results in household Make Payment dead-end",
+      "team": "Eng",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-11T15:22:26.238Z",
+      "ageDays": 26,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/REC-10283/facility-invoice-with-no-due-date-results-in-household-make-payment",
+      "customers": []
+    },
+    {
+      "id": "CON-1073",
+      "title": "Invoices are adding all reservations to an invoice when only a subset of reservations are selected",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-12T16:01:42.129Z",
+      "ageDays": 25,
+      "createdBy": "Michael Kehoe",
+      "assignee": "Scott Graham",
+      "url": "https://linear.app/team-rec/issue/CON-1073/invoices-are-adding-all-reservations-to-an-invoice-when-only-a-subset",
+      "customers": [
+        "Apex PRD"
+      ]
+    },
+    {
+      "id": "PLA-2621",
+      "title": "Investigate missing GL entries for Torrance - May 29 - June 30",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-14T22:39:44.994Z",
+      "ageDays": 23,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2621/investigate-missing-gl-entries-for-torrance-may-29-june-30",
+      "customers": [
+        "City of Torrance"
+      ]
+    },
+    {
+      "id": "CON-1133",
+      "title": "Clean up ~354 duplicate household members across all claimable orgs",
+      "team": "Consumer",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-17T01:43:04.096Z",
+      "ageDays": 21,
+      "createdBy": "Kevin Liu",
+      "assignee": "Kevin Liu",
+      "url": "https://linear.app/team-rec/issue/CON-1133/clean-up-354-duplicate-household-members-across-all-claimable-orgs",
+      "customers": []
+    },
+    {
+      "id": "PLA-2721",
+      "title": "Canceling a cart leaves orphaned product_purchase rows that block membership auto-renew",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Apex",
+        "Platform & AI",
+        "Seen By Partners",
+        "Bug"
+      ],
+      "createdAt": "2026-08-18T15:56:53.527Z",
+      "ageDays": 19,
+      "createdBy": "bart@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2721/canceling-a-cart-leaves-orphaned-product-purchase-rows-that-block",
+      "customers": []
+    },
+    {
+      "id": "CON-1233",
+      "title": "Form on File not applied on Fast Track / planned bookings",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-19T15:46:34.174Z",
+      "ageDays": 18,
+      "createdBy": "Kevin Liu",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1233/form-on-file-not-applied-on-fast-track-planned-bookings",
+      "customers": []
+    },
+    {
+      "id": "PLA-2749",
+      "title": "Billing amount discrepancy after event ticket purchase",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-19T18:26:38.931Z",
+      "ageDays": 18,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2749/billing-amount-discrepancy-after-event-ticket-purchase",
+      "customers": []
+    },
+    {
+      "id": "CON-1280",
+      "title": "Borked Roster PDF Export When Adding a Ridiculous Number of Form Questions/Answers",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "ai:ready-to-implement",
+        "Bug"
+      ],
+      "createdAt": "2026-08-21T02:01:03.675Z",
+      "ageDays": 17,
+      "createdBy": "dan@rec.us",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1280/borked-roster-pdf-export-when-adding-a-ridiculous-number-of-form",
+      "customers": [
+        "Rec"
+      ]
+    },
+    {
+      "id": "PLA-2775",
+      "title": "Add-on Bear Spray (a nightly add on) shows $0.00 price in checkout",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-20T15:54:06.393Z",
+      "ageDays": 17,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2775/add-on-bear-spray-a-nightly-add-on-shows-dollar000-price-in-checkout",
+      "customers": []
+    },
+    {
+      "id": "CON-1264",
+      "title": "Site Reservations table: Date sort doesn't apply, and column order shifts on interaction",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-21T16:34:04.638Z",
+      "ageDays": 16,
+      "createdBy": "Teddy Noll",
+      "assignee": "Scott Graham",
+      "url": "https://linear.app/team-rec/issue/CON-1264/site-reservations-table-date-sort-doesnt-apply-and-column-order-shifts",
+      "customers": []
+    },
+    {
+      "id": "CON-1296",
+      "title": "Create and update programs from the client so expired cookies don't 401",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Seen By Partners",
+        "Programming",
+        "Quick Win",
+        "FE",
+        "Bug"
+      ],
+      "createdAt": "2026-08-24T21:05:30.783Z",
+      "ageDays": 13,
+      "createdBy": "bart@rec.us",
+      "assignee": "Kathleen Lister",
+      "url": "https://linear.app/team-rec/issue/CON-1296/create-and-update-programs-from-the-client-so-expired-cookies-dont-401",
+      "customers": []
+    },
+    {
+      "id": "CON-1323",
+      "title": "Calendar incorrectly flagging a program conflict when there is no site attached",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-26T13:35:28.516Z",
+      "ageDays": 11,
+      "createdBy": "dan@rec.us",
+      "assignee": "armand@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1323/calendar-incorrectly-flagging-a-program-conflict-when-there-is-no-site",
+      "customers": [
+        "Rec"
+      ]
+    },
+    {
+      "id": "CON-1326",
+      "title": "Eligibility Requirements Not Checked from FT->Cart, allowing possible Ineligible Participants to Register",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "ai:ready-to-implement",
+        "Bug"
+      ],
+      "createdAt": "2026-08-26T17:26:30.261Z",
+      "ageDays": 11,
+      "createdBy": "dan@rec.us",
+      "assignee": "Nick",
+      "url": "https://linear.app/team-rec/issue/CON-1326/eligibility-requirements-not-checked-from-ft-cart-allowing-possible",
+      "customers": [
+        "City of Torrance"
+      ]
+    },
+    {
+      "id": "CON-1333",
+      "title": "Fixed-slot sites: discovery surfaces ignore non-grid durations",
+      "team": "Consumer",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Facilities & Reservations",
+        "FE",
+        "BE",
+        "Bug"
+      ],
+      "createdAt": "2026-08-26T21:46:31.223Z",
+      "ageDays": 11,
+      "createdBy": "armand@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1333/fixed-slot-sites-discovery-surfaces-ignore-non-grid-durations",
+      "customers": []
+    },
+    {
+      "id": "PLA-2913",
+      "title": "Refunding payment where account credit used - get alerted account credit refund must be lower than a threshold that it is under",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-30T14:08:55.464Z",
+      "ageDays": 7,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2913/refunding-payment-where-account-credit-used-get-alerted-account-credit",
+      "customers": []
+    },
+    {
+      "id": "PLA-2951",
+      "title": "Stale GL codes on reservations moved before W1 shipped",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T11:38:23.751Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2951/stale-gl-codes-on-reservations-moved-before-w1-shipped",
+      "customers": []
+    },
+    {
+      "id": "PLA-2941",
+      "title": "Deferred revenue accrues on the wrong curve when billing decouples from the allocation basis",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:40.837Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2941/deferred-revenue-accrues-on-the-wrong-curve-when-billing-decouples",
+      "customers": []
+    },
+    {
+      "id": "PLA-2938",
+      "title": "Refund overpayment cap does not reach vintage items",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:18.884Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2938/refund-overpayment-cap-does-not-reach-vintage-items",
+      "customers": []
+    },
+    {
+      "id": "PLA-2937",
+      "title": "Takeover netting is short for payments settled before GL recording was enabled",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:12.560Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2937/takeover-netting-is-short-for-payments-settled-before-gl-recording-was",
+      "customers": []
+    },
+    {
+      "id": "CON-1396",
+      "title": "Private lesson request: location picker can't be exited on mobile after selecting 3 locations",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T19:22:01.146Z",
+      "ageDays": 5,
+      "createdBy": "Loris Lamarque",
+      "assignee": "mahon@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1396/private-lesson-request-location-picker-cant-be-exited-on-mobile-after",
+      "customers": []
+    },
+    {
+      "id": "CON-1399",
+      "title": "Duplicating a section fails with \"SMS is not enabled for this organization\" when the section's waitlist has sendSms: true (587 sections across 31 orgs)",
+      "team": "Consumer",
+      "status": "In Code Review",
+      "statusType": "started",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "P2",
+        "Programs & Memberships",
+        "BE",
+        "Bug",
+        "ai:ready-to-implement"
+      ],
+      "createdAt": "2026-09-01T20:08:10.307Z",
+      "ageDays": 5,
+      "createdBy": "Loris Lamarque",
+      "assignee": "Guilherme Sprorowski",
+      "url": "https://linear.app/team-rec/issue/CON-1399/duplicating-a-section-fails-with-sms-is-not-enabled-for-this",
+      "customers": []
+    },
+    {
+      "id": "CON-1400",
+      "title": "Duplicate section doesn't copy sessions, registration windows, or minimum enrollment",
+      "team": "Consumer",
+      "status": "In Progress",
+      "statusType": "started",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Docs Needed",
+        "P3",
+        "Programs & Memberships",
+        "Improvement",
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T20:08:29.066Z",
+      "ageDays": 5,
+      "createdBy": "Loris Lamarque",
+      "assignee": "Guilherme Sprorowski",
+      "url": "https://linear.app/team-rec/issue/CON-1400/duplicate-section-doesnt-copy-sessions-registration-windows-or-minimum",
+      "customers": []
+    },
+    {
+      "id": "PLA-2964",
+      "title": "Back button on staff site bounces to admin instead of expected event page",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T18:29:45.235Z",
+      "ageDays": 5,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-2964/back-button-on-staff-site-bounces-to-admin-instead-of-expected-event",
+      "customers": []
+    },
+    {
+      "id": "PLA-3029",
+      "title": "SSO: When MS email input as user but not added to Org - they are not allowed to log in. Needing to verify what they see as expected...",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-03T21:46:08.582Z",
+      "ageDays": 3,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3029/sso-when-ms-email-input-as-user-but-not-added-to-org-they-are-not",
+      "customers": []
+    },
+    {
+      "id": "PLA-3021",
+      "title": "SSO connection activation navigates away from settings",
+      "team": "Platform",
+      "status": "In Code Review",
+      "statusType": "started",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug",
+        "Improvement"
+      ],
+      "createdAt": "2026-09-03T19:37:05.720Z",
+      "ageDays": 3,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3021/sso-connection-activation-navigates-away-from-settings",
+      "customers": []
+    },
+    {
+      "id": "PLA-3022",
+      "title": "SSO: https://setup.workos.com/ does not look to fully load - per browser spin",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-03T19:47:03.072Z",
+      "ageDays": 3,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3022/sso-httpssetupworkoscom-does-not-look-to-fully-load-per-browser-spin",
+      "customers": []
+    },
+    {
+      "id": "CON-1467",
+      "title": "Ask Seb obfuscates buttons on Admin pages: Bookings, Manager Order, General Ledger",
+      "team": "Consumer",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Improvement",
+        "Design",
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T20:28:45.035Z",
+      "ageDays": 2,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Edwin Zhang",
+      "url": "https://linear.app/team-rec/issue/CON-1467/ask-seb-obfuscates-buttons-on-admin-pages-bookings-manager-order",
+      "customers": []
+    },
+    {
+      "id": "PLA-3038",
+      "title": "Separate household tabs allow for individual cart checkout when paying off a balance on a payment plan",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T17:16:08.729Z",
+      "ageDays": 2,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Kael Lumen",
+      "url": "https://linear.app/team-rec/issue/PLA-3038/separate-household-tabs-allow-for-individual-cart-checkout-when-paying",
+      "customers": []
+    },
+    {
+      "id": "PLA-3036",
+      "title": "Can't filter for a blank GL code",
+      "team": "Platform",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T16:43:55.264Z",
+      "ageDays": 2,
+      "createdBy": "Lindsay Keare",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-3036/cant-filter-for-a-blank-gl-code",
+      "customers": [
+        "City of Torrance"
+      ]
+    },
+    {
+      "id": "CON-1471",
+      "title": "QR Code on Approval Request permit attachment - non-legible mobile page display",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug",
+        "UX"
+      ],
+      "createdAt": "2026-09-05T14:38:01.150Z",
+      "ageDays": 1,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Scott Graham",
+      "url": "https://linear.app/team-rec/issue/CON-1471/qr-code-on-approval-request-permit-attachment-non-legible-mobile-page",
+      "customers": []
+    },
+    {
+      "id": "CON-1468",
+      "title": "Auto-issue Permit toggle selectable without approvals",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Medium",
+      "priorityValue": 3,
+      "labels": [
+        "Bug",
+        "Design"
+      ],
+      "createdAt": "2026-09-05T13:57:14.669Z",
+      "ageDays": 1,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Scott Graham",
+      "url": "https://linear.app/team-rec/issue/CON-1468/auto-issue-permit-toggle-selectable-without-approvals",
       "customers": []
     },
     {
@@ -5324,7 +5757,7 @@
         "Platform & AI"
       ],
       "createdAt": "2024-05-15T05:55:55.677Z",
-      "ageDays": 806,
+      "ageDays": 845,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-1449/when-you-enter-hh-owners-dob-from-fast-track-doesnt-save-to-profile",
@@ -5344,7 +5777,7 @@
         "Platform & AI"
       ],
       "createdAt": "2024-06-10T20:24:28.711Z",
-      "ageDays": 780,
+      "ageDays": 818,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-1589/handle-lost-connection-to-cc-reader",
@@ -5362,7 +5795,7 @@
         "Bug"
       ],
       "createdAt": "2024-06-25T18:34:28.328Z",
-      "ageDays": 765,
+      "ageDays": 803,
       "createdBy": "Jordan Mathews",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/DES-58/i-somehow-have-a-cart-with-nothing-in-it",
@@ -5380,7 +5813,7 @@
         "Bug"
       ],
       "createdAt": "2024-06-25T18:38:22.617Z",
-      "ageDays": 765,
+      "ageDays": 803,
       "createdBy": "Jordan Mathews",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/DES-71/admin-experience-days-not-appearing-in-bookings-table-for-some",
@@ -5400,7 +5833,7 @@
         "Seen By Partners"
       ],
       "createdAt": "2024-10-25T15:19:21.135Z",
-      "ageDays": 643,
+      "ageDays": 681,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-445/investigate-delay-in-receiving-code-for-support-tickets",
@@ -5419,7 +5852,7 @@
         "FE"
       ],
       "createdAt": "2024-11-13T23:54:01.641Z",
-      "ageDays": 624,
+      "ageDays": 662,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-2617/possible-recess-table-bug-with-cellcustomcomponent",
@@ -5440,7 +5873,7 @@
         "BE"
       ],
       "createdAt": "2024-12-10T19:42:48.574Z",
-      "ageDays": 597,
+      "ageDays": 635,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-444/handle-huge-datasets-for-bulk-creating-facility-rentals",
@@ -5460,7 +5893,7 @@
         "FE"
       ],
       "createdAt": "2025-03-11T01:19:16.432Z",
-      "ageDays": 507,
+      "ageDays": 545,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-443/error-requiring-email-for-changing-minor-household-member-details",
@@ -5480,7 +5913,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-03-25T20:01:45.905Z",
-      "ageDays": 492,
+      "ageDays": 530,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-3522/taxes-error-happening-on-facility-rentals-page",
@@ -5500,7 +5933,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-04-15T21:37:13.956Z",
-      "ageDays": 471,
+      "ageDays": 509,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-3679/intermittent-website-loadingrefresh-glitch-across-devices-and-browsers",
@@ -5522,7 +5955,7 @@
         "FE"
       ],
       "createdAt": "2025-04-16T23:50:30.105Z",
-      "ageDays": 470,
+      "ageDays": 508,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-434/clicking-view-order-button-on-admin-household-bookings-table-record",
@@ -5541,7 +5974,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-04-18T19:20:44.641Z",
-      "ageDays": 468,
+      "ageDays": 506,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-433/crash-on-receipt-page",
@@ -5561,7 +5994,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-04-25T16:47:35.581Z",
-      "ageDays": 461,
+      "ageDays": 499,
       "createdBy": "Andrew Knowles",
       "assignee": "mahon@rec.us",
       "url": "https://linear.app/team-rec/issue/REC-3761/add-attendee-modal-displays-weird-on-laptop-screen",
@@ -5580,7 +6013,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-05-12T20:24:59.646Z",
-      "ageDays": 444,
+      "ageDays": 482,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-431/fix-unhelpful-error-message-and-500-error-when-admin-tries-to-add-user",
@@ -5600,7 +6033,7 @@
         "FE"
       ],
       "createdAt": "2025-05-30T00:27:49.924Z",
-      "ageDays": 427,
+      "ageDays": 465,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-428/canceling-an-order-from-the-admin-store-page-does-not-clear-order-data",
@@ -5619,7 +6052,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-06-11T23:15:02.102Z",
-      "ageDays": 414,
+      "ageDays": 452,
       "createdBy": "Lindsay Keare",
       "assignee": "Elise Hudson",
       "url": "https://linear.app/team-rec/issue/REC-4191/p3-price-override-button-comes-up-when-this-isnt-an-option-for-payment",
@@ -5638,7 +6071,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-09-24T15:03:02.450Z",
-      "ageDays": 309,
+      "ageDays": 347,
       "createdBy": "Elias Arruda",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-419/p3-no-space-on-some-customers-in-reports",
@@ -5656,7 +6089,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T20:29:08.765Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5840/receipt-inconsistent-copy-missing-labels-icons-etc",
@@ -5674,7 +6107,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T20:27:01.293Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5838/cart-header-excessive-height",
@@ -5692,7 +6125,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T20:25:02.968Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5837/discovery-formatting-of-text-in-sectionsession-cards",
@@ -5710,7 +6143,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T20:00:05.045Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5836/profile-snapping-back-to-top",
@@ -5728,7 +6161,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:54:35.655Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5833/customer-cluttered-footer",
@@ -5746,7 +6179,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:50:41.124Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5829/fast-track-joined-waitlist-text-formatting",
@@ -5764,7 +6197,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T18:23:50.592Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5819/profile-confusing-accordions-for-reset-and-delete",
@@ -5782,7 +6215,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T18:22:32.966Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5818/sign-up-auto-populated-address-hard-to-select",
@@ -5800,7 +6233,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T18:21:32.201Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5817/logged-out-state-small-hamburger-menu",
@@ -5819,7 +6252,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-10-01T20:40:38.962Z",
-      "ageDays": 302,
+      "ageDays": 340,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-6012/registration-end-date-changes-to-the-next-day",
@@ -5840,7 +6273,7 @@
         "FE"
       ],
       "createdAt": "2025-11-13T18:41:52.096Z",
-      "ageDays": 259,
+      "ageDays": 297,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-424/p2-bug-unable-to-update-organization-name-due-to-required-banner-mds",
@@ -5858,29 +6291,10 @@
         "Bug"
       ],
       "createdAt": "2025-11-19T12:52:27.572Z",
-      "ageDays": 253,
+      "ageDays": 291,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-122/admin-add-attendee-modal-uses-the-admins-groups-for-section-pricing",
-      "customers": []
-    },
-    {
-      "id": "PLA-570",
-      "title": "Edge Case: Adjusting an item's price to zero after applying a promo code continues to take up a redemption",
-      "team": "Platform",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug",
-        "BE"
-      ],
-      "createdAt": "2025-11-22T00:47:10.616Z",
-      "ageDays": 251,
-      "createdBy": "Kael Lumen",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-570/edge-case-adjusting-an-items-price-to-zero-after-applying-a-promo-code",
       "customers": []
     },
     {
@@ -5899,7 +6313,7 @@
         "FE"
       ],
       "createdAt": "2025-12-19T20:26:09.288Z",
-      "ageDays": 223,
+      "ageDays": 261,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-422/p3-admin-store-after-clicking-on-item-then-closing-purchase-modal",
@@ -5919,7 +6333,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-01-14T16:09:00.507Z",
-      "ageDays": 197,
+      "ageDays": 235,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-121/manually-entering-dates-into-the-date-picker-in-payment-plan",
@@ -5940,46 +6354,10 @@
         "Quick Win"
       ],
       "createdAt": "2026-01-15T20:11:41.925Z",
-      "ageDays": 196,
+      "ageDays": 234,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-405/p3-admin-finance-transactions-roll-up-metrics-refund-amount-is-not",
-      "customers": []
-    },
-    {
-      "id": "REC-8465",
-      "title": "Pass usage log not displaying",
-      "team": "Eng",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-02-04T19:54:32.336Z",
-      "ageDays": 176,
-      "createdBy": "Long Nguyen",
-      "assignee": "Long Nguyen",
-      "url": "https://linear.app/team-rec/issue/REC-8465/pass-usage-log-not-displaying",
-      "customers": []
-    },
-    {
-      "id": "REC-8639",
-      "title": "Test bug",
-      "team": "Eng",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-02-23T20:23:44.148Z",
-      "ageDays": 157,
-      "createdBy": "Kevin Liu",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/REC-8639/test-bug",
       "customers": []
     },
     {
@@ -5994,7 +6372,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-09T14:14:18.165Z",
-      "ageDays": 143,
+      "ageDays": 181,
       "createdBy": "Kathleen Lister",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-8742/console-error-with-isdisabled-prop-in-csv-download-feature",
@@ -6014,7 +6392,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-18T17:22:47.328Z",
-      "ageDays": 134,
+      "ageDays": 172,
       "createdBy": "Michael Kehoe",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-129/cant-search-section-roster-with-hh-owner-email",
@@ -6035,7 +6413,7 @@
         "Apex Stability"
       ],
       "createdAt": "2026-03-27T18:41:54.706Z",
-      "ageDays": 125,
+      "ageDays": 163,
       "createdBy": "Lindsay Keare",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1583/p1-finance-transaction-and-item-logs-audit-logs-off-in-7-orgs",
@@ -6053,29 +6431,10 @@
         "Bug"
       ],
       "createdAt": "2026-04-01T17:15:04.937Z",
-      "ageDays": 120,
+      "ageDays": 158,
       "createdBy": "betsy@rec.us",
       "assignee": "betsy@rec.us",
       "url": "https://linear.app/team-rec/issue/REC-8950/qa-design-polish",
-      "customers": []
-    },
-    {
-      "id": "REC-9129",
-      "title": "Competitions page Design Debt",
-      "team": "Eng",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "needs design",
-        "Bug"
-      ],
-      "createdAt": "2026-04-17T17:18:11.008Z",
-      "ageDays": 104,
-      "createdBy": "John Whiting",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/REC-9129/competitions-page-design-debt",
       "customers": []
     },
     {
@@ -6091,10 +6450,29 @@
         "Bug"
       ],
       "createdAt": "2026-04-17T17:18:14.447Z",
-      "ageDays": 104,
+      "ageDays": 142,
       "createdBy": "John Whiting",
-      "assignee": "John Whiting",
+      "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-9130/fix-competition-table-and-button-layout",
+      "customers": []
+    },
+    {
+      "id": "REC-9129",
+      "title": "Competitions page Design Debt",
+      "team": "Eng",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "needs design",
+        "Bug"
+      ],
+      "createdAt": "2026-04-17T17:18:11.008Z",
+      "ageDays": 142,
+      "createdBy": "John Whiting",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/REC-9129/competitions-page-design-debt",
       "customers": []
     },
     {
@@ -6109,7 +6487,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-20T21:57:03.695Z",
-      "ageDays": 71,
+      "ageDays": 109,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1829/admin-edit-scholarship-page-has-css-visual-truncation-issue-if-page",
@@ -6127,28 +6505,10 @@
         "Bug"
       ],
       "createdAt": "2026-05-27T19:17:31.276Z",
-      "ageDays": 64,
+      "ageDays": 102,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1859/ai-custom-report-unhandled-500-error",
-      "customers": []
-    },
-    {
-      "id": "CON-241",
-      "title": "P2/3, main gallery image not populating when adding feature photo",
-      "team": "Consumer",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-05-27T23:52:06.009Z",
-      "ageDays": 64,
-      "createdBy": "Lindsay Keare",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-241/p23-main-gallery-image-not-populating-when-adding-feature-photo",
       "customers": []
     },
     {
@@ -6163,7 +6523,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-29T16:41:12.314Z",
-      "ageDays": 62,
+      "ageDays": 100,
       "createdBy": "Kevin Liu",
       "assignee": "bart@rec.us",
       "url": "https://linear.app/team-rec/issue/PLA-1868/internalservererror-required-record-not-found",
@@ -6182,7 +6542,7 @@
         "P2"
       ],
       "createdAt": "2026-06-03T22:51:20.045Z",
-      "ageDays": 57,
+      "ageDays": 95,
       "createdBy": "George Ashworth",
       "assignee": "Olivia Gosselin",
       "url": "https://linear.app/team-rec/issue/PLA-1888/internalservererror-insert-into-admin-assignment-assigned-by-user-id",
@@ -6200,7 +6560,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-16T22:40:52.219Z",
-      "ageDays": 44,
+      "ageDays": 82,
       "createdBy": "Lindsay Keare",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-234/p3-default-hourly-pricing-doesnt-get-pulled-into-fixed-slots-pop-up",
@@ -6220,7 +6580,7 @@
         "Bug"
       ],
       "createdAt": "2026-06-25T05:28:53.524Z",
-      "ageDays": 35,
+      "ageDays": 74,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/AI-72/order-seb-is-searching-seems-off",
@@ -6238,7 +6598,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-10T18:45:54.170Z",
-      "ageDays": 20,
+      "ageDays": 58,
       "createdBy": "armand@rec.us",
       "assignee": "Andrew Knowles",
       "url": "https://linear.app/team-rec/issue/CON-717/internalservererror-waitlist-leave-analytics-fails-when-section-has-no",
@@ -6257,7 +6617,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-13T23:53:58.804Z",
-      "ageDays": 17,
+      "ageDays": 55,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2247/bug-musco-court-moveconfigure-residual-persist-pending-concurrency",
@@ -6267,39 +6627,19 @@
       "id": "CON-775",
       "title": "Apex missing forms error",
       "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "Low",
       "priorityValue": 4,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-07-16T21:32:55.229Z",
-      "ageDays": 14,
+      "ageDays": 52,
       "createdBy": "Andrew Knowles",
-      "assignee": "Andrew Knowles",
+      "assignee": "Guilherme Sprorowski",
       "url": "https://linear.app/team-rec/issue/CON-775/apex-missing-forms-error",
       "customers": []
-    },
-    {
-      "id": "PLA-2358",
-      "title": "Customer can not update password",
-      "team": "Platform",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-21T21:28:51.124Z",
-      "ageDays": 9,
-      "createdBy": "jennel.rossetti@rec.us",
-      "assignee": "Kevin Liu",
-      "url": "https://linear.app/team-rec/issue/PLA-2358/customer-can-not-update-password",
-      "customers": [
-        "San Francisco Parks and Rec"
-      ]
     },
     {
       "id": "PLA-2370",
@@ -6313,7 +6653,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-27T17:25:47.706Z",
-      "ageDays": 3,
+      "ageDays": 41,
       "createdBy": "jennel.rossetti@rec.us",
       "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2370/error-occurs-when-user-attempts-to-log-in-or-update-password",
@@ -6331,72 +6671,33 @@
         "Bug"
       ],
       "createdAt": "2026-07-28T19:44:08.569Z",
-      "ageDays": 2,
+      "ageDays": 40,
       "createdBy": "armand@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-835/rental-application-accept-parallel-multi-site-form-copy-can-race-on",
       "customers": []
     },
     {
-      "id": "PLA-2394",
-      "title": "Cart says 2 when only 1 item in cart",
+      "id": "PLA-2401",
+      "title": "Booking payment issues: varied payment status for same booking payment plan",
       "team": "Platform",
-      "status": "In QA",
-      "statusType": "started",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "Low",
       "priorityValue": 4,
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-29T17:16:19.778Z",
-      "ageDays": 1,
+      "createdAt": "2026-07-30T15:31:41.862Z",
+      "ageDays": 38,
       "createdBy": "Sydney Tucker",
-      "assignee": "George Ashworth",
-      "url": "https://linear.app/team-rec/issue/PLA-2394/cart-says-2-when-only-1-item-in-cart",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2401/booking-payment-issues-varied-payment-status-for-same-booking-payment",
       "customers": []
     },
     {
-      "id": "PLA-2399",
-      "title": "User receives error message when updating password.",
-      "team": "Platform",
-      "status": "In Progress",
-      "statusType": "started",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-29T19:43:36.096Z",
-      "ageDays": 1,
-      "createdBy": "jennel.rossetti@rec.us",
-      "assignee": "Kevin Liu",
-      "url": "https://linear.app/team-rec/issue/PLA-2399/user-receives-error-message-when-updating-password",
-      "customers": [
-        "San Francisco Parks and Rec"
-      ]
-    },
-    {
-      "id": "CON-848",
-      "title": "Programs missing year within date info display",
-      "team": "Consumer",
-      "status": "In Code Review",
-      "statusType": "started",
-      "priority": "Low",
-      "priorityValue": 4,
-      "labels": [
-        "Bug",
-        "Programs & Memberships"
-      ],
-      "createdAt": "2026-07-29T18:15:04.361Z",
-      "ageDays": 1,
-      "createdBy": "Sydney Tucker",
-      "assignee": "bart@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-848/programs-missing-year-within-date-info-display",
-      "customers": []
-    },
-    {
-      "id": "PLA-2402",
-      "title": "Payment plan calculation and future functionality query",
+      "id": "PLA-2438",
+      "title": "Allow persistence of row selection across data table pages",
       "team": "Platform",
       "status": "To Do",
       "statusType": "unstarted",
@@ -6405,11 +6706,306 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-30T16:44:01.131Z",
-      "ageDays": 0,
+      "createdAt": "2026-07-31T22:41:48.713Z",
+      "ageDays": 37,
+      "createdBy": "Alex Berman",
+      "assignee": "Alex Berman",
+      "url": "https://linear.app/team-rec/issue/PLA-2438/allow-persistence-of-row-selection-across-data-table-pages",
+      "customers": []
+    },
+    {
+      "id": "PLA-2421",
+      "title": "Bookings page Column Visibility menu has empty area",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-07-31T13:29:32.699Z",
+      "ageDays": 37,
       "createdBy": "Sydney Tucker",
       "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-2402/payment-plan-calculation-and-future-functionality-query",
+      "url": "https://linear.app/team-rec/issue/PLA-2421/bookings-page-column-visibility-menu-has-empty-area",
+      "customers": []
+    },
+    {
+      "id": "CON-1075",
+      "title": "Admin flow encounters legacy page when Waitlist Management toggled on",
+      "team": "Consumer",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-12T16:43:35.877Z",
+      "ageDays": 25,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1075/admin-flow-encounters-legacy-page-when-waitlist-management-toggled-on",
+      "customers": []
+    },
+    {
+      "id": "PLA-2996",
+      "title": "Unable to close 'Time's up!' purchase banner",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-13T16:01:48.432Z",
+      "ageDays": 24,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2996/unable-to-close-times-up-purchase-banner",
+      "customers": []
+    },
+    {
+      "id": "CON-1311",
+      "title": "Blank Screen for Participant Information When Registering User",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-25T18:11:12.508Z",
+      "ageDays": 12,
+      "createdBy": "dan@rec.us",
+      "assignee": "bart@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1311/blank-screen-for-participant-information-when-registering-user",
+      "customers": [
+        "Clarkstown"
+      ]
+    },
+    {
+      "id": "CON-1334",
+      "title": "Admin Skipping Forms During Membership Purchase Disables Form Link",
+      "team": "Consumer",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-27T00:48:38.229Z",
+      "ageDays": 11,
+      "createdBy": "dan@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1334/admin-skipping-forms-during-membership-purchase-disables-form-link",
+      "customers": [
+        "Douglasnv"
+      ]
+    },
+    {
+      "id": "PLA-2867",
+      "title": "UI: Admin -> Data Tables -> Date range filter chip using same date on two different years displays wrong",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug",
+        "FE",
+        "UX",
+        "Quick Win"
+      ],
+      "createdAt": "2026-08-27T19:11:01.294Z",
+      "ageDays": 10,
+      "createdBy": "George Ashworth",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2867/ui-admin-data-tables-date-range-filter-chip-using-same-date-on-two",
+      "customers": []
+    },
+    {
+      "id": "PLA-2939",
+      "title": "At-purchase site move resets the vintage refund floor",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:20.913Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2939/at-purchase-site-move-resets-the-vintage-refund-floor",
+      "customers": []
+    },
+    {
+      "id": "PLA-2946",
+      "title": "Edit-plan waive 400s on vintage items with no engine obligation",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T11:29:32.363Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2946/edit-plan-waive-400s-on-vintage-items-with-no-engine-obligation",
+      "customers": []
+    },
+    {
+      "id": "PLA-2940",
+      "title": "Stranded value on reconfigured or abandoned GL accounts (F2/F3/F5/F6)",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:23.980Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2940/stranded-value-on-reconfigured-or-abandoned-gl-accounts-f2f3f5f6",
+      "customers": []
+    },
+    {
+      "id": "PLA-2942",
+      "title": "Cancelling a mixed item mid-season dips by-date revenue until its schedule finishes",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T01:32:45.757Z",
+      "ageDays": 6,
+      "createdBy": "Kael Lumen",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2942/cancelling-a-mixed-item-mid-season-dips-by-date-revenue-until-its",
+      "customers": []
+    },
+    {
+      "id": "PLA-2914",
+      "title": "Filter payment plans by Auto-pay and suggest filters for Balance Due page",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-31T14:02:00.922Z",
+      "ageDays": 6,
+      "createdBy": "Sydney Tucker",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-2914/filter-payment-plans-by-auto-pay-and-suggest-filters-for-balance-due",
+      "customers": []
+    },
+    {
+      "id": "CON-1404",
+      "title": "Roster table: selection checkbox positioned right of Attendee column instead of left",
+      "team": "Consumer",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T00:02:06.231Z",
+      "ageDays": 5,
+      "createdBy": "betsy@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1404/roster-table-selection-checkbox-positioned-right-of-attendee-column",
+      "customers": []
+    },
+    {
+      "id": "CON-1416",
+      "title": "Locations > Sites",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T18:02:37.886Z",
+      "ageDays": 4,
+      "createdBy": "Guilherme Sprorowski",
+      "assignee": "mahon@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1416/locations-sites",
+      "customers": []
+    },
+    {
+      "id": "PLA-3034",
+      "title": "SS: Login and Security section of Org Details - request buttons open in unique browser tab",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T13:57:29.623Z",
+      "ageDays": 2,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3034/ss-login-and-security-section-of-org-details-request-buttons-open-in",
+      "customers": []
+    },
+    {
+      "id": "PLA-3033",
+      "title": "SSO Org setting area within Organization Details needs small text update - \"s\" to \"S\"",
+      "team": "Platform",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T13:53:07.575Z",
+      "ageDays": 2,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Brad Taylor",
+      "url": "https://linear.app/team-rec/issue/PLA-3033/sso-org-setting-area-within-organization-details-needs-small-text",
+      "customers": []
+    },
+    {
+      "id": "CON-1470",
+      "title": "Approver selection does not persist",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "Low",
+      "priorityValue": 4,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-05T14:20:47.727Z",
+      "ageDays": 1,
+      "createdBy": "Sydney Tucker",
+      "assignee": "Scott Graham",
+      "url": "https://linear.app/team-rec/issue/CON-1470/approver-selection-does-not-persist",
       "customers": []
     },
     {
@@ -6425,7 +7021,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2024-05-16T23:16:38.465Z",
-      "ageDays": 805,
+      "ageDays": 843,
       "createdBy": "George Ashworth",
       "assignee": "mahon@rec.us",
       "url": "https://linear.app/team-rec/issue/REC-1470/reservation-detail-page-shows-add-to-fast-track-and-join-waitlist",
@@ -6443,7 +7039,7 @@
         "Bug"
       ],
       "createdAt": "2024-06-25T18:39:44.476Z",
-      "ageDays": 765,
+      "ageDays": 803,
       "createdBy": "Lea Tiaokhiao",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/DES-73/order-fails-to-appear-in-order-history-if-its-free",
@@ -6461,7 +7057,7 @@
         "Bug"
       ],
       "createdAt": "2024-06-25T18:11:40.258Z",
-      "ageDays": 765,
+      "ageDays": 803,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/DES-39/staff-ops-cancelled-attendee-being-shown-as-confirmed",
@@ -6480,7 +7076,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2024-10-30T21:23:31.618Z",
-      "ageDays": 638,
+      "ageDays": 676,
       "createdBy": "Lindsay Keare",
       "assignee": "Long Nguyen",
       "url": "https://linear.app/team-rec/issue/REC-2501/handle-section-creationduplication-with-bulk-create",
@@ -6498,7 +7094,7 @@
         "Bug"
       ],
       "createdAt": "2024-12-11T21:33:19.476Z",
-      "ageDays": 596,
+      "ageDays": 634,
       "createdBy": "Long Nguyen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-2792/deposits-not-removed-from-cart-when-removing-their-corresponding",
@@ -6517,7 +7113,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-03-03T19:13:56.984Z",
-      "ageDays": 514,
+      "ageDays": 552,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-3312/clear-current-cart-user-stuck-in-times-up",
@@ -6538,7 +7134,7 @@
         "FE"
       ],
       "createdAt": "2025-05-09T16:45:40.357Z",
-      "ageDays": 447,
+      "ageDays": 485,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-432/deposits-rendered-incorrectly-in-admin-checkout-ui",
@@ -6557,7 +7153,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-08-01T00:19:24.352Z",
-      "ageDays": 364,
+      "ageDays": 402,
       "createdBy": "Lindsay Keare",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-4891/p3-manage-order-page-timed-out-despite-successful-refund",
@@ -6575,29 +7171,10 @@
         "Bug"
       ],
       "createdAt": "2025-08-27T16:26:58.934Z",
-      "ageDays": 337,
+      "ageDays": 375,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3497/bug-section-when-multiple-facilitators-were-selected-unable-to-see-all",
-      "customers": []
-    },
-    {
-      "id": "PLA-426",
-      "title": "[Ideally for look ASAP for customer relations] Customer not showing up in system despite getting error message that email is already in use",
-      "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug",
-        "Platform & AI"
-      ],
-      "createdAt": "2025-08-28T22:35:56.143Z",
-      "ageDays": 336,
-      "createdBy": "Lindsay Keare",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-426/ideally-for-look-asap-for-customer-relations-customer-not-showing-up",
       "customers": []
     },
     {
@@ -6612,7 +7189,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-01T13:50:18.869Z",
-      "ageDays": 332,
+      "ageDays": 370,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3509/bug-end-user-side-when-booking-a-session-in-the-check-out-summary-page",
@@ -6630,7 +7207,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-03T16:54:09.223Z",
-      "ageDays": 330,
+      "ageDays": 368,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3517/bug-sessions-date-and-time-not-matched-on-the-admin-side-vs-customer",
@@ -6648,7 +7225,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-04T17:25:39.931Z",
-      "ageDays": 329,
+      "ageDays": 367,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3530/bug-add-a-participant-to-the-waitlist-via-admin-side-then-tried-to",
@@ -6667,7 +7244,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-09-09T17:49:29.255Z",
-      "ageDays": 324,
+      "ageDays": 362,
       "createdBy": "Lindsay Keare",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5465/p2p3-form-answersability-to-enter-a-form-dont-ask-you-to-fill-out-a",
@@ -6685,7 +7262,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-09T16:07:57.425Z",
-      "ageDays": 324,
+      "ageDays": 362,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3547/bug-fast-track-select-a-household-member-that-is-not-eligible-or-does",
@@ -6703,7 +7280,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-10T15:53:30.666Z",
-      "ageDays": 323,
+      "ageDays": 361,
       "createdBy": "Michael Kehoe",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3551/bug-mention-the-location-site-date-and-time-requested-in-the-email",
@@ -6721,7 +7298,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-11T17:16:12.760Z",
-      "ageDays": 322,
+      "ageDays": 360,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3558/bug-when-deleting-an-add-on-no-successful-delete-message-appears-and",
@@ -6739,7 +7316,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-11T17:14:50.547Z",
-      "ageDays": 322,
+      "ageDays": 360,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3557/bug-add-an-add-ons-to-a-created-facility-rental-configure-the-price",
@@ -6757,7 +7334,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-11T16:34:01.904Z",
-      "ageDays": 322,
+      "ageDays": 360,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/OPS-3554/bug-rental-application-no-validation-on-the-maximum-capacity-of-a-site",
@@ -6775,7 +7352,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:57:24.352Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5834/illegible-email-notifications-in-dark-mode",
@@ -6793,7 +7370,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:52:47.664Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5831/reservations-cal-icon-affordance-is-confusing",
@@ -6811,7 +7388,7 @@
         "Bug"
       ],
       "createdAt": "2025-09-25T19:51:17.287Z",
-      "ageDays": 308,
+      "ageDays": 346,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-5830/fast-track-unclear-feedback-when-you-delete-a-program",
@@ -6829,7 +7406,7 @@
         "Bug"
       ],
       "createdAt": "2025-10-14T16:48:17.370Z",
-      "ageDays": 289,
+      "ageDays": 327,
       "createdBy": "paulo@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-239/bug-having-issues-answering-the-forms-when-one-of-the-added-forms-by",
@@ -6848,28 +7425,10 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-10-27T21:59:35.266Z",
-      "ageDays": 276,
+      "ageDays": 314,
       "createdBy": "Long Nguyen",
       "assignee": "Colin Bohn",
       "url": "https://linear.app/team-rec/issue/CON-166/no-booking-found-bug-for-addremove-to-waitlist-operations",
-      "customers": []
-    },
-    {
-      "id": "PLA-598",
-      "title": "Coupon Code Bug Bash",
-      "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2025-11-06T15:07:23.735Z",
-      "ageDays": 266,
-      "createdBy": "Kathleen Lister",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/PLA-598/coupon-code-bug-bash",
       "customers": []
     },
     {
@@ -6885,7 +7444,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2025-11-11T17:10:14.938Z",
-      "ageDays": 261,
+      "ageDays": 299,
       "createdBy": "Scott Graham",
       "assignee": "Long Nguyen",
       "url": "https://linear.app/team-rec/issue/REC-6783/membership-benefits-not-updating-dynamically-during-bulk-upload",
@@ -6904,7 +7463,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-11-20T16:05:35.573Z",
-      "ageDays": 252,
+      "ageDays": 290,
       "createdBy": "Andrew Knowles",
       "assignee": "Long Nguyen",
       "url": "https://linear.app/team-rec/issue/REC-7033/birthdates-on-profiles-show-incorrect-dates-by-one-day",
@@ -6923,10 +7482,29 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-01T20:46:35.340Z",
-      "ageDays": 241,
+      "ageDays": 279,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7210/p2-not-sure-if-bug-or-was-cutting-scope-cant-multi-select-for-filters",
+      "customers": []
+    },
+    {
+      "id": "REC-7287",
+      "title": "Hey team super odd P2-looks like the Torrance team created a 'Polar Plunge' section inside of a P...",
+      "team": "Eng",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug",
+        "Programs & Memberships"
+      ],
+      "createdAt": "2025-12-05T04:56:11.048Z",
+      "ageDays": 276,
+      "createdBy": "Brad Taylor",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/REC-7287/hey-team-super-odd-p2-looks-like-the-torrance-team-created-a-polar",
       "customers": []
     },
     {
@@ -6942,7 +7520,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-04T18:52:38.189Z",
-      "ageDays": 238,
+      "ageDays": 276,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7278/post-refund-redirect-not-working",
@@ -6961,29 +7539,10 @@
         "Bug"
       ],
       "createdAt": "2025-12-04T22:21:06.500Z",
-      "ageDays": 238,
+      "ageDays": 276,
       "createdBy": "ankur@rec.us",
       "assignee": "betsy@rec.us",
       "url": "https://linear.app/team-rec/issue/PRD-34/section-reg-programs-also-showing-capacity-on-every-single-session",
-      "customers": []
-    },
-    {
-      "id": "REC-7287",
-      "title": "Hey team super odd P2-looks like the Torrance team created a 'Polar Plunge' section inside of a P...",
-      "team": "Eng",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug",
-        "Programs & Memberships"
-      ],
-      "createdAt": "2025-12-05T04:56:11.048Z",
-      "ageDays": 237,
-      "createdBy": "Brad Taylor",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/REC-7287/hey-team-super-odd-p2-looks-like-the-torrance-team-created-a-polar",
       "customers": []
     },
     {
@@ -6999,7 +7558,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-10T19:47:09.183Z",
-      "ageDays": 232,
+      "ageDays": 270,
       "createdBy": "Kathleen Lister",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7406/sticky-filters-dont-work-for-table-sort",
@@ -7018,7 +7577,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-12T00:25:17.760Z",
-      "ageDays": 231,
+      "ageDays": 269,
       "createdBy": "mahon@rec.us",
       "assignee": "Lindsay Keare",
       "url": "https://linear.app/team-rec/issue/REC-7438/system-forcing-full-payment-instead-of-allowing-partial-payment",
@@ -7037,7 +7596,7 @@
         "Platform & AI"
       ],
       "createdAt": "2025-12-15T00:25:35.039Z",
-      "ageDays": 228,
+      "ageDays": 266,
       "createdBy": "mahon@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7472/refund-pop-up-misleads-users-about-navigation-after-refund",
@@ -7055,7 +7614,7 @@
         "Bug"
       ],
       "createdAt": "2025-12-19T15:09:47.293Z",
-      "ageDays": 223,
+      "ageDays": 261,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7568/apex-reg-usability-bugs",
@@ -7074,7 +7633,7 @@
         "Platform & AI"
       ],
       "createdAt": "2026-01-09T06:28:41.508Z",
-      "ageDays": 202,
+      "ageDays": 241,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7818/birthdays-off-by-one-day-in-program-registration",
@@ -7093,7 +7652,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-01-09T06:28:59.363Z",
-      "ageDays": 202,
+      "ageDays": 241,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-7819/p2-visitor-log-datetime-issue-theres-a-difference-of-8-hours-between",
@@ -7112,7 +7671,7 @@
         "Platform & AI"
       ],
       "createdAt": "2026-01-15T23:55:48.290Z",
-      "ageDays": 196,
+      "ageDays": 234,
       "createdBy": "Alex Berman",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-403/admin-finance-item-log-transactions-cant-distinguish-card-online-vs",
@@ -7131,7 +7690,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-01-22T00:16:15.056Z",
-      "ageDays": 190,
+      "ageDays": 228,
       "createdBy": "mahon@rec.us",
       "assignee": "betsy@rec.us",
       "url": "https://linear.app/team-rec/issue/REC-8149/needs-design-bug-overlapping-issues-with-nav-bar-on-window-resize",
@@ -7152,7 +7711,7 @@
         "FE"
       ],
       "createdAt": "2026-01-28T19:52:29.652Z",
-      "ageDays": 183,
+      "ageDays": 221,
       "createdBy": "George Ashworth",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-394/p3-admin-manage-order-items-with-payment-plans-always-show-waive",
@@ -7171,7 +7730,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-01-28T14:11:05.856Z",
-      "ageDays": 183,
+      "ageDays": 221,
       "createdBy": "paulo@rec.us",
       "assignee": "ankur@rec.us",
       "url": "https://linear.app/team-rec/issue/OPS-7271/forms-form-successfully-submitted-on-the-customer-side-but-it-says-not",
@@ -7190,29 +7749,10 @@
         "BE"
       ],
       "createdAt": "2026-01-29T23:15:24.236Z",
-      "ageDays": 182,
+      "ageDays": 220,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-374/bug-promiseall-lock-acquisition-can-cause-deadlocks",
-      "customers": []
-    },
-    {
-      "id": "CON-373",
-      "title": "[Bug] TOCTOU in facility rental validation",
-      "team": "Consumer",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug",
-        "BE"
-      ],
-      "createdAt": "2026-01-29T23:15:25.419Z",
-      "ageDays": 182,
-      "createdBy": "Brad Taylor",
-      "assignee": "Brad Taylor",
-      "url": "https://linear.app/team-rec/issue/CON-373/bug-toctou-in-facility-rental-validation",
       "customers": []
     },
     {
@@ -7228,7 +7768,7 @@
         "BE"
       ],
       "createdAt": "2026-01-29T23:15:26.572Z",
-      "ageDays": 182,
+      "ageDays": 220,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-372/bug-discount-code-race-condition-allows-exceeding-redemption-limits",
@@ -7246,7 +7786,7 @@
         "Bug"
       ],
       "createdAt": "2026-02-02T19:22:02.938Z",
-      "ageDays": 178,
+      "ageDays": 216,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-8404/clear-stuck-checkout-entry-to-enable-waitlist-feature",
@@ -7265,7 +7805,7 @@
         "Platform & AI"
       ],
       "createdAt": "2026-02-06T02:11:02.702Z",
-      "ageDays": 174,
+      "ageDays": 213,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-392/prescott-valley-logo-cut-off-on-receipts",
@@ -7284,7 +7824,7 @@
         "Bug"
       ],
       "createdAt": "2026-02-10T21:07:14.520Z",
-      "ageDays": 170,
+      "ageDays": 208,
       "createdBy": "Elise Hudson",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/REC-8550/gl-code-not-appearing-in-item-log-for-admin-rentals",
@@ -7292,7 +7832,7 @@
     },
     {
       "id": "OPS-7550",
-      "title": "[Bug] [Customer Side] Getting \u201cForm responses not provided\u201d error when adding second Facility Rental to cart",
+      "title": "[Bug] [Customer Side] Getting “Form responses not provided” error when adding second Facility Rental to cart",
       "team": "Ops",
       "status": "Todo",
       "statusType": "unstarted",
@@ -7302,7 +7842,7 @@
         "Bug"
       ],
       "createdAt": "2026-02-10T14:41:59.485Z",
-      "ageDays": 170,
+      "ageDays": 208,
       "createdBy": "paulo@rec.us",
       "assignee": "Elise Hudson",
       "url": "https://linear.app/team-rec/issue/OPS-7550/bug-customer-side-getting-form-responses-not-provided-error-when",
@@ -7320,7 +7860,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-06T14:34:07.207Z",
-      "ageDays": 146,
+      "ageDays": 184,
       "createdBy": "paulo@rec.us",
       "assignee": "ankur@rec.us",
       "url": "https://linear.app/team-rec/issue/OPS-7753/bug-admin-balance-due-table-getting-error-when-paying-balance-due-by",
@@ -7338,7 +7878,7 @@
         "Bug"
       ],
       "createdAt": "2026-03-13T01:04:44.083Z",
-      "ageDays": 140,
+      "ageDays": 178,
       "createdBy": "George Ashworth",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/PLA-1463/dataerror-insert-into-refund-suggestion-batch-id-booking-id-citation",
@@ -7356,7 +7896,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-02T21:18:20.287Z",
-      "ageDays": 119,
+      "ageDays": 157,
       "createdBy": "maddie@rec.us",
       "assignee": "armand@rec.us",
       "url": "https://linear.app/team-rec/issue/CON-486/email-customerio-undercounting-external-admins-due-to-missing-segment",
@@ -7376,7 +7916,7 @@
         "Bug"
       ],
       "createdAt": "2026-04-08T14:45:08.412Z",
-      "ageDays": 113,
+      "ageDays": 151,
       "createdBy": "paulo@rec.us",
       "assignee": "Alex Berman",
       "url": "https://linear.app/team-rec/issue/OPS-7907/bug-overlapping-time-bands-allowed-and-causes-delayed-policy-summary",
@@ -7395,7 +7935,7 @@
         "Apex Stability"
       ],
       "createdAt": "2026-04-09T12:34:07.453Z",
-      "ageDays": 112,
+      "ageDays": 150,
       "createdBy": "Kael Lumen",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-1677/decouple-orderitem-fulfillment-from-payment-status-update",
@@ -7413,7 +7953,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-07T18:58:47.293Z",
-      "ageDays": 84,
+      "ageDays": 122,
       "createdBy": "bart@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-500/auth-login-button-visible-when-user-is-already-logged-in",
@@ -7431,7 +7971,7 @@
         "Bug"
       ],
       "createdAt": "2026-05-15T00:34:59.616Z",
-      "ageDays": 77,
+      "ageDays": 115,
       "createdBy": "Kevin Liu",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/CON-235/badgatewayerror-google-calendar-api-request-timeout",
@@ -7450,7 +7990,7 @@
         "Programs & Memberships"
       ],
       "createdAt": "2026-05-22T16:11:08.641Z",
-      "ageDays": 69,
+      "ageDays": 107,
       "createdBy": "betsy@rec.us",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PRD-88/photo-upload-missing-from-hh-member-profile-pages",
@@ -7469,7 +8009,7 @@
         "FE"
       ],
       "createdAt": "2026-06-11T04:14:59.170Z",
-      "ageDays": 49,
+      "ageDays": 88,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-349/bug-customer-invoice-page-shows-the-viewer-as-bill-to-not-the-invoices",
@@ -7488,7 +8028,7 @@
         "FE"
       ],
       "createdAt": "2026-06-11T04:15:05.931Z",
-      "ageDays": 49,
+      "ageDays": 88,
       "createdBy": "Brad Taylor",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/CON-348/bug-markdown-invoice-note-prefills-the-email-composer-as-literal",
@@ -7506,10 +8046,28 @@
         "Bug"
       ],
       "createdAt": "2026-06-25T20:17:25.192Z",
-      "ageDays": 35,
+      "ageDays": 73,
       "createdBy": "Kevin Liu",
       "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2042/integrationerror-you-have-an-in-flight-confirmcardpayment-please-be",
+      "customers": []
+    },
+    {
+      "id": "PLA-2114",
+      "title": "User locked out after password reset",
+      "team": "Platform",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-07-02T22:16:00.573Z",
+      "ageDays": 66,
+      "createdBy": "Scott Graham",
+      "assignee": "Kevin Liu",
+      "url": "https://linear.app/team-rec/issue/PLA-2114/user-locked-out-after-password-reset",
       "customers": []
     },
     {
@@ -7524,7 +8082,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-02T18:22:15.925Z",
-      "ageDays": 28,
+      "ageDays": 66,
       "createdBy": "Kael Lumen",
       "assignee": "John Whiting",
       "url": "https://linear.app/team-rec/issue/PLA-2111/checkout-misleading-numbers-on-installment-only-checkout",
@@ -7542,7 +8100,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-02T18:28:54.068Z",
-      "ageDays": 28,
+      "ageDays": 66,
       "createdBy": "Kael Lumen",
       "assignee": "John Whiting",
       "url": "https://linear.app/team-rec/issue/PLA-2113/checkout-misleading-numbers-on-subsequent-installment-checkout",
@@ -7550,7 +8108,7 @@
     },
     {
       "id": "PLA-2212",
-      "title": "[Bug] bps\u2192cents fee math uses two rounding conventions \u2014 1\u00a2 conservation drift across display/charge/GL",
+      "title": "[Bug] bps→cents fee math uses two rounding conventions — 1¢ conservation drift across display/charge/GL",
       "team": "Platform",
       "status": "Backlog",
       "statusType": "backlog",
@@ -7561,7 +8119,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-12T03:49:18.740Z",
-      "ageDays": 18,
+      "ageDays": 57,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2212/bug-bpscents-fee-math-uses-two-rounding-conventions-1cent-conservation",
@@ -7569,7 +8127,7 @@
     },
     {
       "id": "PLA-2211",
-      "title": "[Bug] Session/tier capacity check is check-then-act \u2014 concurrent purchases can oversell",
+      "title": "[Bug] Session/tier capacity check is check-then-act — concurrent purchases can oversell",
       "team": "Platform",
       "status": "Backlog",
       "statusType": "backlog",
@@ -7580,7 +8138,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-12T03:49:09.834Z",
-      "ageDays": 18,
+      "ageDays": 57,
       "createdBy": "Brad Taylor",
       "assignee": "Brad Taylor",
       "url": "https://linear.app/team-rec/issue/PLA-2211/bug-sessiontier-capacity-check-is-check-then-act-concurrent-purchases",
@@ -7598,31 +8156,11 @@
         "Bug"
       ],
       "createdAt": "2026-07-14T23:52:04.503Z",
-      "ageDays": 16,
+      "ageDays": 54,
       "createdBy": "ankur@rec.us",
       "assignee": "bart@rec.us",
       "url": "https://linear.app/team-rec/issue/PLA-2286/instructor-search-was-not-working-during-a-customer-demo",
       "customers": []
-    },
-    {
-      "id": "CON-765",
-      "title": "Instant Book Reservation 'Name' doesn't get updated when changing Sites",
-      "team": "Consumer",
-      "status": "Backlog",
-      "statusType": "backlog",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-15T22:35:53.921Z",
-      "ageDays": 15,
-      "createdBy": "dan@rec.us",
-      "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-765/instant-book-reservation-name-doesnt-get-updated-when-changing-sites",
-      "customers": [
-        "Apex PRD"
-      ]
     },
     {
       "id": "PLA-2323",
@@ -7636,7 +8174,7 @@
         "Bug"
       ],
       "createdAt": "2026-07-16T19:19:06.780Z",
-      "ageDays": 14,
+      "ageDays": 52,
       "createdBy": "Kevin Liu",
       "assignee": null,
       "url": "https://linear.app/team-rec/issue/PLA-2323/user-unable-to-reset-password-via-email-link",
@@ -7654,69 +8192,89 @@
         "Bug"
       ],
       "createdAt": "2026-07-22T23:23:45.393Z",
-      "ageDays": 8,
+      "ageDays": 46,
       "createdBy": "bart@rec.us",
       "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2366/password-reset-email-not-received",
       "customers": []
     },
     {
-      "id": "CON-822",
-      "title": "Bug: layout on mobile schedule page when needs attention label is long",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
-      "priority": "No priority",
-      "priorityValue": 0,
-      "labels": [
-        "Bug"
-      ],
-      "createdAt": "2026-07-27T14:11:26.622Z",
-      "ageDays": 3,
-      "createdBy": "Kathleen Lister",
-      "assignee": "Kathleen Lister",
-      "url": "https://linear.app/team-rec/issue/CON-822/bug-layout-on-mobile-schedule-page-when-needs-attention-label-is-long",
-      "customers": []
-    },
-    {
       "id": "PLA-2386",
       "title": "New payment method button unresponsive",
       "team": "Platform",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "status": "In QA",
+      "statusType": "started",
       "priority": "No priority",
       "priorityValue": 0,
       "labels": [
         "Bug"
       ],
       "createdAt": "2026-07-28T22:46:01.696Z",
-      "ageDays": 2,
+      "ageDays": 40,
       "createdBy": "Kevin Liu",
-      "assignee": null,
+      "assignee": "Kevin Liu",
       "url": "https://linear.app/team-rec/issue/PLA-2386/new-payment-method-button-unresponsive",
       "customers": []
     },
     {
-      "id": "CON-851",
-      "title": "Site type update not reflected in sites table without refresh",
-      "team": "Consumer",
-      "status": "To Do",
-      "statusType": "unstarted",
+      "id": "DES-313",
+      "title": "Booking fallback and cancel-rental dialog copy contradict what the actions do",
+      "team": "Design",
+      "status": "Backlog",
+      "statusType": "backlog",
       "priority": "No priority",
       "priorityValue": 0,
       "labels": [
+        "Facilities & Reservations",
+        "UX",
         "Bug"
       ],
-      "createdAt": "2026-07-29T20:56:54.394Z",
-      "ageDays": 1,
-      "createdBy": "armand@rec.us",
-      "assignee": "armand@rec.us",
-      "url": "https://linear.app/team-rec/issue/CON-851/site-type-update-not-reflected-in-sites-table-without-refresh",
+      "createdAt": "2026-08-13T21:00:57.822Z",
+      "ageDays": 24,
+      "createdBy": "Brad Taylor",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/DES-313/booking-fallback-and-cancel-rental-dialog-copy-contradict-what-the",
       "customers": []
     },
     {
-      "id": "CON-893",
-      "title": "Natural-sort facility/site names in admin calendar rows and sites list",
+      "id": "AI-306",
+      "title": "Program registration should use search everything user pickers",
+      "team": "AI",
+      "status": "In Progress",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-21T18:55:07.369Z",
+      "ageDays": 16,
+      "createdBy": "Edwin Zhang",
+      "assignee": "Edwin Zhang",
+      "url": "https://linear.app/team-rec/issue/AI-306/program-registration-should-use-search-everything-user-pickers",
+      "customers": []
+    },
+    {
+      "id": "AI-302",
+      "title": "Report generation routine confirmation text is cut off & usability",
+      "team": "AI",
+      "status": "In Progress",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-24T20:09:31.510Z",
+      "ageDays": 13,
+      "createdBy": "Elise Hudson",
+      "assignee": "John Whiting",
+      "url": "https://linear.app/team-rec/issue/AI-302/report-generation-routine-confirmation-text-is-cut-off-and-usability",
+      "customers": []
+    },
+    {
+      "id": "CON-1346",
+      "title": "Audit section page mobile support",
       "team": "Consumer",
       "status": "To Do",
       "statusType": "unstarted",
@@ -7725,12 +8283,248 @@
       "labels": [
         "Bug"
       ],
-      "createdAt": "2026-07-31T00:12:39.168Z",
-      "ageDays": 0,
-      "createdBy": "Kevin Liu",
+      "createdAt": "2026-08-28T14:43:00.776Z",
+      "ageDays": 9,
+      "createdBy": "bart@rec.us",
       "assignee": null,
-      "url": "https://linear.app/team-rec/issue/CON-893/natural-sort-facilitysite-names-in-admin-calendar-rows-and-sites-list",
+      "url": "https://linear.app/team-rec/issue/CON-1346/audit-section-page-mobile-support",
       "customers": []
+    },
+    {
+      "id": "CON-1384",
+      "title": "Program detail sections table does not refresh after creating a section",
+      "team": "Consumer",
+      "status": "In Code Review",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-08-31T23:22:01.481Z",
+      "ageDays": 6,
+      "createdBy": "armand@rec.us",
+      "assignee": "Nick",
+      "url": "https://linear.app/team-rec/issue/CON-1384/program-detail-sections-table-does-not-refresh-after-creating-a",
+      "customers": []
+    },
+    {
+      "id": "CON-1397",
+      "title": "Waitlist rollup shows 168 people, but waitlist shows no people",
+      "team": "Consumer",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T19:36:45.065Z",
+      "ageDays": 5,
+      "createdBy": "ankur@rec.us",
+      "assignee": "armand@rec.us",
+      "url": "https://linear.app/team-rec/issue/CON-1397/waitlist-rollup-shows-168-people-but-waitlist-shows-no-people",
+      "customers": []
+    },
+    {
+      "id": "CON-1401",
+      "title": "Waitlist table does not refresh after admin registers a waitlisted attendee",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T20:30:02.683Z",
+      "ageDays": 5,
+      "createdBy": "armand@rec.us",
+      "assignee": "Nick",
+      "url": "https://linear.app/team-rec/issue/CON-1401/waitlist-table-does-not-refresh-after-admin-registers-a-waitlisted",
+      "customers": []
+    },
+    {
+      "id": "AI-325",
+      "title": "Roster CSV in incorrect format",
+      "team": "AI",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-01T16:37:05.428Z",
+      "ageDays": 5,
+      "createdBy": "Elise Hudson",
+      "assignee": "Elias Arruda",
+      "url": "https://linear.app/team-rec/issue/AI-325/roster-csv-in-incorrect-format",
+      "customers": []
+    },
+    {
+      "id": "CON-1409",
+      "title": "Waitlist table does not refresh after capacity is updated",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T15:23:39.002Z",
+      "ageDays": 4,
+      "createdBy": "armand@rec.us",
+      "assignee": "Nick",
+      "url": "https://linear.app/team-rec/issue/CON-1409/waitlist-table-does-not-refresh-after-capacity-is-updated",
+      "customers": []
+    },
+    {
+      "id": "AI-334",
+      "title": "Hyperlink leading to \"something went wrong\"",
+      "team": "AI",
+      "status": "In Code Review",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T13:25:56.823Z",
+      "ageDays": 4,
+      "createdBy": "Elise Hudson",
+      "assignee": "Edwin Zhang",
+      "url": "https://linear.app/team-rec/issue/AI-334/hyperlink-leading-to-something-went-wrong",
+      "customers": []
+    },
+    {
+      "id": "AI-336",
+      "title": "Accuracy: Seb returns incorrect household balance",
+      "team": "AI",
+      "status": "In Progress",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-02T13:49:45.366Z",
+      "ageDays": 4,
+      "createdBy": "Elise Hudson",
+      "assignee": "Elias Arruda",
+      "url": "https://linear.app/team-rec/issue/AI-336/accuracy-seb-returns-incorrect-household-balance",
+      "customers": []
+    },
+    {
+      "id": "CON-1433",
+      "title": "Open location details instead of Google Maps",
+      "team": "Consumer",
+      "status": "In QA",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-03T18:55:29.108Z",
+      "ageDays": 3,
+      "createdBy": "John Whiting",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1433/open-location-details-instead-of-google-maps",
+      "customers": []
+    },
+    {
+      "id": "CON-1463",
+      "title": "Bug: Unable to edit view",
+      "team": "Consumer",
+      "status": "To Do",
+      "statusType": "unstarted",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T17:13:25.626Z",
+      "ageDays": 2,
+      "createdBy": "betsy@rec.us",
+      "assignee": "Long Nguyen",
+      "url": "https://linear.app/team-rec/issue/CON-1463/bug-unable-to-edit-view",
+      "customers": []
+    },
+    {
+      "id": "CON-1462",
+      "title": "Bug: Filter chips not appearing when selected",
+      "team": "Consumer",
+      "status": "In Progress",
+      "statusType": "started",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T17:05:48.613Z",
+      "ageDays": 2,
+      "createdBy": "betsy@rec.us",
+      "assignee": "Long Nguyen",
+      "url": "https://linear.app/team-rec/issue/CON-1462/bug-filter-chips-not-appearing-when-selected",
+      "customers": []
+    },
+    {
+      "id": "CON-1459",
+      "title": "Being asked for my grade, depsite the program not requiring grade as required info",
+      "team": "Consumer",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T15:45:53.935Z",
+      "ageDays": 2,
+      "createdBy": "ankur@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/CON-1459/being-asked-for-my-grade-depsite-the-program-not-requiring-grade-as",
+      "customers": []
+    },
+    {
+      "id": "AI-350",
+      "title": "Changed session times not reflected in UI",
+      "team": "AI",
+      "status": "Triage",
+      "statusType": "triage",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-04T18:28:03.772Z",
+      "ageDays": 2,
+      "createdBy": "Elise Hudson",
+      "assignee": "Elias Arruda",
+      "url": "https://linear.app/team-rec/issue/AI-350/changed-session-times-not-reflected-in-ui",
+      "customers": []
+    },
+    {
+      "id": "PLA-3044",
+      "title": "Intermittent Page Refresh API errors",
+      "team": "Platform",
+      "status": "Backlog",
+      "statusType": "backlog",
+      "priority": "No priority",
+      "priorityValue": 0,
+      "labels": [
+        "Bug"
+      ],
+      "createdAt": "2026-09-05T12:44:03.034Z",
+      "ageDays": 1,
+      "createdBy": "dan@rec.us",
+      "assignee": null,
+      "url": "https://linear.app/team-rec/issue/PLA-3044/intermittent-page-refresh-api-errors",
+      "customers": [
+        "Rec"
+      ]
     }
   ],
   "featureRequests": [

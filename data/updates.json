@@ -3,6 +3,19 @@
   "updates": [
     {
       "date": "2026-09-07",
+      "title": "The bug list was five weeks stale — refreshed, plus a filter by org",
+      "body": "Dan spotted that every status on Bug Management was out of date. It was: the bug half of this dashboard's snapshot was built once on 31 July and nothing had rebuilt it since.",
+      "items": [
+        "The bug list is current again. It moved from 241 open bugs to 285 — and six of the seven rows at the top of the Urgent list had already been closed. Urgent read 7; the real number is 2. PLA-1880, the row at the very top, went Done on 4 August.",
+        "You can now filter the list by org. Options are the Linear customers attached to open bugs, busiest first, with a count beside each.",
+        "The filter says what it hides. Only 44 of the 285 open bugs are tagged to any org, so picking one shows what is tagged to that org and not everything that affects it — the note under the filter spells that out rather than letting a small number read as a total.",
+        "Org names are shown exactly as Linear holds them, and are deliberately not merged. Linear has separate customer records for some orgs (Chico and City of Chico, Smyrna and Smyrnaga, three spellings of Jurupa Valley including a typo), so a couple of orgs appear twice. Guessing which records are the same org would sometimes merge two different ones, silently. Giving each Linear customer the Rec org ID as its external ID is what would fix it properly.",
+        "The sidebar now says how old the snapshot is, and turns amber past two days. It used to say 'refreshed daily' — which it kept saying for 38 days while nothing refreshed it. That claim is why nobody noticed.",
+        "The rebuild is a script now rather than something done by hand, and it refuses to write a snapshot that still contains closed bugs. Putting it on a daily schedule needs the Linear connector attached to a Routine, which has to be done from the Routines screen."
+      ]
+    },
+    {
+      "date": "2026-09-07",
       "title": "The Rec logo, a rename, and Org Features stops throwing you out of the dashboard",
       "body": "Navigation cleanup, plus two new sections under Admin.",
       "items": [
