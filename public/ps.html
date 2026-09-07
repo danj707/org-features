@@ -160,6 +160,17 @@
      explanation is what invites "it didn't save". */
   .ofs-foot button.ofs-save:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
   .ofs-meta { padding: 8px 16px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); }
+  /* The "Data as of" line. It sits above the KPI cards and must read as a
+     provenance note, not as another metric — hence no card chrome. */
+  .asof { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+          font-size: 12.5px; color: var(--muted); margin: 2px 0 14px; }
+  .asof b { color: var(--ink); font-weight: 700; }
+  .asof-age { color: var(--muted); }
+  .asof-stale { color: #b45309; font-weight: 700; }
+  .asof-stale a { color: #b45309; text-decoration: underline; }
+  /* Pushed right and quiet: it is the same sentence every day, so it must
+     not compete with the date, which is the part that changes. */
+  .asof-src { margin-left: auto; font-size: 11.5px; color: #94a3b8; }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
 </head>
@@ -1164,6 +1175,31 @@
     const gap = (x, y) => shown.filter(k => adoptedIn(x.slug, k) && !adoptedIn(y.slug, k)).map(label);
 
     return e("div", null,
+      /* WHEN THIS DATA IS FROM, stated on the page rather than inferred.
+         The sidebar's snapshot line describes the PS/bugs snapshot, which is
+         a DIFFERENT file on a different schedule — reading it here and
+         assuming it covered these numbers is exactly how the features
+         snapshot sat 16 days stale without anyone noticing. It reads the
+         features snapshot's own `generatedAt`, and it states the AGE
+         (measured) rather than claiming "refreshed daily" (a standing
+         promise this project has already broken once). */
+      e("div", { className: "asof", "data-feat-asof": snapAgeDays(d.generatedAt) },
+        e("span", null, e("b", null, "Data as of "),
+          d.generatedAt ? new Date(d.generatedAt).toLocaleString("en-US",
+            { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
+            : "an unreadable date"),
+        snapStale(d.generatedAt)
+          // A WARNING WHOSE FIX A HUMAN MUST PERFORM CARRIES THE LINK to
+          // perform it. The bake is a GitHub Action now, so a missed refresh
+          // is a red X on a page one click away.
+          ? e("span", { className: "asof-stale" }, "\u26a0 " + snapAgeLabel(d.generatedAt),
+              " \u2014 the nightly bake may have failed. ",
+              e("a", { href: "https://github.com/danj707/org-features/actions/workflows/refresh-features.yml",
+                       target: "_blank", rel: "noopener" }, "Check the last run"))
+          : e("span", { className: "asof-age" }, "\u00b7 " + snapAgeLabel(d.generatedAt)),
+        e("span", { className: "asof-src" },
+          "Baked from the production read replica, daily at 6am ET")),
+
       e("div", { className: "cards" },
         e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"),
           e("div", { className: "v", "data-feat-orgs": all.length }, all.length),
@@ -1582,7 +1618,11 @@
           e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
           e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
           e("div", { style: { marginTop: 8 }, "data-snap-age": snapAgeDays(data.generatedAt) },
-            "Snapshot " + new Date(data.generatedAt).toLocaleString(),
+            // NAMED, because this is the PS/bugs snapshot and it renders at
+            // the foot of every page including Org Features, which is baked
+            // from a different file on a different schedule. An unlabelled
+            // "Snapshot <date>" there describes the wrong dataset.
+            "PS snapshot " + new Date(data.generatedAt).toLocaleString(),
             // NEVER assert "refreshed daily" as a standing fact. This line
             // said exactly that for 38 days while nothing refreshed the
             // bugs half at all, which is how a page full of closed bugs

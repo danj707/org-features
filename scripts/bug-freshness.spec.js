@@ -93,21 +93,35 @@ if (H) {
 
 // ── THE FOOTER STATES AGE AND NO LONGER PROMISES A CADENCE ─────────────────
 {
-  const foot = src.slice(src.indexOf('"Snapshot "') - 400, src.indexOf('"Snapshot "') + 900);
-  ok(foot.length > 100, "the sidebar footer was found");
-  // Asserted over a comment-STRIPPED copy, because the comment beside the
-  // fix quotes the broken wording on purpose. Line comments are stripped
-  // first: a `/*` inside a template literal makes block-first unsound, and
-  // this repo's notes already record that biting nine specs.
-  const noComments = src.replace(/^\s*\/\/.*$/gm, "");
-  ok(noComments.length < src.length, "the comment strip actually removed something");
-  ok(/refreshed daily/.test(src) && !/refreshed daily/.test(noComments),
+  // ANCHORED ON `data-snap-age`, the attribute this block is about, NOT on
+  // the label text. It was anchored on the literal `"Snapshot "` and broke
+  // the day that label was changed to `"PS snapshot "` — a rename that
+  // altered no behaviour, and which left indexOf at -1 so the slice was
+  // garbage and five assertions failed naming the wrong thing. Third
+  // instance in this repo family of a slice pinned to a name rather than to
+  // what the code does.
+  // BOUNDED BY WHAT FOLLOWS IT, not by a character count: the explanatory
+  // comment inside this block is long, and a fixed +900 window cut the stale
+  // branch off so an assertion about it failed on correct code.
+  const anchor = src.indexOf('"data-snap-age"');
+  const foot = anchor < 0 ? "" : src.slice(anchor - 400, src.indexOf('e("main"', anchor));
+  ok(foot.length > 400, "the sidebar footer was found (anchored on data-snap-age)");
+  // Stripped over the SLICE, not the whole file. The comments beside the fix
+  // quote the broken wording on purpose, so they have to come out — but a
+  // regex block-comment strip over a 1,700-line HTML file is unsound (a `/*`
+  // inside a template literal), which is why this is scoped to ~1KB of known
+  // text. Line comments first, for the same reason.
+  const footCode = foot.replace(/^\s*\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  ok(footCode.length < foot.length, "the comment strip actually removed something");
+  ok(/refreshed daily/.test(src),
+    'the "refreshed daily" lesson is still written down somewhere in the page');
+  ok(!/refreshed daily/.test(footCode),
     'the footer no longer claims "refreshed daily" in CODE — it said that for 38 days while nothing refreshed the bugs');
   ok(/snapStale\(data\.generatedAt\)/.test(foot),
     "the footer asks snapStale rather than rendering the date unconditionally");
   ok(/snapAgeDays\(data\.generatedAt\)/.test(foot),
     "the footer carries data-snap-age so a browser check can read the age");
-  ok(/days old/.test(foot), "the stale branch says how old the snapshot is");
+  ok(/days old/.test(footCode), "the stale branch says how old the snapshot is");
 }
 
 // ── THE ORG FILTER ─────────────────────────────────────────────────────────

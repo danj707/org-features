@@ -350,3 +350,56 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 })()
   .catch(e => { ok(false, "the live half threw: " + e.message + "\n" + log); })
   .then(() => { try { child.kill(); } catch { /* already gone */ } report(); });
+
+// ── WHEN THIS DATA IS FROM ─────────────────────────────────────────────────
+// Appended after the live half's .then(report) intentionally: these are
+// synchronous source assertions and `pass`/`failures` are module-level, so
+// they are counted before report() runs on the microtask queue. (The
+// report-goes-last trap recorded in the sibling project is about a spec that
+// PRINTS its summary mid-file; here the print is deferred by a promise.)
+if (!SKIP_SOURCE) {
+  const feat = srcNC.slice(srcNC.indexOf("function Features()"), srcNC.indexOf("function FeatureSettings"));
+
+  ok(/"data-feat-asof"/.test(feat), "the Features page states when its data is from");
+  /* IT READS THE FEATURES SNAPSHOT'S OWN generatedAt. The shell's sidebar
+     line reads the PS/bugs snapshot — a different file on a different
+     schedule — and renders at the foot of this page too. Reading that one
+     here would put a fresh-looking date over 16-day-old numbers, which is
+     the exact failure that went unnoticed. */
+  ok(/data-feat-asof": snapAgeDays\(d\.generatedAt\)/.test(feat),
+     "...from the FEATURES snapshot's generatedAt, not the shell's ps-data snapshot");
+  ok(/snapStale\(d\.generatedAt\)/.test(feat),
+     "it reuses the shared staleness helper rather than growing its own comparison");
+  ok(/snapAgeLabel\(d\.generatedAt\)/.test(feat), "...and the shared age label");
+
+  /* THE AGE IS MEASURED; "refreshed daily" IS A PROMISE. That exact phrase
+     stood on this project for 38 days while nothing refreshed at all. The
+     line may describe the SCHEDULE, but the freshness claim has to come
+     from the timestamp. */
+  const asof = (feat.match(/data-feat-asof[\s\S]*?e\("div", \{ className: "cards" \}/) || [""])[0];
+  ok(asof.length > 200, "the as-of block was found and sliced");
+  ok(!/refreshed daily|updated daily/i.test(asof),
+     "it does not assert freshness as a standing fact — the age is read from the timestamp");
+  /* A WARNING WHOSE FIX ONLY A HUMAN CAN PERFORM CARRIES THE LINK. The bake
+     is a GitHub Action now, so a stale snapshot is one click from its red X. */
+  ok(/actions\/workflows\/refresh-features\.yml/.test(asof),
+     "a stale snapshot links to the workflow that should have refreshed it");
+  ok(/an unreadable date/.test(asof),
+     "a missing or unparseable generatedAt says so rather than rendering Invalid Date");
+
+  // AND THE SHELL'S LINE NAMES ITS OWN SNAPSHOT, or the two are indistinguishable.
+  const shell = srcNC.slice(srcNC.indexOf("function App()"));
+  ok(/"PS snapshot " \+ new Date\(data\.generatedAt\)/.test(shell),
+     "the sidebar names the PS snapshot, so it cannot be read as covering the features page");
+
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  // Matched as a BARE class rule (`.x {`), not `\.x\b` — which also matches a
+  // descendant selector like `.asof-stale a { }` and so survived deleting the
+  // rule that actually colours the warning. An assertion that a class is
+  // mentioned somewhere in the stylesheet is not an assertion that it is
+  // styled.
+  for (const c of ["asof", "asof-stale", "asof-src"])
+    ok(new RegExp("\\." + c + "\\s*\\{").test(css), `.${c} has its own rule`);
+  ok(/\.asof-stale\s*\{[^}]*color:/.test(css),
+     "the stale warning has its own colour — it is the only thing that makes it read as a warning");
+}
