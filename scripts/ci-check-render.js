@@ -82,7 +82,7 @@ function req(method, p, body) {
    thrown" into "it actually rendered something": an unmounted tree throws
    nothing on the second render, it is simply empty. */
 const CASES = [
-  { name: "org features · the list", path: "/ps/features", needs: "[data-feat-fp]" },
+  { name: "org features · the list", path: "/ps/features", needs: "[data-feat-miss]" },
   { name: "org features · a per-org drill-in", path: "/ps/features/apex-park-and-recreation-district",
     needs: "[data-feat-cat]" },
   { name: "org features · an unknown slug explains itself", path: "/ps/features/not-a-real-org",

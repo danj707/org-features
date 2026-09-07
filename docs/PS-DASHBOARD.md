@@ -857,3 +857,71 @@ Verified in a browser: 14 columns with SETTINGS present and FORMS gone, the
 Settings cell reading `11/13` at Apex, a drill-in panel listing all thirteen
 at 85%, and the settings sheet grouping into 12 categories with 13 checkboxes
 under Settings.
+
+## THE DOT STRIP IS GONE — the row names the gaps instead (2026-09-07)
+
+Dan, on the strip of 56 dots under each org: *"this set of boxes is pretty
+unreadable. Reenvision how we could implement this."*
+
+He is right, and it was two mistakes stacked.
+
+**It DUPLICATED the group columns.** The `9/9` cells directly above already
+say how much of each group is in use; a dot can be counted but not read, so
+the strip restated the columns less legibly. **And it was unlabelled** — the
+twelve boxes had no headings, so telling which was which meant hovering.
+
+Worse, the labelled chips it replaced were the thing Dan liked in the first
+place (*"this is a great quick visual representation"*). I swapped them for
+dots to keep the DOM small and lost exactly what made them useful.
+
+### What the row carries now
+
+The one thing the columns **cannot** say: **which** features are missing,
+clustered under their group, worst gap first.
+
+```
+NOT USING 6   PROGRAMS Guest Participation, Instructor Certifications
+              SETTINGS Structured Refund Policies, Tax Collection
+              COMMS SMS Messaging   LEAGUES Competitions / Leagues
+```
+
+- **Ordered by gap size, not alphabetically** — the worst group reads first
+  rather than whichever category happens to sort first. Name is the
+  tie-break, so two renders cannot disagree.
+- **Names, not counts.** "Payments 5" is a number to wonder about; the names
+  are the work.
+- **Capped at 4 groups × 3 names, and WHAT WAS TRIMMED IS STATED.** Aardvark
+  is missing 55 across every group and reads `… +20 more in 8 other groups`.
+  A capped list that does not say it is capped reads as the whole answer,
+  which is how 55 gaps look like 12.
+- **The line wraps rather than clipping** — a trimmed feature name is worse
+  than a second line.
+- A fully-adopted org says so, in green rather than the amber gap chip.
+
+**It is also ~7,200 fewer spans.** The dots were 8,064 elements (144 × 56);
+the gap lines are 858. Paint went 2.1s → 1.0s.
+
+### Guards
+
+`org-features-settings.spec.js` 322 → **340 assertions**. The load-bearing one
+is that **the dot strip cannot come back** (`fp-dot` / `fp-grp` /
+`data-feat-fp` are asserted absent from the whole page, not merely unused).
+
+Mutation-tested ten ways, all failing by name: the gaps reverting to a flat
+comma list, clusters ordered alphabetically instead of worst-first, the
+tie-break dropped, clusters counting instead of naming, the trimmed groups
+dropped silently, the trimmed names inside a cluster dropped silently, a
+fully-adopted org rendering an empty line, the line clipping instead of
+wrapping, the ok label coloured like a gap count, and a `.fp-dot` rule
+creeping back.
+
+**THE SPEC DIED INSTEAD OF FAILING** on the first run — the helper lift threw
+a bare `ReferenceError` on a renamed constant (`FP_MISS_SHOWN` →
+`GAP_GROUPS_SHOWN`) and killed the process before a single recorded failure
+printed. **Fifth instance in this repo family.** The lift is behind a
+try/catch now and reports *"the org-features helpers lift and evaluate —
+THREW: …"* by name.
+
+Verified in a browser: 0 dots left, Apex showing 4 labelled clusters in one
+21px line, Aardvark's 55 gaps showing 4 clusters plus `+20 more in 8 other
+groups` in 44px, and 858 spans where there were 8,064.

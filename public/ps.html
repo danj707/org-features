@@ -223,23 +223,23 @@
   .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
   .adminlink:hover { text-decoration: underline; }
 
-  /* The fingerprint row sits under its org and belongs to it, so it carries
-     no top border of its own — the pair reads as one band. */
-  .fp-row td { border-bottom: 1px solid var(--line); padding-top: 0; white-space: normal; text-align: left; }
-  .tablewrap tr.fp-row:hover td { background: #f1f5f9; }
-  .fp { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 5px; }
-  .fp-grp { display: inline-flex; gap: 2px; padding: 2px 5px; background: #f8fafc;
-            border: 1px solid var(--line); border-radius: 5px; }
-  /* A dot per tracked feature. Off is an OUTLINE, not a paler fill: at 7px a
-     light grey square and a light green one are the same smudge, and the
-     whole point of the strip is telling them apart at a glance. */
-  .fp-dot { display: block; width: 7px; height: 12px; border-radius: 2px;
-            background: #fff; border: 1px solid #cbd5e1; }
-  .fp-dot.on { background: var(--brand); border-color: var(--brand); }
-  .fp-miss { font-size: 11.5px; color: var(--muted); line-height: 1.45; max-width: 1100px; }
-  .fp-miss b { color: #b45309; }
-  .fp-more { color: #94a3b8; font-style: italic; }
-
+  /* The gap line sits under its org and belongs to it, so it carries no top
+     border of its own — the pair reads as one band. */
+  .gap-row td { border-bottom: 1px solid var(--line); padding-top: 0; white-space: normal; text-align: left; }
+  .tablewrap tr.gap-row:hover td { background: #f1f5f9; }
+  .gapline { display: flex; align-items: baseline; gap: 6px 10px; flex-wrap: wrap;
+             font-size: 11.5px; line-height: 1.5; max-width: 1180px; }
+  /* The count leads in warning ink; the clusters are ordinary text, because
+     twelve amber blocks in a row is not a hierarchy. */
+  .gaplabel { flex: none; font-weight: 700; color: #b45309; text-transform: uppercase;
+              font-size: 10px; letter-spacing: .5px; background: #fffbeb;
+              border: 1px solid #fde68a; border-radius: 4px; padding: 2px 6px; }
+  .gaplabel.ok { color: #166534; background: #f0fdf4; border-color: #bbf7d0; }
+  .gapclus { color: #334155; }
+  .gapclus b { color: var(--muted); font-weight: 700; text-transform: uppercase;
+               font-size: 10px; letter-spacing: .4px; margin-right: 5px; }
+  .gapclus i { color: #94a3b8; font-style: normal; }
+  .gapmore { color: #94a3b8; font-style: italic; }
   /* The drill-in's gap panel: grouped, so a reader sees WHERE the gaps are
      rather than one long alphabetical list. */
   .gapwrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -346,10 +346,13 @@
   };
   function catShort(name) { return CAT_SHORT[name] || name; }
 
-  /* How many missing features the list names inline before deferring to the
-     drill-in. Twelve fits two lines at a normal width; an org at 2% adoption
-     is missing 55 and printing all of them turns the table into prose. */
-  const FP_MISS_SHOWN = 12;
+  /* How much of the gap the list shows inline before deferring to the
+     drill-in. FOUR GROUPS × THREE NAMES fits two lines at a normal width; an
+     org at 2% adoption is missing 55 features across every group, and
+     printing all of them turns the table into prose. Whatever is trimmed is
+     counted on screen rather than silently dropped. */
+  const GAP_GROUPS_SHOWN = 4;
+  const GAP_NAMES_SHOWN = 3;
 
   /* The org's page in the Rec admin. NULL without an id, so the link is
      ABSENT rather than pointing at /admin/o/undefined — a link that 404s is
@@ -1964,34 +1967,56 @@
                                   "data-feat-grp": g.cat + ":" + (gs ? gs.used + "/" + gs.total : "") },
                         gs ? gs.used + "/" + gs.total : "—"));
                   })),
-                /* THE FINGERPRINT ROW, always on. It used to render only on
-                   click, which is why the table had bands of dead space and
-                   why nobody saw it. Dan: "this is a great quick visual
-                   representation" — so it is the default view. */
-                e("tr", { key: "fp", className: "fp-row", onClick: open2, style: { cursor: "pointer" } },
+                /* THE GAP LINE, always on — this replaced a strip of 56
+                   unlabelled dots grouped into twelve boxes.
+
+                   TWO THINGS WERE WRONG WITH THE DOTS. They DUPLICATED the
+                   `9/9` group columns directly above them, less legibly: the
+                   columns already say how much of each group is in use, and a
+                   dot can only be counted, not read. And they were unlabelled,
+                   so telling which box was which meant hovering — Dan's word
+                   for it was "pretty unreadable", and he was right.
+
+                   So the row now carries what the columns CANNOT: WHICH
+                   features are missing, clustered under the group they belong
+                   to, biggest gap first. Same shape as the drill-in's gaps
+                   panel, inline. It also drops ~8,000 spans from the page. */
+                e("tr", { key: "gaps", className: "gap-row", onClick: open2, style: { cursor: "pointer" } },
                   e("td", { colSpan: 2 + groups.length },
-                    e("div", { className: "fp", "data-feat-fp": r.o.slug },
-                      groups.map(g => e("span", { key: g.cat, className: "fp-grp", title: g.cat },
-                        g.keys.map(k => e("i", { key: k,
-                          className: "fp-dot" + (adoptedIn(r.o.slug, k) ? " on" : ""),
-                          title: label(k) + (adoptedIn(r.o.slug, k)
-                            ? " — " + (detailOf(r.o.slug, k) || "in use")
-                            : " — not in use") }))))),
-                    /* WHAT THEY ARE NOT USING, NAMED. The dots show the
-                       shape; only names are actionable, and "18 gaps" is a
-                       number to wonder about while a list is something to
-                       work through. Capped, because a 2%-adoption org is
-                       missing 55 of them and the drill-in carries the rest. */
                     miss.length
-                      ? e("div", { className: "fp-miss", "data-feat-miss": miss.length },
-                          e("b", null, "Not using (" + miss.length + "): "),
-                          miss.slice(0, FP_MISS_SHOWN).map(label).join(", "),
-                          miss.length > FP_MISS_SHOWN
-                            ? e("span", { className: "fp-more" },
-                                " · +" + (miss.length - FP_MISS_SHOWN) + " more")
-                            : null)
-                      : e("div", { className: "fp-miss", "data-feat-miss": 0 },
-                          e("b", null, "Using every tracked feature.")))));
+                      ? e("div", { className: "gapline", "data-feat-miss": miss.length },
+                          e("span", { className: "gaplabel" }, "Not using " + miss.length),
+                          /* Clustered by group and ordered by how many are
+                             missing, so the worst gap is the first thing read
+                             rather than whichever category sorts first. */
+                          (() => {
+                            const cl = groups
+                              .map(g => ({ cat: g.cat, gone: g.keys.filter(k => !adoptedIn(r.o.slug, k)) }))
+                              .filter(x => x.gone.length)
+                              .sort((x, y) => y.gone.length - x.gone.length || x.cat.localeCompare(y.cat));
+                            const head = cl.slice(0, GAP_GROUPS_SHOWN);
+                            const restGroups = cl.length - head.length;
+                            const restFeatures = cl.slice(head.length).reduce((n, x) => n + x.gone.length, 0);
+                            return [
+                              head.map(x => e("span", { key: x.cat, className: "gapclus" },
+                                e("b", null, catShort(x.cat)),
+                                /* Names, not a count. "Payments 5" is a number
+                                   to wonder about; the names are the work. */
+                                x.gone.slice(0, GAP_NAMES_SHOWN).map(label).join(", "),
+                                x.gone.length > GAP_NAMES_SHOWN
+                                  ? e("i", null, " +" + (x.gone.length - GAP_NAMES_SHOWN)) : null)),
+                              /* WHAT WAS TRIMMED IS STATED. A capped list that
+                                 does not say it is capped reads as the whole
+                                 answer, which is how 55 gaps look like 12. */
+                              restGroups
+                                ? e("span", { key: "rest", className: "gapmore" },
+                                    "+" + restFeatures + " more in " + restGroups +
+                                    " other group" + (restGroups === 1 ? "" : "s"))
+                                : null,
+                            ];
+                          })())
+                      : e("div", { className: "gapline none", "data-feat-miss": 0 },
+                          e("span", { className: "gaplabel ok" }, "Using every tracked feature")))));
             })))),
         rows.length ? null : e("div", { className: "note" },
           view ? "No organization matches “" + view.label + "” in this snapshot."

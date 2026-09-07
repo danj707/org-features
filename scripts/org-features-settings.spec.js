@@ -181,10 +181,11 @@ if (!SKIP_SOURCE) {
      "a group whose features are all hidden gets no column at all, rather than a permanent 0/0");
   ok(/const notUsing = \(s2\) => shown\.filter/.test(feat),
      "the not-using callout is over the tracked set");
-  const fp = (feat.match(/"data-feat-fp"[\s\S]{0,700}/) || [""])[0];
-  ok(fp.length > 200, "the fingerprint row was found");
-  ok(/g\.keys\.map/.test(fp), "the fingerprint draws one dot per tracked feature in each group");
-  ok(!/allMeasured/.test(fp), "...and never the full measured set");
+  const gapLine = (feat.match(/"data-feat-miss": miss\.length[\s\S]{0,1400}/) || [""])[0];
+  ok(gapLine.length > 300, "the gap line was found");
+  ok(/g\.keys\.filter\(k => !adoptedIn\(r\.o\.slug, k\)\)/.test(gapLine),
+     "the gap line is built from each group's TRACKED features");
+  ok(!/allMeasured/.test(gapLine), "...and never the full measured set");
 
   // THE GAP LIST IN THE COMPARISON is over the tracked set too, or A/B
   // reports a difference on a feature the reader untracked.
@@ -428,9 +429,21 @@ if (!SKIP_SOURCE) {
 // Six asks from Dan, and each one has a way of looking right while being
 // wrong, so each is pinned to the thing that would actually regress.
 {
-  const H = new Function(
-    src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
-    "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat, FP_MISS_SHOWN };")();
+  /* BEHIND A TRY/CATCH, and reporting by name. This lift threw a bare
+     ReferenceError on a renamed constant and killed the whole spec before a
+     single failure printed — fifth instance in this repo family of a guard
+     dying instead of failing. */
+  let H = null;
+  try {
+    H = new Function(
+      src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
+      "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat," +
+      " GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN };")();
+  } catch (err) {
+    ok(false, "the org-features helpers lift and evaluate — THREW: " + err.message);
+    H = { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
+          ofGroupScore: () => null, ofRatioHeat: () => ({}), GAP_GROUPS_SHOWN: 0, GAP_NAMES_SHOWN: 0 };
+  }
 
   // 1. SHORT COLUMN LABELS FOR EVERY CATEGORY IN THE DATA. A miss falls back
   //    to the 25-character name and the symptom is a table nobody can read,
@@ -498,27 +511,46 @@ if (!SKIP_SOURCE) {
   ok(/ofGroupScore\(g\.keys/.test(listPanel), "...and each cell is that group's own share");
   ok(/"data-feat-grp"/.test(listPanel), "the group cells are addressable");
 
-  // 6. THE FINGERPRINT IS THE DEFAULT VIEW, not an expand-on-click.
-  ok(/className: "fp-row"/.test(listPanel), "every org row is followed by its fingerprint row");
+  /* 6. THE GAP LINE IS THE DEFAULT VIEW, and it is not the old dot strip.
+        Dan on that strip: "this set of boxes is pretty unreadable." Two
+        things were wrong with it — it DUPLICATED the `9/9` group columns
+        directly above it, less legibly (a dot can be counted, not read), and
+        it was unlabelled, so telling which box was which meant hovering. The
+        row now carries what the columns CANNOT: which features are missing. */
+  ok(/className: "gap-row"/.test(listPanel), "every org row is followed by its gap line");
+  ok(!/fp-dot|fp-grp|data-feat-fp/.test(src),
+     "the unreadable dot strip is gone, not merely hidden");
   ok(!/isOpen \?/.test(listPanel) && !/setOpen\(/.test(listPanel),
-     "it is not gated behind a click any more — the strip Dan called a great quick visual is always on");
-  // AND OFF IS AN OUTLINE, NOT A PALER FILL. At 7px a light grey square and a
-  // light green one are the same smudge, which defeats the strip.
-  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
-  ok(/\.fp-dot\s*\{[^}]*background:\s*#fff/.test(css), "an unused feature's dot is empty, not tinted");
-  ok(/\.fp-dot\.on\s*\{[^}]*background:\s*var\(--brand\)/.test(css), "...and a used one is filled");
+     "it is not gated behind a click — the gaps are the default view");
 
-  // 7. WHAT THEY ARE NOT USING, NAMED. A count with nowhere to go is the dead
-  //    end this repo keeps writing down.
-  ok(/"data-feat-miss"/.test(listPanel), "the not-using callout is addressable");
-  ok(/Not using \(/.test(listPanel), "it names the count");
-  ok(/miss\.slice\(0, FP_MISS_SHOWN\)\.map\(label\)/.test(listPanel),
-     "...and the features themselves, by name");
-  ok(/\+" more"|" more"/.test(listPanel), "a capped list says how many it did not name");
+  /* 7. THE GAPS ARE CLUSTERED BY GROUP AND NAMED. A flat comma list of 40
+        features is a paragraph; "Payments 5" is a number to wonder about.
+        Grouped, ordered worst-first, with the names. */
+  ok(/"data-feat-miss"/.test(listPanel), "the gap line is addressable");
+  ok(/Not using " \+ miss\.length/.test(listPanel), "it names the count");
+  ok(/className: "gapclus"/.test(listPanel), "the gaps are clustered by group");
+  ok(/\.sort\(\(x, y\) => y\.gone\.length - x\.gone\.length/.test(listPanel),
+     "...ordered by how many are missing, so the worst gap reads first");
+  ok(/x\.cat\.localeCompare\(y\.cat\)/.test(listPanel),
+     "...with a name tie-break, so two renders cannot disagree");
+  ok(/x\.gone\.slice\(0, GAP_NAMES_SHOWN\)\.map\(label\)/.test(listPanel),
+     "each cluster names its features rather than just counting them");
+  /* WHAT WAS TRIMMED IS STATED. A capped list that does not say it is capped
+     reads as the whole answer, which is how 55 gaps look like 12. */
+  ok(/more in " \+ restGroups/.test(listPanel), "the trimmed groups are counted on screen");
+  ok(/x\.gone\.length > GAP_NAMES_SHOWN[\s\S]{0,120}x\.gone\.length - GAP_NAMES_SHOWN/.test(listPanel),
+     "...and so are the trimmed names inside a cluster");
   ok(/Using every tracked feature/.test(listPanel),
-     "a fully-adopted org says so rather than rendering an empty callout");
-  ok(H.FP_MISS_SHOWN > 0 && H.FP_MISS_SHOWN <= 20,
-     `the inline cap is a readable number (got ${H.FP_MISS_SHOWN})`);
+     "a fully-adopted org says so rather than rendering an empty line");
+  ok(H.GAP_GROUPS_SHOWN > 0 && H.GAP_GROUPS_SHOWN <= 6,
+     `the group cap is a readable number (got ${H.GAP_GROUPS_SHOWN})`);
+  ok(H.GAP_NAMES_SHOWN > 0 && H.GAP_NAMES_SHOWN <= 6,
+     `the per-cluster name cap is a readable number (got ${H.GAP_NAMES_SHOWN})`);
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  ok(/\.gapline\s*\{[^}]*flex-wrap:\s*wrap/.test(css),
+     "the gap line wraps rather than clipping — a trimmed name is worse than a second line");
+  ok(/\.gaplabel\.ok\s*\{[^}]*color:/.test(css),
+     "a fully-adopted org's label is coloured differently from a gap count");
 
   // 8. CLICKING AN ORG STAYS IN THE SHELL. A plain href would be a full page
   //    load out of the app; every other drill-in here routes through nav().
