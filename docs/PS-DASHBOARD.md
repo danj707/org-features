@@ -356,3 +356,93 @@ unticking one feature moves the tracked count 56 → 55 and the open checklist t
 options and drops that row from the table; the settings survive a reload; and
 clearing them brings all 144 organizations and 56 features back with the scope
 note gone. No uncaught page errors.
+
+## THE NIGHTLY BAKE IS A CRON JOB NOW, NOT A ROUTINE (2026-09-07)
+
+Dan: *"why is the routine broken?"* and then, correctly: *"pretty
+straightforward cron job, no? every AM, scan each org and read all their
+features"*.
+
+### What was wrong
+
+`Org Features dashboard daily refresh (6am ET)`
+(`trig_01WQfJBjinDM8GRzMRDuwon6`, cron `0 10 * * *`) was **enabled and firing
+on schedule the whole time.** It carried
+`persistent_session_id: session_0118uDXFFMUoa6tAiJ9iLnHq` — a session created
+30 July whose `updated_at` is **2026-08-22T11:40:04Z** and has not moved
+since, status IDLE, `connection_status: disconnected`.
+
+The last daily-refresh commit is **2026-08-22**. So the 22 August firing
+landed, the session then went cold, and every firing after that was delivered
+into a session that never woke. A manual `fire_trigger` on 7 September did not
+land either, which is what ruled out the schedule as the cause.
+
+**THE FAILURE IS SILENT BY CONSTRUCTION, and that is the part worth keeping.**
+A Routine that wakes a *bound* session records no run outcome — `list_triggers`
+returns no `last_run` for it at all (that field is documented as absent when
+"the Routine wakes its own bound session"). So there was no failed run to see,
+no notification, and nothing in any list that said it had stopped. Sixteen days
+of the dashboard confidently serving 22 August data with a "refreshed daily"
+claim on it. Compare the sibling `Daily Feature Update` Routine, which creates a
+fresh session per fire: its failure on the same day shows as
+`last_run: ROUTINE_RUN_STATUS_FAILED`, visible immediately.
+
+**Generalise it: never bind unattended recurring work to a persistent session.**
+A bound session is a container that will eventually be reclaimed, and the
+binding turns that into an unobservable no-op. Fresh-session-per-fire at least
+fails loudly.
+
+### Why it should not have been a Routine at all
+
+The work is: run one saved query, run one script, commit one file. No judgement,
+no tool choice, no reading of anything. An agent session buys nothing and adds a
+container, a connector grant and a session lifetime to depend on.
+
+`.github/workflows/refresh-features.yml` — daily at 10:00 UTC plus
+`workflow_dispatch`:
+
+1. `scripts/refresh/fetch-card.js` fetches **Metabase card 21616** (the saved
+   fleet query; the repo's `fleet-query.sql` remains the readable copy and
+   documents what each metric means).
+2. `merge-snapshot.js` rebuilds the snapshot and **exits non-zero on any of its
+   own sanity checks** — under 100 orgs, a row of the wrong shape, an adoption
+   key that drifted between the query and the script.
+3. `ci-check-data.js` and `npm test` run **before** the push, because a snapshot
+   that will not parse takes the whole dashboard down and this job is the thing
+   that changes that file most often.
+4. Commit and push **only** `data/features-data.json`, rebasing rather than
+   forcing so a human commit landing mid-run is not discarded.
+
+The decisions inside it:
+
+- **A failure is a red X anyone can see.** That is the entire point of moving
+  it — the old shape could not fail visibly.
+- **Nothing changed is not a failure.** `git diff --quiet` skips the commit, so
+  a quiet morning does not deploy Railway for nothing.
+- **A missing `MB_API_KEY` names the secret and where it goes**, rather than
+  failing on a 401 the next person has to decode.
+- **NULL is not an empty snapshot.** `json_agg` over no rows is NULL, so a
+  query matching no organizations fails in the fetcher rather than writing
+  `null` and letting the merge decide what that meant.
+- **`concurrency`**, or two overlapping runs race on the same commit.
+- Card 21616 carries **no template tags**, so — unlike every card in the
+  sibling project — an API save cannot silently retype a date parameter.
+
+### It needs one secret
+
+`MB_API_KEY` in the repo's Actions secrets: Metabase → Admin → Authentication →
+API keys, scoped to a read-only group with access to Rec-Prod-ReadReplica.
+Until it exists the job fails on step 1 with that instruction.
+
+The alternative, taken *not* to be the default: make card 21616 public and read
+`/api/public/card/<uuid>/query/json` with no credential at all, which is how the
+sibling project serves every report. Rejected here because this payload is
+fleet-wide adoption for all 144 organizations rather than one org's own data,
+and an unguessable URL is not an access control.
+
+### The ps-data bugs bake is the same shape and is NOT done
+
+`merge-ps-bugs.js` still needs a Linear fetch, which today comes from the MCP
+connector inside a session. With a Linear API key in the same Actions secrets it
+becomes the identical four-step job and the "Dan must create a Routine by hand"
+ask goes away entirely.

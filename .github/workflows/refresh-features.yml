@@ -1,0 +1,91 @@
+# The nightly bake of data/features-data.json.
+#
+# WHY THIS EXISTS: this ran as a Claude Routine bound to a persistent session
+# until 2026-09-07. It fired on schedule every morning and did nothing from
+# 2026-08-22 onward, because the session it was bound to had gone idle and
+# disconnected — a firing into a dead session is delivered and never
+# processed. Worse, a Routine that wakes a bound session records NO run
+# outcome, so there was nothing to alert on and nothing in any list said it
+# had stopped. Sixteen days of the dashboard quietly serving 22 August.
+#
+# The work itself needs no agent and no judgement: run one saved query, run
+# one script, commit one file. So it is a cron job, where a failure is a red
+# X on a run anybody can see.
+name: Refresh features snapshot
+
+on:
+  schedule:
+    # 10:00 UTC = 6am ET in summer, 5am ET in winter. GitHub cron has no
+    # timezone, so this drifts an hour with DST rather than being wrong — the
+    # Routine it replaces had exactly the same property.
+    - cron: '0 10 * * *'
+  # So a failed night can be re-run, and so this can be proven to work
+  # without waiting until tomorrow.
+  workflow_dispatch:
+
+# One at a time. Two overlapping runs would race on the same commit and the
+# loser would fail its push.
+concurrency:
+  group: refresh-features
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # it pushes the snapshot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # The specs below need the dev dependencies; the fetch and the merge are
+      # node builtins only.
+      - run: npm ci --no-audit --no-fund
+
+      - name: Fetch the fleet snapshot from Metabase
+        env:
+          MB_API_KEY: ${{ secrets.MB_API_KEY }}
+        run: node scripts/refresh/fetch-card.js /tmp/payload.json
+
+      # merge-snapshot.js does its own sanity checks and exits non-zero on any
+      # of them — under 100 orgs, a row of the wrong shape, an adoption key
+      # that drifted between the query and the script. A bad bake fails the
+      # run instead of being committed.
+      - name: Rebuild data/features-data.json
+        run: node scripts/refresh/merge-snapshot.js /tmp/payload.json
+
+      # The same check CI runs on every push, before this one pushes. A
+      # snapshot that will not parse takes the whole dashboard down.
+      - name: The snapshot is valid and has the keys the pages read
+        run: node scripts/ci-check-data.js
+
+      # The measured set is derived from the query, so a metric added to one
+      # side and not the other is caught here rather than on the page.
+      - name: Specs
+        run: npm test
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          # NOTHING TO SAY IS NOT A FAILURE. Nobody configured anything new
+          # today is a normal morning, and an empty commit every night would
+          # deploy Railway for no reason.
+          if git diff --quiet -- data/features-data.json; then
+            echo "no change in the snapshot — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # ONLY the snapshot. A bake must never carry anything else that
+          # happens to be in the tree.
+          git add data/features-data.json
+          git commit -m "Daily data refresh ($(date -u +%F))"
+          # Rebase rather than force: a human commit landing during the run
+          # must not be discarded by the bake.
+          for i in 1 2 3 4; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            echo "push attempt $i failed; retrying"
+            sleep $((2 ** i))
+          done
+          exit 1
