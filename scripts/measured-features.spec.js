@@ -277,6 +277,32 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
     ok(/\d/.test(def), k + " cites a measured figure behind its filter");
   });
 
+  /* EVERY FEATURE CARRIES A "WHY IT MATTERS", because the printed adoption
+     report puts one beside each thing an org is not using. Dan asked for a
+     PDF that gives "a letter score, features not yet adopted, why they are
+     important" — so a feature with no `why` is a bullet on a document handed
+     to a Director with nothing under it.
+
+     IT IS BENEFIT COPY, NOT THE DEFINITION. `description` says what the
+     feature IS ("Restricting who can register based on age"); `why` says what
+     it buys ("stops the wrong ages landing in a class"). The assertions below
+     are what stop the two being collapsed into one field the next time
+     someone tidies the catalog — and the bake preserves `old.features`
+     wholesale, so this copy survives the nightly refresh. */
+  snap.features.forEach(f => {
+    ok(typeof f.why === "string" && f.why.length >= 40,
+      `${f.key} explains why it matters, in enough words to be worth reading`);
+    ok(!f.why || f.why.length <= 220,
+      `${f.key}'s reason fits a bullet rather than a paragraph (${(f.why || "").length} chars)`);
+    ok(!f.why || f.why !== f.description,
+      `${f.key}'s reason is not just its definition restated`);
+    /* NO JARGON A DIRECTOR HAS TO DECODE. The audience for the PDF is an org
+       admin or a director, not us — a `why` naming a table or a column has
+       leaked the schema into a customer-facing document. */
+    ok(!/\b(table|column|uuid|null|join|schema|API|endpoint)\b/i.test(f.why || ""),
+      `${f.key}'s reason is written for an org admin, not out of the schema`);
+  });
+
   // The launch flag reaches the snapshot.
   ok(snap.orgs.every(o => typeof o.launched === "boolean"),
     "every org carries a boolean launched flag");

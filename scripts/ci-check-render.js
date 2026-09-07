@@ -122,6 +122,89 @@ const CASES = [
           cells.length + " cells, " + over.length + " overflowing");
       });
     } },
+  /* THE HEADER STAYS PUT. Dan: "once I scroll down a bit, all the column
+     headers are gone." `position: sticky; top: 0` was already on every `th`
+     and DID NOT WORK, which is exactly why no source assertion could catch
+     this — the CSS reads correctly and the sticky ancestor was wrong. Only a
+     browser that actually scrolls can tell. */
+  { name: "org features · the column headers stay put when you scroll", path: "/ps/features",
+    needs: '[data-rc-sticky="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector(".stickywrap thead th");
+      await pg.evaluate(() => {
+        const w = document.querySelector(".stickywrap");
+        w.scrollTop = 700;
+        const th = w.querySelector("thead th");
+        const wr = w.getBoundingClientRect(), tr = th.getBoundingClientRect();
+        const stuck = w.scrollTop > 300 && tr.top >= wr.top - 2 && tr.bottom <= wr.bottom;
+        document.body.setAttribute("data-rc-sticky", stuck ? "1" : "0");
+        document.body.setAttribute("data-rc-sticky-seen",
+          "scrolled " + w.scrollTop + ", header at " + Math.round(tr.top - wr.top));
+      });
+    } },
+  /* A PILL ON EVERY GROUP CELL, at every value. Dan: "why do some of the
+     feature options have pills and others dont?" The old ramp faded to a
+     WHITE fill, so a 0/7 rendered as bare grey text next to a pill — one
+     column, two shapes, one kind of value. A source assertion sees a `.gpill`
+     span either way; what changed is whether it is visible. */
+  { name: "org features · every group cell wears a pill", path: "/ps/features",
+    needs: '[data-rc-pills="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-grp]");
+      await pg.evaluate(() => {
+        const cells = [...document.querySelectorAll("[data-feat-grp]")].slice(0, 120);
+        const invisible = cells.filter(c => {
+          const bg = getComputedStyle(c).backgroundColor;
+          return !bg || bg === "rgba(0, 0, 0, 0)" || bg === "transparent"
+              || bg === "rgb(255, 255, 255)";
+        });
+        // ...and the bands must actually differ, or "every cell has a pill"
+        // passes on a single flat colour that says nothing.
+        const fills = new Set(cells.map(c => getComputedStyle(c).backgroundColor));
+        document.body.setAttribute("data-rc-pills",
+          (cells.length >= 24 && !invisible.length && fills.size >= 3) ? "1" : "0");
+        document.body.setAttribute("data-rc-pills-seen",
+          cells.length + " cells, " + invisible.length + " invisible, " + fills.size + " fills");
+      });
+    } },
+  /* THE TREND COLUMN, AND THE STATE IT IS IN TODAY. The bake writes one point
+     per day and the series starts at the first bake carrying it, so with a
+     single point EVERY row must show the explanation and NO row may draw a
+     line — a flat line is a claim that nothing changed. The day there are two
+     comparable points this case flips to asserting the line instead, which is
+     why it keys on the two facts rather than on one of them. */
+  { name: "org features · the trend column matches the history it has", path: "/ps/features",
+    needs: '[data-rc-trend="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-trend]");
+      await pg.evaluate(async () => {
+        /* THE CASE READS THE HISTORY ITSELF and requires the column to agree
+           with it. Asserting only "ready cells draw a line" cannot
+           discriminate: drop the two-point minimum and every cell becomes
+           ready and draws one, so the case passes on the regression it is
+           named for. The invariant is the RELATIONSHIP — a line may exist iff
+           there are at least two points scored over the CURRENT feature set. */
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const hist = (d && d.history) || [];
+        const newest = hist.length ? hist[hist.length - 1].setKey : null;
+        const comparable = hist.filter(h => h.setKey === newest).length;
+        const cells = [...document.querySelectorAll("[data-of-trend]")].slice(0, 40);
+        const ready = cells.filter(c => c.getAttribute("data-of-trend") !== "");
+        const lines = cells.filter(c => c.querySelector("svg.trendline polyline"));
+        const blank = cells.filter(c => c.getAttribute("data-of-trend") === "");
+        const good = comparable >= 2
+          // enough history: the orgs with a delta draw a line, and some do
+          ? (ready.length > 0 && lines.length === ready.length)
+          // not enough: NOBODY draws a line, and every cell says why
+          : (lines.length === 0 && blank.length === cells.length
+             && blank.every(c => (c.title || "").length > 20));
+        document.body.setAttribute("data-rc-trend",
+          (cells.length >= 20 && good) ? "1" : "0");
+        document.body.setAttribute("data-rc-trend-seen",
+          comparable + " comparable point(s), " + cells.length + " cells, "
+          + ready.length + " with a delta, " + lines.length + " lines");
+      });
+    } },
   /* ONE BAND PER ORG, with a heavier edge between orgs than inside one.
      "Orgs run together vertically" was a CSS fact: every td carried the same
      1px rule, so three identical hairlines per org. Reverting either half —

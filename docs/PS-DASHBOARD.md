@@ -1046,3 +1046,170 @@ fail alone on the regression it names:
   passing.
 - *the org cell does not run over the adoption figure* — `scrollWidth` against
   `clientWidth` on the first 24 org cells. Fails on the nowrap revert.
+
+## AN ADOPTION GRADE, A TREND, AND FOUR FIXES OFF ONE SCREENSHOT (2026-09-07)
+
+### THE LETTER GRADE'S RAMP IS CURVED TO THE FLEET, and that is measured
+
+Dan: *"yeah the percentage is nice, but I want a letter grade, something
+that's easy to digest as a noob."*
+
+Measured over all 144 orgs before choosing a ramp: **the best org on the
+platform scores 96% and the best LIVE one 89%; the live median is 57% and the
+live mean 50%.** On a 90/80/70/60 school scale **no live org earns an A and 44
+of 73 get an F.** A scale whose modal grade is F carries no information, and it
+is indefensible on a page handed to a Director.
+
+At **75/60/45/25** the 73 live orgs spread **A 8 · B 21 · C 18 · D 14 · F 12**,
+so an A is genuinely the top tenth of the fleet and an F means a *launched* org
+has configured under a quarter of the platform. The spec asserts that SPREAD
+against the live snapshot — every grade reachable, none holding more than 45%,
+and F not the modal outcome — so a well-meaning "let's use the normal scale"
+fails by name.
+
+- **NULL, NEVER AN F.** An org with no adoption record, or a settings state
+  with nothing ticked, is UNMEASURED, and "we cannot tell" printed as an F is
+  the worst possible reading of it.
+- **`GRADE_BASIS` travels with the letter.** A bare "C" reads as an absolute
+  judgement against a 100% nobody reaches.
+- **NO LETTER ON THE FLEET CARD, deliberately.** A grade judges one
+  organization; the fleet mean folds in 71 pre-launch orgs mid-setup, so
+  grading it grades who happens to be onboarding this month.
+- **`scoreColor` is deliberately NOT reused.** Account Health's
+  `adoptionScore` is a different measurement on a different scale from
+  ps-data; routing both through one function would let a ramp tuned to the
+  feature fleet silently re-colour a HubSpot figure.
+
+### ONE DERIVATION, N READERS — `ofDerive`
+
+The score, the tracked set and a category's membership lived inside
+`Features`. They are at module scope now, because **a PDF handed to a Director
+must not come back with a different percentage from the screen it was
+generated off.** `ofDerive(d, cfg)` is settings-scoped once: `hiddenFeatures`
+leaves the tracked set, `excludedOrgs` leaves the fleet, and no reader can
+widen either.
+
+The spec's derivation assertions changed from regexes over a component slice to
+**lifting and RUNNING it**, which is a strict upgrade: `scoreOf` returning null
+for an unmeasured org is now executed rather than asserted to be mentioned.
+
+### THE SPARKLINE COULD NOT BE BACKFILLED, and that is a measurement
+
+Dan: *"can we add sparklines to each org, you know I love those"*, with a
+screenshot of a catalyst table — a signed delta over a small line, green up,
+red down.
+
+Nothing in the snapshot is dated; it is a point-in-time bake. And **the only
+older bake in this repo measured FOURTEEN features against today's
+fifty-six**: Apex reads 86% there and 89% here, which looks like a +3 trend and
+is a denominator that quadrupled. Plotting it would publish a definition change
+as org behaviour.
+
+So the bake **starts recording** a dated point per day, and:
+
+- **EVERY POINT CARRIES THE SET IT WAS SCORED OVER.** `setKey` is a hash of the
+  sorted measured keys, and the page DROPS any point whose key differs from
+  today's. That is what makes the line trustworthy the next time a feature is
+  added or a definition is fixed — and it is computed over `shown`, so
+  unticking a feature in the settings invalidates the series rather than
+  plotting stored scores against a denominator the reader just changed.
+- **NULL UNTIL THERE ARE TWO, and the column says why.** One point is not a
+  trend; a flat line is a claim that nothing changed, which is a different fact
+  from having just started measuring. On the first day that is every row, so
+  the cell carries the explanation rather than a bare dash in a column headed
+  Trend.
+- **The delta is in POINTS, not percent.** Both readings are percentages, so
+  "+12%" is ambiguous: 50 to 56 is +6 points *and* +12 percent. Points is the
+  one a reader can check against the two numbers on screen.
+- **The line is scaled to the SERIES, not to 0–100.** An org moving 61 to 64
+  over a month is a real move and would be flat against a full axis.
+- **The column is not sortable yet.** It is null for every org until the bake
+  has two comparable points, and a sort whose column is empty for the whole
+  table is a control that looks broken.
+- The bake is **idempotent per date** (it was re-run three times by hand the
+  day it was written) and **bounded** at 120 points.
+
+### FOUR FIXES OFF ONE SCREENSHOT
+
+**1. "once I scroll down a bit, all the column headers are gone."**
+`position: sticky; top: 0` was ALREADY on every `th` and could never work:
+`.tablewrap` sets `overflow-x: auto`, CSS forbids `overflow-y: visible` beside
+it, so the used value becomes `auto` and **the wrap is the sticky ancestor**.
+With no height limit it never scrolls vertically, so the header was pinned to
+the top of a box scrolling away with the page. The feature table gets its own
+vertical viewport (`.stickywrap`), and the header draws its edge as a
+**box-shadow** — under `border-collapse: collapse` a sticky cell's border
+paints with the table and scrolls out from under it.
+
+**No source assertion could have caught this**: the CSS reads correctly and the
+sticky ancestor was wrong. It took a browser that actually scrolls.
+
+**2. "why do some of the feature options have pills and others dont?"** The old
+ramp was a linear alpha fade that reached a **white** fill at 0% — on a white
+row, no pill at all. One column, two shapes, one kind of value.
+
+**3. The bands are Dan's, verbatim:** *"green for 100%, orange for 60-90%, and
+red for <60%"*. 90–99 is not 100, so it is orange — a near miss is still a gap,
+and inventing a fourth band for it would be inventing a rule he did not give.
+**Null stays different**: an empty group is UNMEASURED, and a red pill there
+would claim nobody uses something nobody is counting.
+
+**4. "How about a HR to separate out the org name section from the 'not using'
+area."** NOT a reversal of removing the inner hairline — that fix was that the
+inner and outer edges were the SAME 1px weight, so nothing said which pair
+belonged together. There are three weights now: no rule under the summary's
+cells, a light dashed rule above the gaps, and the band's heavy 2px edge below.
+The spec asserts the divider stays *lighter* than the band edge, or the
+run-together complaint comes straight back.
+
+**And the org cell was overflowing into the adoption figure**, found in the
+render: a `max-width` on a `white-space: nowrap` cell clips nothing, so
+*"Aardvark City Parks and Rec `pre-launch` admin ↗"* ran over the `2%`.
+
+### A "WHY IT MATTERS" ON ALL 57 CATALOG FEATURES
+
+Written for the printed report Dan asked for — *"a letter score, features not
+yet adopted, why they are important"*. It is **benefit copy, not the
+definition**: `description` says what a feature IS, `why` says what it buys.
+The spec asserts both that every feature has one and that it is not the
+description restated, and that **no `why` names a table, a column or an
+endpoint** — the audience is an org admin, and a reason written out of the
+schema has leaked into a customer-facing document.
+
+Safe against the nightly refresh because `merge-snapshot.js` preserves
+`old.features` wholesale — checked, the same way the Settings regroup was.
+
+### Guards
+
+`org-features-settings.spec.js` 365 → **450 assertions**;
+`measured-features.spec.js` 218 → **446**; `nav.spec.js` back to 85.
+`ci-check-render.js` 18 → **21 cases**.
+
+**The helper lift now takes `e`.** `const e = React.createElement` sits outside
+both lifted regions, so it is a free identifier in there — supplying a
+recorder for it is what lets the spec assert the **points a sparkline plots**
+rather than assert that a `<polyline>` is mentioned.
+
+Mutation-tested fifteen ways, all failing by name: the setKey guard dropped
+(incomparable points plotted), one point counted as a trend, the line scaled to
+0–100, the delta labelled percent, an unready cell reduced to a bare dash, the
+bake appending twice on one date, the history unbounded, the grade ramp
+reverted to 90/80/70/60, an unmeasured org graded F, 90–99 coloured as 100, a
+0% cell faded back to an invisible pill, the sticky wrap losing its viewport,
+the summary/gaps divider removed, and `Features` keeping a second copy of
+`scoreOf`.
+
+**One render case did not discriminate on the first draft**, and the reason
+generalises: *the trend column* asserted "ready cells draw a line", which is
+true either way — drop the two-point minimum and every cell becomes ready and
+draws one. It reads the history from `/api/data` now and asserts the
+RELATIONSHIP: a line may exist iff there are ≥2 points over the current
+feature set. Verified to fail on that mutation. The setKey mutation is
+spec-only by construction, because today's history holds a single setKey and
+dropping the filter changes nothing in a browser.
+
+**FOURTH instance of a slice pinned to a name** in `nav.spec.js`: moving the
+derivation into `ofDerive` moved the org sort out of the `Features` slice and
+broke an assertion that had nothing to do with ordering. It no longer slices a
+component — there is exactly one place in the file that sorts `d.orgs`, and
+matching it wherever it lives is the assertion.

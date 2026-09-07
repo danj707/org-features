@@ -175,10 +175,15 @@ process.on("exit", () => {
 // the variable it is assigned to: the settings work renamed that variable
 // (`all` is now the excluded-filtered set and the sort moved to `everyOrg`),
 // which broke this assertion while changing nothing about the ordering.
-// THIRD instance of a slice pinned to a name rather than to behaviour.
+// THIRD instance of a slice pinned to a name rather than to behaviour — and
+// then a FOURTH, when the derivation moved out of `Features` into a
+// module-scope `ofDerive` so the list, the drill-in and the printed report
+// could not disagree about a score. That moved the sort out of this slice and
+// broke the assertion again, still changing nothing about the ordering. So it
+// no longer slices a COMPONENT at all: there is exactly one place in the file
+// that sorts `d.orgs`, and matching it wherever it lives is the assertion.
 {
-  const feat = src.slice(src.indexOf("function Features("), src.indexOf("function FeatureSettings"));
-  const sortLine = (feat.match(/\(d\.orgs \|\| \[\]\)\.slice\(\)\.sort\([\s\S]*?\);\n/) || [""])[0];
+  const sortLine = (src.match(/\(d\.orgs \|\| \[\]\)\.slice\(\)\.sort\([\s\S]*?\);\n/) || [""])[0];
   ok(sortLine.length > 20, "the org list's sort was found, by the collection it sorts");
   ok(/localeCompare/.test(sortLine), "orgs are sorted by NAME, with localeCompare");
   ok(!/score/i.test(sortLine), "the org list is NOT ordered by adoption score");

@@ -24,6 +24,7 @@ const http = require("http");
 const { spawn } = require("child_process");
 
 const ROOT = path.join(__dirname, "..");
+let LIFT_ERR = null;
 const src = fs.readFileSync(path.join(ROOT, "public", "ps.html"), "utf8");
 const server = fs.readFileSync(path.join(ROOT, "server.js"), "utf8");
 const SKIP_SOURCE = process.env.SKIP_SOURCE === "1";
@@ -52,6 +53,54 @@ function report() {
    made four assertions in the sibling project pass vacuously. */
 const strip = (s) => s.replace(/^[ \t]*\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
 const srcNC = strip(src);
+
+/* ONE SHARED LIFT OF THE MODULE-SCOPE HELPERS, in TWO slices because they sit
+   either side of `route()`. BEHIND A TRY/CATCH AND REPORTING BY NAME: this
+   lift threw a bare ReferenceError on a renamed constant once and killed the
+   whole spec before a single failure printed — fifth instance in this repo
+   family of a guard dying instead of failing. */
+/* A recorder standing in for React.createElement, so a lifted component's
+   output can be inspected as plain data. */
+function EL(type, props, ...kids) {
+  return { type, props: props || {}, kids: kids.flat(Infinity).filter(k => k != null && k !== false) };
+}
+function elFind(node, type) {
+  if (!node || typeof node !== "object") return null;
+  if (node.type === type) return node;
+  for (const k of node.kids || []) { const hit = elFind(k, type); if (hit) return hit; }
+  return null;
+}
+const H = (() => {
+  const A = src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()"));
+  const B = src.slice(src.indexOf("function scoreColor("), src.indexOf("function Spark("));
+  try {
+    /* THE LIFT TAKES `e`, so the components in this region can be RUN rather
+       than regexed. `const e = React.createElement` sits outside both slices,
+       so it is a free identifier in there — supplying a recorder for it is
+       what lets a spec assert the POINTS a sparkline plots instead of
+       asserting that a <polyline> is mentioned. */
+    return new Function("e", A + "\n" + B +
+      "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat, RATIO_BANDS," +
+      " ofGapClusters, GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN," +
+      " GRADE_RAMP, GRADE_BASIS, ofGrade, ofGradeColor, ofDerive, ofFleetUse, ofRank," +
+      " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell };")(EL);
+  } catch (err) {
+    LIFT_ERR = err;
+    return { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
+             ofGroupScore: () => null, ofRatioHeat: () => ({}), RATIO_BANDS: [],
+             ofGapClusters: () => ({ head: [], restGroups: 0, restFeatures: 0 }),
+             GAP_GROUPS_SHOWN: 0, GAP_NAMES_SHOWN: 0,
+             GRADE_RAMP: [], GRADE_BASIS: "", ofGrade: () => null, ofGradeColor: () => "",
+             ofDerive: () => ({ shown: [], groups: [], all: [], scoreOf: () => null,
+                                adoptedIn: () => false, label: x => x, notUsing: () => [],
+                                detailOf: () => "" }),
+             ofFleetUse: () => ({ liveOrgs: 0, used: {} }), ofRank: () => null,
+             TREND_MIN_POINTS: 0, ofTrend: () => null, ofTrendLabel: () => null,
+             ofTrendColor: () => "", Trendline: () => null, TrendCell: () => null };
+  }
+})();
+ok(!LIFT_ERR, "the module-scope org-features helpers lift and evaluate"
+   + (LIFT_ERR ? " — THREW: " + LIFT_ERR.message : ""));
 const serverNC = strip(server);
 
 // ── LIFT AND RUN THE VALIDATOR ─────────────────────────────────────────────
@@ -139,48 +188,96 @@ if (!SKIP_SOURCE) {
      "a settings fetch that fails falls back to showing everything, not to hiding everything");
   ok(/cfgErr \?/.test(feat), "...and says so on screen rather than silently pretending it is scoped");
 
-  // THE SCORE IS TAKEN OVER THE TRACKED SET, which is the whole point.
-  const scoreFn = (feat.match(/const scoreOf = [\s\S]*?\n    \};/) || [""])[0];
-  ok(scoreFn.length > 60, "scoreOf was found");
-  ok(/shown\.filter/.test(scoreFn) && /shown\.length/.test(scoreFn),
-     "the adoption score's numerator AND denominator are the tracked set, not every measured feature");
-  ok(/!a\) return null/.test(scoreFn),
-     "an org the bake never measured scores null, not 0 — unmeasured is not zero");
-  ok(/!shown\.length\) return null/.test(scoreFn),
-     "with nothing ticked the score is null, never 0% — an empty denominator is not an org that adopted nothing");
+  /* THE DERIVATION IS LIFTED AND RUN. It used to live inside `Features` and
+     these were regexes over that slice; `ofDerive` is at module scope now
+     because the list, the drill-in and the printed report must not each
+     compute their own score — so the assertions get to EXECUTE it instead of
+     asserting that a `return null` is mentioned somewhere. */
+  {
+    const D = {
+      featureCategories: ["Alpha", "Beta", "Empty"],
+      features: [
+        { key: "a1", name: "A One", category: "Alpha" },
+        { key: "a2", name: "A Two", category: "Alpha" },
+        { key: "b1", name: "B One", category: "Beta" },
+        { key: "e1", name: "E One", category: "Empty" },
+        { key: "un", name: "Unmeasured", category: "Alpha" },
+      ],
+      measuredFeatures: ["a1", "a2", "b1", "e1"],
+      orgs: [
+        { slug: "zeta", displayName: "Zeta", launched: true },
+        { slug: "alpha", displayName: "Alpha Org", launched: true },
+        { slug: "gone", displayName: "Excluded Org", launched: true },
+        { slug: "never", displayName: "Never Measured", launched: false },
+      ],
+      adoption: {
+        zeta:  { a1: { adopted: true, detail: "3 sections" }, a2: { adopted: false }, b1: { count: 2 }, e1: { adopted: false } },
+        alpha: { a1: { adopted: false }, a2: { adopted: false }, b1: { adopted: false }, e1: { adopted: false } },
+        gone:  { a1: true, a2: true, b1: true, e1: true },
+      },
+    };
+    const dv = H.ofDerive(D, {});
+    eq(dv.shown.join(","), "a1,a2,b1,e1", "the tracked set is every measured feature when nothing is hidden");
+    eq(dv.scoreOf("zeta"), 50, "the score is the tracked features adopted over the tracked set");
+    eq(dv.scoreOf("never"), null,
+       "an org the bake never measured scores NULL, not 0 — unmeasured is not zero");
+    eq(dv.scoreOf("alpha"), 0, "...while a measured org that adopted nothing really is 0%");
+    eq(dv.label("a1"), "A One", "a key resolves to its catalog name");
+    eq(dv.label("nope"), "nope", "an unknown key falls back to itself rather than to undefined");
+    eq(dv.detailOf("zeta", "a1"), "3 sections", "there is one accessor for a feature's measured detail");
+    eq(dv.detailOf("zeta", "a2"), "", "...and it is empty, never undefined, where the bake recorded none");
+    eq(dv.notUsing("zeta").join(","), "a2,e1", "the not-using list is over the tracked set");
+    eq(dv.groups.map(g => g.cat + ":" + g.keys.join("+")).join(" | "),
+       "Alpha:a1+a2 | Beta:b1 | Empty:e1",
+       "the groups come from the catalog's own categories, in the catalog's order");
+    ok(!dv.groups.some(g => g.keys.includes("un")),
+       "an UNMEASURED catalog feature is in no group — a column of dashes is not a measurement");
 
-  ok(/const shown = allMeasured\.filter\(k => !hidden\.has\(k\)\)/.test(feat),
-     "the tracked set is the measured set minus what settings hide");
+    // HIDING A FEATURE LEAVES EVERY SURFACE AT ONCE, which is the whole point
+    // of the setting. Hide all of Beta and its group must vanish, not sit at 0/0.
+    const hid = H.ofDerive(D, { hiddenFeatures: ["b1"] });
+    eq(hid.shown.join(","), "a1,a2,e1", "a hidden feature leaves the tracked set");
+    ok(!hid.groups.some(g => g.cat === "Beta"),
+       "a group whose features are all hidden gets no column at all, rather than a permanent 0/0");
+    eq(hid.scoreOf("zeta"), 33, "...and the score's denominator shrinks with it");
+    eq(H.ofDerive(D, { hiddenFeatures: ["a1", "a2", "b1", "e1"] }).scoreOf("zeta"), null,
+       "with NOTHING ticked the score is null, never 0% — an empty denominator is not an org that adopted nothing");
 
-  // EXCLUSION APPLIES ONCE, ABOVE EVERYTHING. `all` is what every surface
-  // reads; a second filter further down is how one surface gets missed.
-  ok(/const all = everyOrg\.filter\(o => !excluded\.has\(o\.slug\)\)/.test(feat),
-     "excluded orgs are filtered out once, in the set every surface reads");
-  for (const [what, re] of [
-    // The quick view is applied TO the settings-scoped set, so no view can
-    // widen the page past an excluded org — one assertion pinning both facts.
-    ["the table (through the quick view)", /ofApplyQuickView\(view, all\.filter/],
-    ["the fleet average", /scoredAll = all\.map\(decorate\)/],
-    ["the pulldown and both compare slots", /const orgOptions = all\.map/],
-    ["compare slot A", /cmpA \? all\.find/],
-    ["compare slot B", /cmpB \? all\.find/],
-    ["the org count", /"data-feat-orgs": all\.length/],
-  ]) ok(re.test(feat), `${what} reads the excluded-filtered set`);
+    // EXCLUSION APPLIES ONCE, in the set every surface reads.
+    const exc = H.ofDerive(D, { excludedOrgs: ["gone"] });
+    eq(exc.all.map(o => o.slug).join(","), "alpha,never,zeta",
+       "an excluded org leaves `all`, and `all` comes back sorted by display name");
+    ok(!exc.all.some(o => o.slug === "gone"), "...so no surface reading it can put the org back");
 
-  /* EVERY PER-FEATURE SURFACE COMES OFF `groups`, WHICH COMES OFF `shown`.
-     The old expand-on-click checklist iterated `shown` directly and this
-     asserted that; the checklist is now the always-on fingerprint plus the
-     drill-in's per-category panels, so the invariant moved to the one place
-     the categories are built. If `groups` were built from `allMeasured`,
-     every one of those surfaces would list features the score ignores. */
-  ok(/const groups = \(d\.featureCategories \|\| \[\]\)/.test(feat),
-     "the feature groups come from the catalog's own categories");
-  ok(/keys: shown\.filter\(k => byKey\[k\] && byKey\[k\]\.category === cat\)/.test(feat),
-     "...and hold only TRACKED features, so a hidden feature leaves every group surface");
-  ok(/\.filter\(g => g\.keys\.length > 0\)/.test(feat),
-     "a group whose features are all hidden gets no column at all, rather than a permanent 0/0");
-  ok(/const notUsing = \(s2\) => shown\.filter/.test(feat),
-     "the not-using callout is over the tracked set");
+    /* THE FLEET SIGNAL IS OVER LIVE ORGS ONLY. Half the fleet is pre-launch
+       and has configured almost nothing, so counting them makes every feature
+       look unpopular and the "N of M already use this" argument collapses. */
+    const fu = H.ofFleetUse(D, exc);
+    eq(fu.liveOrgs, 2, "the denominator is LIVE organizations, not every org");
+    eq(fu.used.a1, 1, "...and the numerator counts only the live ones that adopted it");
+    eq(fu.used.e1, 0, "a feature nobody uses counts 0 rather than being absent");
+
+    /* RANK, NOT A GAP TO THE MEAN. And null where it would be noise. */
+    eq(H.ofRank(D.orgs[3], dv), null, "a pre-launch org gets no rank against launched peers");
+    ok(H.ofRank(D.orgs[0], dv) == null,
+       "a rank out of fewer than five peers is not reported — it is noise, not a position");
+    const big = { ...D, orgs: [...D.orgs,
+      ...[70, 60, 50, 40, 30].map((p, i) => ({ slug: "p" + i, displayName: "Peer " + i, launched: true }))],
+      adoption: { ...D.adoption,
+        p0: { a1: true, a2: true, b1: true, e1: true }, p1: { a1: true, a2: true, b1: true, e1: false },
+        p2: { a1: true, a2: false, b1: false, e1: false }, p3: { a1: false, a2: false, b1: false, e1: false },
+        p4: { a1: false, a2: false, b1: false, e1: false } } };
+    const bdv = H.ofDerive(big, {});
+    const rk = H.ofRank(big.orgs.find(o => o.slug === "zeta"), bdv);
+    eq(rk.of, 8, "the rank is out of every scored live org");
+    eq(rk.rank, 4, "...and it counts how many scored strictly higher, so ties share a place");
+    eq(typeof rk.median, "number", "the peer median travels with the rank");
+  }
+
+  ok(/const dv = ofDerive\(d, cfg\)/.test(feat),
+     "Features reads the shared derivation rather than computing its own score");
+  ok(!/const scoreOf = /.test(feat),
+     "...and does not keep a second copy of it, which is how the PDF and the screen start disagreeing");
   /* SLICED ON THE HELPER CALL, not on a class name. The clustering used to be
      an inline IIFE and this slice was anchored on `"data-feat-miss"`; it now
      has to survive the clustering moving to module scope, so it anchors on
@@ -433,23 +530,6 @@ if (!SKIP_SOURCE) {
 // Six asks from Dan, and each one has a way of looking right while being
 // wrong, so each is pinned to the thing that would actually regress.
 {
-  /* BEHIND A TRY/CATCH, and reporting by name. This lift threw a bare
-     ReferenceError on a renamed constant and killed the whole spec before a
-     single failure printed — fifth instance in this repo family of a guard
-     dying instead of failing. */
-  let H = null;
-  try {
-    H = new Function(
-      src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
-      "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat," +
-      " ofGapClusters, GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN };")();
-  } catch (err) {
-    ok(false, "the org-features helpers lift and evaluate — THREW: " + err.message);
-    H = { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
-          ofGroupScore: () => null, ofRatioHeat: () => ({}),
-          ofGapClusters: () => ({ head: [], restGroups: 0, restFeatures: 0 }),
-          GAP_GROUPS_SHOWN: 0, GAP_NAMES_SHOWN: 0 };
-  }
 
   // 1. SHORT COLUMN LABELS FOR EVERY CATEGORY IN THE DATA. A miss falls back
   //    to the 25-character name and the symptom is a table nobody can read,
@@ -461,6 +541,182 @@ if (!SKIP_SOURCE) {
   }
   eq(H.catShort("Something Unseen"), "Something Unseen",
      "an unknown category falls back to its own name rather than to undefined");
+
+  /* THE RATIO BANDS ARE DAN'S, verbatim: "green for 100%, orange for 60-90%,
+     and red for <60%". Lifted and RUN, because a regex over a ramp passes on
+     an inverted comparison. */
+  {
+    const bg = p2 => H.ofRatioHeat(p2).background;
+    const distinct = new Set([bg(100), bg(75), bg(10)]);
+    eq(distinct.size, 3, "the three bands are three different fills");
+    eq(bg(100), bg(100), "100% is its own band");
+    ok(bg(90) === bg(60) && bg(90) === bg(75),
+       "60 through 99 is ONE band — 90-99 is not 100, so a near miss is still a gap");
+    ok(bg(59) === bg(0) && bg(59) === bg(30),
+       "everything under 60 is one band");
+    ok(bg(100) !== bg(99), "...and 99 is not coloured as 100");
+    /* EVERY VALUE GETS A PILL, INCLUDING 0. The previous ramp faded to a white
+       fill, which on a white row is no pill at all — so one column rendered
+       two shapes for one kind of value and Dan asked why some cells had pills
+       and others did not. */
+    for (const p2 of [0, 1, 50, 59, 60, 99, 100]) {
+      const st = H.ofRatioHeat(p2);
+      ok(st.background && st.background !== "#fff" && st.background !== "white",
+         `${p2}% renders a visible pill rather than bare text`);
+      ok(!!st.borderColor, `...with its own border at ${p2}%`);
+    }
+    /* NULL IS A DIFFERENT QUESTION AND STAYS DIFFERENT. An empty group is
+       UNMEASURED; a red pill there would claim nobody uses something nobody is
+       counting. */
+    const nul = H.ofRatioHeat(null);
+    ok(nul.background !== bg(0),
+       "an unmeasured group is not coloured like a measured 0% — absent is not zero");
+  }
+
+  /* THE ADOPTION TREND. Dan: "can we add sparklines to each org, you know I
+     love those", with a screenshot of a catalyst table — a signed delta over
+     a small line, green up, red down.
+
+     THE HISTORY CANNOT BE BACKFILLED, and that is a measurement rather than a
+     limitation: the one older bake in this repo scored FOURTEEN features
+     against today's fifty-six, so Apex reads 86% there and 89% here — which
+     looks like +3 and is a denominator that quadrupled. Every point therefore
+     carries the `setKey` of the set it was scored over, and a point from a
+     different set is DROPPED rather than plotted. These assertions are what
+     stop that guard being quietly removed the next time a feature is added. */
+  {
+    const mk = (n, from, key) => Array.from({ length: n }, (_, i) => ({
+      date: "2026-09-" + String(i + 1).padStart(2, "0"),
+      setKey: key || "56:abc",
+      scores: { me: from + i * 2, flat: 50, gone: null },
+    }));
+
+    eq(H.ofTrend([], "me", "56:abc").ready, false, "no history is not a trend");
+    eq(H.ofTrend(mk(1, 40), "me", "56:abc").ready, false,
+       "ONE point is not a trend — a flat line would claim nothing changed, which is a "
+       + "different fact from having just started measuring");
+    ok(H.TREND_MIN_POINTS >= 2, "...which is what the minimum encodes");
+
+    const t = H.ofTrend(mk(5, 40), "me", "56:abc");
+    eq(t.ready, true, "two or more comparable points is a trend");
+    eq([t.first, t.last, t.delta].join(","), "40,48,8", "the delta is last minus first");
+    eq(t.points.length, 5, "every comparable point is plotted");
+    eq(H.ofTrendLabel(t), "+8 pts",
+       "the delta is labelled in POINTS, not percent — 50 to 56 is +6 points and +12 percent, "
+       + "and points is the one a reader can check against the two numbers on screen");
+    eq(H.ofTrendColor(t), H.ofTrendColor(t), "a rising trend has a colour");
+    const down = H.ofTrend(mk(5, 60).map(h => ({ ...h, scores: { me: 60 - h.date.slice(-2) * 2 } })),
+                           "me", "56:abc");
+    ok(H.ofTrendColor(down) !== H.ofTrendColor(t), "a falling trend is coloured differently");
+    ok(/^\u2212/.test(H.ofTrendLabel(down)),
+       "...and signed with a real minus sign rather than a hyphen");
+    const flat = H.ofTrend(mk(4, 50), "flat", "56:abc");
+    eq(H.ofTrendLabel(flat), "0 pts", "a genuinely unchanged org reads 0, which is an answer");
+    ok(H.ofTrendColor(flat) !== H.ofTrendColor(t) && H.ofTrendColor(flat) !== H.ofTrendColor(down),
+       "...and is neither green nor red");
+
+    /* THE INCOMPARABLE-POINT GUARD, which is the whole reason this can be
+       trusted. Mixed sets must yield only the current set's points. */
+    const mixed = [...mk(3, 20, "14:old"), ...mk(4, 60, "56:abc")];
+    const only = H.ofTrend(mixed, "me", "56:abc");
+    eq(only.points.length, 4, "points scored over a DIFFERENT feature set are dropped, not plotted");
+    eq(only.first, 60, "...so the trend starts at the first comparable measurement");
+    eq(H.ofTrend([...mk(1, 20, "14:old"), ...mk(1, 60, "56:abc")], "me", "56:abc").ready, false,
+       "one comparable point beside an incomparable one is still not a trend");
+    eq(H.ofTrend(mk(5, 40), "gone", "56:abc").ready, false,
+       "an org with null scores throughout has no trend rather than a line at zero");
+
+    /* THE LINE ITSELF, RUN. `Trendline` is lifted with a recorder standing in
+       for createElement, so this asserts the POINTS it plots — a regex would
+       pass on a polyline scaled to the wrong thing. */
+    const svg = H.Trendline({ t: H.ofTrend(mk(3, 40), "me", "56:abc"), w: 62, h: 20 });
+    const poly = elFind(svg, "polyline");
+    ok(poly, "the sparkline draws a polyline");
+    const xs = poly.props.points.split(" ").map(pr => Number(pr.split(",")[0]));
+    const ys = poly.props.points.split(" ").map(pr => Number(pr.split(",")[1]));
+    eq(xs.length, 3, "one vertex per comparable point");
+    ok(xs[0] < xs[1] && xs[1] < xs[2], "...laid out left to right in date order");
+    ok(ys[0] > ys[2], "...and a rising score goes UP the box (SVG y grows downward)");
+    ok(Math.max(...ys) <= 20 && Math.min(...ys) >= 0, "every vertex is inside the viewBox");
+    /* SCALED TO THE SERIES, NOT TO 0-100. An org moving 61 to 64 over a month
+       is a real move and would be a flat line against a full axis, which
+       defeats the point of a sparkline. */
+    const tight = H.Trendline({ t: H.ofTrend(mk(3, 61).map(h => ({ ...h,
+      scores: { me: 61 + Number(h.date.slice(-2)) } })), "me", "56:abc"), w: 62, h: 20 });
+    const tys = elFind(tight, "polyline").props.points.split(" ").map(pr => Number(pr.split(",")[1]));
+    ok(Math.max(...tys) - Math.min(...tys) > 10,
+       "a three-point move fills the box — the line is scaled to the series, not to 0-100");
+    ok(elFind(svg, "circle"), "the endpoint is marked, because \"where is it now\" is asked first");
+
+    /* NOT READY RENDERS AN EXPLANATION, not a bare dash in a column headed
+       Trend. On the first day after this ships that is every row. */
+    const cell = H.TrendCell({ t: H.ofTrend(mk(1, 40), "me", "56:abc") });
+    eq(cell.props["data-of-trend"], "", "an unready trend is addressable as empty");
+    ok(/fills in|history/i.test(String(cell.props.title)),
+       "...and says why, rather than leaving a dash to read as broken data");
+    ok(!elFind(cell, "polyline"), "...and draws NO line, because a flat line is a claim");
+  }
+
+  /* THE SNAPSHOT ACTUALLY CARRIES A HISTORY, or the column can never fill in.
+     The bake appends one point per day; this asserts the shape it writes. */
+  ok(Array.isArray(snap.history) && snap.history.length >= 1,
+     "the snapshot carries an adoption history for the trend to read");
+  {
+    const dvh = H.ofDerive(snap, {});
+    const h0 = snap.history[snap.history.length - 1];
+    eq(h0.setKey, dvh.setKey,
+       "the newest history point's setKey matches the page's own, or every point is dropped as incomparable");
+    eq(h0.measured, dvh.shown.length, "...and it records how many features it was scored over");
+    const live0 = (snap.orgs || []).find(o => o.launched);
+    eq(h0.scores[live0.slug], dvh.scoreOf(live0.slug),
+       "the stored score for a live org equals what the page computes today — the bake and the "
+       + "page must not disagree about one number");
+    ok(snap.history.every(h => h.date && /^\d{4}-\d{2}-\d{2}$/.test(h.date)),
+       "every point is dated");
+    eq(new Set(snap.history.map(h => h.date)).size, snap.history.length,
+       "one point per DATE — a re-run of the bake replaces rather than appends, or one day looks like three");
+  }
+  {
+    const bake = fs.readFileSync(path.join(ROOT, "scripts", "refresh", "merge-snapshot.js"), "utf8");
+    ok(/history/.test(bake) && /setKeyOf/.test(bake),
+       "the bake records the history, so the series grows on its own");
+    ok(/filter\(h => h && h\.date !== today\)/.test(bake),
+       "...idempotently per date");
+    ok(/HISTORY_MAX/.test(bake) && /while \(history\.length > HISTORY_MAX\) history\.shift\(\)/.test(bake),
+       "...and bounded, so the snapshot cannot grow without limit");
+  }
+
+  /* THE GRADE. Dan: "I want a letter grade, something that's easy to digest as
+     a noob." Lifted and RUN over the ramp, and over the fleet's real shape. */
+  {
+    const L = p2 => (H.ofGrade(p2) || {}).letter;
+    eq([L(96), L(89), L(75), L(74), L(60), L(59), L(45), L(44), L(25), L(24), L(0)].join(""),
+       "AAABBCCDDFF", "the ramp runs A/B/C/D/F at 75/60/45/25");
+    eq(H.ofGrade(null), null, "an unmeasured org has NO grade — it is not an F");
+    eq(H.ofGrade(undefined), null, "...and neither does an absent score");
+    eq(H.ofGrade(NaN), null, "...nor an unusable one");
+    ok(H.ofGradeColor(null) !== H.ofGradeColor(0),
+       "an unmeasured score is not coloured like an F");
+    ok(H.GRADE_RAMP.every(g => g.letter && g.color && g.says),
+       "every band carries a letter, a colour and a sentence a non-technical reader can act on");
+    ok(/96%/.test(H.GRADE_BASIS) && /not a 90\/80\/70/.test(H.GRADE_BASIS),
+       "the basis says what the grade is measured against — the fleet, not a school scale");
+    /* THE RAMP HAS TO DISCRIMINATE ON THE REAL FLEET. A 90/80/70/60 ramp gives
+       NO live org an A and 44 of 73 an F; a scale whose modal grade is F
+       carries no information and is indefensible on a page handed to a
+       Director. So this asserts the SPREAD over the actual snapshot. */
+    const dvs = H.ofDerive(snap, {});
+    const live = dvs.all.filter(o => o.launched).map(o => dvs.scoreOf(o.slug)).filter(v => v != null);
+    const tally = {};
+    live.forEach(v => { const g = H.ofGrade(v).letter; tally[g] = (tally[g] || 0) + 1; });
+    ok(Object.keys(tally).length === 5,
+       "every grade is reachable by a live organization on today's snapshot");
+    const worst = Math.max(...Object.values(tally));
+    ok(worst <= live.length * 0.45,
+       `no single grade holds more than 45% of the live fleet (got ${JSON.stringify(tally)})`);
+    ok((tally.F || 0) < (tally.A || 0) + (tally.B || 0),
+       "...and F is not the modal outcome, which is what a school ramp would produce here");
+  }
 
   // 2. THE ADMIN LINK IS ABSENT WITHOUT AN ID, never /admin/o/undefined.
   /* `/home` IS PART OF THE PATH — Dan corrected this after clicking one.
@@ -490,15 +746,13 @@ if (!SKIP_SOURCE) {
   ok(H.ofRatioHeat(null).background !== H.ofRatioHeat(0).background,
      "an untracked group and a real zero are coloured differently");
   ok(H.ofRatioHeat(50).background !== H.ofRatioHeat(100).background, "the ramp ramps");
-  {
-    // LINEAR, checked by the midpoint rather than by reading the formula: a
-    // log ramp (what heat() does for counts) puts 50% far above halfway.
-    const alpha = s2 => Number((String(s2).match(/,([\d.]+)\)$/) || [0, 0])[1]);
-    const a0 = alpha(H.ofRatioHeat(1).background), a50 = alpha(H.ofRatioHeat(50).background),
-          a100 = alpha(H.ofRatioHeat(100).background);
-    const half = (a50 - a0) / (a100 - a0);
-    ok(Math.abs(half - 0.5) < 0.03, `50% sits halfway up the ramp (got ${half.toFixed(3)})`);
-  }
+  /* THE RAMP WAS A LINEAR ALPHA FADE AND IS NOW THREE BANDS, at Dan's
+     instruction ("green for 100%, orange for 60-90%, and red for <60%"). The
+     midpoint-linearity assertion that used to live here cannot survive that
+     and would have been meaningless if kept — the band tests are up with the
+     rest of the lifted helpers. */
+  eq(H.RATIO_BANDS === undefined ? 3 : H.RATIO_BANDS.length, 3,
+     "there are exactly three ratio bands");
 
   const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
 
@@ -662,6 +916,42 @@ if (!SKIP_SOURCE) {
   ok(/\.feattable td\.l\s*\{[^}]*white-space:\s*normal/.test(css),
      "the org cell wraps, so its max-width bounds it instead of overflowing the next column");
 
+  /* 7c. A RULE BETWEEN THE TWO HALVES OF A BAND. Dan: "How about a HR to
+         separate out the org name section from the 'not using' area, it just
+         all runs together." NOT a reversal of removing the inner hairline —
+         that fix was that the inner and outer edges were the same weight. The
+         hierarchy is three weights now, and the divider must stay LIGHTER
+         than the band edge or the run-together complaint comes back. */
+  /* ANCHORED AT THE START OF A RULE. A bare /\.gap-row td\s*\{/ matches
+     inside `.feattable tbody.orgband tr.gap-row td {` first, so this read the
+     BAND EDGE rule and asserted the wrong surface — the same
+     scope-the-assertion trap already recorded twice in this file. */
+  const gapTd = (css.match(/\n\s*\.gap-row td\s*\{[^}]*\}/) || [""])[0];
+  ok(/border-top:\s*1px dashed/.test(gapTd),
+     "the gaps are separated from the org summary by a light rule of their own");
+  ok(!/border-top:\s*[2-9]px/.test(gapTd),
+     "...lighter than the 2px band edge, so the two boundaries still read as different things");
+  ok(/padding-top:\s*[5-9]px|padding-top:\s*\d\dpx/.test(gapTd),
+     "...with space under it, or the rule sits on top of the first gap line");
+
+  /* 7d. STICKY HEADERS. Dan: "once I scroll down a bit, all the column
+         headers are gone." `position: sticky; top: 0` was ALREADY on every
+         `th` and could never work: `.tablewrap` sets `overflow-x: auto`, CSS
+         forbids `overflow-y: visible` beside it, so the wrap is the sticky
+         ancestor — and with no height limit it never scrolls vertically. The
+         header was pinned to the top of a box scrolling away with the page. */
+  const sticky = (css.match(/\.stickywrap\s*\{[^}]*\}/) || [""])[0];
+  ok(/max-height:/.test(sticky) && /overflow:\s*auto/.test(sticky),
+     "the feature table has its own vertical viewport, which is the only way a sticky th can engage");
+  ok(/className: "tablewrap stickywrap"/.test(listPanel),
+     "...and the feature table's own wrap is the one that gets it");
+  const stickyTh = (css.match(/\.stickywrap thead th\s*\{[^}]*\}/) || [""])[0];
+  ok(/position:\s*sticky/.test(stickyTh) && /top:\s*0/.test(stickyTh),
+     "the header cells stick to the top of that viewport");
+  ok(/box-shadow:/.test(stickyTh) && /border-bottom:\s*none/.test(stickyTh),
+     "...and draw their edge as a SHADOW: under border-collapse a sticky cell's border "
+     + "paints with the table and scrolls out from under it");
+
   // 8. CLICKING AN ORG STAYS IN THE SHELL. A plain href would be a full page
   //    load out of the app; every other drill-in here routes through nav().
   ok(/nav\("\/ps\/features\/" \+ encodeURIComponent\(r\.o\.slug\)\)/.test(listPanel),
@@ -699,8 +989,12 @@ if (!SKIP_SOURCE) {
   //     is in use — read from the snapshot's own `detail` string rather than
   //     re-derived, so the page cannot phrase a number differently.
   ok(/"data-feat-cat"/.test(feat), "the drill-in renders a panel per category");
-  ok(/const detailOf = \(s2, k\) =>/.test(feat), "there is one accessor for a feature's measured detail");
-  ok(/\.detail \|\| ""/.test(feat), "...reading the snapshot's own phrasing");
+  /* `detailOf` moved into `ofDerive` with the rest of the derivation, and is
+     LIFTED AND RUN above. What matters here is that the drill-in reads THAT
+     one rather than re-deriving a number in its own words. */
+  ok(/detailOf\(/.test(feat), "the drill-in reads the shared detail accessor");
+  ok(!/const detailOf = /.test(feat),
+     "...and does not keep its own copy, which is how two surfaces phrase one number differently");
   ok(/catlab on/.test(feat) && /catlab off/.test(feat), "each category shows in-use AND not-in-use");
   /* A GAP YOU CANNOT NAME IS NOT AN ACTIONABLE GAP. Dan: "unclear on some of
      these features like 'guest participation' and 'instructor
@@ -956,8 +1250,10 @@ if (!SKIP_SOURCE) {
   ok(/"Feature Adoption"/.test(feat), "the tile is called Feature Adoption");
   ok(!/"Fleet adoption"/.test(feat), "...and the old Fleet adoption label is gone");
   ok((feat.match(/e\(Ring, \{/g) || []).length === 3, "all three KPI tiles are rings");
-  ok(/pct: avg, color: avg == null \? null : scoreColor\(avg\)/.test(feat),
-     "the adoption ring takes the same threshold colour as the rest of the page");
+  ok(/pct: avg, color: avg == null \? null : ofGradeColor\(avg\)/.test(feat),
+     "the adoption ring takes its colour from the GRADE ramp, like every other org-features surface");
+  ok(!/data-of-grade[\s\S]{0,400}"data-feat-avg"|"data-feat-avg"[\s\S]{0,300}e\(Grade/.test(feat),
+     "...but the fleet card carries NO letter: a grade judges one org, and the fleet mean folds in 71 pre-launch ones");
   ok(/pct: all\.length \? \(launched \/ all\.length\) \* 100 : null/.test(feat),
      "the organizations ring shows the LIVE share, which is the only ratio that tile has");
   ok(/data-feat-avg|data-feat-orgs|data-feat-shown/.test(feat),

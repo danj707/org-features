@@ -216,6 +216,26 @@
   .subslug { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
              overflow: hidden; text-overflow: ellipsis; }
   .feattable { min-width: max-content; }
+  /* STICKY HEADERS ACTUALLY STICK. Dan: "once I scroll down a bit, all the
+     column headers are gone."
+
+     `th { position: sticky; top: 0 }` was already there and could never work:
+     `.tablewrap` sets `overflow-x: auto`, and CSS does not allow
+     `overflow-y: visible` beside it — the used value becomes `auto`, so the
+     wrap IS the sticky ancestor. With no height limit the wrap never scrolls
+     vertically, so `top: 0` pins the header to the top of a box that is
+     scrolling away with the page. Nothing sticks.
+
+     So the feature table gets its own vertical viewport. 144 orgs is a long
+     table either way; now the header stays over it. */
+  .stickywrap { max-height: calc(100vh - 150px); overflow: auto; }
+  /* AND THE HEADER NEEDS ITS OWN BACKGROUND AND EDGE. Under
+     `border-collapse: collapse` a sticky cell's borders are painted with the
+     table, not with the cell, so they scroll out from under it — the rule has
+     to be a shadow. */
+  .stickywrap thead th { position: sticky; top: 0; z-index: 2;
+                         background: #f1f5f9; border-bottom: none;
+                         box-shadow: inset 0 -1px 0 var(--line), 0 1px 0 var(--line); }
   .feattable th, .feattable td { padding: 7px 8px; }
   .feattable th:hover { background: #eef2f7; color: var(--ink); }
   /* THE ORG CELL WRAPS. Every `td` in this app is `white-space: nowrap`, so a
@@ -226,7 +246,35 @@
      the line and never a word. */
   .feattable td.l { max-width: 280px; white-space: normal; }
   .feattable td.l > b { white-space: nowrap; }
-  .pill.gpill { min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  /* THE PILL IS THE SAME SHAPE AT EVERY VALUE, including 0. It carries its
+     own border because the band supplies a borderColor — the previous ramp
+     faded to a white fill on a white row, i.e. no pill, which is why one
+     column rendered two different shapes for one kind of value. */
+  .pill.gpill { min-width: 44px; text-align: center; font-variant-numeric: tabular-nums;
+                font-size: 11.5px; border: 1px solid transparent; padding: 2px 8px; }
+  /* The adoption GRADE badge. Monospace digits are wrong here — a single
+     letter wants to read as a mark, so it is a bordered chip sized to the
+     surface it sits on. */
+  .grade { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 800;
+           font-size: 12px; line-height: 1; letter-spacing: .5px; padding: 3px 7px;
+           border: 1px solid; border-radius: 5px; }
+  .grade i { font-style: normal; font-weight: 500; font-size: 11px; color: var(--muted);
+             letter-spacing: 0; }
+  .grade-lg { font-size: 20px; padding: 6px 11px; border-radius: 7px; }
+  .grade-lg i { font-size: 12px; }
+  /* The letter LEADS and the percentage follows it — the whole ask was
+     something readable without knowing the scale. */
+  .scorecell { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; }
+  .scorecell b { font-variant-numeric: tabular-nums; }
+  .gradeline { margin-top: 8px; }
+  /* The trend column: the signed delta over the line, like the catalyst table
+     Dan pointed at. Fixed width so 144 rows do not each size their own
+     column and make the sparklines incomparable. */
+  .trendcell { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .trendcell b { font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .trendline { display: block; }
+  .trendnone { color: #cbd5e1; }
+  .feattable td.trend, .feattable th.trend { width: 76px; }
   .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
   .adminlink:hover { text-decoration: underline; }
 
@@ -246,7 +294,18 @@
   /* Hovering EITHER row lights the whole band, or the summary and its own
      gaps highlight as two separate objects. */
   .tablewrap tbody.orgband:hover td { background: #f1f5f9; }
-  .gap-row td { padding-top: 2px; white-space: normal; text-align: left; }
+  /* A RULE BETWEEN THE TWO HALVES OF A BAND. Dan: "How about a HR to separate
+     out the org name section from the 'not using' area, it just all runs
+     together."
+
+     This is NOT a reversal of removing the inner hairline — that fix was that
+     the inner and outer edges were the SAME 1px weight, so nothing said which
+     pair belonged together. The hierarchy is now three weights: no rule under
+     the summary's own cells, a LIGHT dashed rule above the gaps, and the
+     band's heavy 2px edge below. The divider has to be lighter than the band
+     edge or the complaint comes straight back. */
+  .gap-row td { padding-top: 9px; white-space: normal; text-align: left;
+                border-top: 1px dashed #e2e8f0; }
 
   /* THE GAP STACK: one group per LINE, with the label in a fixed column.
      Dan: "The two rows of not using are just a mash up of words." They were —
@@ -453,15 +512,35 @@
 
   /* A RATIO ramp, deliberately not the pill scale. `heat()` is a LOG ramp
      over counts, where the question is "how big is this next to the biggest";
-     here every cell is already a share of its own denominator, so a linear
+     here every cell is already a share of its own denominator, so a banded
      ramp is the honest one and 4/4 must look the same in a group of four as
-     8/8 does in a group of eight. */
+     8/8 does in a group of eight.
+
+     THE BANDS ARE DAN'S, verbatim: "green for 100%, orange for 60-90%, and
+     red for <60%". 90-99 is not 100, so it is orange — a near-miss is still a
+     gap, and inventing a fourth band for it would be inventing a rule he did
+     not give.
+
+     EVERY CELL GETS A PILL. The previous ramp faded to a WHITE pill at 0%,
+     which on a white row is no pill at all — so one column rendered two
+     different shapes for the same kind of value and Dan asked "why do some of
+     the feature options have pills and others dont?". A 0/7 is a measurement
+     and reads as one now.
+
+     NULL IS STILL DIFFERENT, and that is not the same question. An empty
+     group (every feature in it hidden by the settings) is UNMEASURED, so it
+     gets the grey outline rather than a red pill claiming nobody uses
+     something nobody is counting. */
+  const RATIO_BANDS = [
+    { min: 100, background: "#dcfce7", color: "#166534", borderColor: "#86efac" },
+    { min: 60,  background: "#ffedd5", color: "#9a3412", borderColor: "#fdba74" },
+    { min: 0,   background: "#fee2e2", color: "#b91c1c", borderColor: "#fca5a5" },
+  ];
   function ofRatioHeat(pct) {
-    if (pct == null) return { background: "#f8fafc", color: "#94a3b8" };
-    if (pct === 0) return { background: "#fff", color: "#cbd5e1" };
-    const alpha = 0.10 + (pct / 100) * 0.5;
-    return { background: "rgba(15,111,92," + alpha.toFixed(3) + ")",
-             color: pct > 65 ? "#fff" : "#0f3d33", fontWeight: 700 };
+    if (pct == null) return { background: "#f8fafc", color: "#94a3b8", borderColor: "#e2e8f0" };
+    const b = RATIO_BANDS.find(x => pct >= x.min) || RATIO_BANDS[RATIO_BANDS.length - 1];
+    return { background: b.background, color: b.color, borderColor: b.borderColor,
+             fontWeight: 700 };
   }
 
   /* ---------------- org features: quick views ----------------
@@ -663,13 +742,256 @@
     return e("a", { href, className: cls, onClick: (ev) => { ev.preventDefault(); nav(href); } }, children);
   }
 
+  /* ACCOUNT HEALTH'S OWN score ramp, and deliberately not the Org Features
+     one below. `a.adoptionScore` there comes from ps-data and is a different
+     measurement on a different scale; routing both through one function would
+     couple two unrelated numbers, so that a grade ramp tuned to the feature
+     fleet silently re-coloured a HubSpot figure. */
   function scoreColor(p) { return p >= 70 ? "#16a34a" : p >= 40 ? "#d97706" : "#dc2626"; }
+
+  /* ---------------- the adoption GRADE ----------------
+     Dan: "yeah the percentage is nice, but I want a letter grade, something
+     that's easy to digest as a noob."
+
+     THE RAMP IS CURVED TO THE FLEET, NOT THE AMERICAN SCHOOL SCALE, and that
+     is a measurement rather than a preference. Measured 2026-09-07 over all
+     144 orgs: the best org on the platform scores 96% and the best LIVE one
+     89%, the live median is 57% and the live mean 50%. On a 90/80/70/60 ramp
+     NO live org earns an A and 44 of 73 get an F — a scale whose modal grade
+     is F carries no information, and it is indefensible on a page handed to a
+     Director.
+
+     At 75/60/45/25 the 73 live orgs spread A 8 · B 21 · C 18 · D 14 · F 12,
+     so an A really is the top tenth of the fleet and an F means a LAUNCHED org
+     has configured under a quarter of the platform.
+
+     ANYTHING THAT PRINTS A GRADE MUST PRINT WHAT IT IS GRADED AGAINST. A bare
+     "C" reads as an absolute judgement against a 100% nobody reaches, so
+     GRADE_BASIS travels with it. */
+  const GRADE_RAMP = [
+    { min: 75, letter: "A", color: "#15803d", band: "#dcfce7",
+      says: "Getting nearly everything out of the platform" },
+    { min: 60, letter: "B", color: "#16a34a", band: "#ecfdf5",
+      says: "Strong adoption, with room in a few areas" },
+    { min: 45, letter: "C", color: "#b45309", band: "#fffbeb",
+      says: "The core is in place; several areas are untouched" },
+    { min: 25, letter: "D", color: "#ea580c", band: "#fff7ed",
+      says: "Running on a fraction of what is available" },
+    { min: 0,  letter: "F", color: "#dc2626", band: "#fef2f2",
+      says: "Most of the platform is not configured yet" },
+  ];
+  const GRADE_BASIS = "Graded against what organizations on rec.us actually reach today, "
+    + "not a 90/80/70 school scale — the highest score on the whole platform is 96%.";
+  /* NULL, NEVER AN F. An org with no adoption record, or a settings state with
+     nothing ticked, is UNMEASURED — and "we cannot tell" printed as an F is
+     the worst possible reading of it. Same rule as every other absent-is-not-
+     zero gate in this app. */
+  function ofGrade(pct) {
+    if (pct == null || typeof pct !== "number" || !isFinite(pct)) return null;
+    return GRADE_RAMP.find(g => pct >= g.min) || GRADE_RAMP[GRADE_RAMP.length - 1];
+  }
+  function ofGradeColor(pct) { const g = ofGrade(pct); return g ? g.color : "#94a3b8"; }
+  /* The badge. `size` so one component serves a table cell, a KPI card and the
+     printed report rather than three that drift apart. */
+  function Grade({ pct, size, showSays }) {
+    const g = ofGrade(pct);
+    if (!g) return null;
+    return e("span", { className: "grade" + (size ? " grade-" + size : ""),
+                       "data-of-grade": g.letter,
+                       style: { color: g.color, background: g.band, borderColor: g.color + "40" },
+                       title: g.says + " — " + GRADE_BASIS },
+      g.letter,
+      showSays ? e("i", null, g.says) : null);
+  }
   function ScoreBar({ pct }) {
     if (pct == null) return e("span", { className: "zero" }, "not on rec");
     return e("span", { className: "scorebar" },
       e("i", { style: { width: pct + "%", background: scoreColor(pct), opacity: .25 } }),
       e("b", null, pct + "%"));
   }
+  /* ---------------- ONE DERIVATION, N READERS ----------------
+     The list, the drill-in and the printed report all have to agree about a
+     score, a tracked set and a category's membership. Three components each
+     computing their own is how the PDF handed to a Director comes back with a
+     different percentage from the screen it was generated off — the same rule
+     that sends the Programs autopay column through `progAutopayShare` in the
+     sibling project.
+
+     Everything here is settings-scoped: `hiddenFeatures` leaves the tracked
+     set and `excludedOrgs` leaves the fleet, so no reader can widen either. */
+  function ofDerive(d, cfg) {
+    d = d || {};
+    cfg = cfg || {};
+    const hidden = new Set(cfg.hiddenFeatures || []);
+    const excluded = new Set(cfg.excludedOrgs || []);
+    const byKey = {};
+    (d.features || []).forEach(f => { byKey[f.key || f.id || f.name] = f; });
+    const label = k => (byKey[k] && (byKey[k].name || byKey[k].label)) || k;
+    const allMeasured = d.measuredFeatures || [];
+    const shown = allMeasured.filter(k => !hidden.has(k));
+    const adoptedIn = (slug, k) => {
+      const v = ((d.adoption || {})[slug] || {})[k];
+      return !!(v && (v === true || v.adopted === true || Number(v.count) > 0));
+    };
+    const scoreOf = (slug) => {
+      const a = (d.adoption || {})[slug];
+      if (!a) return null;                      // unmeasured is not zero
+      if (!shown.length) return null;           // nothing ticked is not 0%
+      return Math.round((shown.filter(k => adoptedIn(slug, k)).length / shown.length) * 100);
+    };
+    const orgName = o => o.displayName || o.name || o.slug;
+    const everyOrg = (d.orgs || []).slice().sort((a, b) => orgName(a).localeCompare(orgName(b)));
+    const all = everyOrg.filter(o => !excluded.has(o.slug));
+    const groups = (d.featureCategories || [])
+      .map(cat => ({ cat, keys: shown.filter(k => byKey[k] && byKey[k].category === cat) }))
+      .filter(g => g.keys.length > 0);
+    /* THE CURRENT SET'S KEY, so the trend can drop history points scored over
+       a different one. Hashed exactly as the bake does it — see
+       scripts/refresh/merge-snapshot.js — and taken over `shown`, so
+       UNTICKING A FEATURE INVALIDATES THE WHOLE SERIES rather than plotting
+       stored scores against a denominator the reader has just changed. That is
+       the honest answer: those points really were measured over a set the page
+       is no longer using. */
+    const setKey = (() => {
+      const joined = shown.slice().sort().join(",");
+      let h = 0;
+      for (let i = 0; i < joined.length; i++) { h = (h * 31 + joined.charCodeAt(i)) | 0; }
+      return shown.length + ":" + (h >>> 0).toString(36);
+    })();
+    return {
+      hidden, excluded, byKey, label, allMeasured, shown, adoptedIn, scoreOf,
+      orgName, everyOrg, all, groups, setKey, history: d.history || [],
+      trendOf: (slug) => ofTrend(d.history || [], slug, setKey),
+      total: (d.features || []).length,
+      notUsing: (s2) => shown.filter(k => !adoptedIn(s2, k)),
+      detailOf: (s2, k) => (((d.adoption || {})[s2] || {})[k] || {}).detail || "",
+    };
+  }
+
+  /* HOW MANY LIVE ORGS ALREADY USE EACH FEATURE. This is the ranking signal
+     for "what should we turn on next", and it is the one argument a Director
+     cannot wave away: "62 of 73 organizations live on rec.us use this, and you
+     do not" is a fact about the fleet rather than our opinion about the
+     feature.
+
+     PRE-LAUNCH ORGS ARE OUT OF THE DENOMINATOR. Half the fleet is mid-setup
+     and has configured almost nothing, so counting them makes every feature
+     look unpopular — the same reason the row already says "live" or
+     "pre-launch". */
+  function ofFleetUse(d, dv) {
+    const live = (dv.all || []).filter(o => o.launched);
+    const out = { liveOrgs: live.length, used: {} };
+    (dv.shown || []).forEach(k => {
+      out.used[k] = live.filter(o => dv.adoptedIn(o.slug, k)).length;
+    });
+    return out;
+  }
+
+  /* ---------------- the adoption TREND ----------------
+     Dan: "can we add sparklines to each org, you know I love those", with a
+     screenshot of a catalyst table — a signed 30-day delta over a small
+     sparkline, green up, red down.
+
+     ONLY COMPARABLE POINTS COUNT, and this is the whole reason it can be
+     trusted. Every history point carries the `setKey` of the feature set it
+     was scored over (see scripts/refresh/merge-snapshot.js), and points from
+     a different set are DROPPED rather than plotted. The one older bake in
+     this repo measured FOURTEEN features against today's fifty-six: Apex
+     reads 86% there and 89% here, which looks like +3 and is a denominator
+     that quadrupled. Plotting it would publish a definition change as org
+     behaviour.
+
+     NULL UNTIL THERE ARE TWO, and the column says so rather than drawing a
+     flat line. One point is not a trend; a flat line is a claim that nothing
+     changed, which is not the same fact as "we have only started measuring".
+     Same absent-is-not-zero rule as everywhere else here. */
+  const TREND_MIN_POINTS = 2;
+  function ofTrend(history, slug, setKey) {
+    const pts = (history || [])
+      .filter(h => h && (!setKey || h.setKey === setKey))
+      .map(h => ({ date: h.date, v: (h.scores || {})[slug] }))
+      .filter(x => x.v != null && isFinite(x.v));
+    if (pts.length < TREND_MIN_POINTS) {
+      return { points: pts, ready: false, delta: null, first: null, last: pts.length ? pts[pts.length - 1].v : null };
+    }
+    const first = pts[0].v, last = pts[pts.length - 1].v;
+    return { points: pts, ready: true, first, last, delta: last - first,
+             from: pts[0].date, to: pts[pts.length - 1].date };
+  }
+  /* THE DELTA IS IN POINTS, NOT PERCENT. Both readings are percentages, so
+     "+12%" is ambiguous — 50 to 56 is +6 points and +12 percent, and the two
+     are different sentences about the same move. Points is the one a reader
+     can check against the two numbers on screen. */
+  function ofTrendLabel(t) {
+    if (!t || !t.ready || t.delta == null) return null;
+    const d2 = Math.round(t.delta);
+    return (d2 > 0 ? "+" : d2 < 0 ? "\u2212" : "") + Math.abs(d2) + " pts";
+  }
+  function ofTrendColor(t) {
+    if (!t || !t.ready || t.delta == null) return "#94a3b8";
+    return t.delta > 0 ? "#16a34a" : t.delta < 0 ? "#dc2626" : "#94a3b8";
+  }
+  /* The line. Scaled to the SERIES, not to 0-100 — an org moving 61 to 64
+     over a month is a real move and would be a flat line against a full
+     axis, which is the whole point of a sparkline. A single flat series still
+     draws a mid-height line rather than dividing by zero. */
+  function Trendline({ t, w, h }) {
+    if (!t || !t.ready) return null;
+    w = w || 62; h = h || 20;
+    const vs = t.points.map(x => x.v);
+    const lo = Math.min(...vs), hi = Math.max(...vs), span = hi - lo || 1;
+    const step = vs.length > 1 ? (w - 2) / (vs.length - 1) : 0;
+    const pt = (v, i) => (1 + i * step).toFixed(1) + "," +
+      (h - 2 - ((v - lo) / span) * (h - 4)).toFixed(1);
+    const d2 = vs.map(pt).join(" ");
+    const col = ofTrendColor(t);
+    return e("svg", { className: "trendline", width: w, height: h, viewBox: "0 0 " + w + " " + h,
+                      "aria-hidden": "true", focusable: "false" },
+      e("polyline", { points: d2, fill: "none", stroke: col, strokeWidth: 1.5,
+                      strokeLinecap: "round", strokeLinejoin: "round" }),
+      /* The endpoint is emphasised, because "where is it now" is the first
+         thing anyone asks of a sparkline. */
+      e("circle", { cx: (1 + (vs.length - 1) * step).toFixed(1),
+                    cy: (h - 2 - ((vs[vs.length - 1] - lo) / span) * (h - 4)).toFixed(1),
+                    r: 2, fill: col }));
+  }
+  function TrendCell({ t }) {
+    if (!t || !t.ready) {
+      /* NOT A DASH IN A COLUMN HEADED "TREND" WITH NO EXPLANATION. The
+         history starts at the first bake carrying it, so for the first day
+         this is every row, and a bare — reads as broken data. */
+      return e("span", { className: "trendnone", "data-of-trend": "",
+                         title: (t && t.points.length === 1)
+                           ? "Only one measurement so far. The daily bake adds a point every "
+                             + "morning, so this fills in from tomorrow."
+                           : "No comparable measurement history yet. Points scored over a "
+                             + "different feature set are deliberately not plotted." },
+        "\u00b7");
+    }
+    return e("span", { className: "trendcell", "data-of-trend": Math.round(t.delta),
+                       title: t.first + "% on " + t.from + " \u2192 " + t.last + "% on " + t.to
+                            + " \u00b7 " + t.points.length + " measurements" },
+      e("b", { style: { color: ofTrendColor(t) } }, ofTrendLabel(t)),
+      e(Trendline, { t }));
+  }
+
+  /* WHERE THIS ORG SITS AMONG ITS PEERS, by rank rather than by a gap to an
+     average. "12th of 73" is readable; "18 points below the mean" invites an
+     argument about the mean. Ranked among LIVE orgs only, and NULL for an org
+     that is not live yet — a pre-launch org ranked against launched ones is a
+     comparison nobody asked for. */
+  function ofRank(org, dv) {
+    if (!org || !org.launched) return null;
+    const mine = dv.scoreOf(org.slug);
+    if (mine == null) return null;
+    const peers = (dv.all || []).filter(o => o.launched)
+      .map(o => dv.scoreOf(o.slug)).filter(v => v != null);
+    if (peers.length < 5) return null;          // a rank out of four is noise
+    peers.sort((a, b) => b - a);
+    return { rank: peers.filter(v => v > mine).length + 1, of: peers.length,
+             median: peers[Math.floor((peers.length - 1) / 2)] };
+  }
+
   function Spark({ series }) {
     const max = Math.max(1, ...series.map(s => s.count));
     return e("span", { className: "spark", title: series.map(s => `${s.month}: ${s.count}`).join("\n") },
@@ -1547,47 +1869,15 @@
     if (err) return e("div", { className: "note" }, "Could not load the features snapshot: " + err);
     if (!d || !cfg) return e("div", { className: "note" }, "Loading feature adoption\u2026");
 
-    const hidden = new Set(cfg.hiddenFeatures || []);
-    const excluded = new Set(cfg.excludedOrgs || []);
-
-    const total = (d.features || []).length;
-    const byKey = {};
-    (d.features || []).forEach(f => { byKey[f.key || f.id || f.name] = f; });
-    const label = k => (byKey[k] && (byKey[k].name || byKey[k].label)) || k;
-
-    // The measured set, minus whatever is unticked. THE SCORE IS TAKEN OVER
-    // THIS, which is the whole point of the setting — "how adopted is this
-    // org" only means something against the features you care about.
-    const allMeasured = d.measuredFeatures || [];
-    const shown = allMeasured.filter(k => !hidden.has(k));
-
-    const adoptedIn = (slug, k) => {
-      const v = ((d.adoption || {})[slug] || {})[k];
-      return !!(v && (v === true || v.adopted === true || Number(v.count) > 0));
-    };
-    const scoreOf = (slug) => {
-      const a = (d.adoption || {})[slug];
-      if (!a) return null;                      // unmeasured is not zero
-      if (!shown.length) return null;           // nothing ticked is not 0%
-      return Math.round((shown.filter(k => adoptedIn(slug, k)).length / shown.length) * 100);
-    };
-
-    const orgName = o => o.displayName || o.name || o.slug;
-    const everyOrg = (d.orgs || []).slice().sort((a, b) => orgName(a).localeCompare(orgName(b)));
-    // Excluded orgs leave EVERY surface — the table, the pulldown, both
-    // compare slots, the fleet average and the count — or the page disagrees
-    // with itself about how many orgs there are.
-    const all = everyOrg.filter(o => !excluded.has(o.slug));
-
-    /* GROUPS ARE DERIVED FROM THE CATALOG, in the catalog's own order, and
-       only over TRACKED features — a group whose features the settings have
-       all hidden gets no column at all rather than a permanent 0/0. */
-    const groups = (d.featureCategories || [])
-      .map(cat => ({ cat, keys: shown.filter(k => byKey[k] && byKey[k].category === cat) }))
-      .filter(g => g.keys.length > 0);
-
-    const notUsing = (s2) => shown.filter(k => !adoptedIn(s2, k));
-    const detailOf = (s2, k) => (((d.adoption || {})[s2] || {})[k] || {}).detail || "";
+    /* THROUGH `ofDerive`, so the list, this page's drill-in and the printed
+       report cannot disagree about a score or about which features are
+       tracked. Excluded orgs leave EVERY surface — the table, the pulldown,
+       both compare slots, the fleet average and the count — because they
+       leave `all` here, once. */
+    const dv = ofDerive(d, cfg);
+    const { hidden, excluded, total, byKey, label, allMeasured, shown,
+            adoptedIn, scoreOf, orgName, everyOrg, all, groups,
+            notUsing, detailOf, trendOf } = dv;
 
     const adminLink = (o) => {
       const href = ofRecAdminUrl(o.id);
@@ -1663,7 +1953,9 @@
     const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
       r.score == null
         ? e("span", { className: "zero" }, "not measured")
-        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
+        : e("span", { className: "scorecell" },
+            e(Grade, { pct: r.score }),
+            e("b", { style: { color: ofGradeColor(r.score) } }, r.score + "%")));
 
     const launchTag = o => o.launched
       ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
@@ -1708,8 +2000,10 @@
         e("div", { className: "cards" },
           e("div", { className: "card" }, e("div", { className: "k" }, "Adoption"),
             e("div", { className: "v", "data-feat-orgscore": oScore == null ? "" : oScore,
-                       style: { color: oScore == null ? "#94a3b8" : scoreColor(oScore) } },
+                       style: { color: ofGradeColor(oScore) } },
               oScore == null ? "not measured" : oScore + "%"),
+            oScore == null ? null : e("div", { className: "gradeline" },
+              e(Grade, { pct: oScore, size: "lg", showSays: true })),
             e("div", { className: "d" }, (shown.length - oMiss.length) + " of " + shown.length + " tracked features")),
           /* THE CORE COUNTS LIVE HERE NOW. They came off the list because
              they measure SIZE rather than adoption; on one org's page size
@@ -1846,7 +2140,11 @@
         /* RENAMED from "Fleet adoption" at Dan's request. */
         e("div", { className: "card ringcard", "data-feat-avg": avg == null ? "" : avg,
                    title: "The average adoption score across every scored organization in this view" },
-          e(Ring, { pct: avg, color: avg == null ? null : scoreColor(avg),
+          /* NO LETTER ON THE FLEET CARD, deliberately. A grade is a judgement
+             about ONE organization; the fleet mean folds in 71 pre-launch orgs
+             mid-setup, so grading it grades who happens to be onboarding this
+             month rather than anything anyone can act on. */
+          e(Ring, { pct: avg, color: avg == null ? null : ofGradeColor(avg),
                     label: "Feature Adoption: " + (avg == null ? "not measured" : avg + "%") }),
           e("div", { className: "ringtext" },
             e("div", { className: "k" }, "Feature Adoption"),
@@ -1913,8 +2211,9 @@
             [A, B].map((r, i2) => e("div", { key: i2, className: "cmpcol cmpval" },
               r.score == null
                 ? e("span", { className: "zero" }, "not measured")
-                : e("span", { style: { color: scoreColor(r.score), fontWeight: 800, fontSize: 17 } },
-                    r.score + "%")))),
+                : e("span", { className: "scorecell" },
+                    e(Grade, { pct: r.score }),
+                    e("b", { style: { color: ofGradeColor(r.score), fontSize: 17 } }, r.score + "%"))))),
 
           metrics.map(m => e("div", { className: "cmprow", key: m.key },
             e("div", { className: "cmplab", title: m.description }, m.icon + " " + m.label),
@@ -2001,11 +2300,21 @@
           " " + (sort[1] < 0 ? "high to low" : "low to high"), " \u00b7 ",
           e("a", { href: "#", onClick: ev => { ev.preventDefault(); setSort(null); } },
             "back to alphabetical")) : null,
-        e("div", { className: "tablewrap" },
+        /* `stickywrap` gives this table its own vertical viewport, which is
+           the only way `position: sticky` on a `th` can engage — see the CSS. */
+        e("div", { className: "tablewrap stickywrap" },
           e("table", { className: "feattable" },
             e("thead", null, e("tr", null,
               sortTh("Organization", "name", { className: "l" }),
               sortTh("Adoption", "score"),
+              /* NOT SORTABLE, deliberately. The trend is null for every org
+                 until the daily bake has two comparable points, and a sort
+                 whose column is empty for the whole table is a control that
+                 looks broken. It becomes worth sorting the day it has data —
+                 one line then, rather than a dead header now. */
+              e("th", { key: "trend", className: "trend",
+                        title: "Change in adoption score since the first comparable measurement \u00b7 "
+                             + "recorded once a day by the bake" }, "Trend"),
               /* ONE COLUMN PER FEATURE GROUP, replacing the six raw count
                  pills. The counts were a measure of SIZE — Apex has 98,197
                  registrations and Aspen has none, which says which org is
@@ -2037,6 +2346,7 @@
                        space" in Dan's screenshot. */
                     e("div", { className: "subslug" }, r.o.slug)),
                   scoreCell(r),
+                  e("td", { key: "trend", className: "trend" }, e(TrendCell, { t: trendOf(r.o.slug) })),
                   groups.map(g => {
                     const gs = ofGroupScore(g.keys, k => adoptedIn(r.o.slug, k));
                     return e("td", { key: g.cat, className: "num" },
@@ -2066,7 +2376,7 @@
                    groups readable where a wrapped paragraph of the same words
                    was not. */
                 e("tr", { key: "gaps", className: "gap-row", onClick: open2, style: { cursor: "pointer" } },
-                  e("td", { colSpan: 2 + groups.length },
+                  e("td", { colSpan: 3 + groups.length },
                     (() => {
                       if (!miss.length) {
                         return e("div", { className: "gapstack", "data-feat-miss": 0 },

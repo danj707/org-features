@@ -2227,7 +2227,8 @@
       "signal": "eligibility_rule.attribute_name (value 'age' or 'date_of_birth') with eligibility_rule.comparison_operator/attribute_value, linked to a section via eligibility_rule_group_lookup.section_id; section.age_evaluation_type governs how the age date is resolved",
       "adoption_definition": "Has >=1 section with an age-based eligibility rule attached (an eligibility_rule whose attribute is age/date_of_birth, joined through eligibility_rule_group_lookup.section_id)",
       "measure_question": "How many of this organization's sections have an age minimum or maximum eligibility requirement, and how many sections does it have in total?",
-      "short": "Age elig."
+      "short": "Age elig.",
+      "why": "Stops the wrong ages landing in a class — no more phone calls to move a 5-year-old out of the 8-12 group, and no refunds to process for it."
     },
     {
       "key": "grade_eligibility",
@@ -2236,7 +2237,8 @@
       "description": "Restricting section registration to specific school grade levels.",
       "signal": "eligibility_rule.attribute_name = 'grade' (with attribute_value/comparison_operator), linked to a section via eligibility_rule_group_lookup.section_id",
       "adoption_definition": "Has >=1 live section with a grade-based eligibility rule, joined through eligibility_rule_group_lookup.section_id exactly as age rules are. Measured 2026-09-07: 37 of 73 launched orgs (44 of 144 including unlaunched), 1,567 in total.",
-      "measure_question": "How many of this organization's sections have a grade-level eligibility requirement, and how many sections total?"
+      "measure_question": "How many of this organization's sections have a grade-level eligibility requirement, and how many sections total?",
+      "why": "Lets school-year programs fill correctly without staff hand-checking every registration against a grade list."
     },
     {
       "key": "residency_eligibility",
@@ -2245,7 +2247,8 @@
       "description": "Auto-assigning residents to a group (for resident pricing/access) using ZIP-code or geographic-polygon zones.",
       "signal": "residency_zipcode_group (820 rows, 46 orgs) and residency_polygon_group (41,454 rows, 35 orgs); organization_residency_transfer.",
       "adoption_definition": "Has >=1 residency zone of either kind. An org may use zip lists or drawn polygons or both, so the count is the sum rather than one of them.",
-      "measure_question": "How many residency zones (ZIP-code groups plus polygon groups) has this organization defined?"
+      "measure_question": "How many residency zones (ZIP-code groups plus polygon groups) has this organization defined?",
+      "why": "Resident pricing and resident-first access apply themselves from an address, instead of staff verifying proof of residency at the desk."
     },
     {
       "key": "prerequisites",
@@ -2254,7 +2257,8 @@
       "description": "Requiring participants to meet a prior condition (segment membership) before they can enroll in a section.",
       "signal": "prereq (section_id, segment_id, segment_query, activated_at).",
       "adoption_definition": "Has >=1 prerequisite CONFIGURED. Deliberately not activated_at: 1,186 prereq rows exist across 24 orgs and ZERO are activated, so filtering on activation reads 0 for everyone and hides two dozen orgs that set them up.",
-      "measure_question": "How many of this organization's sections have an enrollment prerequisite configured, and how many sections total?"
+      "measure_question": "How many of this organization's sections have an enrollment prerequisite configured, and how many sections total?",
+      "why": "Keeps Level 2 for people who finished Level 1, so instructors are not re-teaching basics to half the class."
     },
     {
       "key": "registration_windows",
@@ -2263,7 +2267,8 @@
       "description": "Opening and closing registration for a section at specific scheduled times.",
       "signal": "registration_window (opens_at, closes_at, section_id, type). Type is 'default' (67,379) or 'group' (23,825).",
       "adoption_definition": "Has >=1 default-type registration window. NEAR-UNIVERSAL BY CONSTRUCTION — every section gets one, so this is a structural fact rather than a differentiator. Kept because it is a real catalog feature and the page can hide it.",
-      "measure_question": "How many of this organization's sections have a scheduled registration window (open/close times), and how many sections total?"
+      "measure_question": "How many of this organization's sections have a scheduled registration window (open/close times), and how many sections total?",
+      "why": "Registration opens and closes on its own at the time you set, so nobody has to be at a keyboard at 8am on registration day."
     },
     {
       "key": "group_early_access_windows",
@@ -2272,7 +2277,8 @@
       "description": "Giving a specific member group early or exclusive registration access via a group-scoped window.",
       "signal": "registration_window.type = 'group' with group_id set.",
       "adoption_definition": "Has >=1 group-typed registration window actually bound to a group — the member early-access mechanism. 23,825 windows platform-wide.",
-      "measure_question": "How many registration windows are restricted to a specific member group, and how many registration windows are there in total?"
+      "measure_question": "How many registration windows are restricted to a specific member group, and how many registration windows are there in total?",
+      "why": "Gives residents or members a head start on popular programs — the single most requested perk, and the reason a membership feels worth buying."
     },
     {
       "key": "restricted_registration_mode",
@@ -2282,7 +2288,8 @@
       "signal": "NONE THAT WORKS. section.registration_mode carries only 'section' (58,232) and 'per-session' (4,479) — whether you register for a whole section or session by session, which is a different question. There is no invite-only or restricted column on section at all.",
       "adoption_definition": "NOT MEASURABLE. The catalog previously said registration_mode carries \"values other than 'open', e.g. invite_only, waitlist\". It does not, and there is no 'open' value either — so `registration_mode <> 'open'` would report ALL 62,711 sections as restricted, i.e. 100% adoption of a feature with no schema support. Left unmeasured until the product grows the field. The nearest real mechanisms are group early-access windows and eligibility rules, both measured separately.",
       "measure_question": "How many sections have a registration mode other than open (e.g. invite-only or waitlist-only), and how many sections total?",
-      "not_measurable": "section.registration_mode is about section-vs-per-session registration, not restriction. No invite-only field exists."
+      "not_measurable": "section.registration_mode is about section-vs-per-session registration, not restriction. No invite-only field exists.",
+      "why": "Lets you run an invite-only or referral-only section without publishing it to the whole public catalog."
     },
     {
       "key": "waitlist",
@@ -2292,7 +2299,8 @@
       "signal": "section.waitlist_config (JSONB, e.g. {\"enabled\": true, \"maxSize\": 20}); section.waitlist_override; table: waitlist (participant_user_id, section_id)",
       "adoption_definition": "Has >=1 section with waitlist_config enabled, or >=1 waitlist entry",
       "measure_question": "How many of this organization's sections have a waitlist enabled, and how many sections total?",
-      "short": "Waitlist"
+      "short": "Waitlist",
+      "why": "Captures demand you would otherwise lose. A full section with a waitlist tells you what to open next; a full section without one just turns people away."
     },
     {
       "key": "required_participant_info",
@@ -2301,7 +2309,8 @@
       "description": "Requiring certain profile attributes to be filled in before a participant can register.",
       "signal": "section.required_info_config (JSONB describing required profile attributes)",
       "adoption_definition": "Has >=1 live section carrying a required_info_config — the JSONB that demands date of birth, gender, grade or an emergency contact at registration. An opt-in: 2,713 of 62,711 sections. Measured 2026-09-07: 43 of 73 launched orgs (52 of 144 including unlaunched), 2,471 in total.",
-      "measure_question": "How many sections have required participant info configured, and how many sections total?"
+      "measure_question": "How many sections have required participant info configured, and how many sections total?",
+      "why": "Makes sure a roster arrives complete — emergency contact, date of birth — rather than staff chasing missing details before day one."
     },
     {
       "key": "custom_booking_questions",
@@ -2311,7 +2320,8 @@
       "signal": "table: default_booking_question (program_id, data JSONB); table: booking_question_response",
       "adoption_definition": "Has >=1 default_booking_question configured, or >=1 booking_question_response collected",
       "measure_question": "How many of this organization's programs have custom booking questions configured, and how many programs total?",
-      "short": "Bkg. Qs"
+      "short": "Bkg. Qs",
+      "why": "Collects the things you always end up asking anyway (t-shirt size, allergies, pickup person) at the moment of registration instead of by email later."
     },
     {
       "key": "custom_forms",
@@ -2321,7 +2331,8 @@
       "signal": "table: form (schema JSONB); table: form_lookup (section_id/site/product); table: form_submission",
       "adoption_definition": "Has >=1 live form (form.deleted_at IS NULL). Whether the form is attached to anything is measured separately by form_on_file_reuse. Measured 2026-09-07: 58 of 73 launched orgs (80 of 144 including unlaunched), 1,162 in total.",
       "measure_question": "How many custom forms has this organization created, and how many form submissions has it collected?",
-      "short": "Forms"
+      "short": "Forms",
+      "why": "Replaces paper and PDF intake with something that arrives already attached to the right registration."
     },
     {
       "key": "waivers_contracts",
@@ -2330,7 +2341,8 @@
       "description": "Requiring participants to sign waivers or legal contracts (e.g. on booking).",
       "signal": "contract_version.type — the real values are facility-policy, registration-policy, liability-waiver, refund-policy, facility-rental-refund-policy, code-of-conduct and three more. NOT 'waiver' / 'terms_of_service'. contract_version.requirement has exactly one value platform-wide ('soft-ack') and cannot discriminate anything.",
       "adoption_definition": "Has >=1 contract version of any type. Filtering on type='waiver' matches nothing at all.",
-      "measure_question": "How many waiver/contract versions has this organization set up?"
+      "measure_question": "How many waiver/contract versions has this organization set up?",
+      "why": "Signed before the participant can book, and stored against them — which is the difference between having a waiver and being able to find it."
     },
     {
       "key": "form_on_file_reuse",
@@ -2339,7 +2351,8 @@
       "description": "Letting participants reuse a previously submitted form instead of re-filling it each time.",
       "signal": "form_lookup.use_form_on_file = true",
       "adoption_definition": "Has >=1 form lookup with use_form_on_file = true, i.e. a form answered once and reused rather than re-asked every registration. Measured 2026-09-07: 43 of 73 launched orgs (51 of 144 including unlaunched), 11,071 in total.",
-      "measure_question": "How many of this organization's form attachments are set to reuse a form on file, and how many form attachments total?"
+      "measure_question": "How many of this organization's form attachments are set to reuse a form on file, and how many form attachments total?",
+      "why": "A returning family fills the form once, not once per season. It is one of the biggest drop-off points in a repeat registration."
     },
     {
       "key": "guests_allowed",
@@ -2348,7 +2361,8 @@
       "description": "Allowing non-member guests to join program sessions, often at a separate guest price.",
       "signal": "program.allow_guests = true (with program.guest_price)",
       "adoption_definition": "Has >=1 live programme with allow_guests = true. Genuinely rare: 14 programmes across 8 orgs platform-wide. Measured 2026-09-07: 5 of 73 launched orgs (8 of 144 including unlaunched), 14 in total.",
-      "measure_question": "How many of this organization's programs allow guest participants, and how many programs total?"
+      "measure_question": "How many of this organization's programs allow guest participants, and how many programs total?",
+      "why": "Lets a member bring someone along at a guest rate, which is both revenue and your cheapest route to a new member."
     },
     {
       "key": "skill_levels",
@@ -2357,7 +2371,8 @@
       "description": "Assigning a recommended/required skill level to programs or sections.",
       "signal": "section.skill_level and program.recommended_level, both enums of all | beginners | intermediate | advanced | first-timers.",
       "adoption_definition": "Has >=1 live section whose skill_level is set AND is not 'all'. 'all' MEANS NO RESTRICTION and is the commonest value (29,257 sections), so `skill_level IS NOT NULL` reports 54,785 sections as using skill levels when more than half are explicitly unrestricted. Measured: 25,528 real restrictions.",
-      "measure_question": "How many sections have a skill level set, and how many sections total?"
+      "measure_question": "How many sections have a skill level set, and how many sections total?",
+      "why": "Puts people in the right class the first time, so instructors are not splitting a beginner class down the middle."
     },
     {
       "key": "addons",
@@ -2366,7 +2381,8 @@
       "description": "Offering optional or required add-on products alongside a section, site, or activity.",
       "signal": "table: addon (product_id, is_required, min_quantity, max_quantity, pricing_strategy)",
       "adoption_definition": "Has >=1 add-on product (addon), the optional extras attached to a registration or rental. Measured 2026-09-07: 34 of 73 launched orgs (46 of 144 including unlaunched), 2,029 in total.",
-      "measure_question": "How many add-on products has this organization configured, and how many of those are required add-ons?"
+      "measure_question": "How many add-on products has this organization configured, and how many of those are required add-ons?",
+      "why": "Sells the equipment rental, the t-shirt, the extra session at the moment of registration — the point where people actually say yes."
     },
     {
       "key": "seasons",
@@ -2376,7 +2392,8 @@
       "signal": "table: season (name, start_date, end_date, section_template JSONB); table: section_season",
       "adoption_definition": "Has >=1 live season. Note a season's declared start/end dates are its registration window and do NOT contain its sections' actual dates — that is recorded in the sibling reporting project and is why no date maths is done here. Measured 2026-09-07: 66 of 73 launched orgs (94 of 144 including unlaunched), 511 in total.",
       "measure_question": "How many seasons has this organization created, and how many sections are assigned to a season?",
-      "short": "Seasons"
+      "short": "Seasons",
+      "why": "Groups a term's programming so it can be built, published and reported on as one thing instead of section by section."
     },
     {
       "key": "instructors",
@@ -2385,7 +2402,8 @@
       "description": "Maintaining instructor profiles, including instructors who offer private lessons.",
       "signal": "table: instructor (user_id, can_teach_private_lessons, is_pro, is_contractor); table: instructor_reservation_request",
       "adoption_definition": "Has >=1 instructor record. instructor.id is NOT users.id — the path is section_facilitator -> instructor -> users via instructor.user_id, and the obvious join matches nothing. Measured 2026-09-07: 51 of 73 launched orgs (64 of 144 including unlaunched), 1,064 in total.",
-      "measure_question": "How many instructor profiles has this organization set up, and how many of them offer private lessons?"
+      "measure_question": "How many instructor profiles has this organization set up, and how many of them offer private lessons?",
+      "why": "Puts a name and a bio in front of the customer, and opens up private lessons as a revenue line."
     },
     {
       "key": "instructor_certifications",
@@ -2394,7 +2412,8 @@
       "description": "Tracking instructor credentials and their expiration for compliance.",
       "signal": "table: instructor_certification (name, expires_at, instructor_id)",
       "adoption_definition": "Has >=1 tracked instructor certification with a name and expiry. The thinnest of the programme features: 15 orgs. Measured 2026-09-07: 11 of 73 launched orgs (15 of 144 including unlaunched), 70 in total.",
-      "measure_question": "How many instructor certifications are recorded, and how many instructors does the organization have?"
+      "measure_question": "How many instructor certifications are recorded, and how many instructors does the organization have?",
+      "why": "Tracks credentials and when they expire, so a lapsed lifeguard or first-aid cert surfaces before an audit or an incident does."
     },
     {
       "key": "memberships",
@@ -2403,7 +2422,8 @@
       "description": "Selling recurring or term memberships that grant access and pricing benefits.",
       "signal": "group_schema.type = 'membership' (1,009 plans platform-wide); membership, membership_user carry the members.",
       "adoption_definition": "Has >=1 membership PLAN configured. The count of live memberships is already a core usage metric, so this measures whether the org has set the feature up.",
-      "measure_question": "How many memberships has this organization issued, and how many are currently active (status = 'active')?"
+      "measure_question": "How many memberships has this organization issued, and how many are currently active (status = 'active')?",
+      "why": "Turns one-off visitors into predictable recurring revenue, and gives you a group to price and schedule for."
     },
     {
       "key": "auto_renew_memberships",
@@ -2412,7 +2432,8 @@
       "description": "Memberships that automatically renew via recurring Stripe billing.",
       "signal": "group_schema.auto_renewal = true; membership.stripe_subscription_id; membership.next_renewal_at",
       "adoption_definition": "Has >=1 membership with a stripe_subscription_id or next_renewal_at set, or a group_schema with auto_renewal = true",
-      "measure_question": "How many of this organization's memberships are set to auto-renew (have a Stripe subscription), and how many memberships total?"
+      "measure_question": "How many of this organization's memberships are set to auto-renew (have a Stripe subscription), and how many memberships total?",
+      "why": "The membership renews itself on a card on file. Without it every renewal is a manual re-sell, and most of them quietly do not happen."
     },
     {
       "key": "passes",
@@ -2421,7 +2442,8 @@
       "description": "Selling multi-use passes (e.g. 10-visit punch cards) with defined coverage and expiry.",
       "signal": "table: pass_schema (start_mechanism, end_mechanism, config e.g. totalUses); table: pass; table: pass_user",
       "adoption_definition": "Has >=1 pass TYPE configured (pass_schema). Active passes held by members are already a core usage metric. Note pass_schema has no subscription column at all, so a pass cannot auto-renew as a matter of schema. Measured 2026-09-07: 32 of 73 launched orgs (48 of 144 including unlaunched), 376 in total.",
-      "measure_question": "How many pass types (pass schemas) has this organization set up, and how many passes have been issued?"
+      "measure_question": "How many pass types (pass schemas) has this organization set up, and how many passes have been issued?",
+      "why": "A 10-visit punch card is an easier yes than a year's membership, and it prepays the visits."
     },
     {
       "key": "benefit_rules",
@@ -2430,7 +2452,8 @@
       "description": "Defining the access or pricing-discount benefits that a membership group or pass grants.",
       "signal": "table: benefit_rule (type, access_config JSONB, pricing_config JSONB, group_id, pass_schema_id); table: benefit_usage",
       "adoption_definition": "Has >=1 benefit rule — the access or pricing entitlement a membership or pass confers. Every rule on the platform is type 'access'; no pricing benefit rules exist yet. Measured 2026-09-07: 38 of 73 launched orgs (53 of 144 including unlaunched), 710 in total.",
-      "measure_question": "How many benefit rules has this organization configured, and how many of them are pricing-discount benefits (type = 'pricing_discount')?"
+      "measure_question": "How many benefit rules has this organization configured, and how many of them are pricing-discount benefits (type = 'pricing_discount')?",
+      "why": "This is what makes a membership actually do something — the discount and the access are the product, not the badge."
     },
     {
       "key": "physical_access_devices",
@@ -2439,7 +2462,8 @@
       "description": "Using door scanners/readers to grant physical entry via membership or pass.",
       "signal": "table: physical_access_device (seam_device_id); table: physical_access_device_scan_event (access, membership_id, pass_id)",
       "adoption_definition": "Has >=1 Seam-linked physical access device (a door or gate that reads a membership). The least adopted feature measured: 2 orgs, 3 devices. Measured 2026-09-07: 1 of 73 launched orgs (2 of 144 including unlaunched), 3 in total.",
-      "measure_question": "How many physical access control devices (door scanners) has this organization registered?"
+      "measure_question": "How many physical access control devices (door scanners) has this organization registered?",
+      "why": "Door readers let a membership open the gate without a staff member checking it, which is how you staff a facility for longer hours."
     },
     {
       "key": "facility_rentals",
@@ -2448,7 +2472,8 @@
       "description": "Renting out facilities/spaces to customers via rental agreements.",
       "signal": "facility_rental (status: confirmed 515,503 / canceled 142,316 / in-progress 38,529; booking_type: instant 652,850 / managed 43,498).",
       "adoption_definition": "Has >=1 non-canceled facility rental. Canceled rentals are excluded — 142,316 of 696,348 rows. Measured 2026-09-07: 72 of 73 launched orgs, 545,922 non-canceled rentals in total.",
-      "measure_question": "How many facility rentals has this organization created, and how many locations does it have?"
+      "measure_question": "How many facility rentals has this organization created, and how many locations does it have?",
+      "why": "Renting out fields, courts and rooms is usually the largest single revenue line a parks department has."
     },
     {
       "key": "rental_applications",
@@ -2457,7 +2482,8 @@
       "description": "Requiring an application (with approval flow) before a facility can be rented at a site.",
       "signal": "site_rental_application_configuration.rental_application_enabled = true; table: rental_application",
       "adoption_definition": "Has >=1 site with rental_application_enabled = true, or >=1 rental_application",
-      "measure_question": "How many sites have rental applications enabled, and how many sites (courts) does the organization have in total?"
+      "measure_question": "How many sites have rental applications enabled, and how many sites (courts) does the organization have in total?",
+      "why": "An approval step before a rental is confirmed, so insurance, permits and eligibility are checked once rather than argued about later."
     },
     {
       "key": "instant_booking",
@@ -2467,7 +2493,8 @@
       "signal": "court.is_instant_bookable = true; table: site_instant_booking_configuration",
       "adoption_definition": "Has >=1 court with is_instant_bookable = true, or >=1 site_instant_booking_configuration",
       "measure_question": "How many of this organization's sites/courts are instant-bookable, and how many sites total?",
-      "short": "Instant bk."
+      "short": "Instant bk.",
+      "why": "Customers book and pay for a court themselves, at any hour, with no admin in the loop. It is the biggest single reduction in desk work available here."
     },
     {
       "key": "reservation_buffers",
@@ -2476,7 +2503,8 @@
       "description": "Enforcing a gap between back-to-back reservations on a court, or at a location.",
       "signal": "court.buffer_minutes_between_reservations > 0; court.reservation_buffer_minutes_override; location.reservation_buffer",
       "adoption_definition": "Has >=1 court with a nonzero buffer_minutes_between_reservations (or override), or a location with reservation_buffer set",
-      "measure_question": "How many courts have a buffer time between reservations set (greater than zero), and how many courts total?"
+      "measure_question": "How many courts have a buffer time between reservations set (greater than zero), and how many courts total?",
+      "why": "Builds in turnaround between bookings, so a rental does not walk in on the one before it and staff have time to reset the space."
     },
     {
       "key": "security_deposits",
@@ -2485,7 +2513,8 @@
       "description": "Collecting refundable security/damage deposits on facility rentals.",
       "signal": "table: deposit (amount_cents, deposit_type, amount_retained_cents, amount_returned_cents)",
       "adoption_definition": "Has >=1 deposit taken. Types are 'security' (13,352) and 'key' (673); both count, because both are the deposit feature in use. Measured 2026-09-07: 44 of 73 launched orgs (59 of 144 including unlaunched), 13,758 in total.",
-      "measure_question": "How many security deposits has this organization collected, and how many facility rentals does it have?"
+      "measure_question": "How many security deposits has this organization collected, and how many facility rentals does it have?",
+      "why": "A refundable deposit is what makes damage recoverable rather than absorbed by your maintenance budget."
     },
     {
       "key": "rental_permits",
@@ -2494,7 +2523,8 @@
       "description": "Issuing official permits for facility rentals.",
       "signal": "facility_rental_permit (status: issued 3,819 / draft 123 / revoked 14).",
       "adoption_definition": "Has >=1 ISSUED permit. A draft or revoked permit has no working public page, so it is not the feature in use.",
-      "measure_question": "How many facility rental permits has this organization issued, and how many facility rentals does it have?"
+      "measure_question": "How many facility rental permits has this organization issued, and how many facility rentals does it have?",
+      "why": "Gives the renter an official document to show, and gives your crews something to check against on site."
     },
     {
       "key": "group_reservation_windows",
@@ -2503,7 +2533,8 @@
       "description": "Giving specific member groups different court booking windows or duration limits.",
       "signal": "table: site_reservation_window (group_id, max_hours, min_hours, release_time_local)",
       "adoption_definition": "Has >=1 site reservation window bound to a group — the member-only booking horizon, with its own min/max hours and release time. Measured 2026-09-07: 71 of 73 launched orgs (116 of 144 including unlaunched), 6,094 in total.",
-      "measure_question": "How many group-specific reservation-window overrides has this organization set up, and how many sites (courts) does it have?"
+      "measure_question": "How many group-specific reservation-window overrides has this organization set up, and how many sites (courts) does it have?",
+      "why": "Members get to book further ahead or for longer than the public. It is the concrete reason a court membership sells."
     },
     {
       "key": "discount_codes",
@@ -2513,7 +2544,8 @@
       "signal": "table: discount_code (code, pricing_adjustment JSONB, is_active, max_total_redemptions); table: discount_redemption",
       "adoption_definition": "Has >=1 discount code, of any kind and whether or not it has ever been redeemed — creating one is the adoption signal. Measured 2026-09-07: 32 of 73 launched orgs (37 of 144 including unlaunched), 137 in total.",
       "measure_question": "How many discount/promo codes has this organization created, and how many redemptions have been recorded?",
-      "short": "Promos"
+      "short": "Promos",
+      "why": "Runs a promotion you can actually measure and switch off, instead of ad-hoc discounts applied at the desk."
     },
     {
       "key": "payment_plans",
@@ -2523,7 +2555,8 @@
       "signal": "section.available_payment_plans (JSONB PaymentPlanSpec[]); table: payment_plan_installment; order.flow = 'installment'",
       "adoption_definition": "Has >=1 section with available_payment_plans set, or >=1 payment_plan_installment",
       "measure_question": "How many of this organization's sections offer a payment plan (installments), and how many sections total?",
-      "short": "Pay plans"
+      "short": "Pay plans",
+      "why": "Splits a $300 camp into installments. It moves programs out of reach into programs people enroll in, and it is the single most effective access lever here."
     },
     {
       "key": "gift_cards",
@@ -2533,7 +2566,8 @@
       "signal": "table: gift_card_product (value_cents, expiration_policy); stored_value_account.gift_card_product_id",
       "adoption_definition": "Has >=1 gift card PRODUCT configured (gift_card_product). Cards sold are a different number and are not measured here. Measured 2026-09-07: 8 of 73 launched orgs (11 of 144 including unlaunched), 42 in total.",
       "measure_question": "How many gift card products has this organization configured, and how many gift card accounts have been issued?",
-      "short": "Gift cards"
+      "short": "Gift cards",
+      "why": "Sells your programs as a present, and takes the money months before the service is delivered."
     },
     {
       "key": "scholarships",
@@ -2543,7 +2577,8 @@
       "signal": "table: scholarship (value_cents, expiration_policy); stored_value_account.scholarship_id",
       "adoption_definition": "Has >=1 scholarship programme configured. Redemption is a separate question and is not measured here. Measured 2026-09-07: 14 of 73 launched orgs (19 of 144 including unlaunched), 107 in total.",
       "measure_question": "How many scholarship programs has this organization set up, and how many scholarship awards (stored value accounts) have been granted?",
-      "short": "Scholarship"
+      "short": "Scholarship",
+      "why": "Funds a place for a family who cannot pay, with the balance tracked properly rather than as a manual price override."
     },
     {
       "key": "store_credit",
@@ -2552,7 +2587,8 @@
       "description": "Maintaining per-user account credit balances that can be applied to purchases.",
       "signal": "table: credit_account (balance); table: credit (amount); payment.payment_method_type = 'organizationCredit'",
       "adoption_definition": "Has >=1 credit_account with a nonzero balance, or >=1 credit transaction",
-      "measure_question": "How many of this organization's users have a store-credit account with a nonzero balance, and how many credit accounts total?"
+      "measure_question": "How many of this organization's users have a store-credit account with a nonzero balance, and how many credit accounts total?",
+      "why": "Handles a cancellation without pushing money back out the door, and the credit almost always gets spent with you again."
     },
     {
       "key": "structured_refund_policies",
@@ -2561,7 +2597,8 @@
       "description": "Applying automated time-based refund rules to bookings.",
       "signal": "table: structured_refund_policy (rules JSONB, paused); section.structured_refund_policy_id; section.structured_refund_policy_paused",
       "adoption_definition": "Has >=1 structured_refund_policy defined, or >=1 section with structured_refund_policy_id set",
-      "measure_question": "How many sections have a structured refund policy applied, and how many sections total?"
+      "measure_question": "How many sections have a structured refund policy applied, and how many sections total?",
+      "why": "Refund rules apply themselves by how far out the cancellation is, so staff stop making case-by-case judgement calls that get compared to each other."
     },
     {
       "key": "group_pricing_tiers",
@@ -2570,7 +2607,8 @@
       "description": "Charging different prices to specific member groups (e.g. resident vs non-resident pricing).",
       "signal": "section.pricing_policy JSONB, shaped {\"default\":{\"type\":\"fixed\",\"cents\":N,\"groupCents\":{<group uuid>: N}}}. THE section_price TABLE NO LONGER EXISTS.",
       "adoption_definition": "Has >=1 live section whose pricing_policy carries a non-empty groupCents object — i.e. a member/group price that differs from the default. The catalog previously named section_price.group_id; that table was dropped and the signal moved into this JSONB column. Measured: 20,982 sections, 68 orgs.",
-      "measure_question": "How many sections have a group-specific (member) price tier, and how many sections have any custom price tier at all?"
+      "measure_question": "How many sections have a group-specific (member) price tier, and how many sections have any custom price tier at all?",
+      "why": "Resident versus non-resident pricing, applied automatically. This is usually the most politically important price on the whole system."
     },
     {
       "key": "tax_collection",
@@ -2579,7 +2617,8 @@
       "description": "Applying sales tax to products or court reservations.",
       "signal": "product.tax_bps > 0; court.tax_bps > 0",
       "adoption_definition": "Has >=1 product OR site with tax_bps above zero. Both count, because an org may tax merchandise, rentals, or both: 613 products across 19 orgs and 106 courts across 14. Measured 2026-09-07: 11 of 73 launched orgs (20 of 144 including unlaunched), 706 in total.",
-      "measure_question": "How many products and courts have a nonzero tax rate configured, and how many products/courts are there in total?"
+      "measure_question": "How many products and courts have a nonzero tax rate configured, and how many products/courts are there in total?",
+      "why": "Applies the right sales tax at the point of sale rather than reconstructing it at year end."
     },
     {
       "key": "cash_check_payments",
@@ -2588,7 +2627,8 @@
       "description": "Accepting in-person cash or check payments (beyond card/online).",
       "signal": "payment.payment_method_type, which uses HYPHENS: cash, check, card-online, card-present, organization-credit, free, scholarship, gift-card. Plus payment.cash_tendered_cents and payment.check_number.",
       "adoption_definition": "Has >=1 payment whose method is cash or check (168,912 and 4,329 platform-wide). The catalog previously wrote 'organizationCredit' in camelCase; the real value is 'organization-credit'. Measured 2026-09-07: 54 of 73 launched orgs, 163,530 cash or check payments in total.",
-      "measure_question": "How many payments has this organization taken by cash or check, and how many payments total?"
+      "measure_question": "How many payments has this organization taken by cash or check, and how many payments total?",
+      "why": "Records desk cash and checks in the same ledger as online payments, so one report covers all your revenue."
     },
     {
       "key": "gl_accounting",
@@ -2598,7 +2638,8 @@
       "signal": "table: gl_account (name, gl_code); table: gl_config (revenue-type to GL-account mappings); program.gl_account_id / court.gl_account_id / section.gl_account_id",
       "adoption_definition": "Has >=1 unarchived GL account. An archived account was configured once and is no longer in the chart, so it does not count. Measured 2026-09-07: 61 of 73 launched orgs (98 of 144 including unlaunched), 3,707 in total.",
       "measure_question": "How many general-ledger accounts has this organization set up in its chart of accounts?",
-      "short": "GL acct."
+      "short": "GL acct.",
+      "why": "Maps revenue into your chart of accounts, which is what makes the finance export something your finance office will accept."
     },
     {
       "key": "sms_messaging",
@@ -2608,7 +2649,8 @@
       "signal": "organization_sms_config.marketing_sms_number / transactional_sms_number (set); message.channel = 'sms'; message_delivery.segments/cost_cents",
       "adoption_definition": "Has an organization_sms_config with an SMS number set, or >=1 message with channel = 'sms'",
       "measure_question": "How many SMS messages has this organization sent (channel = 'sms'), and how many messages has it sent in total across all channels?",
-      "short": "SMS"
+      "short": "SMS",
+      "why": "A text gets read. For a rain-out, a cancellation or a spot opening up, email is too slow to be useful."
     },
     {
       "key": "email_messaging",
@@ -2618,7 +2660,8 @@
       "signal": "message.channel = 'email'; table: message_delivery (delivered_at, first_opened_at, open_count)",
       "adoption_definition": "Has >=1 email delivery on record (message_delivery.channel='email'). The single widest-adopted feature on the platform. Measured 2026-09-07: 65 of 73 launched orgs (78 of 144 including unlaunched), 740,896 in total.",
       "measure_question": "How many email messages has this organization sent, and how many total email deliveries (recipients) do those represent?",
-      "short": "Email"
+      "short": "Email",
+      "why": "Fills programs you have already built. Reaching last season's participants is the cheapest registration you will ever get."
     },
     {
       "key": "custom_email_domains",
@@ -2627,7 +2670,8 @@
       "description": "Sending email from the org's own verified custom domain rather than a default.",
       "signal": "organization_email_domain (domain, type, status). Status values: verified 17, not_started 8, failed 2, pending 2.",
       "adoption_definition": "Has >=1 VERIFIED sending domain. A domain added and never verified cannot send mail, so counting every row would report the feature as working when it is not.",
-      "measure_question": "How many custom email domains has this organization set up, and how many of them are verified (status = 'verified')?"
+      "measure_question": "How many custom email domains has this organization set up, and how many of them are verified (status = 'verified')?",
+      "why": "Mail comes from your own domain, so it looks official, lands in the inbox instead of spam, and is not mistaken for a scam."
     },
     {
       "key": "notification_subscriptions",
@@ -2636,7 +2680,8 @@
       "description": "Defining custom notification subscription categories users can opt in/out of.",
       "signal": "table: subscription (name, opt_in_by_default); notification_preference.subscription_id",
       "adoption_definition": "Has >=1 notification subscription type configured. Note this table is marketing opt-ins (name, opt_in_by_default) and holds no renewal history. Measured 2026-09-07: 22 of 73 launched orgs (25 of 144 including unlaunched), 61 in total.",
-      "measure_question": "How many notification subscription types has this organization created?"
+      "measure_question": "How many notification subscription types has this organization created?",
+      "why": "Lets people choose what they hear about, which keeps them subscribed instead of unsubscribing from everything."
     },
     {
       "key": "audience_segments",
@@ -2645,7 +2690,8 @@
       "description": "Building dynamic user segments for targeted messaging and eligibility.",
       "signal": "table: segment (configuration JSONB, archived_at)",
       "adoption_definition": "Has >=1 unarchived audience segment. Archived segments are excluded — a retired segment is not the feature in use. Measured 2026-09-07: 46 of 73 launched orgs (58 of 144 including unlaunched), 283 in total.",
-      "measure_question": "How many audience segments has this organization created?"
+      "measure_question": "How many audience segments has this organization created?",
+      "why": "Targets a message at the right list — swim families, last year's campers, lapsed members — rather than emailing everyone and training them to ignore you."
     },
     {
       "key": "competitions_leagues",
@@ -2655,7 +2701,8 @@
       "signal": "table: competition (type league/tournament); table: competition_section; table: competition_event; table: competition_team",
       "adoption_definition": "Has >=1 non-canceled competition. Canceled ones are excluded because a league that never ran is not the feature in use. Measured 2026-09-07: 18 of 73 launched orgs (24 of 144 including unlaunched), 172 in total.",
       "measure_question": "How many competitions (leagues/tournaments) has this organization created, and how many teams exist across them?",
-      "short": "Leagues"
+      "short": "Leagues",
+      "why": "Runs the league in the same place as registration: teams, schedules and standings, instead of a spreadsheet and a separate website."
     },
     {
       "key": "storefront_products",
@@ -2664,7 +2711,8 @@
       "description": "Publishing products for sale in the public online storefront.",
       "signal": "product.publish_to_public (the opt-in) and product.display_in_store (effectively a default).",
       "adoption_definition": "Has >=1 product with publish_to_public = true (581 products, 74 orgs). NOT display_in_store, which is true on 4,685 of 5,860 products across 100 orgs and therefore cannot discriminate.",
-      "measure_question": "How many products are published to the public storefront, and how many products does the organization have in total?"
+      "measure_question": "How many products are published to the public storefront, and how many products does the organization have in total?",
+      "why": "Sells merchandise, equipment and day passes online alongside your programs."
     },
     {
       "key": "pos_desk_locations",
@@ -2673,7 +2721,8 @@
       "description": "Processing in-person point-of-sale transactions at physical desk/till locations.",
       "signal": "table: desk_location (name, enforce_access_control); transaction_event.desk_location_id; table: product_desk_location",
       "adoption_definition": "Has >=1 desk location, i.e. a physical point of sale. Desk locations are what the finance reports split cash-out and item-log figures by. Measured 2026-09-07: 41 of 73 launched orgs (56 of 144 including unlaunched), 396 in total.",
-      "measure_question": "How many POS desk locations has this organization set up, and how many transactions were processed at a desk?"
+      "measure_question": "How many POS desk locations has this organization set up, and how many transactions were processed at a desk?",
+      "why": "Front-desk sales land in the same system as online ones, so the day's takings reconcile to one number."
     },
     {
       "key": "cash_reconciliation",
@@ -2682,7 +2731,8 @@
       "description": "Reconciling cash drawers with over/short reporting and deposit slips.",
       "signal": "table: cash_summary_report (total_cash_amount, expected_amount, short_over_amount, deposit_slip)",
       "adoption_definition": "Has >=1 cash-out report on record (cash_summary_report, with its expected/actual/short-over figures). Only meaningful for orgs taking cash at a desk. Measured 2026-09-07: 30 of 73 launched orgs (36 of 144 including unlaunched), 8,619 in total.",
-      "measure_question": "How many cash reconciliation reports has this organization created?"
+      "measure_question": "How many cash reconciliation reports has this organization created?",
+      "why": "Closes the drawer with an over/short figure and a deposit slip, which is what makes desk cash auditable."
     },
     {
       "key": "custom_staff_roles",
@@ -2691,7 +2741,8 @@
       "description": "Defining custom staff roles with granular can_* permissions and assigning them to users.",
       "signal": "organization_role (29 can_* permission flags), organization_user_role, organization_user.",
       "adoption_definition": "Roles the org NAMED ITSELF — anything other than 'Full Access' and 'Limited Access'. ROLES ARE PLATFORM-SEEDED: 'Full Access' exists at 156 orgs and 'Limited Access' at 78, median 2 roles per org across 165, so counting rows measures the seed rather than adoption. Measured 2026-09-07: 45 of 73 launched orgs have at least one self-named role, 180 such roles in total.",
-      "measure_question": "How many custom staff roles has this organization created, and how many staff users have a role assigned?"
+      "measure_question": "How many custom staff roles has this organization created, and how many staff users have a role assigned?",
+      "why": "Gives each staff member exactly the access their job needs — the practical answer to \"why can a seasonal rec leader issue refunds\"."
     },
     {
       "key": "alternate_identities",
@@ -2700,7 +2751,8 @@
       "description": "Storing external-system identifiers (e.g. IMLeagues) against users for cross-system integration.",
       "signal": "table: user_alternate_identity (source, source_id, alternate_id)",
       "adoption_definition": "Has >=1 alternate ID mapped to a user — the hook for an external system's own member number. Every row on the platform has source 'org'. Measured 2026-09-07: 23 of 73 launched orgs (25 of 144 including unlaunched), 27,509 in total.",
-      "measure_question": "How many users have an alternate identity from an external system, and from how many distinct sources?"
+      "measure_question": "How many users have an alternate identity from an external system, and from how many distinct sources?",
+      "why": "Holds the ID another system knows a person by, so rosters and eligibility can move between systems without hand-matching names."
     },
     {
       "key": "crm_household_notes",
@@ -2709,7 +2761,8 @@
       "description": "Staff keeping CRM-style admin notes on households.",
       "signal": "table: household_note (message, household_id); organization_role.can_manage_crm",
       "adoption_definition": "Has >=1 note recorded against a household. Gated in the product by organization_role.can_manage_crm. Measured 2026-09-07: 55 of 73 launched orgs (69 of 144 including unlaunched), 5,850 in total.",
-      "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?"
+      "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?",
+      "why": "Keeps the history of a family in one place, so whoever picks up the phone next already knows the context."
     },
     {
       "key": "events",
@@ -2719,7 +2772,8 @@
       "signal": "event rows (event.deleted_at IS NULL) per organization; event.is_ticketed marks the ones selling tickets, ticket_tier holds the price bands. NOTE event_session is EMPTY platform-wide (0 rows) — do not measure through it.",
       "adoption_definition": "Has >=1 live event (event.deleted_at IS NULL). Archived events count: adoption is whether the org has configured the feature, and an org that ran events last season still adopted it. event.canceled_at is non-null nowhere on the platform.",
       "measure_question": "How many events has this organization configured, and how many of them are ticketed?",
-      "short": "Events"
+      "short": "Events",
+      "why": "Ticketed events — concerts, movie nights, festivals — sold through the same system, instead of Eventbrite taking a cut and keeping the customer data."
     },
     {
       "key": "ticket_sales",
@@ -2729,7 +2783,8 @@
       "signal": "event_ticket where status='confirmed' AND canceled_at IS NULL AND deleted_at IS NULL, joined to event/ticket_tier for the event and price.",
       "adoption_definition": "Has >=1 confirmed, non-canceled ticket. Counting every event_ticket row instead overstates by ~30% platform-wide, because status='pending' means unpaid in a cart — 5,095 of 17,112 rows, 1,082 of them at one org. A pending ticket is not a sale.",
       "measure_question": "How many tickets has this organization actually sold, and how many are still pending payment?",
-      "short": "Tickets"
+      "short": "Tickets",
+      "why": "Tickets actually sold and paid for. An event configured but selling nothing is usually a publishing or pricing problem worth a look."
     },
     {
       "key": "ai_assistant",
@@ -2739,7 +2794,8 @@
       "signal": "ai_chat_turn where status='succeeded' and the agent is a human-facing one. STATUS IS 'succeeded', NOT 'completed' — the obvious guess matches 0 of 5,337 rows. Threads live in ai_chat_thread; per-turn token and cost_usd are on the turn.",
       "adoption_definition": "Has >=1 succeeded turn a person initiated. The agents 'thread-titler', 'bulk-summarizer' and 'routine-draft-summarizer' are the SYSTEM titling threads and summarizing, not usage — 1,077 of 5,337 turns platform-wide, and at one org they outnumber the real ones 59 to 101. Turns under agent 'routine' are a scheduled routine running, counted separately.",
       "measure_question": "How many questions have this organization's staff asked Seb, and how many distinct people asked them?",
-      "short": "Seb"
+      "short": "Seb",
+      "why": "Staff ask Seb a question in plain English instead of building a report or opening a ticket. It is the fastest way to get answers out of your own data."
     },
     {
       "key": "ai_routines",
@@ -2749,7 +2805,8 @@
       "signal": "ai_chat_routine rows per organization (all rows). Runs are ai_chat_routine_run, and their turns appear in ai_chat_turn under agent='routine'.",
       "adoption_definition": "Has >=1 routine configured — the same shape as discount_codes and scholarships, where having set the thing up is the adoption signal. Runs are deliberately a different number: a routine configured and never fired is still adoption of the feature, and a busy routine is usage of it.",
       "measure_question": "How many scheduled Seb routines has this organization set up, and how often do they run?",
-      "short": "Routines"
+      "short": "Routines",
+      "why": "Seb runs a report or a check on a schedule and sends it to you, so the Monday morning numbers arrive without anyone assembling them."
     }
   ],
   "adoption": {
@@ -43420,5 +43477,158 @@
     "custom_staff_roles",
     "alternate_identities",
     "crm_household_notes"
+  ],
+  "history": [
+    {
+      "date": "2026-09-07",
+      "setKey": "56:1gz5web",
+      "measured": 56,
+      "scores": {
+        "aardvark-city": 2,
+        "apex-park-and-recreation-district": 89,
+        "barrie": 32,
+        "barton-springs": 18,
+        "bellflower": 2,
+        "boston-bcyf": 39,
+        "braintree": 23,
+        "brookline-recreation": 14,
+        "carmichael-district": 7,
+        "central-point-recreation": 50,
+        "chicago-park-district-golf": 7,
+        "chicorec": 71,
+        "city-of-aspen": 20,
+        "city-of-ball-ground": 5,
+        "city-of-battle-ground": 25,
+        "city-of-belmont": 11,
+        "city-of-belton": 64,
+        "city-of-bloomington": 54,
+        "city-of-boerne": 63,
+        "city-of-brisbane": 25,
+        "city-of-buffalo": 61,
+        "city-of-calabasas": 4,
+        "city-of-cedar-rapids": 23,
+        "city-of-duarte": 36,
+        "city-of-easton": 43,
+        "city-of-euclid": 64,
+        "city-of-goodyear": 46,
+        "city-of-hermosa-beach": 70,
+        "city-of-indianapolis": 4,
+        "city-of-jeffersonville": 68,
+        "city-of-joplin": 55,
+        "city-of-lakeland": 52,
+        "city-of-las-vegas": 20,
+        "city-of-league-city": 20,
+        "city-of-lewisburg": 61,
+        "city-of-lockhart": 14,
+        "city-of-lodi": 0,
+        "city-of-madeira-beach": 39,
+        "city-of-madison": 59,
+        "city-of-malibu": 57,
+        "city-of-medford": 23,
+        "city-of-menifee": 61,
+        "city-of-miamisburg": 13,
+        "city-of-midland": 59,
+        "city-of-milford": 13,
+        "city-of-mountain-view": 13,
+        "city-of-nashville": 21,
+        "city-of-natchez": 48,
+        "city-of-niagara-falls": 96,
+        "city-of-norman": 84,
+        "city-of-oakland": 0,
+        "city-of-orinda": 0,
+        "city-of-palm-springs": 13,
+        "city-of-pawnee": 93,
+        "city-of-pflugerville": 0,
+        "city-of-piedmont": 66,
+        "city-of-pleasant-hill": 0,
+        "city-of-san-francisco": 7,
+        "city-of-santa-cruz": 0,
+        "city-of-smyrna": 80,
+        "city-of-stanwood": 11,
+        "city-of-torrance": 75,
+        "city-of-tullahoma": 59,
+        "city-of-university-park": 13,
+        "city-of-watsonville": 29,
+        "city-of-west-haven": 68,
+        "city-of-west-linn": 25,
+        "city-of-west-sacramento": 82,
+        "clark-county": 0,
+        "concord-township": 0,
+        "conference": 30,
+        "d4cprs": 2,
+        "douglas-county-nv": 77,
+        "el-segundo-recreation": 70,
+        "emeryville": 73,
+        "essex-junction": 59,
+        "fairfax-county": 75,
+        "folsom": 29,
+        "foster-city": 23,
+        "glenview-park-district": 2,
+        "golden-gate-village": 11,
+        "hammond-area-recreation-district": 18,
+        "haverford-township": 55,
+        "indy-parks--recreation": 39,
+        "iv2pp-off": 20,
+        "iv2pp-on": 27,
+        "jasons-sanbox": 0,
+        "jurupa-area-recreation-and-park-district": 75,
+        "laguna-beach": 2,
+        "lake-county": 30,
+        "lincoln": 30,
+        "littleton": 59,
+        "maple-grove": 4,
+        "marin-county-parks": 20,
+        "mashantucket-pequot-tribal-nation": 36,
+        "mesa": 9,
+        "mission-oaks-rpd": 20,
+        "needham": 43,
+        "norris": 20,
+        "northern-door-sports-and-recreation": 61,
+        "north-logan": 45,
+        "orangevale-recreation--park-district": 0,
+        "oro-valley": 34,
+        "paradise-recreation-and-park-district": 63,
+        "pittsburg": 14,
+        "pleasant-hill": 54,
+        "prescott-valley": 61,
+        "pueblo-county": 59,
+        "putnam-county": 43,
+        "rec-demo-org": 11,
+        "rec-east-bay": 0,
+        "rec-mountain": 20,
+        "RecSF": 32,
+        "rec-staging": 5,
+        "rec-university": 50,
+        "redwood-city": 5,
+        "rocklin": 30,
+        "sacramento-county": 54,
+        "san-francisco-rec-park": 39,
+        "santacruzcounty": 46,
+        "scotts-valley": 30,
+        "sebastopol": 46,
+        "suffolk-parks-and-recreation": 32,
+        "sunrise-pickleball-club": 21,
+        "sunrise-rpd": 16,
+        "the-dance-palace": 41,
+        "the-ranch": 59,
+        "torranceca": 5,
+        "town-of-clarkstown": 64,
+        "town-of-clarksville": 68,
+        "town-of-corte-madera": 14,
+        "town-of-danvers": 73,
+        "town-of-reading": 46,
+        "town-of-shrewsbury": 66,
+        "town-of-taylor": 52,
+        "town-of-wellesley": 2,
+        "town-of-wellesley-old": 7,
+        "town-of-windham": 82,
+        "upson-county": 7,
+        "watertown": 73,
+        "woodmen-hills-metro-district": 50,
+        "yerba-buena-gardens": 57,
+        "zzzarchivenorthern-door-sports-and-recreation": 0,
+        "zzzyerba-buena-gardens": 4
+      }
+    }
   ]
 }

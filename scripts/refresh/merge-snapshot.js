@@ -224,6 +224,50 @@ for (const r of rows) {
 }
 
 const live = orgs.filter(o => o.launched).length;
+
+/* ── THE ADOPTION HISTORY ────────────────────────────────────────────────
+   One point per bake, so the org list can draw a trend. Nothing else in the
+   snapshot is dated — it is a point-in-time bake — so the series has to
+   accrue from here rather than be reconstructed.
+
+   IT CANNOT BE BACKFILLED FROM GIT, and that is a measurement not a
+   limitation. The only older bake in this repo (2026-08-22) measured
+   FOURTEEN features against today's fifty-six. Apex reads 86% there and 89%
+   here, which looks like a +3 trend and is nothing of the kind: the
+   denominator quadrupled. Diffing across it would publish a definition change
+   as org behaviour.
+
+   SO EVERY POINT CARRIES THE SET IT WAS SCORED OVER. `setKey` is a cheap hash
+   of the sorted measured keys; the page drops any point whose key differs
+   from today's, because a score over a different denominator is a different
+   measurement. That is what makes the sparkline trustworthy the next time a
+   feature is added or a definition is fixed. */
+function setKeyOf(keys) {
+  const joined = keys.slice().sort().join(",");
+  let h = 0;
+  for (let i = 0; i < joined.length; i++) { h = (h * 31 + joined.charCodeAt(i)) | 0; }
+  return keys.length + ":" + (h >>> 0).toString(36);
+}
+const HISTORY_MAX = 120;                       // ~4 months of daily bakes
+const today = new Date().toISOString().slice(0, 10);
+const scores = {};
+for (const o of orgs) {
+  const a = adoption[o.slug] || {};
+  const used = ADOPTION_KEYS.filter(k => a[k] && a[k].adopted).length;
+  scores[o.slug] = ADOPTION_KEYS.length
+    ? Math.round((used / ADOPTION_KEYS.length) * 100)
+    : null;
+}
+const point = { date: today, setKey: setKeyOf(ADOPTION_KEYS),
+                measured: ADOPTION_KEYS.length, scores };
+/* IDEMPOTENT PER DATE. The workflow can be re-run by hand on the same day —
+   it was, three times, the day it was written — and appending each run would
+   put three points on one date and make a day look like a week. */
+const history = (old.history || []).filter(h => h && h.date !== today);
+history.push(point);
+history.sort((x, y) => String(x.date).localeCompare(String(y.date)));
+while (history.length > HISTORY_MAX) history.shift();
+
 const out = {
   generatedAt: new Date().toISOString(),
   source: "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
@@ -236,9 +280,13 @@ const out = {
   adoption,
   notes: `${ADOPTION_KEYS.length} of ${old.features.length} catalog features measured, re-baked ${new Date().toISOString().slice(0, 10)} from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. ${live} of ${orgs.length} organizations are live on rec.us.`,
   measuredFeatures: ADOPTION_KEYS,
+  history,
 };
 
 fs.writeFileSync(dataFile, JSON.stringify(out, null, 2) + "\n");
 console.log(`wrote ${dataFile}`);
 console.log(`  ${orgs.length} orgs (${live} launched, ${orgs.length - live} not), ${ADOPTION_KEYS.length} adoption metrics`);
 console.log(`  generatedAt ${out.generatedAt}`);
+const comparable = history.filter(h => h.setKey === point.setKey).length;
+console.log(`  history ${history.length} point(s), ${comparable} comparable to today's set `
+  + `(${point.setKey})${comparable < 2 ? " — the trend needs two, so it draws nothing yet" : ""}`);
