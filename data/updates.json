@@ -3,6 +3,19 @@
   "updates": [
     {
       "date": "2026-09-07",
+      "title": "Org Features: the pills are back, alphabetical order, and you can compare two orgs",
+      "body": "Four fixes to the Org Features section, all from Dan looking at it.",
+      "items": [
+        "The metric columns are heat-coloured pills again, the way the standalone dashboard shows them. The colour scale is now shared between the two pages rather than written twice, so the same number cannot read as a different colour depending which page you opened.",
+        "Organizations are listed alphabetically. They were sorted by adoption score, which means you had to already know an org's score to find it in a list of 69.",
+        "The filter is a pulldown of every organization instead of a search box. The list is known and closed, so a typo in a text box could only ever empty the table.",
+        "You can compare two organizations: pick A and B and they render as two rows over the same columns, with a line naming the features each one has that the other does not. It stays hidden until both slots are filled — a one-row comparison is not one.",
+        "Fleet adoption no longer moves when you filter to a single org. It is a fleet figure, so it is computed over all of them.",
+        "The public dashboard's link still said 'PS Dashboard' after the rename. Fixed — half a rename is worse than none."
+      ]
+    },
+    {
+      "date": "2026-09-07",
       "title": "The bug list was five weeks stale — refreshed, plus a filter by org",
       "body": "Dan spotted that every status on Bug Management was out of date. It was: the bug half of this dashboard's snapshot was built once on 31 July and nothing had rebuilt it since.",
       "items": [

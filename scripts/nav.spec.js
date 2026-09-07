@@ -105,9 +105,19 @@ process.on("exit", () => {
   ok(/fetch\("\/api\/data"\)/.test(feat), "Features reads /api/data, the same snapshot the public dashboard reads");
   /* THE FLEET AVERAGE EXCLUDES UNSCORED ORGS. Folding an org the bake has not
      measured in as a zero drags the fleet figure down and misreports it. */
-  ok(/scored\s*=\s*rows\.filter\(r => r\.score != null\)/.test(feat),
+  // Matched on the PROPERTY, not on the variable name or the exact dash
+  // glyph: both were pinned literally and both broke on a rename that
+  // changed nothing about the behaviour. An assertion about spelling is not
+  // an assertion about what the code does.
+  ok(/\.filter\(r => r\.score != null\)/.test(feat),
      "the fleet average is taken over orgs that could be scored, not over all of them");
-  ok(/avg == null \? "—"/.test(feat), "with nothing scoreable the average is a dash, never 0%");
+  ok(/avg == null \? ("—"|"\\u2014")/.test(feat),
+     "with nothing scoreable the average is a dash, never 0%");
+  // AND IT IS OVER EVERY ORG, not over whatever the pulldown has narrowed
+  // to. A "fleet adoption" figure that moves when you filter one org is not
+  // a fleet figure, and the filter is new.
+  ok(/scoredAll = all\.map\(decorate\)\.filter/.test(feat),
+     "the fleet average is computed over ALL orgs rather than the filtered rows");
 }
 
 // ── THE TWO NEW ABOUT PAGES ───────────────────────────────────────────────
@@ -149,4 +159,55 @@ process.on("exit", () => {
     ok(/^\d{4}-\d{2}-\d{2}$/.test(String(u.date)), `every entry has an ISO date — saw ${JSON.stringify(u.date)}`);
     ok(typeof u.title === "string" && u.title.length > 5, `every entry has a title — saw ${JSON.stringify(u.title)}`);
   }
+}
+
+// ── THE ORG LIST IS ALPHABETICAL ──────────────────────────────────────────
+// It shipped sorted by adoption %, which makes an org impossible to find in
+// a list of 69 — you have to already know its score. Asserted on the
+// comparator's INPUT rather than its exact spelling: what must not come back
+// is ordering by score.
+{
+  const feat = src.slice(src.indexOf("function Features()"), src.indexOf("function HowItWorks()"));
+  const sortLine = (feat.match(/const all = [\s\S]*?;\n/) || [""])[0];
+  ok(sortLine.length > 20, "the org list's sort was found");
+  ok(/localeCompare/.test(sortLine), "orgs are sorted by NAME, with localeCompare");
+  ok(!/score/i.test(sortLine), "the org list is NOT ordered by adoption score");
+}
+
+// ── ONE PILL SCALE, SHARED ────────────────────────────────────────────────
+// The public dashboard and the same view inside the shell show the same orgs
+// and the same numbers. A second copy of the colour ramp drifts the first
+// time either is touched, and then one org reads "busy" on one page and
+// "quiet" on the other for the same figure.
+{
+  const pills = fs.readFileSync(path.join(__dirname, "..", "public", "feature-pills.js"), "utf8");
+  const dash = fs.readFileSync(path.join(__dirname, "..", "public", "dashboard.html"), "utf8");
+  ok(/Math\.log\(1 \+ v\)/.test(pills), "the shared file holds the log heat ramp");
+  ok(/w\.RecPills = \{ heat, columnMaxes, fmtNum \}/.test(pills), "it exposes the three helpers");
+  for (const [name, page] of [["dashboard.html", dash], ["ps.html", src]]) {
+    ok(/<script src="\/feature-pills\.js"><\/script>/.test(page), name + " loads the shared pill scale");
+    ok(!/function heat\(v, max\) \{[\s\S]{0,200}Math\.log/.test(page),
+      name + " does NOT carry its own copy of the heat ramp");
+  }
+  // Three states, and they must stay distinct: not measured, a real zero,
+  // and a value. Collapsing null into 0 is the absent-is-not-zero rule.
+  const H = new Function(pills.replace("(window)", "(globalThis)") + "; return globalThis.RecPills;")();
+  ok(H.heat(null, 100).background !== H.heat(0, 100).background,
+    "an unmeasured cell and a real zero are coloured differently");
+  ok(H.heat(1, 100).background !== H.heat(100, 100).background, "the ramp actually ramps");
+  eq(H.fmtNum(null), "\u2014", "a null formats as a dash rather than as 0");
+  eq(H.fmtNum(1234), "1,234", "numbers are grouped");
+  // Per-COLUMN maxima, or one huge column flattens every other one.
+  const mx = H.columnMaxes([{ u: { a: 5, b: 900 } }, { u: { a: 50, b: 9 } }], ["a", "b"], (r, k) => r.u[k]);
+  eq(mx.a, 50, "column a is scaled against its own max");
+  eq(mx.b, 900, "column b is scaled against its own max");
+}
+
+// ── THE RENAME IS COMPLETE ON BOTH PAGES ──────────────────────────────────
+// Half a rename is worse than none: the public dashboard still linked to
+// "PS Dashboard" after the sidebar became CX.
+{
+  const dash = fs.readFileSync(path.join(__dirname, "..", "public", "dashboard.html"), "utf8");
+  ok(!/PS Dashboard/.test(dash), "the public dashboard no longer says PS Dashboard");
+  ok(/CX Dashboard/.test(dash), "it says CX Dashboard");
 }

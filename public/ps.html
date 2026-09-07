@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
 <script src="/vendor/react.production.min.js"></script>
 <script src="/vendor/react-dom.production.min.js"></script>
+<script src="/feature-pills.js"></script>
 <style>
   :root {
     --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
@@ -73,6 +74,11 @@
   .pill.frdev { background: #fce7f3; color: #9d174d; }
   .pill.frroad { background: #dcfce7; color: #166534; }
   .pill.frreq { background: #cffafe; color: #155e75; }
+  /* The metric pills get their own modifier rather than widening .pill,
+     which the bug-priority pills also use. Numeric cells need a floor width
+     and tabular figures or a column of "7" next to "94,166" reads ragged. */
+  .pill.mpill { min-width: 46px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  .catlist { display: grid; gap: 6px; padding: 4px 0 2px; }
   .chip { display: inline-block; background: #eef2f7; border: 1px solid var(--line); color: #334155; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px 1px 0; }
   .scorebar { position: relative; display: inline-flex; align-items: center; width: 92px; height: 18px; border-radius: 999px; background: #eef2f7; overflow: hidden; vertical-align: middle; }
   .scorebar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
@@ -997,7 +1003,9 @@
   function Features() {
     const [d, setD] = useState(null);
     const [err, setErr] = useState(null);
-    const [q, setQ] = useState("");
+    const [only, setOnly] = useState("");          // a single org, from the pulldown
+    const [cmpA, setCmpA] = useState("");
+    const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
     useEffect(() => {
       fetch("/api/data")
@@ -1005,85 +1013,154 @@
         .then(setD).catch(e => setErr(e.message));
     }, []);
     if (err) return e("div", { className: "note" }, "Could not load the features snapshot: " + err);
-    if (!d) return e("div", { className: "note" }, "Loading feature adoption…");
+    if (!d) return e("div", { className: "note" }, "Loading feature adoption\u2026");
 
     const measured = (d.measuredFeatures || []).length;
     const total = (d.features || []).length;
     const byKey = {};
     (d.features || []).forEach(f => { byKey[f.key || f.id || f.name] = f; });
+    const label = k => (byKey[k] && (byKey[k].name || byKey[k].label)) || k;
 
+    const adoptedIn = (slug, k) => {
+      const v = ((d.adoption || {})[slug] || {})[k];
+      return !!(v && (v === true || v.adopted === true || Number(v.count) > 0));
+    };
     const scoreOf = (slug) => {
-      const a = (d.adoption || {})[slug] || {};
-      const hits = (d.measuredFeatures || []).filter(k => {
-        const v = a[k];
-        return v && (v === true || v.adopted === true || Number(v.count) > 0);
-      }).length;
+      const a = (d.adoption || {})[slug];
+      // No adoption record at all is NOT a zero — it is unmeasured, and it
+      // must not be averaged in or coloured as if it were a real 0%.
+      if (!a) return null;
+      const hits = (d.measuredFeatures || []).filter(k => adoptedIn(slug, k)).length;
       return measured ? Math.round((hits / measured) * 100) : null;
     };
 
-    const rows = (d.orgs || [])
-      .map(o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} }))
-      .filter(r => !q || (r.o.displayName || r.o.name || "").toLowerCase().includes(q.toLowerCase()))
-      .sort((a, b) => (b.score == null ? -1 : b.score) - (a.score == null ? -1 : a.score));
+    const orgName = o => o.displayName || o.name || o.slug;
+    // ALPHABETICAL, by the name actually on screen, with localeCompare so
+    // accents and case sort the way a reader expects. Sorting by adoption
+    // (which this did) makes an org impossible to find in a list of 69.
+    const all = (d.orgs || []).slice().sort((a, b) => orgName(a).localeCompare(orgName(b)));
 
-    /* THE FLEET AVERAGE IS OVER ORGS WE COULD SCORE, not over every org. An
-       org with no adoption record cannot be averaged in as a zero — that is
-       the "absent is not zero" rule, and folding them in would drag the fleet
-       number down with orgs the bake simply has not measured. */
-    const scored = rows.filter(r => r.score != null);
-    const avg = scored.length
-      ? Math.round(scored.reduce((s, r) => s + r.score, 0) / scored.length) : null;
+    const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
+    const rows = all.filter(o => !only || o.slug === only).map(decorate);
 
-    const metricKeys = (d.coreMetrics || []).map(m => m.key || m.id).filter(Boolean);
+    /* THE FLEET AVERAGE IS OVER ORGS WE COULD SCORE, not over every org, and
+       it is over ALL of them rather than whatever the pulldown has narrowed
+       to — a fleet figure that moves when you filter is not a fleet figure. */
+    const scoredAll = all.map(decorate).filter(r => r.score != null);
+    const avg = scoredAll.length
+      ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
+
+    const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
+      .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
+    const metricKeys = metrics.map(m => m.key);
+
+    // Pills are scaled per COLUMN, against every org rather than the filtered
+    // set — otherwise picking one org paints all its cells dark, which says
+    // nothing. Shared with the standalone dashboard so the two cannot
+    // disagree about what a number looks like.
+    const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
+    const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
+      r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
+      window.RecPills.fmtNum(r.usage[k] == null ? null : Number(r.usage[k])));
+
+    const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
+      r.score == null
+        ? e("span", { className: "zero" }, "not measured")
+        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
+
+    const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
+
+    // ── A vs B ──────────────────────────────────────────────────────────
+    const a = cmpA ? decorate(all.find(o => o.slug === cmpA)) : null;
+    const b = cmpB ? decorate(all.find(o => o.slug === cmpB)) : null;
+    // The interesting half of a comparison is not the numbers side by side,
+    // it is which features one org has configured and the other has not — so
+    // that is spelled out rather than left to be read off two rows of pills.
+    // Only over the MEASURED set: an unmeasured feature is not a difference.
+    const gap = (x, y) => (d.measuredFeatures || [])
+      .filter(k => adoptedIn(x.o.slug, k) && !adoptedIn(y.o.slug, k)).map(label);
 
     return e("div", null,
       e("div", { className: "cards" },
         e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"),
-          e("div", { className: "v", "data-feat-orgs": rows.length }, rows.length)),
+          e("div", { className: "v", "data-feat-orgs": all.length }, all.length)),
         e("div", { className: "card" }, e("div", { className: "k" }, "Fleet adoption"),
           e("div", { className: "v", "data-feat-avg": avg == null ? "" : avg },
-            avg == null ? "—" : avg + "%"),
-          e("div", { className: "note" }, scored.length + " of " + rows.length + " scored")),
+            avg == null ? "\u2014" : avg + "%"),
+          e("div", { className: "note" }, scoredAll.length + " of " + all.length + " scored")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Features measured"),
           e("div", { className: "v" }, measured + " / " + total),
-          /* SAID OUT LOUD, because the denominator is the score. A reader
-             comparing 86% here against a future 60% needs to know the
+          /* SAID OUT LOUD, because the denominator IS the score. A reader
+             comparing 86% today against 60% later needs to know the
              denominator grew rather than the org regressed. */
           e("div", { className: "note" }, "scores re-baseline as more are measured"))),
+
       e("div", { className: "panel" },
+        e("h2", null, "Compare two organizations",
+          e("span", { className: "hint" }, "pick A and B \u2014 same columns, side by side")),
         e("div", { className: "filters" },
-          e("input", { placeholder: "Filter organizations…", value: q,
-                       onChange: ev => setQ(ev.target.value) })),
+          e("select", { value: cmpA, onChange: ev => setCmpA(ev.target.value), "data-feat-cmpa": cmpA || "none" },
+            e("option", { value: "" }, "Organization A\u2026"), orgOptions),
+          e("select", { value: cmpB, onChange: ev => setCmpB(ev.target.value), "data-feat-cmpb": cmpB || "none" },
+            e("option", { value: "" }, "Organization B\u2026"), orgOptions),
+          (cmpA || cmpB) ? e("button", { onClick: () => { setCmpA(""); setCmpB(""); } }, "Clear") : null),
+        // Absent until both are chosen. A one-row "comparison" is not one,
+        // and a half-filled table reads as a loading failure.
+        (a && b) ? e("div", null,
+          e("div", { className: "tablewrap" }, e("table", { "data-feat-cmp": a.o.slug + "|" + b.o.slug },
+            e("thead", null, e("tr", null,
+              e("th", { className: "l" }, "Organization"), e("th", null, "Adoption"),
+              metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
+            e("tbody", null, [a, b].map((r, i) => e("tr", { key: r.o.slug + i, "data-feat-cmprow": i === 0 ? "a" : "b" },
+              e("td", { className: "l" }, e("b", null, orgName(r.o)), e("div", { className: "note" }, r.o.slug)),
+              scoreCell(r),
+              metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))))))),
+          // Same org twice is a legitimate thing to do by accident; say so
+          // rather than rendering an empty diff that reads as "identical".
+          a.o.slug === b.o.slug
+            ? e("div", { className: "note" }, "That is the same organization in both slots.")
+            : e("div", { className: "catlist", "data-feat-gap": 1 },
+                [[a, b], [b, a]].map(([x, y], i) => {
+                  const g = gap(x, y);
+                  return e("div", { key: i, className: "note" },
+                    e("b", null, "Only " + orgName(x.o) + ": "),
+                    g.length ? g.join(", ") : "nothing " + orgName(y.o) + " does not also have");
+                }))
+        ) : e("div", { className: "note" }, "Pick an organization in both slots to compare them."),
+      ),
+
+      e("div", { className: "panel" },
+        e("h2", null, "Feature usage by organization",
+          e("span", { className: "hint" }, "click a row for its feature checklist")),
+        e("div", { className: "filters" },
+          // A PULLDOWN, not free text: the org set is known and closed, so a
+          // typo in a search box can only ever produce an empty table.
+          e("select", { value: only, onChange: ev => setOnly(ev.target.value), "data-feat-only": only || "all" },
+            e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
+          only ? e("button", { onClick: () => setOnly("") }, "Show all") : null),
         e("div", { className: "tablewrap" },
           e("table", null,
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"),
               e("th", null, "Adoption"),
-              ...metricKeys.map(k => e("th", { key: k }, (byKey[k] && byKey[k].label) || k)))),
-            e("tbody", null, ...rows.map(r => {
+              metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
+            e("tbody", null, rows.map(r => {
               const isOpen = open === r.o.slug;
               return e(React.Fragment, { key: r.o.slug },
                 e("tr", { onClick: () => setOpen(isOpen ? null : r.o.slug),
                           style: { cursor: "pointer" }, "data-feat-row": r.o.slug },
-                  e("td", { className: "l" }, e("b", null, r.o.displayName || r.o.name),
+                  e("td", { className: "l" }, e("b", null, orgName(r.o)),
                     e("div", { className: "note" }, r.o.slug)),
-                  e("td", { "data-feat-score": r.score == null ? "" : r.score },
-                    r.score == null
-                      ? e("span", { className: "zero" }, "not measured")
-                      : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%")),
-                  ...metricKeys.map(k => e("td", { key: k },
-                    r.usage[k] == null ? e("span", { className: "zero" }, "—")
-                                       : Number(r.usage[k]).toLocaleString()))),
-                isOpen ? e("tr", { key: "x" }, e("td", { colSpan: 2 + metricKeys.length },
+                  scoreCell(r),
+                  metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))),
+                isOpen ? e("tr", { key: "x" }, e("td", { colSpan: 2 + metrics.length },
                   e("div", { className: "note", "data-feat-open": r.o.slug },
-                    (d.measuredFeatures || []).map(k => {
-                      const a = ((d.adoption || {})[r.o.slug] || {})[k];
-                      const on = a && (a === true || a.adopted === true || Number(a.count) > 0);
-                      return e("span", { key: k, className: "chip",
-                                         style: { opacity: on ? 1 : .45 } },
-                        (on ? "● " : "○ ") + ((byKey[k] && byKey[k].label) || k));
-                    })))) : null);
-            }))))));
+                    (d.measuredFeatures || []).map(k =>
+                      e("span", { key: k, className: "chip",
+                                  style: { opacity: adoptedIn(r.o.slug, k) ? 1 : .45 } },
+                        (adoptedIn(r.o.slug, k) ? "\u25cf " : "\u25cb ") + label(k)))))) : null);
+            })))),
+        rows.length ? null : e("div", { className: "note" }, "No organizations match.")));
   }
 
   /* ── HOW THIS WORKS ──────────────────────────────────────────────────────

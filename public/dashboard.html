@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 <script src="/vendor/react.production.min.js"></script>
 <script src="/vendor/react-dom.production.min.js"></script>
+<script src="/feature-pills.js"></script>
 <style>
   :root {
     --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
@@ -93,13 +94,10 @@
   const fmt = (n) => n == null ? "—" : Number(n).toLocaleString("en-US");
 
   // heat color for a value within a column's max (log scale so big orgs don't wash everyone out)
-  function heat(v, max) {
-    if (v == null) return { background: "#f8fafc", color: "#94a3b8" };
-    if (v === 0)   return { background: "#fff", color: "#cbd5e1" };
-    const t = Math.log(1 + v) / Math.log(1 + (max || 1));
-    const alpha = 0.08 + t * 0.55;
-    return { background: `rgba(15,111,92,${alpha.toFixed(3)})`, color: t > 0.6 ? "#fff" : "#0f3d33", fontWeight: 600 };
-  }
+  // heat() lives in /feature-pills.js now — ONE scale for this page and
+  // the same view inside the CX dashboard, or the two drift and the same
+  // number reads as a different colour depending which page you opened.
+  const heat = window.RecPills.heat;
 
   // Which feature keys carry a real adoption signal (the measured set, if any).
   function measuredKeys(data) {
@@ -439,7 +437,7 @@
       e("header", { className: "top" }, e("div", { className: "inner" },
         e("h1", { style: { cursor: "pointer" }, onClick: () => nav("/") }, "Rec · Feature Usage by Organization"),
         e("span", { className: "badge-live" }, "Live rec.us data"),
-        e("a", { className: "badge-live", href: "/ps", style: { color: "#fff" } }, "PS Dashboard →"),
+        e("a", { className: "badge-live", href: "/ps", style: { color: "#fff" } }, "CX Dashboard →"),
         data && e("span", { className: "sub" },
           "snapshot " + new Date(data.generatedAt).toLocaleString() + " · " + agePhrase(days)),
         data && stale && e("span", { className: "badge-stale", title: "Snapshot is " + days + " days old — re-bake it for current numbers" }, "⚠ Stale"),
