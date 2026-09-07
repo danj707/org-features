@@ -218,28 +218,58 @@
   .feattable { min-width: max-content; }
   .feattable th, .feattable td { padding: 7px 8px; }
   .feattable th:hover { background: #eef2f7; color: var(--ink); }
-  .feattable td.l { max-width: 260px; }
+  /* THE ORG CELL WRAPS. Every `td` in this app is `white-space: nowrap`, so a
+     260px max-width on a cell that cannot wrap CLIPS NOTHING — it overflows,
+     and the org's name, launch tag and admin link ran straight over the
+     adoption figure in the next column ("Aardvark City Parks and Rec
+     pre-launch admin ↗2%"). The items keep their own nowrap, so what wraps is
+     the line and never a word. */
+  .feattable td.l { max-width: 280px; white-space: normal; }
+  .feattable td.l > b { white-space: nowrap; }
   .pill.gpill { min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
   .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
   .adminlink:hover { text-decoration: underline; }
 
-  /* The gap line sits under its org and belongs to it, so it carries no top
-     border of its own — the pair reads as one band. */
-  .gap-row td { border-bottom: 1px solid var(--line); padding-top: 0; white-space: normal; text-align: left; }
-  .tablewrap tr.gap-row:hover td { background: #f1f5f9; }
-  .gapline { display: flex; align-items: baseline; gap: 6px 10px; flex-wrap: wrap;
-             font-size: 11.5px; line-height: 1.5; max-width: 1180px; }
-  /* The count leads in warning ink; the clusters are ordinary text, because
-     twelve amber blocks in a row is not a hierarchy. */
-  .gaplabel { flex: none; font-weight: 700; color: #b45309; text-transform: uppercase;
-              font-size: 10px; letter-spacing: .5px; background: #fffbeb;
-              border: 1px solid #fde68a; border-radius: 4px; padding: 2px 6px; }
-  .gaplabel.ok { color: #166534; background: #f0fdf4; border-color: #bbf7d0; }
-  .gapclus { color: #334155; }
-  .gapclus b { color: var(--muted); font-weight: 700; text-transform: uppercase;
-               font-size: 10px; letter-spacing: .4px; margin-right: 5px; }
-  .gapclus i { color: #94a3b8; font-style: normal; }
-  .gapmore { color: #94a3b8; font-style: italic; }
+  /* ONE BAND PER ORG. Dan, on the flat gap line: "Orgs run together
+     vertically, not enough separation here." Every `td` in this app carries
+     the same 1px bottom rule, so the boundary INSIDE an org (summary row to
+     gap row) looked exactly like the boundary BETWEEN two orgs — three
+     identical hairlines per screen-inch and nothing saying which pair
+     belonged together.
+
+     The pair is a <tbody> now, which is what gives the band a hover state and
+     a single heavy edge. The inner rule is removed rather than lightened: a
+     faint line still reads as a division. */
+  .feattable tbody.orgband td { border-bottom: none; }
+  .feattable tbody.orgband tr.gap-row td { border-bottom: 2px solid #cbd5e1; padding-bottom: 15px; }
+  .feattable tbody.orgband tr:first-child td { padding-top: 14px; }
+  /* Hovering EITHER row lights the whole band, or the summary and its own
+     gaps highlight as two separate objects. */
+  .tablewrap tbody.orgband:hover td { background: #f1f5f9; }
+  .gap-row td { padding-top: 2px; white-space: normal; text-align: left; }
+
+  /* THE GAP STACK: one group per LINE, with the label in a fixed column.
+     Dan: "The two rows of not using are just a mash up of words." They were —
+     the previous version was a flex row that wrapped, so `Payments Promo
+     codes, Deposits` ran straight into `Comms SMS, Broadcasts` mid-sentence
+     and the eye had nothing to anchor on. A grid with a fixed label column is
+     the whole fix: every line starts in the same place, the ratio sits in its
+     own tabular column, and the names never wrap past their own row. */
+  .gapstack { display: grid; grid-template-columns: 116px 46px minmax(0, 1fr);
+              gap: 3px 12px; align-items: baseline; font-size: 11.5px;
+              line-height: 1.5; max-width: 1080px; padding-left: 2px; }
+  .gapeyebrow { grid-column: 1 / -1; font-weight: 700; color: #b45309;
+                text-transform: uppercase; font-size: 10px; letter-spacing: .5px;
+                margin-bottom: 1px; }
+  .gapeyebrow.ok { color: #166534; }
+  .gapcat { font-weight: 700; color: var(--muted); text-transform: uppercase;
+            font-size: 10px; letter-spacing: .4px; }
+  .gapratio { font-variant-numeric: tabular-nums; color: #94a3b8; font-weight: 700;
+              text-align: right; }
+  .gapnames { color: #334155; min-width: 0; }
+  .gapnames i { color: #94a3b8; font-style: normal; }
+  .gaptrim { grid-column: 2 / -1; color: #94a3b8; font-style: italic; }
+  @media (max-width: 760px) { .gapstack { grid-template-columns: 96px 40px minmax(0, 1fr); } }
   /* The drill-in's gap panel: grouped, so a reader sees WHERE the gaps are
      rather than one long alphabetical list. */
   .gapwrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -346,13 +376,55 @@
   };
   function catShort(name) { return CAT_SHORT[name] || name; }
 
-  /* How much of the gap the list shows inline before deferring to the
-     drill-in. FOUR GROUPS × THREE NAMES fits two lines at a normal width; an
-     org at 2% adoption is missing 55 features across every group, and
-     printing all of them turns the table into prose. Whatever is trimmed is
-     counted on screen rather than silently dropped. */
-  const GAP_GROUPS_SHOWN = 4;
-  const GAP_NAMES_SHOWN = 3;
+  /* How much of the gap the stack shows inline before deferring to the
+     drill-in. THREE GROUPS, because each one now owns a whole LINE rather
+     than sharing a wrapped paragraph — four lines of gaps under a two-line
+     summary is more org than fits on a screen, and the third-worst group is
+     already well past the thing worth acting on. FOUR NAMES per line is what
+     the name column holds at a normal width: the median tracked feature name
+     is 24 characters and the longest is 43 ("Alternate IDs / External System
+     Integration"), so five would wrap and reintroduce the mash-up this
+     layout exists to fix. Whatever is trimmed is COUNTED on screen. */
+  const GAP_GROUPS_SHOWN = 3;
+  const GAP_NAMES_SHOWN = 4;
+
+  /* THE GAP CLUSTERS, at module scope so a spec can RUN this rather than
+     regex over it — the previous version was an inline IIFE inside the row
+     map, and an assertion that a sort is MENTIONED is not an assertion that
+     anything is ordered. Returns keys, not labels: the catalog lives in the
+     component, and a helper that needed it could not be tested without one.
+
+     `isAdopted` is scoped to one org by the caller. A group with nothing
+     missing is dropped entirely — a line reading "Payments 7/7" belongs in
+     the columns above, not in a list of what to turn on. */
+  function ofGapClusters(groups, isAdopted, groupsShown, namesShown) {
+    const cl = (groups || [])
+      .map(g => {
+        const keys = g.keys || [];
+        const gone = keys.filter(k => !isAdopted(k));
+        return { cat: g.cat, gone, used: keys.length - gone.length, total: keys.length };
+      })
+      .filter(x => x.gone.length)
+      /* DEEPEST GAP FIRST BY COUNT — the biggest block of work, which is what
+         the reader is here to find. Ties break on the smaller share in use,
+         so a group with nothing configured beats one that is half done, and
+         then on name so two runs of the same snapshot cannot disagree about
+         which three lines are shown. */
+      .sort((x, y) => y.gone.length - x.gone.length
+                   || (x.used / x.total) - (y.used / y.total)
+                   || String(x.cat).localeCompare(String(y.cat)));
+    const head = cl.slice(0, groupsShown);
+    const tail = cl.slice(head.length);
+    return {
+      head: head.map(x => ({
+        cat: x.cat, used: x.used, total: x.total,
+        keys: x.gone.slice(0, namesShown),
+        more: Math.max(0, x.gone.length - namesShown),
+      })),
+      restGroups: tail.length,
+      restFeatures: tail.reduce((n, x) => n + x.gone.length, 0),
+    };
+  }
 
   /* The org's page in the Rec admin. NULL without an id, so the link is
      ABSENT rather than pointing at /admin/o/undefined — a link that 404s is
@@ -1945,10 +2017,15 @@
                 { key: g.cat,
                   title: g.cat + " \u2014 " + g.keys.length + " tracked feature" + (g.keys.length === 1 ? "" : "s")
                        + " \u00b7 click to sort by how much of it is in use" })))),
-            e("tbody", null, rows.map(r => {
+            rows.map(r => {
               const miss = notUsing(r.o.slug);
               const open2 = () => nav("/ps/features/" + encodeURIComponent(r.o.slug));
-              return e(React.Fragment, { key: r.o.slug },
+              /* THE PAIR IS ONE <tbody>, not a Fragment. A table may carry many,
+                 and it is what lets the band own a single heavy bottom edge and
+                 ONE hover state — as two <tr>s in a shared tbody, the summary and
+                 its own gaps highlighted as separate objects and every internal
+                 hairline looked exactly like the boundary between two orgs. */
+              return e("tbody", { key: r.o.slug, className: "orgband" },
                 e("tr", { onClick: open2, style: { cursor: "pointer" }, "data-feat-row": r.o.slug,
                           "data-feat-launched": r.o.launched ? "1" : "0" },
                   e("td", { className: "l" },
@@ -1967,57 +2044,74 @@
                                   "data-feat-grp": g.cat + ":" + (gs ? gs.used + "/" + gs.total : "") },
                         gs ? gs.used + "/" + gs.total : "—"));
                   })),
-                /* THE GAP LINE, always on — this replaced a strip of 56
-                   unlabelled dots grouped into twelve boxes.
+                /* THE GAP STACK — one group per LINE, worst first.
 
-                   TWO THINGS WERE WRONG WITH THE DOTS. They DUPLICATED the
-                   `9/9` group columns directly above them, less legibly: the
-                   columns already say how much of each group is in use, and a
-                   dot can only be counted, not read. And they were unlabelled,
-                   so telling which box was which meant hovering — Dan's word
-                   for it was "pretty unreadable", and he was right.
+                   THREE VERSIONS OF THIS ROW HAVE NOW BEEN REJECTED, and each
+                   rejection named a different fault worth keeping:
 
-                   So the row now carries what the columns CANNOT: WHICH
-                   features are missing, clustered under the group they belong
-                   to, biggest gap first. Same shape as the drill-in's gaps
-                   panel, inline. It also drops ~8,000 spans from the page. */
+                   1. a strip of 56 unlabelled dots in twelve boxes —
+                      "pretty unreadable". It DUPLICATED the group columns
+                      directly above it, less legibly, and telling which box
+                      was which meant hovering.
+                   2. a wrapped flex LINE of clusters — "The two rows of not
+                      using are just a mash up of words". True: at a normal
+                      width `Payments Promo codes, Deposits` ran into
+                      `Comms SMS, Broadcasts` mid-sentence, with nothing for
+                      the eye to anchor on.
+
+                   So the names get a GRID: a fixed label column, the group's
+                   own ratio in a tabular column beside it, and the missing
+                   feature names on their own line. Every line starts in the
+                   same place down the whole table, which is what makes three
+                   groups readable where a wrapped paragraph of the same words
+                   was not. */
                 e("tr", { key: "gaps", className: "gap-row", onClick: open2, style: { cursor: "pointer" } },
                   e("td", { colSpan: 2 + groups.length },
-                    miss.length
-                      ? e("div", { className: "gapline", "data-feat-miss": miss.length },
-                          e("span", { className: "gaplabel" }, "Not using " + miss.length),
-                          /* Clustered by group and ordered by how many are
-                             missing, so the worst gap is the first thing read
-                             rather than whichever category sorts first. */
-                          (() => {
-                            const cl = groups
-                              .map(g => ({ cat: g.cat, gone: g.keys.filter(k => !adoptedIn(r.o.slug, k)) }))
-                              .filter(x => x.gone.length)
-                              .sort((x, y) => y.gone.length - x.gone.length || x.cat.localeCompare(y.cat));
-                            const head = cl.slice(0, GAP_GROUPS_SHOWN);
-                            const restGroups = cl.length - head.length;
-                            const restFeatures = cl.slice(head.length).reduce((n, x) => n + x.gone.length, 0);
-                            return [
-                              head.map(x => e("span", { key: x.cat, className: "gapclus" },
-                                e("b", null, catShort(x.cat)),
-                                /* Names, not a count. "Payments 5" is a number
-                                   to wonder about; the names are the work. */
-                                x.gone.slice(0, GAP_NAMES_SHOWN).map(label).join(", "),
-                                x.gone.length > GAP_NAMES_SHOWN
-                                  ? e("i", null, " +" + (x.gone.length - GAP_NAMES_SHOWN)) : null)),
-                              /* WHAT WAS TRIMMED IS STATED. A capped list that
-                                 does not say it is capped reads as the whole
-                                 answer, which is how 55 gaps look like 12. */
-                              restGroups
-                                ? e("span", { key: "rest", className: "gapmore" },
-                                    "+" + restFeatures + " more in " + restGroups +
-                                    " other group" + (restGroups === 1 ? "" : "s"))
-                                : null,
-                            ];
-                          })())
-                      : e("div", { className: "gapline none", "data-feat-miss": 0 },
-                          e("span", { className: "gaplabel ok" }, "Using every tracked feature")))));
-            })))),
+                    (() => {
+                      if (!miss.length) {
+                        return e("div", { className: "gapstack", "data-feat-miss": 0 },
+                          e("div", { className: "gapeyebrow ok" }, "Using every tracked feature"));
+                      }
+                      const cl = ofGapClusters(groups, k => adoptedIn(r.o.slug, k),
+                                               GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN);
+                      return e("div", { className: "gapstack", "data-feat-miss": miss.length },
+                        /* THE TOTAL LEADS, and it is stated against the
+                           denominator. "Not using 31" alone is a number with
+                           no scale; the three lines under it are a sample of
+                           it, not the whole of it, and a reader who cannot
+                           see that reads 31 gaps as 11. */
+                        e("div", { className: "gapeyebrow" },
+                          "Not using " + miss.length + " of " + shown.length),
+                        cl.head.map(x => [
+                          e("div", { key: x.cat + ":c", className: "gapcat" }, catShort(x.cat)),
+                          /* The group's own share, so the line says how DEEP
+                             the gap is — 0/4 and 3/4 are different problems
+                             and both list names. Same used/total as the
+                             column above it and the drill-in, deliberately:
+                             three spellings of one ratio is how a reader
+                             stops trusting any of them. */
+                          e("div", { key: x.cat + ":r", className: "gapratio",
+                                     "data-feat-gapratio": catShort(x.cat) + ":" + x.used + "/" + x.total },
+                            x.used + "/" + x.total),
+                          /* Names, not a count. "Payments 5" is a number to
+                             wonder about; the names are the work. */
+                          e("div", { key: x.cat + ":n", className: "gapnames" },
+                            x.keys.map(label).join(", "),
+                            x.more ? e("i", null, "  +" + x.more + " more") : null),
+                        ]),
+                        /* WHAT WAS TRIMMED IS STATED. A capped list that does
+                           not say it is capped reads as the whole answer,
+                           which is how 55 gaps look like 12. It sits in the
+                           NAME column, not the label column, so it reads as a
+                           footnote to the list rather than a fourth group. */
+                        cl.restGroups
+                          ? e("div", { key: "trim", className: "gaptrim",
+                                       "data-feat-gaptrim": cl.restFeatures + "/" + cl.restGroups },
+                              "+" + cl.restFeatures + " more in " + cl.restGroups +
+                              " other group" + (cl.restGroups === 1 ? "" : "s"))
+                          : null);
+                    })())));
+            }))),
         rows.length ? null : e("div", { className: "note" },
           view ? "No organization matches “" + view.label + "” in this snapshot."
                : "No organizations match.")),

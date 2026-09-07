@@ -181,11 +181,15 @@ if (!SKIP_SOURCE) {
      "a group whose features are all hidden gets no column at all, rather than a permanent 0/0");
   ok(/const notUsing = \(s2\) => shown\.filter/.test(feat),
      "the not-using callout is over the tracked set");
-  const gapLine = (feat.match(/"data-feat-miss": miss\.length[\s\S]{0,1400}/) || [""])[0];
-  ok(gapLine.length > 300, "the gap line was found");
-  ok(/g\.keys\.filter\(k => !adoptedIn\(r\.o\.slug, k\)\)/.test(gapLine),
-     "the gap line is built from each group's TRACKED features");
-  ok(!/allMeasured/.test(gapLine), "...and never the full measured set");
+  /* SLICED ON THE HELPER CALL, not on a class name. The clustering used to be
+     an inline IIFE and this slice was anchored on `"data-feat-miss"`; it now
+     has to survive the clustering moving to module scope, so it anchors on
+     the call that does the work. */
+  const gapCall = (feat.match(/ofGapClusters\(groups[\s\S]{0,1600}/) || [""])[0];
+  ok(gapCall.length > 300, "the gap stack's clustering call was found");
+  ok(/ofGapClusters\(groups, k => adoptedIn\(r\.o\.slug, k\)/.test(feat),
+     "the gap stack is built from `groups` — the TRACKED features — scoped to this org");
+  ok(!/allMeasured/.test(gapCall), "...and never the full measured set");
 
   // THE GAP LIST IN THE COMPARISON is over the tracked set too, or A/B
   // reports a difference on a feature the reader untracked.
@@ -438,11 +442,13 @@ if (!SKIP_SOURCE) {
     H = new Function(
       src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
       "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat," +
-      " GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN };")();
+      " ofGapClusters, GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN };")();
   } catch (err) {
     ok(false, "the org-features helpers lift and evaluate — THREW: " + err.message);
     H = { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
-          ofGroupScore: () => null, ofRatioHeat: () => ({}), GAP_GROUPS_SHOWN: 0, GAP_NAMES_SHOWN: 0 };
+          ofGroupScore: () => null, ofRatioHeat: () => ({}),
+          ofGapClusters: () => ({ head: [], restGroups: 0, restFeatures: 0 }),
+          GAP_GROUPS_SHOWN: 0, GAP_NAMES_SHOWN: 0 };
   }
 
   // 1. SHORT COLUMN LABELS FOR EVERY CATEGORY IN THE DATA. A miss falls back
@@ -523,34 +529,138 @@ if (!SKIP_SOURCE) {
   ok(!/isOpen \?/.test(listPanel) && !/setOpen\(/.test(listPanel),
      "it is not gated behind a click — the gaps are the default view");
 
-  /* 7. THE GAPS ARE CLUSTERED BY GROUP AND NAMED. A flat comma list of 40
-        features is a paragraph; "Payments 5" is a number to wonder about.
-        Grouped, ordered worst-first, with the names. */
-  ok(/"data-feat-miss"/.test(listPanel), "the gap line is addressable");
-  ok(/Not using " \+ miss\.length/.test(listPanel), "it names the count");
-  ok(/className: "gapclus"/.test(listPanel), "the gaps are clustered by group");
-  ok(/\.sort\(\(x, y\) => y\.gone\.length - x\.gone\.length/.test(listPanel),
-     "...ordered by how many are missing, so the worst gap reads first");
-  ok(/x\.cat\.localeCompare\(y\.cat\)/.test(listPanel),
-     "...with a name tie-break, so two renders cannot disagree");
-  ok(/x\.gone\.slice\(0, GAP_NAMES_SHOWN\)\.map\(label\)/.test(listPanel),
-     "each cluster names its features rather than just counting them");
+  /* 7. THE GAPS ARE ONE GROUP PER LINE, IN A GRID. Two earlier versions were
+        rejected by Dan and the assertions below name what each got wrong: a
+        strip of unlabelled dots ("pretty unreadable"), then a wrapped flex
+        line ("The two rows of not using are just a mash up of words").
+
+        THE CLUSTERING IS LIFTED AND RUN, not regexed. It used to be an inline
+        IIFE, and a regex over an IIFE proves the sort is MENTIONED — not that
+        anything comes back ordered. */
+  {
+    const G = [
+      { cat: "Settings & Configuration", keys: ["s1", "s2", "s3", "s4", "s5", "s6"] },
+      { cat: "Payments & Pricing",       keys: ["p1", "p2", "p3"] },
+      { cat: "Communications",           keys: ["c1", "c2", "c3"] },
+      { cat: "AI & Automation",          keys: ["a1", "a2"] },
+      { cat: "Leagues & Teams",          keys: ["l1"] },
+    ];
+    // Settings 1/6 (5 gone) · Payments 0/3 (3 gone) · Comms 2/3 (1 gone)
+    // · AI 0/2 (2 gone) · Leagues 1/1 (0 gone, so it must not appear).
+    const on = new Set(["s1", "c1", "c2", "l1"]);
+    const isOn = k => on.has(k);
+    const out = H.ofGapClusters(G, isOn, 3, 4);
+
+    eq(out.head.length, 3, "the stack shows exactly the group cap it was given");
+    eq(out.head.map(x => x.cat).join(" | "),
+       "Settings & Configuration | Payments & Pricing | AI & Automation",
+       "DEEPEST GAP FIRST BY COUNT, so the biggest block of work reads first");
+    /* A GROUP WITH NOTHING MISSING IS DROPPED, and the cap has to be WIDE
+       for that to be testable: sorted deepest-first, a zero-gap group can
+       never reach the top three anyway, so under a cap of 3 the assertion is
+       vacuous and the mutation that keeps them survives it. */
+    const wide = H.ofGapClusters(G, isOn, 9, 4);
+    eq(wide.head.length, 4,
+       "with room for every group, only the ones with gaps get lines");
+    ok(!wide.head.some(x => x.cat === "Leagues & Teams"),
+       "a group with nothing missing is dropped — a line reading 1/1 belongs in the columns above");
+    eq(out.head[0].used + "/" + out.head[0].total, "1/6",
+       "each line carries its group's own used/total, so the line says how DEEP the gap is");
+    eq(out.head[0].keys.join(","), "s2,s3,s4,s5",
+       "the line names its missing features, capped at the name limit");
+    eq(out.head[0].more, 1, "...and says how many names it trimmed");
+    eq(out.head[1].more, 0, "a line that fits trims nothing");
+    eq(out.restGroups, 1, "the groups that did not fit are counted");
+    eq(out.restFeatures, 1, "...and so are the features inside them");
+    ok(out.head.every(x => x.keys.every(k => !isOn(k))),
+       "every name on a line is genuinely NOT adopted");
+
+    /* THE COUNT TIE-BREAK IS THE SHARE, so a group with nothing configured
+       beats one that is half done. Two groups each missing two features: the
+       one at 0/2 is the deeper hole and must lead. */
+    const tie = H.ofGapClusters(
+      [{ cat: "Half done", keys: ["h1", "h2", "h3", "h4"] },
+       { cat: "Nothing on", keys: ["n1", "n2"] }],
+      k => k === "h1" || k === "h2", 2, 4);
+    eq(tie.head.map(x => x.cat).join(" | "), "Nothing on | Half done",
+       "on an equal count the smaller share in use leads");
+
+    /* AND THEN THE NAME, or two renders of one snapshot can disagree about
+       which three lines a reader sees. */
+    const nameTie = H.ofGapClusters(
+      [{ cat: "Zebra", keys: ["z1", "z2"] }, { cat: "Alpha", keys: ["a1", "a2"] }],
+      () => false, 2, 4);
+    eq(nameTie.head.map(x => x.cat).join(" | "), "Alpha | Zebra",
+       "an identical count AND share breaks on name, so the order is deterministic");
+
+    // Absent is not zero: no groups at all is an empty stack, never a throw.
+    const none = H.ofGapClusters([], () => false, 3, 4);
+    eq(none.head.length, 0, "no groups yields no lines rather than throwing");
+    eq(none.restGroups, 0, "...and nothing trimmed");
+  }
+
+  ok(/"data-feat-miss"/.test(listPanel), "the gap stack is addressable");
+  /* THE TOTAL IS STATED AGAINST THE DENOMINATOR. The three lines are a SAMPLE
+     of the gap, not the whole of it, and "Not using 31" with no scale beside
+     three lines reads as eleven gaps. */
+  ok(/"Not using " \+ miss\.length \+ " of " \+ shown\.length/.test(listPanel),
+     "the eyebrow names the gap against the tracked total, not as a bare count");
+  ok(/className: "gapcat"[\s\S]{0,80}catShort/.test(listPanel),
+     "each line leads with its group's short label");
+  ok(/className: "gapratio"/.test(listPanel), "...then the group's own ratio, in its own column");
+  ok(/className: "gapnames"/.test(listPanel), "...then the missing feature names");
+  ok(/x\.keys\.map\(label\)/.test(listPanel),
+     "each line names its features rather than just counting them");
   /* WHAT WAS TRIMMED IS STATED. A capped list that does not say it is capped
      reads as the whole answer, which is how 55 gaps look like 12. */
-  ok(/more in " \+ restGroups/.test(listPanel), "the trimmed groups are counted on screen");
-  ok(/x\.gone\.length > GAP_NAMES_SHOWN[\s\S]{0,120}x\.gone\.length - GAP_NAMES_SHOWN/.test(listPanel),
-     "...and so are the trimmed names inside a cluster");
+  ok(/more in " \+ cl\.restGroups/.test(listPanel), "the trimmed groups are counted on screen");
+  ok(/"  \+" \+ x\.more \+ " more"/.test(listPanel),
+     "...and so are the trimmed names inside a line");
   ok(/Using every tracked feature/.test(listPanel),
-     "a fully-adopted org says so rather than rendering an empty line");
-  ok(H.GAP_GROUPS_SHOWN > 0 && H.GAP_GROUPS_SHOWN <= 6,
-     `the group cap is a readable number (got ${H.GAP_GROUPS_SHOWN})`);
+     "a fully-adopted org says so rather than rendering an empty stack");
+  ok(H.GAP_GROUPS_SHOWN > 0 && H.GAP_GROUPS_SHOWN <= 4,
+     `the group cap is a readable number of LINES (got ${H.GAP_GROUPS_SHOWN})`);
   ok(H.GAP_NAMES_SHOWN > 0 && H.GAP_NAMES_SHOWN <= 6,
-     `the per-cluster name cap is a readable number (got ${H.GAP_NAMES_SHOWN})`);
+     `the per-line name cap is a readable number (got ${H.GAP_NAMES_SHOWN})`);
   const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
-  ok(/\.gapline\s*\{[^}]*flex-wrap:\s*wrap/.test(css),
-     "the gap line wraps rather than clipping — a trimmed name is worse than a second line");
-  ok(/\.gaplabel\.ok\s*\{[^}]*color:/.test(css),
-     "a fully-adopted org's label is coloured differently from a gap count");
+
+  /* THE MASH-UP FIX IS THE GRID, and it is the one thing no source assertion
+     about the JSX can see: the same names in a flex row wrap into a
+     paragraph. A FIXED first column is what makes every line start in the
+     same place down the whole table. */
+  const stackRule = (css.match(/\.gapstack\s*\{[^}]*\}/) || [""])[0];
+  ok(/display:\s*grid/.test(stackRule), "the gap stack is a GRID, not a wrapping flex line");
+  ok(/grid-template-columns:\s*\d+px\s+\d+px/.test(stackRule),
+     "...with a FIXED label column and a fixed ratio column, so the lines align");
+  ok(!/flex-wrap/.test(stackRule),
+     "...and it cannot wrap words from one group into another's line");
+  ok(/\.gapratio\s*\{[^}]*tabular-nums/.test(css),
+     "the ratio column is tabular, so 1/6 and 12/13 line up");
+  ok(/\.gapeyebrow\.ok\s*\{[^}]*color:/.test(css),
+     "a fully-adopted org's eyebrow is coloured differently from a gap count");
+
+  /* 7b. ONE BAND PER ORG. Dan: "Orgs run together vertically, not enough
+         separation here." Every td in this app carries the same 1px rule, so
+         the boundary INSIDE an org looked exactly like the boundary between
+         two of them. */
+  ok(/e\("tbody", \{ key: r\.o\.slug, className: "orgband" \}/.test(listPanel),
+     "an org and its gaps are ONE <tbody>, which is what gives the band a single edge");
+  ok(!/React\.Fragment, \{ key: r\.o\.slug \}/.test(listPanel),
+     "...not a Fragment, which cannot be bordered or hovered as a unit");
+  ok(/\.feattable tbody\.orgband td\s*\{[^}]*border-bottom:\s*none/.test(css),
+     "the hairline INSIDE a band is removed, not merely lightened — a faint line still divides");
+  const bandEdge = (css.match(/\.feattable tbody\.orgband tr\.gap-row td\s*\{[^}]*\}/) || [""])[0];
+  ok(/border-bottom:\s*2px/.test(bandEdge),
+     "the band's own bottom edge is heavier than a row rule, so orgs read as separate objects");
+  ok(/padding-bottom:\s*\d\dpx/.test(bandEdge), "...with real space above it");
+  ok(/\.tablewrap tbody\.orgband:hover td\s*\{/.test(css),
+     "hovering either row lights the whole band, not half of an org");
+
+  /* THE ORG CELL WRAPS. `th, td { white-space: nowrap }` is global here, so a
+     max-width on that cell clips nothing — it overflows, and the org name ran
+     over the adoption figure beside it. */
+  ok(/\.feattable td\.l\s*\{[^}]*white-space:\s*normal/.test(css),
+     "the org cell wraps, so its max-width bounds it instead of overflowing the next column");
 
   // 8. CLICKING AN ORG STAYS IN THE SHELL. A plain href would be a full page
   //    load out of the app; every other drill-in here routes through nav().

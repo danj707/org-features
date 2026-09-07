@@ -83,6 +83,66 @@ function req(method, p, body) {
    nothing on the second render, it is simply empty. */
 const CASES = [
   { name: "org features · the list", path: "/ps/features", needs: "[data-feat-miss]" },
+  /* THE ALIGNMENT IS THE WHOLE FIX, AND ONLY A BROWSER CAN SEE IT. Dan's
+     complaint about the version before this was "The two rows of not using
+     are just a mash up of words" — the same names, the same order, the same
+     markup depth, rendered as a wrapping flex line instead of a grid. So a
+     source assertion cannot tell the two apart, and "a gap line rendered"
+     passes on both. This measures the left edge of the NAME column down the
+     table: under the grid every line starts at one x, and under a flex line
+     each one starts wherever its label happened to end. */
+  { name: "org features · every gap line starts in the same place", path: "/ps/features",
+    needs: '[data-rc-gapx="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector(".gapnames");
+      await pg.evaluate(() => {
+        const xs = [...document.querySelectorAll(".gapnames")]
+          .slice(0, 24).map(n => Math.round(n.getBoundingClientRect().left));
+        const cats = [...document.querySelectorAll(".gapcat")]
+          .slice(0, 24).map(n => Math.round(n.getBoundingClientRect().left));
+        const one = new Set(xs).size === 1 && new Set(cats).size === 1;
+        document.body.setAttribute("data-rc-gapx", (xs.length >= 6 && one) ? "1" : "0");
+        document.body.setAttribute("data-rc-gapx-seen", xs.length + ":" + new Set(xs).size);
+      });
+    } },
+  /* THE ORG CELL MUST NOT OVERFLOW INTO THE ADOPTION FIGURE. A max-width on a
+     `white-space: nowrap` cell clips nothing, it overflows — and the only
+     symptom is a name running over the number beside it, which no source
+     assertion can see. Measured as content width against the cell's own. */
+  { name: "org features · the org cell does not run over the adoption figure", path: "/ps/features",
+    needs: '[data-rc-fit="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("td.l");
+      await pg.evaluate(() => {
+        const cells = [...document.querySelectorAll(".feattable td.l")].slice(0, 24);
+        const over = cells.filter(c => c.scrollWidth > c.clientWidth + 1);
+        document.body.setAttribute("data-rc-fit",
+          (cells.length >= 6 && !over.length) ? "1" : "0");
+        document.body.setAttribute("data-rc-fit-seen",
+          cells.length + " cells, " + over.length + " overflowing");
+      });
+    } },
+  /* ONE BAND PER ORG, with a heavier edge between orgs than inside one.
+     "Orgs run together vertically" was a CSS fact: every td carried the same
+     1px rule, so three identical hairlines per org. Reverting either half —
+     the inner rule coming back, or the band edge dropping to 1px — makes the
+     two weights equal again, which is what this compares. */
+  { name: "org features · an org and its gaps are one band", path: "/ps/features",
+    needs: '[data-rc-band="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("tbody.orgband");
+      await pg.evaluate(() => {
+        const bands = [...document.querySelectorAll("tbody.orgband")];
+        const pairs = bands.length && bands.slice(0, 20).every(b => b.rows.length === 2);
+        const px = el => parseFloat(getComputedStyle(el).borderBottomWidth) || 0;
+        const inner = bands.slice(0, 20).map(b => px(b.rows[0].cells[0]));
+        const edge = bands.slice(0, 20).map(b => px(b.rows[1].cells[0]));
+        const ok = pairs && inner.every(v => v === 0) && edge.every(v => v >= 2);
+        document.body.setAttribute("data-rc-band", ok ? "1" : "0");
+        document.body.setAttribute("data-rc-band-seen",
+          bands.length + " bands, inner " + inner[0] + "px, edge " + edge[0] + "px");
+      });
+    } },
   { name: "org features · a per-org drill-in", path: "/ps/features/apex-park-and-recreation-district",
     needs: "[data-feat-cat]" },
   { name: "org features · an unknown slug explains itself", path: "/ps/features/not-a-real-org",

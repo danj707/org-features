@@ -925,3 +925,124 @@ THREW: …"* by name.
 Verified in a browser: 0 dots left, Apex showing 4 labelled clusters in one
 21px line, Aardvark's 55 gaps showing 4 clusters plus `+20 more in 8 other
 groups` in 44px, and 858 spans where there were 8,064.
+
+## THE ORG ROW, THIRD TIME (2026-09-07) — a grid, and one band per org
+
+Dan, on the version before this: *"still not loving this view--give me three
+different options for readability."* With three faults named:
+
+- *"pills are all too similar, after a few rows I lose track of what I'm
+  looking at"*
+- *"Orgs run together vertically, not enough separation here"*
+- *"The two rows of not using are just a mash up of words"*
+
+Three options were mocked in chat off the row shape he had already said he
+preferred (*"I liked the slightly larger row a bit better"*), and he picked
+**B — a two-tier row: the summary line and its group columns unchanged, with
+the gaps below in a labelled grid.** The other two traded the sortable group
+grid away (A: one adoption bar plus the weakest three groups) or hid the names
+behind a disclosure (C: a density silhouette per group, gaps on expand). B was
+the recommendation because the other two solve the mash-up by REMOVING the
+names rather than formatting them.
+
+### THREE VERSIONS OF THIS ROW HAVE NOW BEEN REJECTED, and each rejection is a rule
+
+1. **six raw count pills** — a measure of SIZE, not adoption. Apex has 98,197
+   registrations and Aspen has none, which says which org is big.
+2. **a strip of 56 unlabelled dots in twelve boxes** — *"pretty unreadable"*.
+   It DUPLICATED the `9/9` group columns directly above it, less legibly: a dot
+   can be counted but not read, and telling which box was which meant
+   hovering.
+3. **a wrapped flex line of clusters** — *"a mash up of words"*. True at any
+   real width: `Payments Promo codes, Deposits` ran into `Comms SMS,
+   Broadcasts` mid-sentence with nothing for the eye to anchor on.
+
+### THE FIX FOR THE MASH-UP IS A GRID, AND NO SOURCE ASSERTION CAN SEE IT
+
+Same names, same order, same markup depth — a flex row wraps them into a
+paragraph and a grid lines them up. So `.gapstack` is
+`grid-template-columns: 116px 46px minmax(0, 1fr)`: **a fixed label column, a
+fixed tabular ratio column, then the names**. Measured on the live page, all
+144 orgs put the name column at **x = 457** — one edge down the whole table,
+which is the thing that makes three groups readable where the same words in a
+paragraph were not.
+
+- **THREE GROUPS, not four.** Each one owns a LINE now rather than sharing a
+  wrap, and four lines under a two-line summary is more org than fits.
+- **FOUR NAMES per line.** The median tracked feature name is 24 characters and
+  the longest is 43 (*Alternate IDs / External System Integration*), so five
+  wraps and reintroduces the mash-up.
+- **The eyebrow states the total against the denominator** — `NOT USING 53 OF
+  56`. The three lines are a SAMPLE of the gap; a bare *"Not using 53"* above
+  three lines reads as eleven gaps.
+- **Each line carries its group's own `used/total`**, so it says how DEEP the
+  gap is: 0/9 and 11/13 are different problems and both list names. It is the
+  same ratio the column above it and the drill-in print, deliberately — three
+  spellings of one number is how a reader stops trusting any of them.
+- **A group with nothing missing is dropped.** A line reading `1/1` belongs in
+  the columns, not in a list of what to turn on.
+
+### ONE BAND PER ORG — the separation complaint was a CSS fact
+
+`th, td { border-bottom: 1px solid var(--line) }` is global here, so the
+boundary INSIDE an org (summary row → gap row) looked **exactly** like the
+boundary BETWEEN two orgs: three identical hairlines per org and nothing saying
+which pair belonged together.
+
+The pair is a **`<tbody class="orgband">`** now — a table may carry many — and
+that is what makes the band an object: the inner rule is **removed** rather
+than lightened (a faint line still reads as a division), the band's own bottom
+edge is `2px` with 15px of space above it, and `tbody.orgband:hover` lights the
+whole thing. As two `<tr>`s in one shared tbody, the summary and its own gaps
+highlighted as separate objects.
+
+### `ofGapClusters` IS AT MODULE SCOPE, so the spec can RUN it
+
+The clustering was an inline IIFE inside the row map, and **an assertion that a
+sort is MENTIONED is not an assertion that anything comes back ordered.** It
+returns keys rather than labels, so it is testable without the catalog, which
+lives in the component.
+
+Ordering: **deepest gap first by COUNT** — the biggest block of work, which is
+what the reader is here for — then the **smaller share in use**, so a group
+with nothing configured beats one that is half done, then the **name**, so two
+renders of one snapshot cannot disagree about which three lines are shown.
+
+### AND THE ORG CELL WAS OVERFLOWING INTO THE ADOPTION FIGURE
+
+Found in the render, not in review: `.feattable td.l { max-width: 260px }` on a
+cell the global rule makes `white-space: nowrap` **clips nothing** — it
+overflows. So *"Aardvark City Parks and Rec `pre-launch` admin ↗"* ran straight
+over the `2%` beside it. The cell wraps now; the name, tag and link keep their
+own nowrap, so what wraps is the line and never a word.
+
+### Guards
+
+`org-features-settings.spec.js` 340 → **365 assertions**, and the gap
+assertions changed from regexes over an IIFE to LIFTING AND RUNNING
+`ofGapClusters` over a five-group fixture. Mutation-tested ten ways, all
+failing by name: the share tie-break dropped, the name tie-break dropped,
+shallowest-gap-first, zero-gap groups kept, the stack back to a wrapping flex
+line, the hairline inside the band restored, the band edge down to 1px, the
+pair back to a Fragment, the eyebrow reverted to a bare count, and the
+per-line trim note dropped.
+
+**One assertion was vacuous on the first draft**, for a reason worth keeping:
+*"a group with nothing missing is dropped"* ran under a cap of 3, and sorted
+deepest-first a zero-gap group can never reach the top three anyway — so the
+mutation that keeps them SURVIVED it. It runs at a cap of 9 now, where there is
+room for the group that must not appear.
+
+Plus **three `ci-check-render.js` cases (15 → 18)**, all three keyed on
+geometry a source assertion structurally cannot reach, and each verified to
+fail alone on the regression it names:
+
+- *every gap line starts in the same place* — the left edge of `.gapnames` and
+  `.gapcat` down 24 bands must be ONE x. Fails on the flex revert; the band
+  case keeps passing.
+- *an org and its gaps are one band* — every `tbody.orgband` holds exactly two
+  rows, the inner `border-bottom` computes to 0px and the band edge to ≥2px.
+  Fails on both border reverts and on the Fragment; the alignment case keeps
+  passing.
+- *the org cell does not run over the adoption figure* — `scrollWidth` against
+  `clientWidth` on the first 24 org cells. Fails on the nowrap revert.
