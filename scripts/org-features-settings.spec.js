@@ -157,7 +157,9 @@ if (!SKIP_SOURCE) {
   ok(/const all = everyOrg\.filter\(o => !excluded\.has\(o\.slug\)\)/.test(feat),
      "excluded orgs are filtered out once, in the set every surface reads");
   for (const [what, re] of [
-    ["the table", /const rows = all\.filter/],
+    // The quick view is applied TO the settings-scoped set, so no view can
+    // widen the page past an excluded org — one assertion pinning both facts.
+    ["the table (through the quick view)", /ofApplyQuickView\(view, all\.filter/],
     ["the fleet average", /scoredAll = all\.map\(decorate\)/],
     ["the pulldown and both compare slots", /const orgOptions = all\.map/],
     ["compare slot A", /cmpA \? all\.find/],
@@ -555,4 +557,114 @@ if (!SKIP_SOURCE) {
   ok(/"data-feat-orgscore"/.test(feat), "the drill-in states the org's adoption score");
   ok(/metrics\.map\(m => e\("div", \{ className: "card", key: m\.key \}/.test(feat),
      "the core counts moved to the drill-in rather than being deleted");
+}
+
+// ── QUICK VIEWS ────────────────────────────────────────────────────────────
+// LIFTED AND RUN. The one mistake that matters here is a direction — "lowest
+// adoption" showing the top — and a regex over a comparator passes just as
+// happily inverted.
+{
+  const Q = new Function(
+    src.slice(src.indexOf("const OF_QUICK_VIEWS"), src.indexOf("function route()")) +
+    "; return { OF_QUICK_VIEWS, ofQuickView, ofApplyQuickView };")();
+  const snap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
+  const measured = new Set(snap.measuredFeatures);
+
+  ok(Q.OF_QUICK_VIEWS.length >= 10, `there are ten or so quick views (got ${Q.OF_QUICK_VIEWS.length})`);
+  const ids = Q.OF_QUICK_VIEWS.map(v => v.id);
+  eq(new Set(ids).size, ids.length, "the view ids are unique — two chips sharing one id is one dead chip");
+  for (const v of Q.OF_QUICK_VIEWS) {
+    ok(v.label && v.label.length <= 22, `"${v.id}" has a chip-sized label (got "${v.label}")`);
+    /* EVERY CHIP CARRIES A TITLE saying what it ranks by. "Top SMS" alone
+       does not say whether that is by volume or by configuration date. */
+    ok(v.title && v.title.length > 15, `"${v.id}" explains itself on hover`);
+    ok(v.kind === "rank" || v.kind === "feature", `"${v.id}" has a known kind`);
+    /* A FEATURE VIEW MUST NAME A KEY THE BAKE ACTUALLY MEASURES. A renamed
+       metric would otherwise leave a chip that scopes to nothing, and the
+       zero-count filter would hide it — a chip that silently disappears is
+       how a filter stops being trusted. */
+    if (v.kind === "feature")
+      ok(measured.has(v.key), `"${v.id}" ranks on a measured feature (${v.key})`);
+    if (v.kind === "rank") ok(v.dir === 1 || v.dir === -1, `"${v.id}" has a direction`);
+  }
+  // The two Dan named by hand.
+  ok(Q.OF_QUICK_VIEWS.some(v => v.key === "sms_messaging"), "there is an SMS view");
+  ok(Q.OF_QUICK_VIEWS.some(v => v.key === "ticket_sales"), "there is a ticketing view");
+  ok(ids.includes("top") && ids.includes("lowest"), "top and lowest adoption are both offered");
+  eq(Q.ofQuickView("nope"), null, "an unknown id resolves to null rather than throwing");
+
+  /* THE FEATURES ARE NARROW ENOUGH TO SCAN — measured, not assumed. A chip
+     for a feature 110 of 144 orgs use lists most of the platform and answers
+     nothing, which is the whole reason this set was chosen from the data. */
+  for (const v of Q.OF_QUICK_VIEWS.filter(x => x.kind === "feature")) {
+    const users = Object.keys(snap.adoption).filter(s2 => (snap.adoption[s2][v.key] || {}).adopted);
+    ok(users.length > 0 && users.length <= 70,
+       `"${v.id}" scopes to a scannable slice — ${users.length} of ${snap.orgs.length} orgs use ${v.key}`);
+  }
+
+  // ── the reducer ──
+  const mk = (slug, score, launched, n) => ({ o: { slug, displayName: slug, launched }, score, _n: n });
+  const rows = [mk("a", 90, true, 5), mk("b", 10, true, 100), mk("c", 50, false, 0),
+                mk("d", null, true, 7), mk("e", 30, false, 50)];
+  const countOf = (slug, k) => (rows.find(r => r.o.slug === slug) || { _n: 0 })._n;
+
+  eq(Q.ofApplyQuickView(null, rows, countOf).rows.length, 5, "no view leaves the rows alone");
+
+  const top = Q.ofApplyQuickView(Q.ofQuickView("top"), rows, countOf);
+  eq(top.rows.map(r => r.o.slug), ["a", "c", "e", "b"], "Top adoption ranks highest first");
+  ok(!top.rows.some(r => r.score == null),
+     "an UNSCORED org is dropped from a ranked view — 'we cannot tell' is not a score");
+
+  const low = Q.ofApplyQuickView(Q.ofQuickView("lowest"), rows, countOf);
+  eq(low.rows.map(r => r.o.slug), ["b", "a"], "Lowest adoption ranks lowest first AND live-only");
+  ok(low.rows[0].score < top.rows[0].score,
+     "the two adoption views really are opposite ends — the direction is not inverted");
+
+  const pre = Q.ofApplyQuickView(Q.ofQuickView("prelaunch"), rows, countOf);
+  eq(pre.rows.map(r => r.o.slug), ["c", "e"], "Pre-launch progress keeps only unlaunched orgs, best first");
+
+  const sms = Q.ofApplyQuickView(Q.ofQuickView("sms"), rows, countOf);
+  eq(sms.rows.map(r => r.o.slug), ["b", "e", "d", "a"], "a feature view ranks by volume, busiest first");
+  ok(!sms.rows.some(r => r.o.slug === "c"),
+     "...and drops orgs with none of it — 'top SMS users' must not list organizations sending zero");
+  eq(sms.total, 4, "the total is the scoped count, which is what the chip promises");
+
+  // THE CAP IS REPORTED, not silent: 25 rows that look like the whole list is
+  // how a reader takes a slice for the fleet.
+  const many = Array.from({ length: 40 }, (_, i) => mk("o" + i, i, true, i));
+  const capped = Q.ofApplyQuickView(Q.ofQuickView("top"), many, () => 1);
+  eq(capped.rows.length, 25, "a ranked view is capped at its limit");
+  eq(capped.total, 40, "...and still reports the true total");
+  eq(capped.capped, true, "...and says it is capped");
+
+  // Deterministic: two runs of one view cannot disagree about a tie.
+  const ties = [mk("zeta", 50, true, 3), mk("alpha", 50, true, 3), mk("mid", 50, true, 3)];
+  eq(Q.ofApplyQuickView(Q.ofQuickView("top"), ties, countOf).rows.map(r => r.o.slug),
+     ["alpha", "mid", "zeta"], "ties break by name, so the order is stable between runs");
+
+  // ── the wiring ──
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
+  ok(/ofApplyQuickView\(view, all\.filter/.test(feat),
+     "the view is applied to the settings-scoped set, so it cannot widen past an exclusion");
+  ok(/"data-feat-qvchip"/.test(feat), "the chips are addressable");
+  ok(/setQv\(qv === v\.id \? "" : v\.id\); setOnly\(""\)/.test(feat),
+     "clicking the active chip clears it, and picking one clears the single-org pulldown");
+  ok(/setOnly\(ev\.target\.value\); if \(ev\.target\.value\) setQv\(""\)/.test(feat),
+     "...and picking an org clears the chip — two controls producing one state looks broken");
+  ok(/v\.kind !== "feature" \|\| shown\.indexOf\(v\.key\) >= 0/.test(feat),
+     "a chip whose feature the settings hide is not offered");
+  ok(/\.filter\(x => x\.n > 0\)/.test(feat), "a chip with nothing behind it is not offered");
+  ok(/ofApplyQuickView\(v, all\.map\(decorate\), countOf\)\.total/.test(feat),
+     "each chip's count comes from the SAME reducer that filters, or it promises a number the click does not deliver");
+  ok(/"data-feat-qvnote"/.test(feat), "an active view states what it is showing");
+  ok(/showing " \+ rows\.length \+ " of " \+ qvOut\.total/.test(feat),
+     "...including the cap, so 25 rows are not read as the fleet");
+  ok(/No organization matches/.test(feat),
+     "an empty view names itself rather than reading as a broken page");
+  ok(/clear and go back to all/.test(feat), "there is a way back to the full alphabetical list");
+
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  for (const c of ["qv", "qvchip", "qvnote"]) ok(new RegExp("\\." + c + "\\s*\\{").test(css), `.${c} has its own rule`);
+  ok(/\.qvchip\.on\s*\{[^}]*background:\s*var\(--brand\)/.test(css),
+     "the active chip is visibly active — otherwise nothing on screen says which view is on");
 }

@@ -606,3 +606,96 @@ an unknown slug explaining itself. No uncaught page errors.
 slices anchored on the literal `"function Features()"` — a signature change
 that altered no behaviour, leaving `indexOf` at -1 and garbage slices. They
 anchor on `"function Features("` now. Fourth instance in this repo family.
+
+## ELEVEN QUICK VIEWS ON THE ORG FEATURES LIST (2026-09-07)
+
+Dan: *"add some quick filters next to the 'all organizations' pull down menu.
+I need 'top orgs by adoption', 'lowest orgs by adoption', top 'sms users',
+top event users, that type of thing. Thinking of 10 or so quick filters so I
+can quickly scan which orgs are doing what."*
+
+A chip row beside the pulldown. Each chip **scopes and sorts** — "top SMS
+users" means both *only orgs sending SMS* and *busiest first*; scoping alone
+gives an alphabetical list of twenty orgs and no answer.
+
+### WHICH FEATURES ARE ON THE ROW WAS MEASURED
+
+A "top users" scan is only worth a click where a handful of orgs dominate.
+`facility_rentals` is on 110 of 144 orgs and `group_reservation_windows` on
+116 — a chip for either lists most of the platform. Every feature chip is on
+**16–57 orgs with the top five holding 59–96% of the volume**:
+
+| feature | orgs | top-5 share |
+|---|---|---|
+| `auto_renew_memberships` | 16 | 76% |
+| `ai_routines` | 17 | 84% |
+| `sms_messaging` | 20 | 88% |
+| `ticket_sales` | 23 | 96% |
+| `rental_permits` | 23 | 87% |
+| `competitions_leagues` | 24 | 76% |
+| `payment_plans` | 37 | 72% |
+| `ai_assistant` (Seb) | 57 | 59% |
+
+**`ticket_sales`, not `events`, for the ticketing chip.** An `event` row is a
+CONFIGURED event, so ranking by it puts whoever drafted the most events on
+top; a confirmed ticket is a sale. The spec asserts every feature chip stays
+inside 70 orgs, so adding a broad one fails rather than shipping a chip that
+answers nothing.
+
+### The three ranked views, and why two of them filter
+
+- **Top adoption** — highest first, capped at 25.
+- **Lowest adoption — LIVE ONLY, and that is the view rather than a detail.**
+  A pre-launch org at 2% is mid-configuration, not a finding; a *live* org at
+  25% is. Without the filter this view is just the 71 unlaunched orgs.
+- **Pre-launch progress** — the other side: of the orgs not yet live, who is
+  furthest through configuration.
+
+**AN UNSCORED ORG IS NOT THE LOWEST-ADOPTION ORG.** `scoreOf` is null when
+the bake never measured an org, and letting a null sort to one end would put
+"we cannot tell" at the top of a list titled Lowest adoption. Ranked views
+drop them.
+
+**Ties break by name**, so two runs of one view cannot disagree.
+
+### The rules the chips follow
+
+- **One active at a time**, and clicking the active chip clears it — so there
+  is no separate "off" chip. Picking a chip clears the single-org pulldown and
+  picking an org clears the chip: two controls producing one state is a
+  control that looks broken.
+- **The count on a chip comes from the SAME reducer that does the filtering**,
+  or the chip promises a number the click does not deliver.
+- **A chip with nothing behind it is not offered**, and neither is one whose
+  feature the settings have hidden — the settings scope this page, so ranking
+  orgs on something the score ignores is noise.
+- **THE ACTIVE VIEW STATES WHAT IT IS SHOWING**, including the cap: 25 rows
+  that look like the full list is how a reader takes a slice for the fleet.
+  It also carries the way back to all 144 alphabetically.
+- **The view is applied to the settings-scoped set**, so no view can widen
+  past an excluded org.
+- **The default order is untouched** — alphabetical, as Dan asked earlier. A
+  quick view re-sorts; it does not redefine how the list opens.
+
+### Guards
+
+`org-features-settings.spec.js` 182 → **268 assertions**, lifting and RUNNING
+`ofApplyQuickView` over fixtures, and checking the chip set against the
+**snapshot** rather than a transcribed list.
+
+Mutation-tested **14 ways, all failing by name**: the rank direction
+inverted (the one mistake that matters, and a regex over a comparator cannot
+see it), lowest-adoption losing its live-only filter, unscored orgs ranking as
+lowest, a feature view listing orgs with zero, the cap applied silently, ties
+made non-deterministic, a chip offered for a settings-hidden feature, an empty
+chip offered, chip counts computed separately from the filter, the chip not
+clearing the pulldown, the scope note removed, the active chip not visibly
+active, a chip ranking on an unmeasured key, and a broad feature offered as a
+scan.
+
+Verified in a browser: 11 chips each carrying a number; at rest all 144 rows
+alphabetical with no scope note; Top adoption 25 rows scoring 96/93/89/84…;
+Lowest 7/11/13/13… all live; Pre-launch all unlaunched; the SMS chip's "20"
+matching exactly the 20 rows the click shows, ranked by volume; picking an org
+clearing the chip and vice versa; and clicking the active chip returning to
+all 144. No uncaught page errors.

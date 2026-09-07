@@ -176,6 +176,19 @@
      the group columns are not squeezed to nothing, and the table scrolls in
      .tablewrap rather than compressing — the same fix the sibling project's
      programs table needed. */
+  /* The quick-view chip row, beside the single-org pulldown. Buttons rather
+     than links: each one changes the table's state, it does not navigate. */
+  .qv { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .qvchip { display: inline-flex; align-items: baseline; gap: 5px; cursor: pointer;
+            background: #fff; border: 1px solid var(--line); border-radius: 999px;
+            padding: 5px 11px; font-size: 12.5px; font-weight: 600; color: #334155; }
+  .qvchip:hover { background: #f1f5f9; }
+  .qvchip.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .qvn { font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .qvchip.on .qvn { color: rgba(255,255,255,.8); }
+  .qvnote { font-size: 12px; color: var(--muted); padding: 8px 16px;
+            background: #fbfcfe; border-bottom: 1px solid var(--line); }
+  .qvnote b { color: var(--ink); }
   .subslug { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
              overflow: hidden; text-overflow: ellipsis; }
   .feattable { min-width: max-content; }
@@ -333,6 +346,102 @@
     const alpha = 0.10 + (pct / 100) * 0.5;
     return { background: "rgba(15,111,92," + alpha.toFixed(3) + ")",
              color: pct > 65 ? "#fff" : "#0f3d33", fontWeight: 700 };
+  }
+
+  /* ---------------- org features: quick views ----------------
+     Ten one-click scans, next to the single-org pulldown. Dan: "I need 'top
+     orgs by adoption', 'lowest orgs by adoption', top 'sms users', top event
+     users, that type of thing... so I can quickly scan which orgs are doing
+     what."
+
+     A quick view does TWO things — it scopes and it sorts — because "top SMS
+     users" means both "only orgs sending SMS" and "busiest first". Scoping
+     without sorting gives an alphabetical list of twenty orgs and no answer.
+
+     WHICH FEATURES ARE HERE WAS MEASURED, not guessed. A "top users" scan is
+     only worth a click where a handful of orgs dominate; `facility_rentals`
+     is on 110 of 144 orgs and `group_reservation_windows` on 116, so a chip
+     for either lists most of the platform and tells you nothing. Every
+     feature below is on 16-57 orgs, with the top five holding 59-96% of the
+     volume. Counts are from the 2026-09-07 bake:
+
+       sms_messaging           20 orgs  (top 5 = 88% of sends)
+       ticket_sales            23       (96%)
+       rental_permits          23       (87%)
+       competitions_leagues    24       (76%)
+       payment_plans           37       (72%)
+       ai_assistant            57       (59%)
+       ai_routines             17       (84%)
+       auto_renew_memberships  16       (76%)
+
+     `ticket_sales` rather than `events` for the ticketing chip: an `event`
+     row is a CONFIGURED event, so ranking by it puts whoever drafted the
+     most events on top, while a confirmed ticket is a sale. */
+  const OF_QUICK_VIEWS = [
+    { id: "top",        label: "Top adoption",        kind: "rank", dir: -1, limit: 25,
+      title: "The 25 highest adoption scores" },
+    /* LIVE ONLY, and that is the point of the view rather than a detail. A
+       pre-launch org at 2% is mid-configuration and not a finding; a LIVE org
+       at 25% is. Without the filter this view is just the 71 unlaunched orgs. */
+    { id: "lowest",     label: "Lowest adoption",     kind: "rank", dir: 1, limit: 25, liveOnly: true,
+      title: "The 25 lowest adoption scores among organizations live on rec.us" },
+    /* The other side of the same coin: of the orgs not yet live, who is
+       furthest through configuration. */
+    { id: "prelaunch",  label: "Pre-launch progress", kind: "rank", dir: -1, limit: 25, launched: false,
+      title: "Organizations not yet live on rec.us, best configured first" },
+    { id: "sms",        label: "SMS",                 kind: "feature", key: "sms_messaging",
+      title: "Organizations sending SMS, by volume" },
+    { id: "tickets",    label: "Selling tickets",     kind: "feature", key: "ticket_sales",
+      title: "Organizations with confirmed ticket sales, by volume" },
+    { id: "seb",        label: "Seb",                 kind: "feature", key: "ai_assistant",
+      title: "Organizations using the AI assistant, by turns" },
+    { id: "routines",   label: "Seb routines",        kind: "feature", key: "ai_routines",
+      title: "Organizations with scheduled AI routines" },
+    { id: "autorenew",  label: "Auto-renew",          kind: "feature", key: "auto_renew_memberships",
+      title: "Organizations with auto-renewing membership plans" },
+    { id: "plans",      label: "Payment plans",       kind: "feature", key: "payment_plans",
+      title: "Organizations offering payment plans / installments" },
+    { id: "leagues",    label: "Leagues",             kind: "feature", key: "competitions_leagues",
+      title: "Organizations running competitions or leagues" },
+    { id: "permits",    label: "Rental permits",      kind: "feature", key: "rental_permits",
+      title: "Organizations issuing facility rental permits" },
+  ];
+  function ofQuickView(id) { return OF_QUICK_VIEWS.find(v => v.id === id) || null; }
+
+  /* Scope and order for one quick view. PURE, and taking its inputs as
+     arguments, so a spec can RUN it over fixtures — a regex over a comparator
+     passes just as happily when the comparison is inverted, which is the one
+     mistake that matters here ("lowest" showing the top).
+
+     `rows` are already decorated ({ o, score, usage }) and already scoped to
+     the settings, so a quick view can never widen past an exclusion. */
+  function ofApplyQuickView(view, rows, countOf) {
+    if (!view) return { rows, note: null, capped: false };
+    let out = rows.slice();
+
+    if (view.kind === "rank") {
+      /* AN UNSCORED ORG IS NOT THE LOWEST-ADOPTION ORG. `scoreOf` returns
+         null when the bake never measured that org, and letting a null sort
+         to one end would put "we cannot tell" at the top of a list titled
+         "Lowest adoption". Same absent-is-not-zero rule as everywhere else. */
+      out = out.filter(r => r.score != null);
+      if (view.liveOnly) out = out.filter(r => r.o.launched);
+      if (view.launched === false) out = out.filter(r => !r.o.launched);
+      // Name as the tie-break, so two runs of the same view cannot disagree.
+      out.sort((a, b) => (a.score - b.score) * view.dir
+        || (a.o.displayName || a.o.name || a.o.slug).localeCompare(b.o.displayName || b.o.name || b.o.slug));
+    } else {
+      // A "top users" view keeps only orgs that USE the thing — otherwise
+      // "top SMS users" is a list of 124 organizations sending none.
+      out = out.filter(r => countOf(r.o.slug, view.key) > 0);
+      out.sort((a, b) => countOf(b.o.slug, view.key) - countOf(a.o.slug, view.key)
+        || (a.o.displayName || a.o.name || a.o.slug).localeCompare(b.o.displayName || b.o.name || b.o.slug));
+    }
+
+    const total = out.length;
+    const capped = view.limit != null && total > view.limit;
+    if (capped) out = out.slice(0, view.limit);
+    return { rows: out, total, capped };
   }
 
   function route() {
@@ -1218,6 +1327,7 @@
     const [cfg, setCfg] = useState(null);        // null until the fetch settles
     const [cfgErr, setCfgErr] = useState(null);
     const [only, setOnly] = useState("");
+    const [qv, setQv] = useState("");
     const [cmpA, setCmpA] = useState("");
     const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
@@ -1269,7 +1379,25 @@
     const all = everyOrg.filter(o => !excluded.has(o.slug));
 
     const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
-    const rows = all.filter(o => !only || o.slug === only).map(decorate);
+    const countOf = (s2, k) => Number((((d.adoption || {})[s2] || {})[k] || {}).count || 0);
+
+    /* THE QUICK VIEW IS APPLIED TO `all`, which is already settings-scoped,
+       so no view can widen the page past an excluded org. The default order
+       stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
+       the list opens. */
+    const view = ofQuickView(qv);
+    const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
+    const rows = qvOut.rows;
+
+    /* A CHIP WITH NOTHING BEHIND IT IS NOT OFFERED, and one whose feature the
+       settings have hidden is not either — the settings scope this page, so a
+       chip for an untracked feature would rank orgs on something the score
+       ignores. Counts come from the same reducer that does the filtering, or
+       the chip promises a number the click does not deliver. */
+    const qvChips = OF_QUICK_VIEWS
+      .filter(v => v.kind !== "feature" || shown.indexOf(v.key) >= 0)
+      .map(v => ({ v, n: ofApplyQuickView(v, all.map(decorate), countOf).total }))
+      .filter(x => x.n > 0);
 
     const scoredAll = all.map(decorate).filter(r => r.score != null);
     const avg = scoredAll.length
@@ -1529,9 +1657,34 @@
                         title: "Choose which features and organizations this page counts",
                         style: { float: "right", marginTop: -2 } }, "⚙")),
         e("div", { className: "filters" },
-          e("select", { value: only, onChange: ev => setOnly(ev.target.value), "data-feat-only": only || "all" },
+          e("select", { value: only, onChange: ev => { setOnly(ev.target.value); if (ev.target.value) setQv(""); },
+                        "data-feat-only": only || "all" },
             e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
-          only ? e("button", { onClick: () => setOnly("") }, "Show all") : null),
+          /* ONE ACTIVE VIEW AT A TIME, and picking one clears the single-org
+             pulldown (and vice versa). Two controls producing one state is a
+             control that looks broken — the same rule as the season and
+             status pickers in the sibling project. Clicking the active chip
+             clears it, so there is no separate "off" chip. */
+          e("div", { className: "qv", "data-feat-qv": qv || "none" }, qvChips.map(({ v, n }) =>
+            e("button", { key: v.id, title: v.title,
+                          className: "qvchip" + (qv === v.id ? " on" : ""),
+                          "data-feat-qvchip": v.id,
+                          onClick: () => { setQv(qv === v.id ? "" : v.id); setOnly(""); } },
+              v.label,
+              // The count is what the click will actually show. A ranked view
+              // is capped rather than scoped, so it says the cap instead.
+              e("span", { className: "qvn" }, v.kind === "feature" ? n : "top " + v.limit))))),
+        /* THE ACTIVE VIEW STATES WHAT IT IS SHOWING. A re-sorted, re-scoped
+           table that looks like the full list is how a reader takes 25 rows
+           for 144 — the same reason the settings scope note exists. */
+        view ? e("div", { className: "qvnote", "data-feat-qvnote": view.id },
+          e("b", null, view.title), " \u00b7 ",
+          qvOut.capped
+            ? "showing " + rows.length + " of " + qvOut.total
+            : "showing all " + rows.length,
+          " \u00b7 ",
+          e("a", { href: "#", onClick: ev => { ev.preventDefault(); setQv(""); } },
+            "clear and go back to all " + all.length + " alphabetically")) : null,
         e("div", { className: "tablewrap" },
           e("table", { className: "feattable" },
             e("thead", null, e("tr", null,
@@ -1597,7 +1750,9 @@
                       : e("div", { className: "fp-miss", "data-feat-miss": 0 },
                           e("b", null, "Using every tracked feature.")))));
             })))),
-        rows.length ? null : e("div", { className: "note" }, "No organizations match.")),
+        rows.length ? null : e("div", { className: "note" },
+          view ? "No organization matches “" + view.label + "” in this snapshot."
+               : "No organizations match.")),
 
       showSettings ? e(FeatureSettings, {
         data: d, cfg,
