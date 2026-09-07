@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node scripts/store.spec.js && node scripts/nav.spec.js && node scripts/bug-freshness.spec.js"
+    "test": "node scripts/store.spec.js && node scripts/nav.spec.js && node scripts/bug-freshness.spec.js && node scripts/measured-features.spec.js"
   },
   "dependencies": {
     "compression": "^1.7.4",

@@ -22,8 +22,8 @@ const dataFile = path.join(repoRoot, "data", "features-data.json");
 const old = JSON.parse(fs.readFileSync(dataFile, "utf8"));
 const rows = JSON.parse(fs.readFileSync(payloadPath, "utf8"));
 
-if (!Array.isArray(rows) || rows.length < 50 || rows.some(r => r.length !== 24)) {
-  console.error(`payload sanity check failed: ${rows.length} rows; expected >=50 rows of 24 columns`);
+if (!Array.isArray(rows) || rows.length < 50 || rows.some(r => r.length !== 28)) {
+  console.error(`payload sanity check failed: ${rows.length} rows; expected >=50 rows of 28 columns`);
   process.exit(1);
 }
 
@@ -33,6 +33,9 @@ const ADOPTION_KEYS = [
   "payment_plans", "discount_codes", "scholarships", "gift_cards",
   "custom_booking_questions", "custom_forms", "instant_booking",
   "gl_accounting", "seasons", "competitions_leagues",
+  // Added 2026-09-07. Order matters: these map onto payload columns 24-27 by
+  // POSITION, so appending is safe and inserting is not.
+  "events", "ticket_sales", "ai_assistant", "ai_routines",
 ];
 const TEMPLATES = {
   age_eligibility: n => `${fmt(n)} sections with age rules`,
@@ -49,6 +52,15 @@ const TEMPLATES = {
   gl_accounting: n => `${fmt(n)} GL accounts`,
   seasons: n => `${fmt(n)} seasons`,
   competitions_leagues: n => `${fmt(n)} leagues/competitions`,
+  events: n => `${fmt(n)} events`,
+  // "sold", not "tickets" — the count deliberately excludes the 30% of rows
+  // that are pending (unpaid, sitting in a cart), and the wording has to say
+  // which of the two numbers this is.
+  ticket_sales: n => `${fmt(n)} tickets sold`,
+  // "asked" rather than "turns": this counts turns a PERSON initiated, with
+  // the automatic thread-titling and summarizing turns excluded.
+  ai_assistant: n => `${fmt(n)} questions asked`,
+  ai_routines: n => `${fmt(n)} routines set up`,
 };
 
 const orgs = [], usage = {}, adoption = {};
@@ -77,8 +89,8 @@ const out = {
   featureCategories: old.featureCategories,
   features: old.features,
   adoption,
-  notes: `Core usage + wave-1 adoption (14 of 53 catalog features) re-baked ${new Date().toISOString().slice(0, 10)} from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.`,
-  measuredFeatures: old.measuredFeatures,
+  notes: `Core usage + adoption (${ADOPTION_KEYS.length} of ${old.features.length} catalog features) re-baked ${new Date().toISOString().slice(0, 10)} from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining ${old.features.length - ADOPTION_KEYS.length} features queued for later waves.`,
+  measuredFeatures: ADOPTION_KEYS,
 };
 
 fs.writeFileSync(dataFile, JSON.stringify(out, null, 2) + "\n");

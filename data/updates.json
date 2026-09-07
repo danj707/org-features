@@ -3,6 +3,20 @@
   "updates": [
     {
       "date": "2026-09-07",
+      "title": "Now measuring events, ticket sales and Seb — and the snapshot was 16 days old",
+      "body": "Dan: \"there's a bunch of stuff we're NOT measuring here. Events/ticket sales, SMS usage, Seb usage.\" Two of the three were missing entirely; SMS was already there.",
+      "items": [
+        "Four new measurements: Events, Event Ticket Sales, Seb (AI Assistant) and Seb Routines. The dashboard now measures 18 of 57 catalogued features, up from 14.",
+        "Seb is the widest adoption of the four: 43 of 73 organizations have asked it something, 2,367 questions in total. Apex 484, El Segundo 316, Torrance 263, Hermosa Beach 230, Douglas County 227.",
+        "Ticket sales: 11,470 tickets sold across 15 organizations. Jurupa leads with 6,267, then Torrance 4,210 and Chico 601. Events themselves: 124 across 24 organizations.",
+        "Seb Routines — scheduled jobs an org has set up — are still early: 33 across 10 organizations, led by Hermosa Beach with 9.",
+        "SMS was already measured and is unchanged: 17 organizations, 17,167 messages sent, led by West Haven with 5,244.",
+        "The fleet adoption figure moved from 56% to 51%. That is the denominator growing from 14 measured features to 18, not orgs going backwards — which is why the card states the denominator out loud.",
+        "The snapshot itself was also 16 days stale (the daily refresh had not run since 22 August) and is now current, with 73 published organizations, up from 69."
+      ]
+    },
+    {
+      "date": "2026-09-07",
       "title": "Org Features: the pills are back, alphabetical order, and you can compare two orgs",
       "body": "Four fixes to the Org Features section, all from Dan looking at it.",
       "items": [

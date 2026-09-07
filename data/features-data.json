@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T10:05:17.234Z",
+  "generatedAt": "2026-09-07T12:47:31.244Z",
   "source": "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
   "status": "adoption-wave-1",
   "orgs": [
@@ -14,6 +14,12 @@
       "slug": "carmichael-district",
       "name": "Carmichael Recreation and Park District",
       "displayName": "Carmichael"
+    },
+    {
+      "id": "449ce3cc-b071-4c6e-b474-d6591d32f617",
+      "slug": "central-point-recreation",
+      "name": "Central Point Parks & Recreation",
+      "displayName": "CPPR"
     },
     {
       "id": "de370d91-868b-4f7b-bf23-3694749661a5",
@@ -115,7 +121,7 @@
       "id": "844620a6-c3d2-4a70-ac3e-1c6e5b76a49f",
       "slug": "city-of-malibu",
       "name": "City of Malibu",
-      "displayName": "Malibu"
+      "displayName": "Malibu CSD"
     },
     {
       "id": "bc94a100-8adb-4303-90cb-7c4714c22751",
@@ -274,6 +280,12 @@
       "displayName": "Mission Oaks"
     },
     {
+      "id": "9e6de746-5935-4c47-855d-0f50b02bfe7e",
+      "slug": "needham",
+      "name": "Needham Park & Recreation",
+      "displayName": "Needham"
+    },
+    {
       "id": "8146fb39-04ec-4a06-89c7-e82f3cd808f3",
       "slug": "norris",
       "name": "Norris Recreation Center ",
@@ -284,6 +296,12 @@
       "slug": "northern-door-sports-and-recreation",
       "name": "Northern Door Sports and Recreation",
       "displayName": "NDSR"
+    },
+    {
+      "id": "f395300e-2edf-42f3-ba24-bebbceb1fa33",
+      "slug": "paradise-recreation-and-park-district",
+      "name": "Paradise Recreation and Park District",
+      "displayName": "PRPD"
     },
     {
       "id": "52efcded-a5e8-4dbf-8a45-100f70170de0",
@@ -362,6 +380,12 @@
       "slug": "the-ranch",
       "name": "The Ranch",
       "displayName": "The Ranch"
+    },
+    {
+      "id": "5dee565a-6012-4b4f-a325-0aea81674364",
+      "slug": "town-of-clarkstown",
+      "name": "Town of Clarkstown",
+      "displayName": null
     },
     {
       "id": "460566d3-3a51-4387-a7a0-0b010923e40d",
@@ -458,188 +482,196 @@
   ],
   "usage": {
     "apex-park-and-recreation-district": {
-      "programs": 613,
-      "registrations": 94166,
-      "memberships": 24529,
-      "passes": 4866,
-      "facilities": 331,
-      "reservations": 86394
+      "programs": 619,
+      "registrations": 98197,
+      "memberships": 24811,
+      "passes": 4921,
+      "facilities": 332,
+      "reservations": 90715
     },
     "carmichael-district": {
       "programs": 0,
-      "registrations": 84,
+      "registrations": 99,
       "memberships": 0,
       "passes": 0,
       "facilities": 12,
-      "reservations": 152
+      "reservations": 193
+    },
+    "central-point-recreation": {
+      "programs": 48,
+      "registrations": 328,
+      "memberships": 219,
+      "passes": 0,
+      "facilities": 67,
+      "reservations": 496
     },
     "chicorec": {
-      "programs": 170,
-      "registrations": 9768,
-      "memberships": 1241,
-      "passes": 21,
+      "programs": 184,
+      "registrations": 10478,
+      "memberships": 1233,
+      "passes": 8,
       "facilities": 141,
-      "reservations": 16632
+      "reservations": 17699
     },
     "city-of-battle-ground": {
       "programs": 0,
-      "registrations": 449,
-      "memberships": 61,
+      "registrations": 462,
+      "memberships": 62,
       "passes": 0,
       "facilities": 7,
-      "reservations": 1839
+      "reservations": 1862
     },
     "city-of-belmont": {
       "programs": 1,
-      "registrations": 10065,
+      "registrations": 10585,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 14599
+      "reservations": 15275
     },
     "city-of-belton": {
-      "programs": 41,
-      "registrations": 3866,
-      "memberships": 175,
+      "programs": 43,
+      "registrations": 3958,
+      "memberships": 194,
       "passes": 3,
       "facilities": 48,
-      "reservations": 722
+      "reservations": 796
     },
     "city-of-boerne": {
-      "programs": 50,
-      "registrations": 2234,
-      "memberships": 371,
+      "programs": 51,
+      "registrations": 2286,
+      "memberships": 376,
       "passes": 0,
-      "facilities": 46,
-      "reservations": 4326
+      "facilities": 47,
+      "reservations": 4363
     },
     "city-of-brisbane": {
       "programs": 22,
-      "registrations": 850,
-      "memberships": 117,
+      "registrations": 886,
+      "memberships": 121,
       "passes": 0,
       "facilities": 3,
-      "reservations": 1721
+      "reservations": 1762
     },
     "city-of-buffalo": {
-      "programs": 28,
-      "registrations": 1357,
-      "memberships": 2945,
+      "programs": 29,
+      "registrations": 1486,
+      "memberships": 3058,
       "passes": 0,
       "facilities": 41,
-      "reservations": 2703
+      "reservations": 2844
     },
     "city-of-easton": {
-      "programs": 13,
-      "registrations": 852,
-      "memberships": 615,
-      "passes": 1,
+      "programs": 14,
+      "registrations": 877,
+      "memberships": 623,
+      "passes": 0,
       "facilities": 23,
-      "reservations": 2391
+      "reservations": 2400
     },
     "city-of-euclid": {
-      "programs": 19,
-      "registrations": 326,
-      "memberships": 1090,
+      "programs": 23,
+      "registrations": 346,
+      "memberships": 1257,
       "passes": 1,
       "facilities": 21,
-      "reservations": 1336
+      "reservations": 1529
     },
     "city-of-hermosa-beach": {
-      "programs": 36,
-      "registrations": 608,
-      "memberships": 1367,
+      "programs": 37,
+      "registrations": 971,
+      "memberships": 1566,
       "passes": 0,
-      "facilities": 78,
-      "reservations": 4822
+      "facilities": 80,
+      "reservations": 5330
     },
     "city-of-jeffersonville": {
       "programs": 22,
-      "registrations": 4553,
-      "memberships": 2411,
+      "registrations": 4598,
+      "memberships": 2455,
       "passes": 0,
       "facilities": 74,
-      "reservations": 2010
+      "reservations": 2052
     },
     "city-of-joplin": {
       "programs": 21,
-      "registrations": 739,
-      "memberships": 205,
-      "passes": 6,
+      "registrations": 817,
+      "memberships": 4,
+      "passes": 7,
       "facilities": 87,
-      "reservations": 527
+      "reservations": 607
     },
     "city-of-lewisburg": {
       "programs": 26,
-      "registrations": 119,
-      "memberships": 362,
+      "registrations": 126,
+      "memberships": 505,
       "passes": 0,
       "facilities": 40,
-      "reservations": 483
+      "reservations": 493
     },
     "city-of-lockhart": {
       "programs": 0,
-      "registrations": 178,
+      "registrations": 181,
       "memberships": 0,
       "passes": 0,
       "facilities": 9,
-      "reservations": 476
+      "reservations": 480
     },
     "city-of-madeira-beach": {
       "programs": 24,
-      "registrations": 2031,
-      "memberships": 272,
+      "registrations": 2159,
+      "memberships": 283,
       "passes": 0,
       "facilities": 39,
-      "reservations": 2047
+      "reservations": 2064
     },
     "city-of-madison": {
       "programs": 83,
-      "registrations": 1903,
-      "memberships": 643,
-      "passes": 500,
+      "registrations": 1950,
+      "memberships": 645,
+      "passes": 475,
       "facilities": 25,
-      "reservations": 3510
+      "reservations": 3517
     },
     "city-of-malibu": {
       "programs": 78,
-      "registrations": 9492,
-      "memberships": 559,
-      "passes": 117,
+      "registrations": 10106,
+      "memberships": 568,
+      "passes": 115,
       "facilities": 19,
-      "reservations": 4664
+      "reservations": 4701
     },
     "city-of-menifee": {
       "programs": 179,
-      "registrations": 14177,
-      "memberships": 3725,
+      "registrations": 15517,
+      "memberships": 3857,
       "passes": 0,
       "facilities": 94,
-      "reservations": 10021
+      "reservations": 10007
     },
     "city-of-miamisburg": {
       "programs": 0,
-      "registrations": 1544,
+      "registrations": 1708,
       "memberships": 0,
       "passes": 0,
       "facilities": 15,
-      "reservations": 5043
+      "reservations": 5217
     },
     "city-of-midland": {
       "programs": 8,
-      "registrations": 2486,
-      "memberships": 1156,
-      "passes": 518,
+      "registrations": 2611,
+      "memberships": 1213,
+      "passes": 506,
       "facilities": 124,
-      "reservations": 14491
+      "reservations": 14825
     },
     "city-of-milford": {
       "programs": 0,
-      "registrations": 14457,
-      "memberships": 1029,
+      "registrations": 15093,
+      "memberships": 1034,
       "passes": 0,
       "facilities": 33,
-      "reservations": 25724
+      "reservations": 26594
     },
     "city-of-mountain-view": {
       "programs": 24,
@@ -647,135 +679,135 @@
       "memberships": 0,
       "passes": 0,
       "facilities": 26,
-      "reservations": 3707
+      "reservations": 3719
     },
     "city-of-natchez": {
       "programs": 7,
-      "registrations": 253,
-      "memberships": 224,
+      "registrations": 264,
+      "memberships": 225,
       "passes": 5,
       "facilities": 41,
-      "reservations": 86
+      "reservations": 149
     },
     "city-of-norman": {
-      "programs": 133,
-      "registrations": 10174,
-      "memberships": 7731,
-      "passes": 11061,
+      "programs": 135,
+      "registrations": 10499,
+      "memberships": 7955,
+      "passes": 10956,
       "facilities": 403,
-      "reservations": 8945
+      "reservations": 9577
     },
     "city-of-piedmont": {
       "programs": 29,
-      "registrations": 7451,
-      "memberships": 6299,
-      "passes": 796,
+      "registrations": 7738,
+      "memberships": 6415,
+      "passes": 812,
       "facilities": 35,
-      "reservations": 4042
+      "reservations": 4047
     },
     "city-of-smyrna": {
       "programs": 103,
-      "registrations": 14883,
-      "memberships": 3314,
-      "passes": 49,
+      "registrations": 17246,
+      "memberships": 3829,
+      "passes": 61,
       "facilities": 98,
-      "reservations": 5922
+      "reservations": 6404
     },
     "city-of-torrance": {
-      "programs": 662,
-      "registrations": 73574,
-      "memberships": 14141,
-      "passes": 384,
-      "facilities": 411,
-      "reservations": 69798
+      "programs": 659,
+      "registrations": 74432,
+      "memberships": 14329,
+      "passes": 395,
+      "facilities": 415,
+      "reservations": 70479
     },
     "city-of-tullahoma": {
-      "programs": 11,
-      "registrations": 220,
-      "memberships": 1831,
+      "programs": 12,
+      "registrations": 254,
+      "memberships": 1953,
       "passes": 0,
       "facilities": 49,
-      "reservations": 511
+      "reservations": 545
     },
     "city-of-watsonville": {
       "programs": 17,
-      "registrations": 130,
-      "memberships": 161,
+      "registrations": 136,
+      "memberships": 164,
       "passes": 0,
       "facilities": 13,
       "reservations": 2589
     },
     "city-of-west-haven": {
-      "programs": 103,
-      "registrations": 3712,
-      "memberships": 2026,
+      "programs": 106,
+      "registrations": 3814,
+      "memberships": 2050,
       "passes": 51,
-      "facilities": 118,
-      "reservations": 5944
+      "facilities": 119,
+      "reservations": 6096
     },
     "city-of-west-sacramento": {
-      "programs": 87,
-      "registrations": 23140,
-      "memberships": 7374,
-      "passes": 319,
-      "facilities": 169,
-      "reservations": 7685
+      "programs": 90,
+      "registrations": 25546,
+      "memberships": 7532,
+      "passes": 226,
+      "facilities": 175,
+      "reservations": 9210
     },
     "douglas-county-nv": {
-      "programs": 79,
-      "registrations": 1190,
-      "memberships": 1741,
+      "programs": 88,
+      "registrations": 2315,
+      "memberships": 2316,
       "passes": 0,
       "facilities": 192,
-      "reservations": 7933
+      "reservations": 8484
     },
     "el-segundo-recreation": {
-      "programs": 98,
-      "registrations": 2979,
-      "memberships": 3568,
-      "passes": 510,
+      "programs": 107,
+      "registrations": 7972,
+      "memberships": 5157,
+      "passes": 758,
       "facilities": 160,
-      "reservations": 16741
+      "reservations": 24930
     },
     "emeryville": {
-      "programs": 133,
-      "registrations": 10803,
-      "memberships": 3201,
-      "passes": 1171,
+      "programs": 134,
+      "registrations": 11056,
+      "memberships": 3234,
+      "passes": 1200,
       "facilities": 113,
-      "reservations": 16361
+      "reservations": 16687
     },
     "essex-junction": {
-      "programs": 38,
-      "registrations": 735,
-      "memberships": 269,
+      "programs": 40,
+      "registrations": 2803,
+      "memberships": 489,
       "passes": 0,
-      "facilities": 18,
-      "reservations": 2240
+      "facilities": 19,
+      "reservations": 2474
     },
     "folsom": {
       "programs": 39,
-      "registrations": 2438,
-      "memberships": 524,
+      "registrations": 2481,
+      "memberships": 535,
       "passes": 0,
       "facilities": 36,
-      "reservations": 4758
+      "reservations": 4812
     },
     "foster-city": {
-      "programs": 5,
-      "registrations": 5008,
-      "memberships": 634,
+      "programs": 4,
+      "registrations": 5277,
+      "memberships": 649,
       "passes": 0,
       "facilities": 8,
-      "reservations": 6355
+      "reservations": 6660
     },
     "jurupa-area-recreation-and-park-district": {
-      "programs": 94,
-      "registrations": 3964,
-      "memberships": 3494,
+      "programs": 102,
+      "registrations": 4284,
+      "memberships": 3642,
       "passes": 0,
-      "facilities": 101,
-      "reservations": 10410
+      "facilities": 102,
+      "reservations": 11488
     },
     "lake-county": {
       "programs": 6,
@@ -783,31 +815,31 @@
       "memberships": 0,
       "passes": 0,
       "facilities": 5,
-      "reservations": 43
+      "reservations": 44
     },
     "lincoln": {
       "programs": 59,
-      "registrations": 2954,
+      "registrations": 3043,
       "memberships": 0,
       "passes": 0,
       "facilities": 24,
-      "reservations": 4549
+      "reservations": 4628
     },
     "littleton": {
-      "programs": 18,
-      "registrations": 423,
-      "memberships": 203,
+      "programs": 22,
+      "registrations": 687,
+      "memberships": 302,
       "passes": 0,
       "facilities": 57,
-      "reservations": 964
+      "reservations": 1012
     },
     "mashantucket-pequot-tribal-nation": {
       "programs": 36,
-      "registrations": 292,
+      "registrations": 299,
       "memberships": 270,
       "passes": 0,
       "facilities": 13,
-      "reservations": 468
+      "reservations": 469
     },
     "mission-oaks-rpd": {
       "programs": 25,
@@ -817,104 +849,120 @@
       "facilities": 18,
       "reservations": 10134
     },
+    "needham": {
+      "programs": 51,
+      "registrations": 571,
+      "memberships": 331,
+      "passes": 0,
+      "facilities": 93,
+      "reservations": 793
+    },
     "norris": {
       "programs": 0,
-      "registrations": 889,
-      "memberships": 130,
+      "registrations": 933,
+      "memberships": 134,
       "passes": 0,
       "facilities": 10,
-      "reservations": 5698
+      "reservations": 6041
     },
     "northern-door-sports-and-recreation": {
       "programs": 19,
-      "registrations": 232,
-      "memberships": 102,
+      "registrations": 367,
+      "memberships": 109,
       "passes": 22,
       "facilities": 23,
-      "reservations": 953
+      "reservations": 1077
+    },
+    "paradise-recreation-and-park-district": {
+      "programs": 19,
+      "registrations": 125,
+      "memberships": 215,
+      "passes": 5,
+      "facilities": 97,
+      "reservations": 1784
     },
     "pleasant-hill": {
-      "programs": 70,
-      "registrations": 2624,
-      "memberships": 1109,
-      "passes": 110,
+      "programs": 71,
+      "registrations": 2640,
+      "memberships": 1114,
+      "passes": 117,
       "facilities": 67,
-      "reservations": 3486
+      "reservations": 3564
     },
     "prescott-valley": {
-      "programs": 86,
-      "registrations": 6228,
-      "memberships": 1248,
+      "programs": 93,
+      "registrations": 6660,
+      "memberships": 1314,
       "passes": 0,
-      "facilities": 121,
-      "reservations": 10317
+      "facilities": 123,
+      "reservations": 10635
     },
     "pueblo-county": {
       "programs": 22,
-      "registrations": 1792,
-      "memberships": 654,
-      "passes": 86,
+      "registrations": 1813,
+      "memberships": 657,
+      "passes": 96,
       "facilities": 21,
-      "reservations": 1549
+      "reservations": 1588
     },
     "putnam-county": {
-      "programs": 22,
-      "registrations": 1051,
+      "programs": 24,
+      "registrations": 1107,
       "memberships": 0,
       "passes": 0,
       "facilities": 57,
-      "reservations": 1223
+      "reservations": 1148
     },
     "rocklin": {
       "programs": 95,
-      "registrations": 1534,
-      "memberships": 919,
+      "registrations": 1568,
+      "memberships": 945,
       "passes": 0,
       "facilities": 21,
-      "reservations": 3206
+      "reservations": 3250
     },
     "sacramento-county": {
       "programs": 47,
-      "registrations": 2325,
+      "registrations": 2436,
       "memberships": 0,
       "passes": 0,
       "facilities": 140,
-      "reservations": 3657
+      "reservations": 4037
     },
     "san-francisco-rec-park": {
-      "programs": 215,
-      "registrations": 370306,
+      "programs": 214,
+      "registrations": 376948,
       "memberships": 0,
       "passes": 0,
       "facilities": 114,
-      "reservations": 551383
+      "reservations": 558935
     },
     "santacruzcounty": {
-      "programs": 103,
-      "registrations": 6160,
-      "memberships": 1649,
+      "programs": 99,
+      "registrations": 6285,
+      "memberships": 1673,
       "passes": 0,
       "facilities": 251,
-      "reservations": 9403
+      "reservations": 9531
     },
     "sebastopol": {
       "programs": 55,
-      "registrations": 1168,
+      "registrations": 1184,
       "memberships": 6,
       "passes": 0,
       "facilities": 11,
-      "reservations": 5970
+      "reservations": 6020
     },
     "sunrise-pickleball-club": {
-      "programs": 35,
-      "registrations": 706,
+      "programs": 34,
+      "registrations": 718,
       "memberships": 0,
       "passes": 0,
       "facilities": 11,
-      "reservations": 2506
+      "reservations": 2517
     },
     "sunrise-rpd": {
-      "programs": 26,
+      "programs": 24,
       "registrations": 35,
       "memberships": 1,
       "passes": 0,
@@ -923,91 +971,99 @@
     },
     "the-dance-palace": {
       "programs": 6,
-      "registrations": 124,
+      "registrations": 151,
       "memberships": 5,
       "passes": 0,
       "facilities": 11,
-      "reservations": 1552
+      "reservations": 1590
     },
     "the-ranch": {
       "programs": 41,
-      "registrations": 7843,
-      "memberships": 1597,
-      "passes": 86,
+      "registrations": 8236,
+      "memberships": 1666,
+      "passes": 88,
       "facilities": 14,
-      "reservations": 8563
+      "reservations": 8991
+    },
+    "town-of-clarkstown": {
+      "programs": 62,
+      "registrations": 815,
+      "memberships": 5379,
+      "passes": 0,
+      "facilities": 78,
+      "reservations": 1164
     },
     "town-of-clarksville": {
       "programs": 31,
-      "registrations": 1565,
-      "memberships": 656,
+      "registrations": 1687,
+      "memberships": 677,
       "passes": 54,
       "facilities": 21,
-      "reservations": 2938
+      "reservations": 2948
     },
     "town-of-corte-madera": {
       "programs": 0,
-      "registrations": 13765,
+      "registrations": 14239,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 20485
+      "reservations": 21061
     },
     "town-of-danvers": {
-      "programs": 134,
-      "registrations": 7872,
-      "memberships": 2108,
-      "passes": 324,
+      "programs": 138,
+      "registrations": 8171,
+      "memberships": 2130,
+      "passes": 347,
       "facilities": 72,
-      "reservations": 8289
+      "reservations": 9165
     },
     "town-of-reading": {
-      "programs": 119,
-      "registrations": 5144,
-      "memberships": 689,
+      "programs": 121,
+      "registrations": 5515,
+      "memberships": 717,
       "passes": 0,
       "facilities": 80,
-      "reservations": 948
+      "reservations": 972
     },
     "town-of-shrewsbury": {
-      "programs": 172,
-      "registrations": 3254,
-      "memberships": 1784,
-      "passes": 0,
-      "facilities": 153,
-      "reservations": 4374
+      "programs": 178,
+      "registrations": 3818,
+      "memberships": 1992,
+      "passes": 7,
+      "facilities": 157,
+      "reservations": 4491
     },
     "town-of-taylor": {
       "programs": 67,
-      "registrations": 4941,
-      "memberships": 278,
+      "registrations": 4967,
+      "memberships": 275,
       "passes": 0,
       "facilities": 25,
-      "reservations": 1584
+      "reservations": 1599
     },
     "town-of-windham": {
-      "programs": 122,
-      "registrations": 4979,
-      "memberships": 1624,
-      "passes": 15,
+      "programs": 123,
+      "registrations": 5068,
+      "memberships": 1643,
+      "passes": 17,
       "facilities": 55,
-      "reservations": 4763
+      "reservations": 4853
     },
     "watertown": {
-      "programs": 165,
-      "registrations": 10056,
-      "memberships": 2182,
+      "programs": 164,
+      "registrations": 10515,
+      "memberships": 2240,
       "passes": 0,
       "facilities": 133,
-      "reservations": 10583
+      "reservations": 10908
     },
     "yerba-buena-gardens": {
-      "programs": 47,
-      "registrations": 1550,
-      "memberships": 323,
+      "programs": 49,
+      "registrations": 2715,
+      "memberships": 507,
       "passes": 0,
       "facilities": 8,
-      "reservations": 1332
+      "reservations": 1641
     }
   },
   "featureCategories": [
@@ -1020,7 +1076,9 @@
     "Integrations & Admin",
     "Communications",
     "Leagues & Teams",
-    "Store & POS"
+    "Store & POS",
+    "Events & Ticketing",
+    "AI & Automation"
   ],
   "features": [
     {
@@ -1513,19 +1571,59 @@
       "signal": "table: household_note (message, household_id); organization_role.can_manage_crm",
       "adoption_definition": "Has >=1 household_note created",
       "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?"
+    },
+    {
+      "key": "events",
+      "name": "Events & Ticketing",
+      "category": "Events & Ticketing",
+      "description": "Standalone ticketed events — concerts, camps-out, festivals — configured outside the program/section model.",
+      "signal": "event rows (event.deleted_at IS NULL) per organization; event.is_ticketed marks the ones selling tickets, ticket_tier holds the price bands. NOTE event_session is EMPTY platform-wide (0 rows) — do not measure through it.",
+      "adoption_definition": "Has >=1 live event (event.deleted_at IS NULL). Archived events count: adoption is whether the org has configured the feature, and an org that ran events last season still adopted it. event.canceled_at is non-null nowhere on the platform.",
+      "measure_question": "How many events has this organization configured, and how many of them are ticketed?",
+      "short": "Events"
+    },
+    {
+      "key": "ticket_sales",
+      "name": "Event Ticket Sales",
+      "category": "Events & Ticketing",
+      "description": "Tickets actually sold for an event, as distinct from tickets sitting unpaid in a cart.",
+      "signal": "event_ticket where status='confirmed' AND canceled_at IS NULL AND deleted_at IS NULL, joined to event/ticket_tier for the event and price.",
+      "adoption_definition": "Has >=1 confirmed, non-canceled ticket. Counting every event_ticket row instead overstates by ~30% platform-wide, because status='pending' means unpaid in a cart — 5,095 of 17,112 rows, 1,082 of them at one org. A pending ticket is not a sale.",
+      "measure_question": "How many tickets has this organization actually sold, and how many are still pending payment?",
+      "short": "Tickets"
+    },
+    {
+      "key": "ai_assistant",
+      "name": "Seb (AI Assistant)",
+      "category": "AI & Automation",
+      "description": "Staff asking Seb questions in the admin — the conversational assistant, not the scheduled routines.",
+      "signal": "ai_chat_turn where status='succeeded' and the agent is a human-facing one. STATUS IS 'succeeded', NOT 'completed' — the obvious guess matches 0 of 5,337 rows. Threads live in ai_chat_thread; per-turn token and cost_usd are on the turn.",
+      "adoption_definition": "Has >=1 succeeded turn a person initiated. The agents 'thread-titler', 'bulk-summarizer' and 'routine-draft-summarizer' are the SYSTEM titling threads and summarizing, not usage — 1,077 of 5,337 turns platform-wide, and at one org they outnumber the real ones 59 to 101. Turns under agent 'routine' are a scheduled routine running, counted separately.",
+      "measure_question": "How many questions have this organization's staff asked Seb, and how many distinct people asked them?",
+      "short": "Seb"
+    },
+    {
+      "key": "ai_routines",
+      "name": "Seb Routines (Scheduled AI)",
+      "category": "AI & Automation",
+      "description": "Recurring jobs an org has set up for Seb to run on a schedule — a report every Monday, a weekly check on something.",
+      "signal": "ai_chat_routine rows per organization (all rows). Runs are ai_chat_routine_run, and their turns appear in ai_chat_turn under agent='routine'.",
+      "adoption_definition": "Has >=1 routine configured — the same shape as discount_codes and scholarships, where having set the thing up is the adoption signal. Runs are deliberately a different number: a routine configured and never fired is still adoption of the feature, and a busy routine is usage of it.",
+      "measure_question": "How many scheduled Seb routines has this organization set up, and how often do they run?",
+      "short": "Routines"
     }
   ],
   "adoption": {
     "apex-park-and-recreation-district": {
       "age_eligibility": {
         "adopted": true,
-        "count": 4336,
-        "detail": "4,336 sections with age rules"
+        "count": 4573,
+        "detail": "4,573 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 3485,
-        "detail": "3,485 sections with waitlist"
+        "count": 3712,
+        "detail": "3,712 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -1534,18 +1632,18 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 216451,
-        "detail": "216,451 emails sent"
+        "count": 236997,
+        "detail": "236,997 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 263,
-        "detail": "263 sections with plans"
+        "count": 287,
+        "detail": "287 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
-        "count": 13,
-        "detail": "13 promo codes"
+        "count": 14,
+        "detail": "14 promo codes"
       },
       "scholarships": {
         "adopted": true,
@@ -1564,8 +1662,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 89,
-        "detail": "89 forms"
+        "count": 94,
+        "detail": "94 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -1574,8 +1672,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 887,
-        "detail": "887 GL accounts"
+        "count": 890,
+        "detail": "890 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -1586,6 +1684,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 150,
+        "detail": "150 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 484,
+        "detail": "484 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 routines set up"
       }
     },
     "carmichael-district": {
@@ -1658,28 +1776,140 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "central-point-recreation": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 70,
+        "detail": "70 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 72,
+        "detail": "72 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 40,
+        "detail": "40 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "chicorec": {
       "age_eligibility": {
         "adopted": true,
-        "count": 1404,
-        "detail": "1,404 sections with age rules"
+        "count": 1505,
+        "detail": "1,505 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 1185,
-        "detail": "1,185 sections with waitlist"
+        "count": 1278,
+        "detail": "1,278 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 2784,
-        "detail": "2,784 SMS sent"
+        "count": 2826,
+        "detail": "2,826 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 5843,
-        "detail": "5,843 emails sent"
+        "count": 6820,
+        "detail": "6,820 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -1708,8 +1938,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 36,
-        "detail": "36 forms"
+        "count": 37,
+        "detail": "37 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -1718,8 +1948,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 50,
-        "detail": "50 GL accounts"
+        "count": 51,
+        "detail": "51 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -1727,6 +1957,26 @@
         "detail": "5 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 601,
+        "detail": "601 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 101,
+        "detail": "101 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -1802,6 +2052,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-belmont": {
@@ -1874,18 +2144,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-belton": {
       "age_eligibility": {
         "adopted": true,
-        "count": 67,
-        "detail": "67 sections with age rules"
+        "count": 73,
+        "detail": "73 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 sections with waitlist"
+        "count": 12,
+        "detail": "12 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -1894,8 +2184,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 74,
-        "detail": "74 emails sent"
+        "count": 84,
+        "detail": "84 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -1924,8 +2214,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 20,
-        "detail": "20 forms"
+        "count": 21,
+        "detail": "21 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -1943,6 +2233,26 @@
         "detail": "3 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 23,
+        "detail": "23 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -1966,8 +2276,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 4890,
-        "detail": "4,890 emails sent"
+        "count": 5746,
+        "detail": "5,746 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2018,6 +2328,26 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 22,
+        "detail": "22 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-brisbane": {
@@ -2090,13 +2420,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-buffalo": {
       "age_eligibility": {
         "adopted": true,
-        "count": 10,
-        "detail": "10 sections with age rules"
+        "count": 11,
+        "detail": "11 sections with age rules"
       },
       "waitlist": {
         "adopted": false,
@@ -2115,8 +2465,8 @@
       },
       "payment_plans": {
         "adopted": true,
-        "count": 8,
-        "detail": "8 sections with plans"
+        "count": 7,
+        "detail": "7 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -2162,13 +2512,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 38,
+        "detail": "38 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-easton": {
       "age_eligibility": {
         "adopted": true,
-        "count": 38,
-        "detail": "38 sections with age rules"
+        "count": 39,
+        "detail": "39 sections with age rules"
       },
       "waitlist": {
         "adopted": false,
@@ -2182,8 +2552,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 35,
-        "detail": "35 emails sent"
+        "count": 38,
+        "detail": "38 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2234,18 +2604,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-euclid": {
       "age_eligibility": {
         "adopted": true,
-        "count": 16,
-        "detail": "16 sections with age rules"
+        "count": 34,
+        "detail": "34 sections with age rules"
       },
       "waitlist": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 5,
+        "detail": "5 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -2254,8 +2644,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 819,
-        "detail": "819 emails sent"
+        "count": 1838,
+        "detail": "1,838 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2284,8 +2674,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 6,
-        "detail": "6 forms"
+        "count": 8,
+        "detail": "8 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -2306,18 +2696,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 33,
+        "detail": "33 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 routines set up"
       }
     },
     "city-of-hermosa-beach": {
       "age_eligibility": {
         "adopted": true,
-        "count": 213,
-        "detail": "213 sections with age rules"
+        "count": 214,
+        "detail": "214 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 sections with waitlist"
+        "count": 12,
+        "detail": "12 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -2326,8 +2736,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 147,
-        "detail": "147 emails sent"
+        "count": 218,
+        "detail": "218 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2335,9 +2745,9 @@
         "detail": "Not using"
       },
       "discount_codes": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 promo codes"
       },
       "scholarships": {
         "adopted": true,
@@ -2356,13 +2766,13 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 forms"
+        "count": 18,
+        "detail": "18 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 20,
-        "detail": "20 instant-bookable sites"
+        "count": 21,
+        "detail": "21 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -2378,6 +2788,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 230,
+        "detail": "230 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 routines set up"
       }
     },
     "city-of-jeffersonville": {
@@ -2398,8 +2828,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 1921,
-        "detail": "1,921 emails sent"
+        "count": 1929,
+        "detail": "1,929 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -2433,8 +2863,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 8,
-        "detail": "8 instant-bookable sites"
+        "count": 6,
+        "detail": "6 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -2450,6 +2880,26 @@
         "adopted": true,
         "count": 9,
         "detail": "9 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-joplin": {
@@ -2500,13 +2950,13 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 18,
-        "detail": "18 forms"
+        "count": 19,
+        "detail": "19 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 68,
-        "detail": "68 instant-bookable sites"
+        "count": 66,
+        "detail": "66 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -2519,6 +2969,26 @@
         "detail": "2 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -2594,6 +3064,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lockhart": {
@@ -2666,6 +3156,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-madeira-beach": {
@@ -2686,8 +3196,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 305,
-        "detail": "305 emails sent"
+        "count": 392,
+        "detail": "392 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2738,6 +3248,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-madison": {
@@ -2758,8 +3288,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 1322,
-        "detail": "1,322 emails sent"
+        "count": 1493,
+        "detail": "1,493 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -2810,28 +3340,48 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 13,
+        "detail": "13 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-malibu": {
       "age_eligibility": {
         "adopted": true,
-        "count": 608,
-        "detail": "608 sections with age rules"
+        "count": 611,
+        "detail": "611 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 519,
-        "detail": "519 sections with waitlist"
+        "count": 522,
+        "detail": "522 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 731,
-        "detail": "731 SMS sent"
+        "count": 780,
+        "detail": "780 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 4576,
-        "detail": "4,576 emails sent"
+        "count": 5842,
+        "detail": "5,842 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -2870,8 +3420,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 GL accounts"
+        "count": 15,
+        "detail": "15 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -2882,18 +3432,38 @@
         "adopted": true,
         "count": 4,
         "detail": "4 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-menifee": {
       "age_eligibility": {
         "adopted": true,
-        "count": 666,
-        "detail": "666 sections with age rules"
+        "count": 673,
+        "detail": "673 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 543,
-        "detail": "543 sections with waitlist"
+        "count": 545,
+        "detail": "545 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -2902,8 +3472,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 40254,
-        "detail": "40,254 emails sent"
+        "count": 48269,
+        "detail": "48,269 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -2942,8 +3512,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 26,
-        "detail": "26 GL accounts"
+        "count": 28,
+        "detail": "28 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -2951,6 +3521,26 @@
         "detail": "4 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -2974,8 +3564,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 9,
-        "detail": "9 emails sent"
+        "count": 10,
+        "detail": "10 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3026,6 +3616,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-midland": {
@@ -3046,8 +3656,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 107,
-        "detail": "107 emails sent"
+        "count": 110,
+        "detail": "110 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3095,6 +3705,26 @@
         "detail": "3 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -3170,6 +3800,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-mountain-view": {
@@ -3239,6 +3889,26 @@
         "detail": "6 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -3314,18 +3984,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-norman": {
       "age_eligibility": {
         "adopted": true,
-        "count": 528,
-        "detail": "528 sections with age rules"
+        "count": 540,
+        "detail": "540 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 392,
-        "detail": "392 sections with waitlist"
+        "count": 397,
+        "detail": "397 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -3334,13 +4024,13 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 52160,
-        "detail": "52,160 emails sent"
+        "count": 56301,
+        "detail": "56,301 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 52,
-        "detail": "52 sections with plans"
+        "count": 57,
+        "detail": "57 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -3364,8 +4054,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 30,
-        "detail": "30 forms"
+        "count": 31,
+        "detail": "31 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -3374,8 +4064,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 80,
-        "detail": "80 GL accounts"
+        "count": 81,
+        "detail": "81 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -3386,6 +4076,26 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-piedmont": {
@@ -3406,8 +4116,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 31969,
-        "detail": "31,969 emails sent"
+        "count": 42676,
+        "detail": "42,676 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3446,8 +4156,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 22,
-        "detail": "22 GL accounts"
+        "count": 23,
+        "detail": "23 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -3458,33 +4168,53 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 89,
+        "detail": "89 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 routines set up"
       }
     },
     "city-of-smyrna": {
       "age_eligibility": {
         "adopted": true,
-        "count": 1985,
-        "detail": "1,985 sections with age rules"
+        "count": 2146,
+        "detail": "2,146 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 1711,
-        "detail": "1,711 sections with waitlist"
+        "count": 1838,
+        "detail": "1,838 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 24,
-        "detail": "24 SMS sent"
+        "count": 33,
+        "detail": "33 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 2025,
-        "detail": "2,025 emails sent"
+        "count": 2028,
+        "detail": "2,028 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 503,
-        "detail": "503 sections with plans"
+        "count": 547,
+        "detail": "547 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -3530,18 +4260,38 @@
         "adopted": true,
         "count": 3,
         "detail": "3 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 76,
+        "detail": "76 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 routines set up"
       }
     },
     "city-of-torrance": {
       "age_eligibility": {
         "adopted": true,
-        "count": 3512,
-        "detail": "3,512 sections with age rules"
+        "count": 3538,
+        "detail": "3,538 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 4568,
-        "detail": "4,568 sections with waitlist"
+        "count": 4574,
+        "detail": "4,574 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3550,8 +4300,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 6582,
-        "detail": "6,582 emails sent"
+        "count": 6612,
+        "detail": "6,612 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3580,18 +4330,18 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 20,
-        "detail": "20 forms"
+        "count": 21,
+        "detail": "21 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 299,
-        "detail": "299 instant-bookable sites"
+        "count": 298,
+        "detail": "298 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 70,
-        "detail": "70 GL accounts"
+        "count": 78,
+        "detail": "78 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -3602,6 +4352,26 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 4210,
+        "detail": "4,210 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 263,
+        "detail": "263 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 routines set up"
       }
     },
     "city-of-tullahoma": {
@@ -3622,8 +4392,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 1239,
-        "detail": "1,239 emails sent"
+        "count": 2613,
+        "detail": "2,613 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3671,6 +4441,26 @@
         "detail": "4 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -3746,28 +4536,48 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-west-haven": {
       "age_eligibility": {
         "adopted": true,
-        "count": 305,
-        "detail": "305 sections with age rules"
+        "count": 314,
+        "detail": "314 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 59,
-        "detail": "59 sections with waitlist"
+        "count": 66,
+        "detail": "66 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 5224,
-        "detail": "5,224 SMS sent"
+        "count": 5244,
+        "detail": "5,244 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 92923,
-        "detail": "92,923 emails sent"
+        "count": 96432,
+        "detail": "96,432 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3818,18 +4628,38 @@
         "adopted": true,
         "count": 3,
         "detail": "3 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-west-sacramento": {
       "age_eligibility": {
         "adopted": true,
-        "count": 796,
-        "detail": "796 sections with age rules"
+        "count": 841,
+        "detail": "841 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 516,
-        "detail": "516 sections with waitlist"
+        "count": 536,
+        "detail": "536 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3838,8 +4668,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 14146,
-        "detail": "14,146 emails sent"
+        "count": 15663,
+        "detail": "15,663 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3868,13 +4698,13 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 57,
-        "detail": "57 forms"
+        "count": 59,
+        "detail": "59 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 12,
-        "detail": "12 instant-bookable sites"
+        "count": 10,
+        "detail": "10 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -3890,18 +4720,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 77,
+        "detail": "77 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 32,
+        "detail": "32 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "douglas-county-nv": {
       "age_eligibility": {
         "adopted": true,
-        "count": 22,
-        "detail": "22 sections with age rules"
+        "count": 30,
+        "detail": "30 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 39,
-        "detail": "39 sections with waitlist"
+        "count": 42,
+        "detail": "42 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3910,8 +4760,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 295,
-        "detail": "295 emails sent"
+        "count": 3058,
+        "detail": "3,058 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -3940,8 +4790,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 19,
-        "detail": "19 forms"
+        "count": 20,
+        "detail": "20 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -3962,18 +4812,38 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 77,
+        "detail": "77 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 227,
+        "detail": "227 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 routines set up"
       }
     },
     "el-segundo-recreation": {
       "age_eligibility": {
         "adopted": true,
-        "count": 240,
-        "detail": "240 sections with age rules"
+        "count": 278,
+        "detail": "278 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 154,
-        "detail": "154 sections with waitlist"
+        "count": 169,
+        "detail": "169 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3982,8 +4852,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 emails sent"
+        "count": 24,
+        "detail": "24 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -3992,8 +4862,8 @@
       },
       "discount_codes": {
         "adopted": true,
-        "count": 1,
-        "detail": "1 promo codes"
+        "count": 2,
+        "detail": "2 promo codes"
       },
       "scholarships": {
         "adopted": false,
@@ -4017,8 +4887,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 144,
-        "detail": "144 instant-bookable sites"
+        "count": 146,
+        "detail": "146 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -4034,18 +4904,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 316,
+        "detail": "316 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "emeryville": {
       "age_eligibility": {
         "adopted": true,
-        "count": 1057,
-        "detail": "1,057 sections with age rules"
+        "count": 1096,
+        "detail": "1,096 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 1112,
-        "detail": "1,112 sections with waitlist"
+        "count": 1148,
+        "detail": "1,148 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -4054,13 +4944,13 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 45521,
-        "detail": "45,521 emails sent"
+        "count": 49204,
+        "detail": "49,204 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 107,
-        "detail": "107 sections with plans"
+        "count": 110,
+        "detail": "110 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -4084,8 +4974,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 31,
-        "detail": "31 forms"
+        "count": 34,
+        "detail": "34 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -4099,10 +4989,30 @@
       },
       "seasons": {
         "adopted": true,
-        "count": 12,
-        "detail": "12 seasons"
+        "count": 14,
+        "detail": "14 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 64,
+        "detail": "64 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4121,8 +5031,8 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 1,
-        "detail": "1 SMS sent"
+        "count": 131,
+        "detail": "131 SMS sent"
       },
       "email_messaging": {
         "adopted": false,
@@ -4131,8 +5041,8 @@
       },
       "payment_plans": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 sections with plans"
+        "count": 12,
+        "detail": "12 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -4150,14 +5060,14 @@
         "detail": "Not using"
       },
       "custom_booking_questions": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 programs with questions"
       },
       "custom_forms": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 forms"
+        "count": 21,
+        "detail": "21 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -4175,6 +5085,26 @@
         "detail": "2 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4250,6 +5180,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "foster-city": {
@@ -4322,18 +5272,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "jurupa-area-recreation-and-park-district": {
       "age_eligibility": {
         "adopted": true,
-        "count": 768,
-        "detail": "768 sections with age rules"
+        "count": 902,
+        "detail": "902 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 702,
-        "detail": "702 sections with waitlist"
+        "count": 831,
+        "detail": "831 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -4342,8 +5312,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 18119,
-        "detail": "18,119 emails sent"
+        "count": 18254,
+        "detail": "18,254 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -4372,8 +5342,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 43,
-        "detail": "43 forms"
+        "count": 45,
+        "detail": "45 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -4394,13 +5364,33 @@
         "adopted": true,
         "count": 5,
         "detail": "5 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 6267,
+        "detail": "6,267 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "lake-county": {
       "age_eligibility": {
         "adopted": true,
-        "count": 10,
-        "detail": "10 sections with age rules"
+        "count": 11,
+        "detail": "11 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -4444,8 +5434,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 4,
-        "detail": "4 forms"
+        "count": 5,
+        "detail": "5 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -4459,10 +5449,30 @@
       },
       "seasons": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 seasons"
+        "count": 4,
+        "detail": "4 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4471,8 +5481,8 @@
     "lincoln": {
       "age_eligibility": {
         "adopted": true,
-        "count": 180,
-        "detail": "180 sections with age rules"
+        "count": 181,
+        "detail": "181 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -4521,8 +5531,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 instant-bookable sites"
+        "count": 20,
+        "detail": "20 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": false,
@@ -4538,18 +5548,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "littleton": {
       "age_eligibility": {
         "adopted": true,
-        "count": 25,
-        "detail": "25 sections with age rules"
+        "count": 29,
+        "detail": "29 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 18,
-        "detail": "18 sections with waitlist"
+        "count": 19,
+        "detail": "19 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -4557,9 +5587,9 @@
         "detail": "Not using"
       },
       "email_messaging": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -4568,8 +5598,8 @@
       },
       "discount_codes": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 promo codes"
+        "count": 7,
+        "detail": "7 promo codes"
       },
       "scholarships": {
         "adopted": false,
@@ -4610,13 +5640,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mashantucket-pequot-tribal-nation": {
       "age_eligibility": {
         "adopted": true,
-        "count": 13,
-        "detail": "13 sections with age rules"
+        "count": 14,
+        "detail": "14 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -4665,8 +5715,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 instant-bookable sites"
+        "count": 1,
+        "detail": "1 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -4682,6 +5732,26 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mission-oaks-rpd": {
@@ -4751,6 +5821,118 @@
         "detail": "5 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "needham": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 114,
+        "detail": "114 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 141,
+        "detail": "141 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 SMS sent"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 forms"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4826,18 +6008,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "northern-door-sports-and-recreation": {
       "age_eligibility": {
         "adopted": true,
-        "count": 36,
-        "detail": "36 sections with age rules"
+        "count": 33,
+        "detail": "33 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 58,
-        "detail": "58 sections with waitlist"
+        "count": 54,
+        "detail": "54 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -4846,8 +6048,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 69,
-        "detail": "69 emails sent"
+        "count": 70,
+        "detail": "70 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -4896,8 +6098,120 @@
       },
       "competitions_leagues": {
         "adopted": true,
+        "count": 2,
+        "detail": "2 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "paradise-recreation-and-park-district": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 102,
+        "detail": "102 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 93,
+        "detail": "93 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
         "count": 1,
-        "detail": "1 leagues/competitions"
+        "detail": "1 emails sent"
+      },
+      "payment_plans": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with plans"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 scholarship programs"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 88,
+        "detail": "88 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "pleasant-hill": {
@@ -4918,8 +6232,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 6820,
-        "detail": "6,820 emails sent"
+        "count": 6821,
+        "detail": "6,821 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -4970,13 +6284,33 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "prescott-valley": {
       "age_eligibility": {
         "adopted": true,
-        "count": 366,
-        "detail": "366 sections with age rules"
+        "count": 394,
+        "detail": "394 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -4990,8 +6324,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 377,
-        "detail": "377 emails sent"
+        "count": 381,
+        "detail": "381 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -5042,13 +6376,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 20,
+        "detail": "20 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 routines set up"
       }
     },
     "pueblo-county": {
       "age_eligibility": {
         "adopted": true,
-        "count": 159,
-        "detail": "159 sections with age rules"
+        "count": 167,
+        "detail": "167 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5062,8 +6416,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 806,
-        "detail": "806 emails sent"
+        "count": 2237,
+        "detail": "2,237 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -5097,8 +6451,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 4,
-        "detail": "4 instant-bookable sites"
+        "count": 1,
+        "detail": "1 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -5114,13 +6468,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "putnam-county": {
       "age_eligibility": {
         "adopted": true,
-        "count": 50,
-        "detail": "50 sections with age rules"
+        "count": 55,
+        "detail": "55 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5184,8 +6558,28 @@
       },
       "competitions_leagues": {
         "adopted": true,
-        "count": 8,
-        "detail": "8 leagues/competitions"
+        "count": 11,
+        "detail": "11 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rocklin": {
@@ -5258,6 +6652,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sacramento-county": {
@@ -5308,8 +6722,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 12,
-        "detail": "12 forms"
+        "count": 14,
+        "detail": "14 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -5330,13 +6744,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "san-francisco-rec-park": {
       "age_eligibility": {
         "adopted": true,
-        "count": 268,
-        "detail": "268 sections with age rules"
+        "count": 277,
+        "detail": "277 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5350,8 +6784,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 8773,
-        "detail": "8,773 emails sent"
+        "count": 45358,
+        "detail": "45,358 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -5402,13 +6836,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 45,
+        "detail": "45 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 routines set up"
       }
     },
     "santacruzcounty": {
       "age_eligibility": {
         "adopted": true,
-        "count": 178,
-        "detail": "178 sections with age rules"
+        "count": 183,
+        "detail": "183 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5452,8 +6906,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 10,
-        "detail": "10 forms"
+        "count": 12,
+        "detail": "12 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -5462,8 +6916,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 41,
-        "detail": "41 GL accounts"
+        "count": 43,
+        "detail": "43 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -5474,13 +6928,33 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sebastopol": {
       "age_eligibility": {
         "adopted": true,
-        "count": 290,
-        "detail": "290 sections with age rules"
+        "count": 291,
+        "detail": "291 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -5528,9 +7002,9 @@
         "detail": "8 forms"
       },
       "instant_booking": {
-        "adopted": true,
-        "count": 3,
-        "detail": "3 instant-bookable sites"
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       },
       "gl_accounting": {
         "adopted": true,
@@ -5543,6 +7017,26 @@
         "detail": "9 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -5618,6 +7112,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sunrise-rpd": {
@@ -5690,6 +7204,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "the-dance-palace": {
@@ -5710,8 +7244,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 emails sent"
+        "count": 4,
+        "detail": "4 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -5762,18 +7296,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 21,
+        "detail": "21 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "the-ranch": {
       "age_eligibility": {
         "adopted": true,
-        "count": 507,
-        "detail": "507 sections with age rules"
+        "count": 509,
+        "detail": "509 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 537,
-        "detail": "537 sections with waitlist"
+        "count": 539,
+        "detail": "539 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -5782,8 +7336,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 28441,
-        "detail": "28,441 emails sent"
+        "count": 30848,
+        "detail": "30,848 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -5792,8 +7346,8 @@
       },
       "discount_codes": {
         "adopted": true,
-        "count": 1,
-        "detail": "1 promo codes"
+        "count": 2,
+        "detail": "2 promo codes"
       },
       "scholarships": {
         "adopted": false,
@@ -5834,6 +7388,118 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "town-of-clarkstown": {
+      "age_eligibility": {
+        "adopted": true,
+        "count": 170,
+        "detail": "170 sections with age rules"
+      },
+      "waitlist": {
+        "adopted": true,
+        "count": 193,
+        "detail": "193 sections with waitlist"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 emails sent"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 programs with questions"
+      },
+      "custom_forms": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 forms"
+      },
+      "instant_booking": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 instant-bookable sites"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 GL accounts"
+      },
+      "seasons": {
+        "adopted": true,
+        "count": 7,
+        "detail": "7 seasons"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 112,
+        "detail": "112 questions asked"
+      },
+      "ai_routines": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 routines set up"
       }
     },
     "town-of-clarksville": {
@@ -5854,8 +7520,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 816,
-        "detail": "816 emails sent"
+        "count": 866,
+        "detail": "866 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -5884,8 +7550,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 10,
-        "detail": "10 forms"
+        "count": 12,
+        "detail": "12 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -5894,8 +7560,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 13,
-        "detail": "13 GL accounts"
+        "count": 17,
+        "detail": "17 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -5906,6 +7572,26 @@
         "adopted": true,
         "count": 1,
         "detail": "1 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 12,
+        "detail": "12 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-corte-madera": {
@@ -5978,38 +7664,58 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-danvers": {
       "age_eligibility": {
         "adopted": true,
-        "count": 198,
-        "detail": "198 sections with age rules"
+        "count": 203,
+        "detail": "203 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 228,
-        "detail": "228 sections with waitlist"
+        "count": 233,
+        "detail": "233 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 17,
-        "detail": "17 SMS sent"
+        "count": 565,
+        "detail": "565 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 4326,
-        "detail": "4,326 emails sent"
+        "count": 4498,
+        "detail": "4,498 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 12,
-        "detail": "12 sections with plans"
+        "count": 11,
+        "detail": "11 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 promo codes"
+        "count": 3,
+        "detail": "3 promo codes"
       },
       "scholarships": {
         "adopted": true,
@@ -6050,28 +7756,48 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-reading": {
       "age_eligibility": {
         "adopted": true,
-        "count": 272,
-        "detail": "272 sections with age rules"
+        "count": 286,
+        "detail": "286 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 63,
-        "detail": "63 sections with waitlist"
+        "count": 68,
+        "detail": "68 sections with waitlist"
       },
       "sms_messaging": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 3,
+        "detail": "3 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 67,
-        "detail": "67 emails sent"
+        "count": 79,
+        "detail": "79 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -6122,18 +7848,38 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 29,
+        "detail": "29 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-shrewsbury": {
       "age_eligibility": {
         "adopted": true,
-        "count": 557,
-        "detail": "557 sections with age rules"
+        "count": 589,
+        "detail": "589 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 534,
-        "detail": "534 sections with waitlist"
+        "count": 589,
+        "detail": "589 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -6142,13 +7888,13 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 878,
-        "detail": "878 emails sent"
+        "count": 884,
+        "detail": "884 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 28,
-        "detail": "28 sections with plans"
+        "count": 29,
+        "detail": "29 sections with plans"
       },
       "discount_codes": {
         "adopted": false,
@@ -6172,8 +7918,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 27,
-        "detail": "27 forms"
+        "count": 29,
+        "detail": "29 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -6194,6 +7940,26 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 events"
+      },
+      "ticket_sales": {
+        "adopted": true,
+        "count": 31,
+        "detail": "31 tickets sold"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-taylor": {
@@ -6204,8 +7970,8 @@
       },
       "waitlist": {
         "adopted": true,
-        "count": 144,
-        "detail": "144 sections with waitlist"
+        "count": 146,
+        "detail": "146 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -6264,30 +8030,50 @@
       },
       "competitions_leagues": {
         "adopted": true,
-        "count": 31,
-        "detail": "31 leagues/competitions"
+        "count": 32,
+        "detail": "32 leagues/competitions"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-windham": {
       "age_eligibility": {
         "adopted": true,
-        "count": 235,
-        "detail": "235 sections with age rules"
+        "count": 243,
+        "detail": "243 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 173,
-        "detail": "173 sections with waitlist"
+        "count": 189,
+        "detail": "189 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 3062,
-        "detail": "3,062 SMS sent"
+        "count": 3072,
+        "detail": "3,072 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 26122,
-        "detail": "26,122 emails sent"
+        "count": 29805,
+        "detail": "29,805 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -6316,8 +8102,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 36,
-        "detail": "36 forms"
+        "count": 38,
+        "detail": "38 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -6338,6 +8124,26 @@
         "adopted": true,
         "count": 3,
         "detail": "3 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 16,
+        "detail": "16 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "watertown": {
@@ -6353,13 +8159,13 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 3092,
-        "detail": "3,092 SMS sent"
+        "count": 3257,
+        "detail": "3,257 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 5530,
-        "detail": "5,530 emails sent"
+        "count": 5634,
+        "detail": "5,634 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -6410,28 +8216,48 @@
         "adopted": true,
         "count": 11,
         "detail": "11 leagues/competitions"
+      },
+      "events": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "yerba-buena-gardens": {
       "age_eligibility": {
         "adopted": true,
-        "count": 147,
-        "detail": "147 sections with age rules"
+        "count": 161,
+        "detail": "161 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 134,
-        "detail": "134 sections with waitlist"
+        "count": 138,
+        "detail": "138 sections with waitlist"
       },
       "sms_messaging": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 30,
+        "detail": "30 SMS sent"
       },
       "email_messaging": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 180,
+        "detail": "180 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -6460,13 +8286,13 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 forms"
+        "count": 8,
+        "detail": "8 forms"
       },
       "instant_booking": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 instant-bookable sites"
+        "count": 3,
+        "detail": "3 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -6475,17 +8301,37 @@
       },
       "seasons": {
         "adopted": true,
-        "count": 4,
-        "detail": "4 seasons"
+        "count": 9,
+        "detail": "9 seasons"
       },
       "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 questions asked"
+      },
+      "ai_routines": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
       }
     }
   },
-  "notes": "Core usage + wave-1 adoption (14 of 53 catalog features) re-baked 2026-08-22 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.",
+  "notes": "Core usage + adoption (18 of 57 catalog features) re-baked 2026-09-07 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions documented in that file. Absent adoption cells = not yet verifiable. Remaining 39 features queued for later waves.",
   "measuredFeatures": [
     "age_eligibility",
     "waitlist",
@@ -6500,6 +8346,10 @@
     "instant_booking",
     "gl_accounting",
     "seasons",
-    "competitions_leagues"
+    "competitions_leagues",
+    "events",
+    "ticket_sales",
+    "ai_assistant",
+    "ai_routines"
   ]
 }
