@@ -428,6 +428,29 @@ The decisions inside it:
 - Card 21616 carries **no template tags**, so — unlike every card in the
   sibling project — an API save cannot silently retype a date parameter.
 
+### VERIFIED GREEN 2026-09-07, and the 403 on the way is worth recording
+
+Run 3 of the workflow: fetch 4s, whole job 19s, and it pushed
+`9ee00d9 Daily data refresh (2026-09-07)`. The first two runs failed, and both
+failures are traps someone will hit again:
+
+1. **The key went into Railway, not GitHub.** `MB_API_KEY` on the Railway
+   `org-features` service is what an app redeploy picks up; a GitHub Actions
+   runner cannot see it. The log showed `MB_API_KEY:` empty and the fetcher's
+   own "not set" message. They are two different secret stores with the same
+   variable name.
+2. **A CARD IN A PERSONAL COLLECTION CAN NEVER BE READ BY AN API KEY.**
+   Card 21616 was saved into "Dan Jenner's Personal Collection" (where a
+   newly-saved card lands by default), and Metabase answered
+   `403 You don't have permissions to do that.` A Metabase API key acts as a
+   synthetic user in a *group*, never as the person who minted it, and a
+   personal collection cannot be granted to a group — so no permission change
+   could ever have fixed it. The card was moved to the **CX Dashboard**
+   collection (id 4324) and the run went green with no other change.
+
+   Generalise it: when an API key 403s on a saved question, check WHERE the
+   question lives before touching permissions.
+
 ### It needs one secret
 
 `MB_API_KEY` in the repo's Actions secrets: Metabase → Admin → Authentication →
