@@ -181,7 +181,10 @@
     const [q, setQ] = useState("");
     const [status, setStatus] = useState("");
     const [health, setHealth] = useState("");
-    const [sort, setSort] = useState(["openBugCount", -1]);
+    // ALPHABETICAL BY DEFAULT. It opened sorted by open-bug count descending,
+    // which buries an account you are looking for behind whichever ones
+    // happen to have bugs. Clicking a column still re-sorts and still wins.
+    const [sort, setSort] = useState(["name", 1]);
     const accounts = data.accounts;
 
     const filtered = useMemo(() => {

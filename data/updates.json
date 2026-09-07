@@ -3,6 +3,20 @@
   "updates": [
     {
       "date": "2026-09-07",
+      "title": "All 56 measurable features are now measured, and the org list includes accounts that have not launched",
+      "body": "The dashboard measured 18 of 57 catalogued features. It now measures 56 — everything the database can actually answer.",
+      "items": [
+        "56 of 57 features measured, up from 18. The 39 that read 'Not yet measured' now carry real numbers.",
+        "Sandbox organizations are gone (23 of them), and organizations that have not launched yet are now included and marked. 144 organizations: 73 live on rec.us, 71 not. An org mid-configuration is exactly who an adoption dashboard is for, so they are shown rather than hidden — but they are flagged, and they are not averaged into a fleet figure unlabelled.",
+        "Account Health opens sorted alphabetically. It opened on open-bug count, which buried whichever account you came to look at.",
+        "The widest-adopted features across launched orgs: facility rentals 72 of 73, member booking windows 71, policies and waivers 70, seasons 66, email 65, skill levels 64. The thinnest: physical access devices 1, guest participation 5, custom sending domains 8, gift cards 8, structured refund policies 8.",
+        "Fleet adoption now reads about a third rather than half. That is the denominator tripling from 18 features to 56, not organizations going backwards.",
+        "Six of the catalogued measurement definitions turned out to be wrong and were corrected against the live database, including one that would have reported every organization as using a feature that does not exist in the schema at all.",
+        "One feature stays unmeasured on purpose — Invite-Only / Restricted Registration. There is no field for it; the page says so rather than showing a made-up number."
+      ]
+    },
+    {
+      "date": "2026-09-07",
       "title": "Now measuring events, ticket sales and Seb — and the snapshot was 16 days old",
       "body": "Dan: \"there's a bunch of stuff we're NOT measuring here. Events/ticket sales, SMS usage, Seb usage.\" Two of the three were missing entirely; SMS was already there.",
       "items": [

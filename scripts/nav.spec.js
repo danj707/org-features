@@ -211,3 +211,17 @@ process.on("exit", () => {
   ok(!/PS Dashboard/.test(dash), "the public dashboard no longer says PS Dashboard");
   ok(/CX Dashboard/.test(dash), "it says CX Dashboard");
 }
+
+// ── ACCOUNT HEALTH OPENS ALPHABETICALLY ───────────────────────────────────
+// It opened on open-bug count descending, which buries the account you came
+// to look at behind whichever ones happen to have bugs. Asserted on the
+// initial state only — clicking a column still re-sorts and still wins.
+{
+  const health = src.slice(src.indexOf("function Health("), src.indexOf("function Org("));
+  ok(health.length > 200, "the Health component was found and sliced");
+  const init = (health.match(/useState\(\["([a-zA-Z]+)", (-?1)\]\)/) || [])
+  ok(init[1] === "name", `Account Health sorts by name by default — got ${init[1]}`);
+  ok(init[2] === "1", `...ascending — got dir ${init[2]}`);
+  ok(/s\[0\] === key \? -s\[1\] : -1/.test(health),
+    "clicking a column still re-sorts, so the default is a default and not a lock");
+}

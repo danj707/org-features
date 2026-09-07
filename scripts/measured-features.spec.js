@@ -48,7 +48,11 @@ process.on("exit", () => {
   }
 });
 
+// The four from wave 2 plus the ones whose FILTER is the interesting part.
 const NEW = ["events", "ticket_sales", "ai_assistant", "ai_routines"];
+const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
+  "group_pricing_tiers", "waivers_contracts", "cash_check_payments",
+  "custom_email_domains", "prerequisites", "facility_rentals", "rental_permits"];
 
 // ── THE THREE LISTS MUST AGREE, OR THE PAGE RENDERS RAW KEYS ──────────────
 // merge-snapshot maps payload columns onto ADOPTION_KEYS by POSITION, and the
@@ -81,11 +85,33 @@ const NEW = ["events", "ticket_sales", "ai_assistant", "ai_routines"];
   // the page still advertising the old count.
   ok(/measuredFeatures: ADOPTION_KEYS/.test(merge),
     "measuredFeatures is derived from ADOPTION_KEYS, not carried over from the old snapshot");
-  // The column-count check has to match the payload width or the whole bake
-  // is refused (28 = 4 identity + 6 core + 18 adoption).
-  ok(/r\.length !== 28/.test(merge), "the payload sanity check expects 28 columns");
-  const cols = (sql.match(/COALESCE\(\w+\.n,0\)/g) || []).length;
-  eq(cols + 4, 28, "the fleet query emits 28 columns per org");
+  // KEYED, NOT POSITIONAL. The payload used to be a flat array mapped onto
+  // ADOPTION_KEYS by index — safe while appending, silently catastrophic the
+  // first time a metric was inserted in the middle, and there are 56 now.
+  ok(/r\.length !== 7/.test(merge),
+    "the payload row is [slug,id,name,display,launched,{core},{adoption}]");
+  ok(/typeof r\[4\] !== "boolean"/.test(merge), "the launch flag is checked as a boolean");
+  // Both drift checks must actually EXIT, not merely be declared — renaming
+  // the const to something unused left the substring matching, and that
+  // mutation survived the first draft.
+  ok(/missingKeys\.length\)?\s*\{[\s\S]{0,400}process\.exit\(1\)/.test(merge),
+    "a payload MISSING an adoption key is refused");
+  ok(/unknownKeys\.length\)?\s*\{[\s\S]{0,400}process\.exit\(1\)/.test(merge),
+    "a payload carrying an UNKNOWN adoption key is refused");
+  ok(/typeof k === "string"/.test(merge),
+    "ADOPTION_KEYS is checked for HOLES — a stray comma makes it sparse and every other check still passes");
+  ok(/new Set\(ADOPTION_KEYS\)\.size !== ADOPTION_KEYS\.length/.test(merge),
+    "...and for duplicates");
+  // The query's keys and the script's keys must be the same set.
+  const sqlKeys = [...sql.matchAll(/'([a-z_]+)', COALESCE\(a_\w+\.n,0\)/g)].map(m => m[1]);
+  eq(sqlKeys.length, adoption.length, "the fleet query emits one value per ADOPTION_KEY");
+  const onlySql = sqlKeys.filter(k => !adoption.includes(k));
+  const onlyJs = adoption.filter(k => !sqlKeys.includes(k));
+  eq(onlySql.length, 0, "no key is in the query but not the script" + (onlySql.length ? " — " + onlySql.join(", ") : ""));
+  eq(onlyJs.length, 0, "no key is in the script but not the query" + (onlyJs.length ? " — " + onlyJs.join(", ") : ""));
+  // Postgres caps json_build_object at 100 args; 56 keys is 112.
+  ok(/jsonb_build_object/.test(sql) && sql.split("jsonb_build_object").length - 1 >= 2,
+    "the adoption object is built in chunks, because json_build_object caps at 100 arguments");
 }
 
 // ── THE FOUR TRAPS ────────────────────────────────────────────────────────
@@ -174,4 +200,89 @@ const NEW = ["events", "ticket_sales", "ai_assistant", "ai_routines"];
     "the events catalog entry warns that event_session is empty");
   ok(/pending/.test(snap.features.find(f => f.key === "ticket_sales").adoption_definition),
     "the tickets catalog entry records that pending rows are excluded");
+}
+
+// ── THE WAVE-3 TRAPS ──────────────────────────────────────────────────────
+// Every one of these is a filter that returns a WRONG NUMBER rather than an
+// error, and each was measured against production rather than assumed.
+{
+  const code = sql.replace(/^\s*--.*$/gm, "");
+  ok(code.length < sql.length, "the SQL comment strip removed something");
+
+  // 'all' MEANS NO RESTRICTION and is the commonest skill_level (29,257).
+  ok(/skill_level::text <> 'all'/.test(code),
+    "skill levels exclude 'all', which means NO restriction and is the commonest value");
+  // Staff roles are platform-seeded: Full Access at 156 orgs, Limited at 78.
+  ok(/name NOT IN \('Full Access','Limited Access'\)/.test(code),
+    "custom staff roles exclude the two platform-seeded role names");
+  // display_in_store is true on 4,685 of 5,860 products — a default.
+  ok(/publish_to_public = true/.test(code) && !/display_in_store/.test(code),
+    "storefront products key on publish_to_public, not the default-true display_in_store");
+  // section_price is GONE; group pricing lives in a JSONB column.
+  ok(/pricing_policy #> '\{default,groupCents\}'/.test(code),
+    "group pricing reads section.pricing_policy groupCents — the section_price table no longer exists");
+  ok(!/section_price/.test(code), "nothing references the dropped section_price table");
+  // payment_method_type uses hyphens.
+  ok(/'cash','check'/.test(code), "cash/check payments use the real hyphenated values");
+  ok(!/organizationCredit/.test(code), "no camelCase payment method survives");
+  // A domain that is not verified cannot send mail.
+  ok(/organization_email_domain WHERE status='verified'/.test(code),
+    "custom email domains count VERIFIED ones only");
+  // 1,186 prereqs exist and ZERO are activated.
+  ok(/FROM prereq GROUP BY/.test(code) && !/prereq WHERE activated_at/.test(code),
+    "prerequisites count configured rows, not activated ones — zero are activated platform-wide");
+  // Canceled rentals and non-issued permits are not the feature in use.
+  ok(/facility_rental WHERE status <> 'canceled'/.test(code), "canceled facility rentals are excluded");
+  ok(/facility_rental_permit WHERE status='issued'/.test(code), "only issued permits count");
+
+  // THE ORG SET. Sandboxes out, unlaunched in and flagged.
+  ok(/slug NOT ILIKE '%sandbox%'/.test(code) && /name NOT ILIKE '%sandbox%'/.test(code),
+    "sandbox orgs are excluded on BOTH slug and display name");
+  // Scoped to the org CTE's WHERE clause, and matched after the launched
+  // ALIAS is removed — otherwise the alias itself satisfies the pattern and
+  // re-adding the filter survives, which it did on the first draft.
+  const orgWhere = code.slice(code.indexOf("FROM organization"), code.indexOf(")", code.indexOf("FROM organization")))
+    .replace(/\(published_at IS NOT NULL\) AS launched/g, "");
+  ok(!/published_at/.test(orgWhere),
+    "unlaunched orgs are NOT filtered out of the org set — they are included and flagged");
+  ok(/\(published_at IS NOT NULL\) AS launched/.test(code),
+    "launch state travels with each org as a flag");
+}
+
+// ── EVERY MEASURED FEATURE IS DOCUMENTED, AND THE ONE THAT IS NOT ─────────
+// MEASURABLE SAYS WHY. A feature with no schema support must not get a
+// plausible-looking number: section.registration_mode carries only
+// 'section' and 'per-session', so `<> 'open'` would report 100% adoption.
+{
+  const byKey = {}; snap.features.forEach(f => { byKey[f.key] = f; });
+  snap.measuredFeatures.forEach(k => {
+    ok(byKey[k], k + " has a catalog entry");
+    ok(byKey[k] && byKey[k].adoption_definition && byKey[k].adoption_definition.length > 60,
+      k + " documents what adoption means");
+  });
+  const unmeasured = snap.features.filter(f => !snap.measuredFeatures.includes(f.key));
+  eq(unmeasured.length, 1, "exactly one catalog feature is unmeasured");
+  eq(unmeasured[0] && unmeasured[0].key, "restricted_registration_mode",
+    "...and it is the one with no schema support");
+  ok(unmeasured[0] && unmeasured[0].not_measurable,
+    "the unmeasured feature records WHY rather than looking merely forgotten");
+  ok(/NOT MEASURABLE/.test(unmeasured[0].adoption_definition),
+    "...and says so in its adoption definition");
+
+  TRAPPED.forEach(k => {
+    const def = byKey[k].adoption_definition + " " + byKey[k].signal;
+    // Require a FIGURE, not a word: the point of these definitions is that
+    // the filter was measured against production, and a number is the only
+    // evidence of that which cannot be written without having looked.
+    ok(/\d/.test(def), k + " cites a measured figure behind its filter");
+  });
+
+  // The launch flag reaches the snapshot.
+  ok(snap.orgs.every(o => typeof o.launched === "boolean"),
+    "every org carries a boolean launched flag");
+  const live = snap.orgs.filter(o => o.launched).length;
+  ok(live > 0 && live < snap.orgs.length,
+    `both launched and unlaunched orgs are present — ${live} of ${snap.orgs.length}`);
+  ok(!snap.orgs.some(o => /sandbox/i.test(o.slug) || /sandbox/i.test(o.name || "")),
+    "no sandbox org reached the snapshot");
 }
