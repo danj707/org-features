@@ -109,6 +109,32 @@
   const STATUS_ORDER = ["Launched R&R","Launched Pilot","Configuration","Discovery","Delayed/Deferred"];
   const PRI_CLASS = { "Urgent": "p1", "High": "p2", "Medium": "p3", "Low": "p4", "No priority": "p0" };
 
+  // ---------------- snapshot freshness ----------------
+  // At module scope, and pure, so a spec can RUN these rather than regex
+  // over them: a regex passes just as happily on an inverted comparison.
+  // SNAP_STALE_DAYS is 2, not 1 — the bake runs at 6am ET and a reader in
+  // the morning before it lands is looking at yesterday's snapshot, which
+  // is normal and must not cry wolf. Two days means a refresh was missed.
+  const SNAP_STALE_DAYS = 2;
+  function snapAgeDays(iso) {
+    if (!iso) return null;
+    const t = Date.parse(iso);
+    if (isNaN(t)) return null;                 // an unparseable date is not "0 days old"
+    return Math.max(0, Math.floor((Date.now() - t) / 864e5));
+  }
+  function snapStale(iso) {
+    const d = snapAgeDays(iso);
+    // A snapshot whose date cannot be read is treated as stale, not fresh.
+    // Failing the other way is what let this go unnoticed for five weeks.
+    return d === null || d >= SNAP_STALE_DAYS;
+  }
+  function snapAgeLabel(iso) {
+    const d = snapAgeDays(iso);
+    if (d === null) return "date unreadable";
+    return d === 0 ? "today" : d === 1 ? "yesterday" : d + " days old";
+  }
+
+
   function route() {
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
@@ -265,6 +291,7 @@
   // ---------------- Bug Management ----------------
   function Bugs({ data }) {
     const [q, setQ] = useState("");
+    const [org, setOrg] = useState("");
     const [team, setTeam] = useState("");
     const [pri, setPri] = useState("");
     const [who, setWho] = useState("");
@@ -273,8 +300,32 @@
     const teams = [...new Set(bugs.map(b => b.team))].sort();
     const reporters = [...new Set(bugs.map(b => b.createdBy).filter(Boolean))].sort();
 
+    // Org options are the Linear customer names attached to open bugs, used
+    // VERBATIM and never folded together. Linear's customer list holds
+    // near-duplicate records for some orgs (Chico / City of Chico,
+    // Smyrna / Smyrnaga, Jeffersonville / Jeffersonville, IN) and 52 of its
+    // 81 records carry no domain, so there is nothing to establish identity
+    // against. Matching on name similarity would silently merge two
+    // different orgs on a page used to decide what to work on; matching
+    // against Rec's own org list resolves only 11 of 24 exactly, and the
+    // rest would need the same guess. The fix is in Linear: give every
+    // customer the rec org UUID as its external ID, the way City of
+    // Torrance already does. Until then the duplicates are named on screen
+    // rather than quietly reconciled.
+    const orgCounts = useMemo(() => {
+      const m = {};
+      bugs.forEach(b => b.customers.forEach(c => { m[c] = (m[c] || 0) + 1; }));
+      return m;
+    }, [bugs]);
+    // Busiest first, so the orgs with real bug load lead; name breaks ties
+    // so two runs cannot disagree about the order.
+    const orgs = useMemo(() => Object.keys(orgCounts).sort((a, b) =>
+      orgCounts[b] - orgCounts[a] || a.localeCompare(b)), [orgCounts]);
+    const tagged = bugs.filter(b => b.customers.length).length;
+
     const filtered = bugs.filter(b =>
       (!q || (b.title + " " + b.id + " " + b.customers.join(" ")).toLowerCase().includes(q.toLowerCase())) &&
+      (!org || b.customers.indexOf(org) >= 0) &&
       (!team || b.team === team) && (!pri || b.priority === pri) &&
       (!who || b.createdBy === who) && (!onlyCust || b.customers.length > 0));
 
@@ -305,10 +356,22 @@
         e("h2", null, "Open bugs", e("span", { className: "hint" }, "search before filing — avoid duplicates · click through to Linear to tag more customers")),
         e("div", { className: "filters" },
           e("input", { type: "text", placeholder: "Search title, ID, account… (dupe check)", value: q, onChange: ev => setQ(ev.target.value) }),
+          orgs.length ? e("select", { value: org, onChange: ev => setOrg(ev.target.value), "data-bug-org": org || "all", title: "Linear customer attached to the bug" },
+            e("option", { value: "" }, "All orgs"),
+            orgs.map(o => e("option", { key: o, value: o }, o + " (" + orgCounts[o] + ")"))) : null,
           e("select", { value: team, onChange: ev => setTeam(ev.target.value) }, e("option", { value: "" }, "All teams"), teams.map(t => e("option", { key: t, value: t }, t))),
           e("select", { value: pri, onChange: ev => setPri(ev.target.value) }, e("option", { value: "" }, "All priorities"), ["Urgent", "High", "Medium", "Low", "No priority"].map(p => e("option", { key: p, value: p }, p))),
           e("select", { value: who, onChange: ev => setWho(ev.target.value) }, e("option", { value: "" }, "All reporters"), reporters.map(r => e("option", { key: r, value: r }, r))),
           e("label", { className: "chk" }, e("input", { type: "checkbox", checked: onlyCust, onChange: ev => setOnlyCust(ev.target.checked) }), "has account")),
+        // Only a minority of open bugs carry a Linear customer, so an org
+        // filter necessarily hides the untagged majority. Saying so is the
+        // difference between "this org has 3 bugs" and the truth, which is
+        // "3 open bugs are TAGGED to this org". Same reason the org names
+        // are not folded: the reader has to be able to see what is missing.
+        org ? e("div", { className: "note", "data-bug-orgnote": 1 },
+          "Showing the " + orgCounts[org] + " open bug(s) tagged to " + org + " in Linear. " +
+          (bugs.length - tagged) + " of " + bugs.length + " open bugs carry no customer at all and are hidden by this filter — some of them will affect " + org + " too. " +
+          "Linear also holds separate customer records for some orgs, so an org can appear more than once in this list; tagging bugs to one record per org (or setting each customer's external ID to the rec org UUID) is what would merge them.") : null,
         e("div", { className: "tablewrap" }, e("table", null,
           e("thead", null, e("tr", null, e("th", { className: "l" }, "Bug"), e("th", { className: "l" }, "Priority"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Team"), e("th", null, "Age"), e("th", { className: "l" }, "Accounts"), e("th", { className: "l" }, "Reporter"))),
           e("tbody", null, filtered.map(b => e("tr", { key: b.id },
@@ -1184,7 +1247,17 @@
         e("div", { className: "foot" },
           e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
           e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
-          e("div", { style: { marginTop: 8 } }, "Snapshot " + new Date(data.generatedAt).toLocaleString() + " · refreshed daily"))),
+          e("div", { style: { marginTop: 8 }, "data-snap-age": snapAgeDays(data.generatedAt) },
+            "Snapshot " + new Date(data.generatedAt).toLocaleString(),
+            // NEVER assert "refreshed daily" as a standing fact. This line
+            // said exactly that for 38 days while nothing refreshed the
+            // bugs half at all, which is how a page full of closed bugs
+            // read as current. State the AGE, which is measured, and shout
+            // when it is old enough to be misleading.
+            snapStale(data.generatedAt)
+              ? e("div", { style: { color: "#fbbf24", fontWeight: 700, marginTop: 2 } },
+                  "\u26a0 " + snapAgeDays(data.generatedAt) + " days old — statuses may have moved on")
+              : e("span", null, " \u00b7 " + snapAgeLabel(data.generatedAt))))),
       e("main", null,
         e("header", { className: "top" }, e("h1", null, titles[r.page][0]), e("div", { className: "sub" }, titles[r.page][1])),
         e("div", { className: "wrap" },

@@ -89,10 +89,94 @@ would delete the whole name-matching problem.
 
 ## Refresh model
 
-Nightly Claude Routine (same as org-features): pull Linear/HubSpot/Airtable
-via connectors, rebuild `ps-data.json`, push. The bake currently lives as a
-session script; formalizing it into `scripts/ps/` happens once the shape is
-approved.
+**This described an intention, not a fact, and the gap cost five weeks.**
+`ps-data.json` was baked once by hand on 2026-07-31 and nothing refreshed it.
+The "Org Features dashboard daily refresh" Routine rebuilds
+`features-data.json` from Metabase and **does not touch this file** — so on
+2026-09-06 the page still listed `PLA-1880` as *In Code Review* when it had
+gone Done on 2026-08-04, and **six of the seven rows at the top of the Urgent
+list were closed**. Urgent read 7; the truth was 2.
+
+Three things changed as a result.
+
+### 1. The bugs bake is a script now
+
+`scripts/refresh/merge-ps-bugs.js`, same shape as `merge-snapshot.js`: it
+takes a payload file and rewrites one section, carrying everything else over.
+
+```
+node scripts/refresh/merge-ps-bugs.js payload.json
+```
+
+`payload.json` is `{ issues: [...], customers: [...] }`:
+
+- **`issues`** — the `issues` arrays from Linear `list_issues` with
+  `label: "Bug"`, **fetched per STATE** (`backlog`, `unstarted`, `started`,
+  `triage`) and concatenated. **Do not page the label.** Closed bugs
+  outnumber open ones about 5:1, so paging by `updatedAt` reads 1,300+
+  records and is still not finished; four state calls return the whole open
+  set (~285) and each answers `hasNextPage: false`.
+- **`customers`** — the `customers` array from `list_customers` with
+  `includeNeeds: true`. **One call, no pagination** (81 customers). Each
+  `needs[].issue.id` is the bug→org mapping, and this is the only place it
+  exists.
+
+The script **refuses** a payload carrying a closed issue, or one that looks
+like a partial fetch, and exits non-zero rather than writing — the failure it
+exists to prevent is a snapshot that looks current and is not. `accounts` and
+`featureRequests` are never written by it; those come from HubSpot and
+Airtable and have their own refresh, which is still by hand.
+
+### 2. Staleness is on screen
+
+The sidebar used to read *"Snapshot &lt;date&gt; · refreshed daily"* — a
+standing claim, printed under a 38-day-old date, by a page nothing refreshed.
+It states the **measured age** now, and past `SNAP_STALE_DAYS` (2) it says so
+in amber. Two days, not one: the bake runs at 6am ET, so a reader before it
+lands is legitimately looking at yesterday's snapshot and must not be warned.
+An **unreadable or missing** date counts as stale, never as fresh — failing
+the other way is exactly how this went unnoticed.
+
+### 3. What is still MANUAL, and why
+
+**There is no scheduled Routine for this bake.** A Routine that fires in a
+fresh session needs the **Linear connector attached to it**, and that grant
+cannot be made from a Claude Code session — the API refuses the `connectors`
+parameter for this organization. So creating one from here would produce a job
+that fails every morning with nothing to show for it.
+
+**The action, for Dan:** create a Routine from the claude.ai Routines UI (where
+connectors can be picked), attach **Linear**, schedule it after the 6am
+features refresh, and give it the steps above. Until then the bugs half is
+refreshed by hand — and the amber banner is what makes a missed refresh
+visible instead of silent.
+
+## Org names are Linear customer names, verbatim
+
+The Bug Management org filter offers **exactly the names Linear holds**, and
+never folds them together. That is deliberate and it is not tidy:
+
+- Linear carries **near-duplicate customer records** for one org — three
+  Jurupa Valley variants including a typo (`Jarupa Valley`,
+  `Jarupa Valley, CA`, `Jurupa Valley, CA`), `Jeffersonville` and
+  `Jeffersonville, IN`, `Chico` and `City of Chico`, `Smyrna` and `Smyrnaga`
+  — plus records that are not orgs at all (`EVERYONE`, `Rec`, `Instructor`).
+- **52 of its 81 customer records carry no domain**, and no two records share
+  one, so domains cannot establish identity.
+- Matching the names against Rec's own org list (`features-data.json`, which
+  this repo already has) resolves **11 of the 24** that appear on open bugs
+  exactly; the other 13 would need the same fuzzy guess.
+
+Merging two orgs on a page used to decide what to work on is silent and wrong,
+so the duplicates are **named on screen** rather than quietly reconciled. The
+real fix is in Linear: give every customer the rec org UUID as its external
+ID, the way City of Torrance already does — that deletes the whole
+name-matching problem, and it is open question 1 below.
+
+**And the filter states its own coverage.** Only **44 of 285** open bugs carry
+any customer, so filtering by org necessarily hides the untagged 241. Without
+saying so, "3 bugs" reads as this org's total when the truth is "3 bugs are
+*tagged* to this org".
 
 ## Open questions for Dan
 
