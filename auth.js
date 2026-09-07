@@ -31,16 +31,37 @@ if (!SIGNUP_CODE) {
 }
 
 // ---------- user store ----------
-
+//
+// THE ACCOUNTS ARE THE ONLY STATE THIS APP CANNOT RE-DERIVE. Every snapshot it
+// serves can be rebuilt by re-running a bake; a password nobody has a copy of
+// cannot. So these go through the store, which is what allows the /data volume
+// to be detached later and the service to roll on deploy instead of stopping.
+//
+// The store keeps reads SYNCHRONOUS (an in-memory mirror hydrated at boot), so
+// loadUsers stays callable from inside a route handler and no guard in this
+// file had to become async. In disk mode it reads and writes the same file at
+// the same path as before, byte for byte.
 let USERS_FILE = null;
-function init(dataDir) {
+let store = null;
+function init(dataDir, storeModule) {
   USERS_FILE = path.join(dataDir, "users.json");
+  store = storeModule || null;
 }
 function loadUsers() {
+  if (store) {
+    const rec = store.readJSON("users", null);
+    // `.users || []` on a record that exists but holds no array is the same
+    // answer as no record at all, and both are "no accounts yet" — which is a
+    // real state on a fresh install, not an error.
+    if (rec && Array.isArray(rec.users)) return rec.users;
+    if (rec && Array.isArray(rec)) return rec;
+    return [];
+  }
   try { return JSON.parse(fs.readFileSync(USERS_FILE, "utf8")).users || []; }
   catch { return []; }
 }
 function saveUsers(users) {
+  if (store) { store.writeJSON("users", { users }); return; }
   fs.mkdirSync(path.dirname(USERS_FILE), { recursive: true });
   const tmp = USERS_FILE + ".tmp";
   fs.writeFileSync(tmp, JSON.stringify({ users }, null, 2));

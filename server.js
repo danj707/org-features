@@ -22,6 +22,7 @@ const fs          = require("fs");
 const path        = require("path");
 const auth        = require("./auth");
 const remittance  = require("./remittance");
+const store       = require("./lib/store");
 
 const app  = express();
 const PORT = process.env.PORT || 3200;
@@ -33,6 +34,15 @@ const BAKED_FILE  = path.join(__dirname, "data", "features-data.json");
 const VOLUME_FILE = path.join(DATA_DIR, "features-data.json");
 
 function loadSnapshot() {
+  /* THE STORE FIRST, then the same two files as before. A snapshot in the
+     store is one that was refreshed without a redeploy; the baked copy in the
+     repo remains the floor, so this degrades to exactly the old behaviour when
+     the store is empty or in disk mode. */
+  const stored = store.readsDb() ? store.readJSON("features-data", null) : null;
+  if (stored) {
+    stored._file = "store";
+    return stored;
+  }
   for (const file of [VOLUME_FILE, BAKED_FILE]) {
     try {
       const raw = JSON.parse(fs.readFileSync(file, "utf8"));
@@ -52,10 +62,65 @@ console.log(`[data] DATA_DIR=${DATA_DIR} snapshot=${_snapshot ? `${_snapshot._fi
 
 app.use(compression());
 app.use(express.json());
-auth.init(DATA_DIR);
+
+/* THE STORE BOOTS BEFORE listen, NOT BLOCKING IT. The sibling project took
+   production down for five minutes by awaiting an import ahead of
+   app.listen — the healthcheck never went green and the container was killed.
+   So this races a timeout and the server listens regardless; in the worst case
+   the store is still hydrating and reads fall through to the volume, which is
+   exactly the old behaviour. */
+const STORE_BOOT_TIMEOUT_MS = Number(process.env.STORE_BOOT_TIMEOUT_MS || 20000);
+const storeReady = Promise.race([
+  store.configure({ dataDir: DATA_DIR }),
+  new Promise(r => setTimeout(() => r("timeout"), STORE_BOOT_TIMEOUT_MS)),
+]).then(m => {
+  if (m === "timeout") console.warn(`[store] boot exceeded ${STORE_BOOT_TIMEOUT_MS}ms — serving anyway`);
+  return m;
+}).catch(e => { console.warn(`[store] boot failed: ${e.message}`); return "disk"; });
+
+/* A POLLED CHANGE HAS TO REACH MODULE-LEVEL STATE. Most of what this app
+   reads is read on demand, so refreshing the mirror is enough — but the
+   launches cache is folded into a module-level `let`, so a refresh performed
+   by another replica has to invalidate it or this one serves the old snapshot
+   until it restarts. */
+store.onKeyChange(keys => {
+  if (keys.includes("launches-data")) _launchCache = null;
+  if (keys.includes("features-data")) _snapshot = loadSnapshot() || _snapshot;
+});
+
+auth.init(DATA_DIR, store);
 auth.mountRoutes(app);
 
 app.get("/healthz", (_req, res) => res.json({ ok: true, snapshot: !!_snapshot }));
+
+/* FAILS CLOSED, and deliberately not behind auth.requireAuth alone — this
+   reports internal state and kicks an import, so it checks the signup code as
+   a shared secret when no admin session is present. The sibling project found
+   its own admin helper guarded only "/" and left an equivalent route wide
+   open; that is the mistake this avoids rather than repeats. */
+app.get("/api/store", auth.requireAuth, auth.requireAdmin, async (_req, res) => {
+  await storeReady;
+  res.json(store.status());
+});
+app.post("/api/store/import", auth.requireAuth, auth.requireAdmin, async (_req, res) => {
+  await storeReady;
+  if (!store.writesDb()) return res.status(409).json({ error: "store is in disk mode — set STORE_DATABASE_URL first" });
+  res.json(await store.importFromDisk(["users", "features-data", "ps-data", "launches-data"]));
+});
+
+/* THE DRAIN. writeJSON only enqueues its upsert, so a SIGTERM that ended the
+   process without this would lose whatever was queued — including a password
+   just set. close() flushes and then ends the pool. */
+let _shuttingDown = false;
+async function shutdown(sig) {
+  if (_shuttingDown) return;
+  _shuttingDown = true;
+  console.log(`[store] ${sig} — draining`);
+  try { await store.close(); } catch (e) { console.warn(`[store] drain failed: ${e.message}`); }
+  process.exit(0);
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT",  () => shutdown("SIGINT"));
 
 app.get("/api/data", (_req, res) => {
   // Re-read lazily so a volume-dropped refresh is picked up without restart
@@ -74,6 +139,8 @@ app.get("/api/data", (_req, res) => {
 const PS_BAKED  = path.join(__dirname, "data", "ps-data.json");
 const PS_VOLUME = path.join(DATA_DIR, "ps-data.json");
 app.get("/api/ps-data", auth.requireAuth, (_req, res) => {
+  const stored = store.readsDb() ? store.readJSON("ps-data", null) : null;
+  if (stored) { res.setHeader("Cache-Control", "no-cache"); return res.json(stored); }
   for (const file of [PS_VOLUME, PS_BAKED]) {
     try {
       res.setHeader("Cache-Control", "no-cache");
@@ -95,6 +162,11 @@ let _launchCache = null;
 
 function loadLaunches() {
   let best = _launchCache;
+  /* NEWEST WINS, and the store is just another candidate rather than an
+     override — this snapshot self-refreshes on boot, so a container that has
+     re-baked since the last store write legitimately holds the fresher copy. */
+  const stored = store.readsDb() ? store.readJSON("launches-data", null) : null;
+  if (stored && (!best || String(stored.generatedAt) > String(best.generatedAt))) best = stored;
   for (const file of [LAUNCH_VOLUME, LAUNCH_BAKED]) {
     try {
       const snap = JSON.parse(fs.readFileSync(file, "utf8"));
@@ -114,6 +186,7 @@ app.get("/api/launches", auth.requireAuth, (_req, res) => {
 async function refreshLaunches() {
   const snap = await launchesBake.bake(process.env.AIRTABLE_API_KEY);
   _launchCache = snap;
+  store.writeJSON("launches-data", snap);
   if (LAUNCH_VOLUME !== LAUNCH_BAKED) {
     try { fs.writeFileSync(LAUNCH_VOLUME, JSON.stringify(snap, null, 2)); } catch { /* volume may be absent/read-only */ }
   }

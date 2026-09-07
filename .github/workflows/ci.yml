@@ -1,0 +1,60 @@
+name: CI
+
+# WHY THIS EXISTS AT ALL. The Railway service already has `checkSuites: true`,
+# so it holds every deploy until the commit's check suites finish — but with no
+# workflow in the repo there were no suites, so that gate was passing on
+# nothing. This file is what turns it into a real gate.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+
+      # Every hand-written JS file must at least parse. Cheap, and it catches
+      # the class of mistake that otherwise only shows up as a boot crash.
+      - name: Syntax check
+        run: |
+          for f in server.js auth.js remittance.js lib/*.js scripts/*.js scripts/refresh/*.js; do
+            [ -e "$f" ] || continue
+            node --check "$f" || exit 1
+          done
+          echo "all JS parses"
+
+      # THE INLINE REACT IS THE RISK HERE. Both dashboards are one big Babel
+      # block inside an HTML file, so a syntax error there is invisible to
+      # `node --check` and blanks the page in a browser instead. The sibling
+      # project shipped that twice before it added this check.
+      - name: Inline JSX parses
+        run: node scripts/ci-check-html.js
+
+      - name: Specs
+        run: npm test
+
+      # A SNAPSHOT THAT WILL NOT PARSE TAKES THE WHOLE DASHBOARD DOWN, and the
+      # daily refresh Routine commits one straight to main. Cheap insurance on
+      # the exact file that changes most often.
+      - name: Data snapshots are valid JSON with the keys the pages read
+        run: node scripts/ci-check-data.js
+
+  boot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      # The server has to actually start and answer. In disk mode with no
+      # database url this is the behaviour every deploy gets today, so a green
+      # boot here means the store change is genuinely inert.
+      - name: Boots and serves in disk mode
+        run: node scripts/ci-boot-check.js

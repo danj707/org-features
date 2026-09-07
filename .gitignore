@@ -3,3 +3,5 @@
 .env
 data/users.json
 node_modules/
+
+# nothing here is committed — the store's own tables and the volume hold state
