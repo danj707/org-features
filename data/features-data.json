@@ -2206,7 +2206,6 @@
   },
   "featureCategories": [
     "Registration & Eligibility",
-    "Forms & Waivers",
     "Programs & Scheduling",
     "Memberships & Passes",
     "Facilities & Rentals",
@@ -2216,7 +2215,8 @@
     "Leagues & Teams",
     "Store & POS",
     "Events & Ticketing",
-    "AI & Automation"
+    "AI & Automation",
+    "Settings & Configuration"
   ],
   "features": [
     {
@@ -2316,7 +2316,7 @@
     {
       "key": "custom_forms",
       "name": "Custom Forms",
-      "category": "Forms & Waivers",
+      "category": "Settings & Configuration",
       "description": "Building dynamic custom forms attached to sections, sites, or products to collect structured responses.",
       "signal": "table: form (schema JSONB); table: form_lookup (section_id/site/product); table: form_submission",
       "adoption_definition": "Has >=1 live form (form.deleted_at IS NULL). Whether the form is attached to anything is measured separately by form_on_file_reuse. Measured 2026-09-07: 58 of 73 launched orgs (80 of 144 including unlaunched), 1,162 in total.",
@@ -2326,7 +2326,7 @@
     {
       "key": "waivers_contracts",
       "name": "Waivers & Legal Contracts",
-      "category": "Forms & Waivers",
+      "category": "Settings & Configuration",
       "description": "Requiring participants to sign waivers or legal contracts (e.g. on booking).",
       "signal": "contract_version.type — the real values are facility-policy, registration-policy, liability-waiver, refund-policy, facility-rental-refund-policy, code-of-conduct and three more. NOT 'waiver' / 'terms_of_service'. contract_version.requirement has exactly one value platform-wide ('soft-ack') and cannot discriminate anything.",
       "adoption_definition": "Has >=1 contract version of any type. Filtering on type='waiver' matches nothing at all.",
@@ -2335,7 +2335,7 @@
     {
       "key": "form_on_file_reuse",
       "name": "Reusable Forms On File",
-      "category": "Forms & Waivers",
+      "category": "Settings & Configuration",
       "description": "Letting participants reuse a previously submitted form instead of re-filling it each time.",
       "signal": "form_lookup.use_form_on_file = true",
       "adoption_definition": "Has >=1 form lookup with use_form_on_file = true, i.e. a form answered once and reused rather than re-asked every registration. Measured 2026-09-07: 43 of 73 launched orgs (51 of 144 including unlaunched), 11,071 in total.",
@@ -2472,7 +2472,7 @@
     {
       "key": "reservation_buffers",
       "name": "Reservation Buffer Times",
-      "category": "Facilities & Rentals",
+      "category": "Settings & Configuration",
       "description": "Enforcing a gap between back-to-back reservations on a court, or at a location.",
       "signal": "court.buffer_minutes_between_reservations > 0; court.reservation_buffer_minutes_override; location.reservation_buffer",
       "adoption_definition": "Has >=1 court with a nonzero buffer_minutes_between_reservations (or override), or a location with reservation_buffer set",
@@ -2481,7 +2481,7 @@
     {
       "key": "security_deposits",
       "name": "Security Deposits",
-      "category": "Facilities & Rentals",
+      "category": "Settings & Configuration",
       "description": "Collecting refundable security/damage deposits on facility rentals.",
       "signal": "table: deposit (amount_cents, deposit_type, amount_retained_cents, amount_returned_cents)",
       "adoption_definition": "Has >=1 deposit taken. Types are 'security' (13,352) and 'key' (673); both count, because both are the deposit feature in use. Measured 2026-09-07: 44 of 73 launched orgs (59 of 144 including unlaunched), 13,758 in total.",
@@ -2490,7 +2490,7 @@
     {
       "key": "rental_permits",
       "name": "Facility Rental Permits",
-      "category": "Facilities & Rentals",
+      "category": "Settings & Configuration",
       "description": "Issuing official permits for facility rentals.",
       "signal": "facility_rental_permit (status: issued 3,819 / draft 123 / revoked 14).",
       "adoption_definition": "Has >=1 ISSUED permit. A draft or revoked permit has no working public page, so it is not the feature in use.",
@@ -2557,7 +2557,7 @@
     {
       "key": "structured_refund_policies",
       "name": "Structured Refund Policies",
-      "category": "Payments & Pricing",
+      "category": "Settings & Configuration",
       "description": "Applying automated time-based refund rules to bookings.",
       "signal": "table: structured_refund_policy (rules JSONB, paused); section.structured_refund_policy_id; section.structured_refund_policy_paused",
       "adoption_definition": "Has >=1 structured_refund_policy defined, or >=1 section with structured_refund_policy_id set",
@@ -2575,7 +2575,7 @@
     {
       "key": "tax_collection",
       "name": "Tax Collection",
-      "category": "Payments & Pricing",
+      "category": "Settings & Configuration",
       "description": "Applying sales tax to products or court reservations.",
       "signal": "product.tax_bps > 0; court.tax_bps > 0",
       "adoption_definition": "Has >=1 product OR site with tax_bps above zero. Both count, because an org may tax merchandise, rentals, or both: 613 products across 19 orgs and 106 courts across 14. Measured 2026-09-07: 11 of 73 launched orgs (20 of 144 including unlaunched), 706 in total.",
@@ -2593,7 +2593,7 @@
     {
       "key": "gl_accounting",
       "name": "GL Accounting Configuration",
-      "category": "Integrations & Admin",
+      "category": "Settings & Configuration",
       "description": "Categorizing revenue into a chart of general-ledger accounts for finance reporting.",
       "signal": "table: gl_account (name, gl_code); table: gl_config (revenue-type to GL-account mappings); program.gl_account_id / court.gl_account_id / section.gl_account_id",
       "adoption_definition": "Has >=1 unarchived GL account. An archived account was configured once and is no longer in the chart, so it does not count. Measured 2026-09-07: 61 of 73 launched orgs (98 of 144 including unlaunched), 3,707 in total.",
@@ -2623,7 +2623,7 @@
     {
       "key": "custom_email_domains",
       "name": "Custom Sending Email Domains",
-      "category": "Communications",
+      "category": "Settings & Configuration",
       "description": "Sending email from the org's own verified custom domain rather than a default.",
       "signal": "organization_email_domain (domain, type, status). Status values: verified 17, not_started 8, failed 2, pending 2.",
       "adoption_definition": "Has >=1 VERIFIED sending domain. A domain added and never verified cannot send mail, so counting every row would report the feature as working when it is not.",
@@ -2632,7 +2632,7 @@
     {
       "key": "notification_subscriptions",
       "name": "Notification Subscription Types",
-      "category": "Communications",
+      "category": "Settings & Configuration",
       "description": "Defining custom notification subscription categories users can opt in/out of.",
       "signal": "table: subscription (name, opt_in_by_default); notification_preference.subscription_id",
       "adoption_definition": "Has >=1 notification subscription type configured. Note this table is marketing opt-ins (name, opt_in_by_default) and holds no renewal history. Measured 2026-09-07: 22 of 73 launched orgs (25 of 144 including unlaunched), 61 in total.",
@@ -2669,7 +2669,7 @@
     {
       "key": "pos_desk_locations",
       "name": "POS Desk Locations",
-      "category": "Store & POS",
+      "category": "Settings & Configuration",
       "description": "Processing in-person point-of-sale transactions at physical desk/till locations.",
       "signal": "table: desk_location (name, enforce_access_control); transaction_event.desk_location_id; table: product_desk_location",
       "adoption_definition": "Has >=1 desk location, i.e. a physical point of sale. Desk locations are what the finance reports split cash-out and item-log figures by. Measured 2026-09-07: 41 of 73 launched orgs (56 of 144 including unlaunched), 396 in total.",
@@ -2687,7 +2687,7 @@
     {
       "key": "custom_staff_roles",
       "name": "Custom Staff Roles & Permissions",
-      "category": "Integrations & Admin",
+      "category": "Settings & Configuration",
       "description": "Defining custom staff roles with granular can_* permissions and assigning them to users.",
       "signal": "organization_role (29 can_* permission flags), organization_user_role, organization_user.",
       "adoption_definition": "Roles the org NAMED ITSELF — anything other than 'Full Access' and 'Limited Access'. ROLES ARE PLATFORM-SEEDED: 'Full Access' exists at 156 orgs and 'Limited Access' at 78, median 2 roles per org across 165, so counting rows measures the seed rather than adoption. Measured 2026-09-07: 45 of 73 launched orgs have at least one self-named role, 180 such roles in total.",

@@ -326,7 +326,6 @@
      the symptom is a table nobody can read. */
   const CAT_SHORT = {
     "Registration & Eligibility": "Registration",
-    "Forms & Waivers": "Forms",
     "Programs & Scheduling": "Programs",
     "Memberships & Passes": "Memberships",
     "Facilities & Rentals": "Facilities",
@@ -337,6 +336,13 @@
     "Store & POS": "Store / POS",
     "Events & Ticketing": "Events",
     "AI & Automation": "AI",
+    /* NEW 2026-09-07. Dan: "missing a whole section on settings, like
+       permits, waivers, forms, desk locations, etc." All thirteen were
+       already measured but scattered across five functional categories, so
+       the setup picture could not be read anywhere. `Forms & Waivers` is gone
+       with them — forms and waivers ARE the settings he named, and a category
+       with no features left is a column that can never render. */
+    "Settings & Configuration": "Settings",
   };
   function catShort(name) { return CAT_SHORT[name] || name; }
 

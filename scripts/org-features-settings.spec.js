@@ -849,3 +849,57 @@ if (!SKIP_SOURCE) {
   ok(/\.ringcard\s*\{[^}]*display:\s*flex/.test(css), "the ring sits beside its figure");
   ok(/\.ring\s*\{[^}]*flex:\s*none/.test(css), "the ring does not squash when the text is long");
 }
+
+// ── THE SETTINGS CATEGORY ──────────────────────────────────────────────────
+// Dan: "missing a whole section on settings, like permits, waivers, forms,
+// desk locations, etc." All thirteen were already measured but scattered
+// across five functional categories, so the setup picture could not be read
+// anywhere. Asserted against the CATALOG, not a transcribed list.
+{
+  const snap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
+  const byCat = {};
+  for (const f of snap.features) (byCat[f.category] = byCat[f.category] || []).push(f.key);
+
+  ok(snap.featureCategories.includes("Settings & Configuration"),
+     "there is a Settings & Configuration category");
+  /* THE FOUR DAN NAMED ARE THE ANCHORS. If any of them drifts back out, the
+     regroup has silently stopped answering the thing he asked for. */
+  for (const k of ["rental_permits", "waivers_contracts", "custom_forms", "pos_desk_locations"])
+    ok((byCat["Settings & Configuration"] || []).includes(k),
+       `${k} is in the Settings category — one of the four Dan named`);
+  ok((byCat["Settings & Configuration"] || []).length >= 10,
+     `the Settings category is substantial (${(byCat["Settings & Configuration"] || []).length} features)`);
+
+  /* EVERY FEATURE'S CATEGORY MUST BE A LISTED ONE, or it silently gets no
+     column: `groups` is built by mapping over featureCategories, so a
+     feature in an unlisted category is measured, scored, and invisible. */
+  const unlisted = snap.features.filter(f => !snap.featureCategories.includes(f.category));
+  eq(unlisted.length, 0,
+     `every feature sits in a listed category — orphans get NO column and vanish from the page: ${unlisted.map(f => f.key + " (" + f.category + ")").join(", ")}`);
+
+  /* AND EVERY LISTED CATEGORY MUST HAVE A FEATURE. An empty one is a column
+     that can never render and a heading in the settings sheet that never
+     appears — which is why "Forms & Waivers" came out when its three
+     features moved. */
+  const empty = snap.featureCategories.filter(c => !(byCat[c] || []).length);
+  eq(empty.length, 0, `no category is empty: ${empty.join(", ")}`);
+
+  ok(!snap.featureCategories.includes("Forms & Waivers"),
+     "Forms & Waivers is gone — forms and waivers ARE the settings, and it has no features left");
+
+  // The catalog and the page's short labels stay in step, both ways.
+  const H2 = new Function(
+    src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
+    "; return { CAT_SHORT };")();
+  const stale = Object.keys(H2.CAT_SHORT).filter(c => !snap.featureCategories.includes(c));
+  eq(stale.length, 0, `no short label points at a category that no longer exists: ${stale.join(", ")}`);
+
+  /* THE NIGHTLY BAKE MUST NOT UNDO THIS. merge-snapshot carries the catalog
+     over from the committed snapshot rather than rebuilding it, which is the
+     only reason a category edit survives a refresh. */
+  const merge = fs.readFileSync(path.join(ROOT, "scripts", "refresh", "merge-snapshot.js"), "utf8");
+  ok(/featureCategories: old\.featureCategories/.test(merge),
+     "the bake carries featureCategories over, so tomorrow's refresh does not revert the regroup");
+  ok(/features: old\.features/.test(merge),
+     "...and the feature catalog with it, including each feature's category");
+}

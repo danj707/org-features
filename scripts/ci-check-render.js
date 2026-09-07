@@ -105,6 +105,14 @@ const CASES = [
       await pg.waitForSelector('[data-feat-qvchip="sms"]');
       await pg.click('[data-feat-qvchip="sms"]');
     } },
+  /* The Settings & Configuration category, on both surfaces. It is the one
+     category that exists only because features were MOVED into it, so a
+     regroup that half-applies (catalog edited, short label missing) shows
+     up here as a 24-character column header rather than as an error. */
+  { name: "org features · the Settings column", path: "/ps/features", text: "SETTINGS" },
+  { name: "org features · the Settings panel on a drill-in",
+    path: "/ps/features/apex-park-and-recreation-district",
+    needs: '[data-feat-cat="Settings & Configuration"]' },
   { name: "org features · the settings sheet", path: "/ps/features", needs: "[data-feat-settings]",
     act: async (pg) => {
       await pg.waitForSelector("[data-feat-gear]");

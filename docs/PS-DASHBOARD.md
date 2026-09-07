@@ -773,3 +773,87 @@ renders), signs in, and drives a real Chromium at every page.
 command line** and killed the shell (exit 144). Third instance in this repo
 family, and the rule is already written down: never `pkill -f` a pattern that
 could appear in the command running it. Use the backgrounded job's own PID.
+
+## A SETTINGS & CONFIGURATION CATEGORY (2026-09-07)
+
+Dan: *"missing a whole section on settings, like permits, waivers, forms,
+desk locations, etc."* — and, when asked which of two problems that was,
+*"Regroup into a Settings section"*.
+
+**All four he named were already measured and already on the page.** At Apex
+all four are IN USE, which is why they read as absent: the gaps panel leads
+and anything in use sits further down inside its functional category.
+
+| | was | Apex |
+|---|---|---|
+| Facility Rental Permits | Facilities & Rentals | 495 permits issued |
+| Waivers & Legal Contracts | Forms & Waivers | 28 policy/waiver versions |
+| Custom Forms | Forms & Waivers | 94 forms |
+| POS Desk Locations | Store & POS | 31 desk locations |
+
+So the problem was not coverage, it was that **the setup picture was
+scattered across five functional categories and could not be read anywhere.**
+
+### The thirteen, and the line drawn
+
+The rule: **org-level setup an admin configures once**, as opposed to
+per-registration behaviour or transactional output.
+
+Custom Forms · Waivers & Legal Contracts · Reusable Forms On File · Facility
+Rental Permits · Reservation Buffer Times · Security Deposits · Structured
+Refund Policies · Tax Collection · GL Accounting Configuration · Custom Staff
+Roles & Permissions · Custom Sending Email Domains · Notification
+Subscription Types · POS Desk Locations
+
+**`Forms & Waivers` is GONE with them** — forms and waivers *are* the
+settings Dan named, so the category emptied. A listed category with no
+features is a column that can never render and a heading in the settings
+sheet that never appears, so it came out of `featureCategories` too.
+
+**What deliberately did NOT move:** `alternate_identities` and
+`crm_household_notes` stay in Integrations & Admin — an external-id mapping
+is an integration, and 1,830 household notes is CRM *usage*, not setup.
+`registration_windows`, `group_early_access_windows` and
+`required_participant_info` stay in Registration & Eligibility: they are
+per-section behaviour, not an org-level screen.
+
+Category sizes now: Registration 10 · **Settings 13** · Payments 7 ·
+Programs 6 · Memberships 5 · Facilities 4 · Comms 3 · Integrations 2 ·
+Store/POS 2 · Events 2 · AI 2 · Leagues 1. Twelve categories, 57 features —
+the same 57.
+
+### TOMORROW'S BAKE DOES NOT REVERT IT
+
+`merge-snapshot.js` carries `featureCategories: old.featureCategories` and
+`features: old.features` over from the committed snapshot rather than
+rebuilding them, and the fleet query knows nothing about categories. That is
+the only reason a category edit survives a refresh, so the spec pins both
+lines — without them the nightly job would quietly undo this.
+
+### Guards
+
+`org-features-settings.spec.js` 322 → **334 assertions**, all asserted against
+the **catalog** rather than a transcribed list:
+
+- the four Dan named are in the Settings category (if one drifts out, the
+  regroup has stopped answering what he asked for);
+- **every feature's category is a listed one** — an orphan is measured,
+  scored, and gets no column at all, so it vanishes from the page;
+- **no listed category is empty**;
+- every category in the data has a short column label, and no short label
+  points at a category that no longer exists;
+- the bake still carries the catalog.
+
+Mutation-tested six ways, all failing by name: permits drifting back out, a
+feature landing in an unlisted category, an empty category left listed, the
+Settings label missing, a stale label for a dead category, and the bake
+dropping `featureCategories`.
+
+Plus two render cases — the Settings **column** and the Settings **panel** on
+a drill-in — because a half-applied regroup (catalog edited, short label
+missing) shows up as a 24-character column header rather than as an error.
+
+Verified in a browser: 14 columns with SETTINGS present and FORMS gone, the
+Settings cell reading `11/13` at Apex, a drill-in panel listing all thirteen
+at 85%, and the settings sheet grouping into 12 categories with 13 checkboxes
+under Settings.
