@@ -699,3 +699,77 @@ Lowest 7/11/13/13… all live; Pre-launch all unlaunched; the SMS chip's "20"
 matching exactly the 20 rows the click shows, ranked by volume; picking an org
 clearing the chip and vice versa; and clicking the active chip returning to
 all 144. No uncaught page errors.
+
+## TWO BLANK PAGES IN ONE AFTERNOON, AND THE CHECK THAT NOW CATCHES THEM (2026-09-07)
+
+Both were the same class, both reached Dan, and every check this project had
+passed on both:
+
+```
+Cannot access 'groups' before initialization      (sorting a group column)
+Cannot access 'launchTag' before initialization    (the per-org drill-in)
+```
+
+A derived value read **above its own declaration** — a temporal dead zone.
+`node --check` passes, because the file is valid. `ci-check-html` passes,
+because the Babel block *parses*; it only throws when **run**.
+`ci-boot-check` passes, because the server serves the HTML happily. All five
+specs pass, because none of them mounts a component. React catches the throw,
+unmounts the tree, and the response is **a 200 with a complete document and
+nothing on screen.**
+
+**PARSING IS NOT RUNNING. A page can only be proven to render by rendering
+it.** The sibling rental-report project learned this the same way and its
+rule is the one to follow here: *in these components, define derived values
+AFTER everything they read* — the safest place is immediately before the
+`return`.
+
+### The second one is the more instructive
+
+The first fix — moving the `groups` derivation above the sort block that
+reads it — **carried the whole drill-in up with it**, because the drill-in
+happened to sit inside the region being moved. The drill-in reads
+`launchTag`, `decorate`, `metrics` and `pill`, all declared lower down, so
+`/ps/features/<slug>` went blank while `/ps/features` stayed fine — that path
+is guarded by `if (slug)`, so the list never evaluates it.
+
+**And I re-ran the wrong check.** The browser verification I ran after that
+move covered the list, the rings, the sort and the comparison; the drill-in
+check was the one from *before* the move. That is the rule already recorded
+in the sibling project, verbatim: *when you move a control, move the case
+that pins where it is, and re-run after the last change rather than before
+it.*
+
+### `scripts/ci-check-render.js` — 13 cases, in CI
+
+Boots the real server against the committed snapshot (the pages fetch from
+their own origin, and the snapshot in the repo is what CI should prove
+renders), signs in, and drives a real Chromium at every page.
+
+- **Every case must assert something** — a `needs` selector or a `text`
+  snippet. The script *refuses to run* if a case has neither, because an
+  unmounted tree throws nothing on the second render: it is simply empty, so
+  "no uncaught error" alone passes on a blank page.
+- **`text` exists for pages with no class to hook.** CX Reporting is built
+  from inline styles; its case keys on a figure it computes from the
+  snapshot, so chrome-without-data still fails.
+- **Click-only paths get their own case.** The sorted group column and the
+  settings sheet are reachable only by a click, and the group column is
+  exactly where the first blank page lived.
+- **It says when a page came up BLANK**, because a missing selector and an
+  unmounted tree look identical from the outside otherwise.
+- **It SKIPS with a message** without puppeteer rather than passing. A render
+  check reporting success without having opened a browser is the warm-cache
+  sign-off this repo family already has a rule about.
+- Its own CI job, not part of `npm test`, since it needs a browser.
+
+**Verified against both real bugs**: reintroducing the `launchTag` move fails
+`a per-org drill-in`; reintroducing the `groups` move fails that *and*
+`sorting a group column`. Each names the page that goes blank.
+
+### A sandbox trap, hit AGAIN
+
+`pkill -f "PORT=3455"` to stop a probe server matched **this session's own
+command line** and killed the shell (exit 144). Third instance in this repo
+family, and the rule is already written down: never `pkill -f` a pattern that
+could appear in the command running it. Use the backgrounded job's own PID.

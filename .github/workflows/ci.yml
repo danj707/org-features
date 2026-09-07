@@ -45,6 +45,27 @@ jobs:
       - name: Data snapshots are valid JSON with the keys the pages read
         run: node scripts/ci-check-data.js
 
+  # PARSING IS NOT RUNNING. Both dashboards are one Babel block inside an HTML
+  # file, so a value read above its own declaration is a temporal dead zone
+  # that `node --check` cannot see, ci-check-html cannot see (the block
+  # PARSES), the boot check cannot see (the server serves it happily) and no
+  # spec can see (none mounts a component). React catches the throw, unmounts
+  # the tree, and the response is a 200 with a complete document and nothing
+  # on screen. This project shipped TWO of those in one afternoon on
+  # 2026-09-07 before this job existed.
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - name: Install a browser for the render check
+        run: npx --yes puppeteer browsers install chrome
+      - name: Every page renders in a real browser
+        run: npm run render
+
   boot:
     runs-on: ubuntu-latest
     steps:

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Dashboard tracking rec.us feature usage & adoption by organization",
   "scripts": {
+    "render": "node scripts/ci-check-render.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node scripts/store.spec.js && node scripts/nav.spec.js && node scripts/bug-freshness.spec.js && node scripts/measured-features.spec.js && node scripts/org-features-settings.spec.js"

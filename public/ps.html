@@ -1517,6 +1517,79 @@
                              onClick: ev => ev.stopPropagation() }, "admin \u2197") : null;
     };
 
+    const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
+    const countOf = (s2, k) => Number((((d.adoption || {})[s2] || {})[k] || {}).count || 0);
+
+    /* THE QUICK VIEW IS APPLIED TO `all`, which is already settings-scoped,
+       so no view can widen the page past an excluded org. The default order
+       stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
+       the list opens. */
+    const view = ofQuickView(qv);
+    const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
+
+    /* A HEADER CLICK OVERRIDES THE ORDER, NOT THE SCOPE. Sorting inside "Top
+       SMS users" re-orders those 20 orgs; it does not bring the other 124
+       back. The quick view is applied first and this re-sorts its output. */
+    const groupPct = (r, cat) => {
+      const g = groups.find(x => x.cat === cat);
+      const gs = g && ofGroupScore(g.keys, k => adoptedIn(r.o.slug, k));
+      return gs ? gs.pct : null;
+    };
+    const sortVal = (r, key) =>
+      key === "name" ? (r.o.displayName || r.o.name || r.o.slug)
+      : key === "score" ? r.score
+      : groupPct(r, key);
+    const numericCol = (key) => key !== "name";
+    const rows = sort
+      ? ofSortRows(qvOut.rows, sort[0], sort[1], sortVal, numericCol(sort[0]))
+      : qvOut.rows;
+
+    /* One header renderer for all fourteen columns, so the arrow and the
+       click cannot drift apart — the same idiom the Account Health table
+       already uses, and deliberately identical so the two tables behave the
+       same way under a click. */
+    const sortTh = (label, key, extra) => e("th", Object.assign({
+      onClick: () => setSort(s2 => [key, s2 && s2[0] === key ? -s2[1] : ofFirstDir(numericCol(key))]),
+      style: { cursor: "pointer" },
+      "data-feat-th": key,
+      "data-feat-thdir": sort && sort[0] === key ? (sort[1] < 0 ? "desc" : "asc") : "",
+    }, extra || {}), label + (sort && sort[0] === key ? (sort[1] < 0 ? " \u2193" : " \u2191") : ""));
+
+    /* A CHIP WITH NOTHING BEHIND IT IS NOT OFFERED, and one whose feature the
+       settings have hidden is not either — the settings scope this page, so a
+       chip for an untracked feature would rank orgs on something the score
+       ignores. Counts come from the same reducer that does the filtering, or
+       the chip promises a number the click does not deliver. */
+    const qvChips = OF_QUICK_VIEWS
+      .filter(v => v.kind !== "feature" || shown.indexOf(v.key) >= 0)
+      .map(v => ({ v, n: ofApplyQuickView(v, all.map(decorate), countOf).total }))
+      .filter(x => x.n > 0);
+
+    const scoredAll = all.map(decorate).filter(r => r.score != null);
+    const avg = scoredAll.length
+      ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
+    const launched = all.filter(o => o.launched).length;
+
+    const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
+      .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
+    const metricKeys = metrics.map(m => m.key);
+
+    const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
+    const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
+      r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
+      window.RecPills.fmtNum(r.usage[k] == null ? null : Number(r.usage[k])));
+
+    const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
+      r.score == null
+        ? e("span", { className: "zero" }, "not measured")
+        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
+
+    const launchTag = o => o.launched
+      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
+      : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
+
+    const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
+
     /* ── THE DRILL-IN ─────────────────────────────────────────────────────
        Rendered by the SAME component as the list, on purpose. A separate
        top-level component would fetch the snapshot again and resolve the
@@ -1648,79 +1721,6 @@
           onSaved: (next) => { setCfg(next); setCfgErr(null); setShowSettings(false); },
         }) : null);
     }
-
-    const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
-    const countOf = (s2, k) => Number((((d.adoption || {})[s2] || {})[k] || {}).count || 0);
-
-    /* THE QUICK VIEW IS APPLIED TO `all`, which is already settings-scoped,
-       so no view can widen the page past an excluded org. The default order
-       stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
-       the list opens. */
-    const view = ofQuickView(qv);
-    const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
-
-    /* A HEADER CLICK OVERRIDES THE ORDER, NOT THE SCOPE. Sorting inside "Top
-       SMS users" re-orders those 20 orgs; it does not bring the other 124
-       back. The quick view is applied first and this re-sorts its output. */
-    const groupPct = (r, cat) => {
-      const g = groups.find(x => x.cat === cat);
-      const gs = g && ofGroupScore(g.keys, k => adoptedIn(r.o.slug, k));
-      return gs ? gs.pct : null;
-    };
-    const sortVal = (r, key) =>
-      key === "name" ? (r.o.displayName || r.o.name || r.o.slug)
-      : key === "score" ? r.score
-      : groupPct(r, key);
-    const numericCol = (key) => key !== "name";
-    const rows = sort
-      ? ofSortRows(qvOut.rows, sort[0], sort[1], sortVal, numericCol(sort[0]))
-      : qvOut.rows;
-
-    /* One header renderer for all fourteen columns, so the arrow and the
-       click cannot drift apart — the same idiom the Account Health table
-       already uses, and deliberately identical so the two tables behave the
-       same way under a click. */
-    const sortTh = (label, key, extra) => e("th", Object.assign({
-      onClick: () => setSort(s2 => [key, s2 && s2[0] === key ? -s2[1] : ofFirstDir(numericCol(key))]),
-      style: { cursor: "pointer" },
-      "data-feat-th": key,
-      "data-feat-thdir": sort && sort[0] === key ? (sort[1] < 0 ? "desc" : "asc") : "",
-    }, extra || {}), label + (sort && sort[0] === key ? (sort[1] < 0 ? " \u2193" : " \u2191") : ""));
-
-    /* A CHIP WITH NOTHING BEHIND IT IS NOT OFFERED, and one whose feature the
-       settings have hidden is not either — the settings scope this page, so a
-       chip for an untracked feature would rank orgs on something the score
-       ignores. Counts come from the same reducer that does the filtering, or
-       the chip promises a number the click does not deliver. */
-    const qvChips = OF_QUICK_VIEWS
-      .filter(v => v.kind !== "feature" || shown.indexOf(v.key) >= 0)
-      .map(v => ({ v, n: ofApplyQuickView(v, all.map(decorate), countOf).total }))
-      .filter(x => x.n > 0);
-
-    const scoredAll = all.map(decorate).filter(r => r.score != null);
-    const avg = scoredAll.length
-      ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
-    const launched = all.filter(o => o.launched).length;
-
-    const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
-      .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
-    const metricKeys = metrics.map(m => m.key);
-
-    const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
-    const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
-      r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
-      window.RecPills.fmtNum(r.usage[k] == null ? null : Number(r.usage[k])));
-
-    const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
-      r.score == null
-        ? e("span", { className: "zero" }, "not measured")
-        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
-
-    const launchTag = o => o.launched
-      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
-      : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
-
-    const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
 
     const a = cmpA ? all.find(o => o.slug === cmpA) : null;
     const b = cmpB ? all.find(o => o.slug === cmpB) : null;
