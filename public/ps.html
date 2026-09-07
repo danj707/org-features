@@ -171,6 +171,68 @@
   /* Pushed right and quiet: it is the same sentence every day, so it must
      not compete with the date, which is the part that changes. */
   .asof-src { margin-left: auto; font-size: 11.5px; color: #94a3b8; }
+  /* ── Org Features: the group table, the fingerprint, the drill-in ─────── */
+  /* Twelve group columns plus name and adoption. The name column is capped so
+     the group columns are not squeezed to nothing, and the table scrolls in
+     .tablewrap rather than compressing — the same fix the sibling project's
+     programs table needed. */
+  .subslug { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
+             overflow: hidden; text-overflow: ellipsis; }
+  .feattable { min-width: max-content; }
+  .feattable th, .feattable td { padding: 7px 8px; }
+  .feattable td.l { max-width: 260px; }
+  .pill.gpill { min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
+  .adminlink:hover { text-decoration: underline; }
+
+  /* The fingerprint row sits under its org and belongs to it, so it carries
+     no top border of its own — the pair reads as one band. */
+  .fp-row td { border-bottom: 1px solid var(--line); padding-top: 0; white-space: normal; text-align: left; }
+  .tablewrap tr.fp-row:hover td { background: #f1f5f9; }
+  .fp { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 5px; }
+  .fp-grp { display: inline-flex; gap: 2px; padding: 2px 5px; background: #f8fafc;
+            border: 1px solid var(--line); border-radius: 5px; }
+  /* A dot per tracked feature. Off is an OUTLINE, not a paler fill: at 7px a
+     light grey square and a light green one are the same smudge, and the
+     whole point of the strip is telling them apart at a glance. */
+  .fp-dot { display: block; width: 7px; height: 12px; border-radius: 2px;
+            background: #fff; border: 1px solid #cbd5e1; }
+  .fp-dot.on { background: var(--brand); border-color: var(--brand); }
+  .fp-miss { font-size: 11.5px; color: var(--muted); line-height: 1.45; max-width: 1100px; }
+  .fp-miss b { color: #b45309; }
+  .fp-more { color: #94a3b8; font-style: italic; }
+
+  /* The drill-in's gap panel: grouped, so a reader sees WHERE the gaps are
+     rather than one long alphabetical list. */
+  .gapwrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+             gap: 12px; padding: 12px 16px; }
+  .gapgrp { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .gaphead { display: flex; justify-content: space-between; align-items: baseline; gap: 6px;
+             background: #fffbeb; color: #92400e; font-size: 11px; font-weight: 700;
+             text-transform: uppercase; letter-spacing: .4px; padding: 5px 8px;
+             border-bottom: 1px solid var(--line); }
+  .gapn { font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .gapitem { font-size: 12.5px; color: #334155; padding: 4px 8px; border-bottom: 1px solid #f1f5f9; }
+  .gapitem:last-child { border-bottom: 0; }
+  .gapclear { padding: 0 16px 12px; font-size: 12px; color: var(--muted); }
+  .gapclear b { color: #166534; }
+
+  /* Per-category: in use on the left with its measured figure, not in use on
+     the right. Two columns rather than one list, because "what they have" and
+     "what they don't" are two different questions being asked at once. */
+  .catcols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; padding: 10px 16px 14px; }
+  @media (max-width: 780px) { .catcols { grid-template-columns: 1fr; } }
+  .catlab { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+            padding-bottom: 5px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .catlab.on { color: #166534; }
+  .catlab.off { color: #b45309; }
+  .catrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+            font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
+  .catrow.off .catname { color: var(--muted); }
+  .catname { font-weight: 600; color: #1a2333; }
+  .catdetail { color: var(--muted); font-size: 11.5px; text-align: right;
+               font-variant-numeric: tabular-nums; }
+  .catnone { font-size: 12px; color: #94a3b8; font-style: italic; padding: 4px 0; }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
 </head>
@@ -212,12 +274,77 @@
   }
 
 
+  // ---------------- org features: groups, links, ratios ----------------
+  // At module scope and pure, so a spec can RUN them. A regex over a
+  // comparison passes just as happily when the comparison is inverted.
+
+  /* SHORT COLUMN LABELS. The catalog's category names are up to 25 characters
+     ("Registration & Eligibility") and there are twelve columns — the long
+     names force the table several screens wide. The spec fails if a category
+     in the data has no short label, because the fallback is the long name and
+     the symptom is a table nobody can read. */
+  const CAT_SHORT = {
+    "Registration & Eligibility": "Registration",
+    "Forms & Waivers": "Forms",
+    "Programs & Scheduling": "Programs",
+    "Memberships & Passes": "Memberships",
+    "Facilities & Rentals": "Facilities",
+    "Payments & Pricing": "Payments",
+    "Integrations & Admin": "Integrations",
+    "Communications": "Comms",
+    "Leagues & Teams": "Leagues",
+    "Store & POS": "Store / POS",
+    "Events & Ticketing": "Events",
+    "AI & Automation": "AI",
+  };
+  function catShort(name) { return CAT_SHORT[name] || name; }
+
+  /* How many missing features the list names inline before deferring to the
+     drill-in. Twelve fits two lines at a normal width; an org at 2% adoption
+     is missing 55 and printing all of them turns the table into prose. */
+  const FP_MISS_SHOWN = 12;
+
+  /* The org's page in the Rec admin. NULL without an id, so the link is
+     ABSENT rather than pointing at /admin/o/undefined — a link that 404s is
+     worse than no link, and the snapshot's org id is the uuid this path
+     wants (the same trap as check-ins, where `Member ID` is a 6-char rec_id
+     that looks identical and 404s). */
+  function ofRecAdminUrl(orgId) {
+    return orgId ? "https://www.rec.us/admin/o/" + orgId : null;
+  }
+
+  /* A category's adoption for one org. NULL when the category has no tracked
+     features — settings can hide every feature in a group, and 0/0 is not
+     "uses none of it". Same absent-is-not-zero rule as everywhere else. */
+  function ofGroupScore(keys, isAdopted) {
+    if (!keys || !keys.length) return null;
+    const used = keys.filter(isAdopted).length;
+    return { used, total: keys.length, pct: Math.round((used / keys.length) * 100) };
+  }
+
+  /* A RATIO ramp, deliberately not the pill scale. `heat()` is a LOG ramp
+     over counts, where the question is "how big is this next to the biggest";
+     here every cell is already a share of its own denominator, so a linear
+     ramp is the honest one and 4/4 must look the same in a group of four as
+     8/8 does in a group of eight. */
+  function ofRatioHeat(pct) {
+    if (pct == null) return { background: "#f8fafc", color: "#94a3b8" };
+    if (pct === 0) return { background: "#fff", color: "#cbd5e1" };
+    const alpha = 0.10 + (pct / 100) * 0.5;
+    return { background: "rgba(15,111,92," + alpha.toFixed(3) + ")",
+             color: pct > 65 ? "#fff" : "#0f3d33", fontWeight: 700 };
+  }
+
   function route() {
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
     if (p.startsWith("/ps/reporting")) return { page: "reporting" };
     if (p.startsWith("/ps/remittance")) return { page: "remittance" };
     if (p.startsWith("/ps/admin")) return { page: "admin" };
+    /* BEFORE the bare prefix test, which would otherwise swallow the slug
+       and land every drill-in back on the list. */
+    const fm = p.match(/^\/ps\/features\/(.+)$/);
+    if (fm) return { page: "featureorg", slug: decodeURIComponent(fm[1]) };
     if (p.startsWith("/ps/features")) return { page: "features" };
     if (p.startsWith("/ps/how")) return { page: "how" };
     if (p.startsWith("/ps/updates")) return { page: "updates" };
@@ -1085,7 +1212,7 @@
      like the snapshot had gone. */
   const OF_DEFAULT_SETTINGS = { hiddenFeatures: [], excludedOrgs: [] };
 
-  function Features() {
+  function Features({ slug }) {
     const [d, setD] = useState(null);
     const [err, setErr] = useState(null);
     const [cfg, setCfg] = useState(null);        // null until the fetch settles
@@ -1169,6 +1296,141 @@
 
     const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
 
+    /* GROUPS ARE DERIVED FROM THE CATALOG, in the catalog's own order, and
+       only over TRACKED features — a group whose features the settings have
+       all hidden gets no column at all rather than a permanent 0/0. */
+    const groups = (d.featureCategories || [])
+      .map(cat => ({ cat, keys: shown.filter(k => byKey[k] && byKey[k].category === cat) }))
+      .filter(g => g.keys.length > 0);
+
+    const notUsing = (s2) => shown.filter(k => !adoptedIn(s2, k));
+    const detailOf = (s2, k) => (((d.adoption || {})[s2] || {})[k] || {}).detail || "";
+
+    const adminLink = (o) => {
+      const href = ofRecAdminUrl(o.id);
+      return href ? e("a", { className: "adminlink", href, target: "_blank", rel: "noopener",
+                             title: "Open " + orgName(o) + " in the Rec admin",
+                             // The row itself navigates to the drill-in, so a
+                             // click on the link must not do both.
+                             onClick: ev => ev.stopPropagation() }, "admin \u2197") : null;
+    };
+
+    /* ── THE DRILL-IN ─────────────────────────────────────────────────────
+       Rendered by the SAME component as the list, on purpose. A separate
+       top-level component would fetch the snapshot again and resolve the
+       settings again, and the two copies would disagree about the tracked
+       set the first time either changed — the one-reducer-N-readers rule
+       this page already follows for the score. It also keeps the shell: the
+       sidebar stays, and the breadcrumb goes back without a page load. */
+    if (slug) {
+      const o = everyOrg.find(x => x.slug === slug);
+      const crumb = e("div", { className: "crumb", "data-feat-crumb": 1 },
+        link("/ps/features", "Org Features"), " / ",
+        e("b", null, o ? orgName(o) : slug));
+      if (!o) {
+        return e("div", null, crumb,
+          e("div", { className: "note" },
+            "No organization with the slug “" + slug + "” is in this snapshot. ",
+            "It may have been renamed, or added since the last bake."));
+      }
+      const oScore = scoreOf(o.slug);
+      const oMiss = notUsing(o.slug);
+      const oUsage = (d.usage || {})[o.slug] || {};
+      return e("div", null, crumb,
+        e("div", { className: "org-h" },
+          e("h2", null, orgName(o)), launchTag(o), adminLink(o),
+          e("div", { className: "links" }, o.slug)),
+
+        /* EXCLUDED IS NEVER HIDDEN, and a deep link to an excluded org still
+           works — it is reachable from the settings sheet and from a link
+           somebody was sent. It says why it is missing from the list rather
+           than pretending not to exist. */
+        excluded.has(o.slug) ? e("div", { className: "note", "data-feat-exclnote": 1,
+            style: { color: "#b45309", fontWeight: 600 } },
+          "⚠ This organization is excluded in the settings, so it is not in the list or the fleet average.") : null,
+
+        e("div", { className: "cards" },
+          e("div", { className: "card" }, e("div", { className: "k" }, "Adoption"),
+            e("div", { className: "v", "data-feat-orgscore": oScore == null ? "" : oScore,
+                       style: { color: oScore == null ? "#94a3b8" : scoreColor(oScore) } },
+              oScore == null ? "not measured" : oScore + "%"),
+            e("div", { className: "d" }, (shown.length - oMiss.length) + " of " + shown.length + " tracked features")),
+          /* THE CORE COUNTS LIVE HERE NOW. They came off the list because
+             they measure SIZE rather than adoption; on one org's page size
+             is exactly the context you want beside the gaps. */
+          metrics.map(m => e("div", { className: "card", key: m.key },
+            e("div", { className: "k" }, m.icon + " " + m.label),
+            e("div", { className: "v", style: { fontSize: 20 } },
+              window.RecPills.fmtNum(oUsage[m.key] == null ? null : Number(oUsage[m.key]))),
+            e("div", { className: "d" }, m.description)))),
+
+        /* THE GAPS LEAD. Dan: "Callout what the org is NOT using
+           specifically." On a page about one account the unused list is the
+           thing to act on, so it sits above the per-category detail rather
+           than being assembled from it. */
+        e("div", { className: "panel", "data-feat-gaps": oMiss.length },
+          e("h2", null, oMiss.length ? "Not using — " + oMiss.length + " of " + shown.length + " tracked features"
+                                     : "Using every tracked feature",
+            e("span", { className: "hint" }, oMiss.length ? "the specific gaps, by group" : "nothing tracked is unused here")),
+          oMiss.length
+            ? e("div", { className: "gapwrap" }, groups.map(g => {
+                const gm = g.keys.filter(k => !adoptedIn(o.slug, k));
+                if (!gm.length) return null;
+                return e("div", { key: g.cat, className: "gapgrp" },
+                  e("div", { className: "gaphead" }, catShort(g.cat),
+                    e("span", { className: "gapn" }, gm.length + "/" + g.keys.length)),
+                  gm.map(k => e("div", { key: k, className: "gapitem",
+                                         title: (byKey[k] && byKey[k].description) || "" }, label(k))));
+              }))
+            : e("div", { className: "note" },
+                "Every feature this page tracks is in use at " + orgName(o) + "."),
+          /* A FULLY-ADOPTED GROUP IS NOT A GAP, so it is not listed above —
+             but "no gaps in Forms & Waivers" is itself worth seeing, and
+             without this the panel silently omits whole groups. */
+          oMiss.length ? e("div", { className: "gapclear" },
+            (() => {
+              const clear = groups.filter(g => g.keys.every(k => adoptedIn(o.slug, k))).map(g => catShort(g.cat));
+              return clear.length
+                ? e("span", null, e("b", null, "Fully adopted: "), clear.join(", "))
+                : e("span", null, "No group is fully adopted yet.");
+            })()) : null),
+
+        /* EVERY CATEGORY, USED AND UNUSED, with the measured figure beside
+           each thing in use — that figure is the snapshot's own `detail`
+           string ("4,573 sections with age rules"), so the page never
+           re-derives a number the bake already phrased. */
+        groups.map(g => {
+          const gs = ofGroupScore(g.keys, k => adoptedIn(o.slug, k));
+          const used = g.keys.filter(k => adoptedIn(o.slug, k));
+          const unused = g.keys.filter(k => !adoptedIn(o.slug, k));
+          return e("div", { className: "panel", key: g.cat, "data-feat-cat": g.cat },
+            e("h2", null, g.cat,
+              e("span", { className: "hint" }, gs.used + " of " + gs.total + " in use"),
+              e("span", { className: "pill gpill", style: ofRatioHeat(gs.pct) }, gs.pct + "%")),
+            e("div", { className: "catcols" },
+              e("div", null,
+                e("div", { className: "catlab on" }, "In use (" + used.length + ")"),
+                used.length
+                  ? used.map(k => e("div", { key: k, className: "catrow" },
+                      e("span", { className: "catname" }, label(k)),
+                      e("span", { className: "catdetail" }, detailOf(o.slug, k) || "in use")))
+                  : e("div", { className: "catnone" }, "Nothing in this group yet.")),
+              e("div", null,
+                e("div", { className: "catlab off" }, "Not in use (" + unused.length + ")"),
+                unused.length
+                  ? unused.map(k => e("div", { key: k, className: "catrow off",
+                                               title: (byKey[k] && byKey[k].description) || "" },
+                      e("span", { className: "catname" }, label(k))))
+                  : e("div", { className: "catnone" }, "All of it is in use."))));
+        }),
+
+        showSettings ? e(FeatureSettings, {
+          data: d, cfg,
+          onClose: () => setShowSettings(false),
+          onSaved: (next) => { setCfg(next); setCfgErr(null); setShowSettings(false); },
+        }) : null);
+    }
+
     const a = cmpA ? all.find(o => o.slug === cmpA) : null;
     const b = cmpB ? all.find(o => o.slug === cmpB) : null;
     const A = a ? decorate(a) : null, B = b ? decorate(b) : null;
@@ -1244,8 +1506,8 @@
               e("th", { className: "l" }, "Organization"), e("th", null, "Adoption"),
               metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
             e("tbody", null, [A, B].map((r, i) => e("tr", { key: r.o.slug + i, "data-feat-cmprow": i === 0 ? "a" : "b" },
-              e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o),
-                e("div", { className: "note" }, r.o.slug)),
+              e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o), " ", adminLink(r.o),
+                e("div", { className: "subslug" }, r.o.slug)),
               scoreCell(r),
               metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))))))),
           A.o.slug === B.o.slug
@@ -1261,40 +1523,79 @@
       ),
 
       e("div", { className: "panel" },
-        e("h2", null, "Feature usage by organization",
-          e("span", { className: "hint" }, "click a row for its feature checklist"),
+        e("h2", null, "Feature adoption by organization",
+          e("span", { className: "hint" }, "one column per feature group — click a row for the full breakdown"),
           e("button", { onClick: () => setShowSettings(true), "data-feat-gear": 1,
                         title: "Choose which features and organizations this page counts",
-                        style: { float: "right", marginTop: -2 } }, "\u2699")),
+                        style: { float: "right", marginTop: -2 } }, "⚙")),
         e("div", { className: "filters" },
           e("select", { value: only, onChange: ev => setOnly(ev.target.value), "data-feat-only": only || "all" },
             e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
           only ? e("button", { onClick: () => setOnly("") }, "Show all") : null),
         e("div", { className: "tablewrap" },
-          e("table", null,
+          e("table", { className: "feattable" },
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"),
               e("th", null, "Adoption"),
-              metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
+              /* ONE COLUMN PER FEATURE GROUP, replacing the six raw count
+                 pills. The counts were a measure of SIZE — Apex has 98,197
+                 registrations and Aspen has none, which says which org is
+                 big, not which features either has configured. This page is
+                 about adoption, so every column is now a share of its own
+                 group and the core counts moved to the drill-in, where size
+                 is context rather than the headline. */
+              groups.map(g => e("th", { key: g.cat, title: g.cat + " — " + g.keys.length + " tracked feature" + (g.keys.length === 1 ? "" : "s") },
+                catShort(g.cat))))),
             e("tbody", null, rows.map(r => {
-              const isOpen = open === r.o.slug;
+              const miss = notUsing(r.o.slug);
+              const open2 = () => nav("/ps/features/" + encodeURIComponent(r.o.slug));
               return e(React.Fragment, { key: r.o.slug },
-                e("tr", { onClick: () => setOpen(isOpen ? null : r.o.slug),
-                          style: { cursor: "pointer" }, "data-feat-row": r.o.slug,
+                e("tr", { onClick: open2, style: { cursor: "pointer" }, "data-feat-row": r.o.slug,
                           "data-feat-launched": r.o.launched ? "1" : "0" },
-                  e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o),
-                    e("div", { className: "note" }, r.o.slug)),
+                  e("td", { className: "l" },
+                    e("b", null, orgName(r.o)), " ", launchTag(r.o), " ", adminLink(r.o),
+                    /* .subslug, NOT .note. The global .note is the CENTRED
+                       EMPTY-STATE style with 26px of vertical padding — using
+                       it for a slug is what made every row three lines tall
+                       with the slug adrift in the middle, which is the "ton of
+                       space" in Dan's screenshot. */
+                    e("div", { className: "subslug" }, r.o.slug)),
                   scoreCell(r),
-                  metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))),
-                isOpen ? e("tr", { key: "x" }, e("td", { colSpan: 2 + metrics.length },
-                  e("div", { className: "note", "data-feat-open": r.o.slug },
-                    // The checklist shows the TRACKED set, so it matches the
-                    // score above it rather than listing features the score
-                    // ignores.
-                    shown.map(k =>
-                      e("span", { key: k, className: "chip",
-                                  style: { opacity: adoptedIn(r.o.slug, k) ? 1 : .45 } },
-                        (adoptedIn(r.o.slug, k) ? "\u25cf " : "\u25cb ") + label(k)))))) : null);
+                  groups.map(g => {
+                    const gs = ofGroupScore(g.keys, k => adoptedIn(r.o.slug, k));
+                    return e("td", { key: g.cat, className: "num" },
+                      e("span", { className: "pill gpill", style: ofRatioHeat(gs && gs.pct),
+                                  "data-feat-grp": g.cat + ":" + (gs ? gs.used + "/" + gs.total : "") },
+                        gs ? gs.used + "/" + gs.total : "—"));
+                  })),
+                /* THE FINGERPRINT ROW, always on. It used to render only on
+                   click, which is why the table had bands of dead space and
+                   why nobody saw it. Dan: "this is a great quick visual
+                   representation" — so it is the default view. */
+                e("tr", { key: "fp", className: "fp-row", onClick: open2, style: { cursor: "pointer" } },
+                  e("td", { colSpan: 2 + groups.length },
+                    e("div", { className: "fp", "data-feat-fp": r.o.slug },
+                      groups.map(g => e("span", { key: g.cat, className: "fp-grp", title: g.cat },
+                        g.keys.map(k => e("i", { key: k,
+                          className: "fp-dot" + (adoptedIn(r.o.slug, k) ? " on" : ""),
+                          title: label(k) + (adoptedIn(r.o.slug, k)
+                            ? " — " + (detailOf(r.o.slug, k) || "in use")
+                            : " — not in use") }))))),
+                    /* WHAT THEY ARE NOT USING, NAMED. The dots show the
+                       shape; only names are actionable, and "18 gaps" is a
+                       number to wonder about while a list is something to
+                       work through. Capped, because a 2%-adoption org is
+                       missing 55 of them and the drill-in carries the rest. */
+                    miss.length
+                      ? e("div", { className: "fp-miss", "data-feat-miss": miss.length },
+                          e("b", null, "Not using (" + miss.length + "): "),
+                          miss.slice(0, FP_MISS_SHOWN).map(label).join(", "),
+                          miss.length > FP_MISS_SHOWN
+                            ? e("span", { className: "fp-more" },
+                                " · +" + (miss.length - FP_MISS_SHOWN) + " more")
+                            : null)
+                      : e("div", { className: "fp-miss", "data-feat-miss": 0 },
+                          e("b", null, "Using every tracked feature.")))));
             })))),
         rows.length ? null : e("div", { className: "note" }, "No organizations match.")),
 
@@ -1587,7 +1888,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], featureorg: ["Org Features", "Feature adoption for one organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         /* Renamed PS -> CX at Dan's request. THE LABEL ONLY: the /ps/* routes,
@@ -1640,7 +1941,8 @@
           r.page === "bugs" ? e(Bugs, { data }) :
           r.page === "remittance" ? e(Remittance, null) :
           r.page === "admin" ? e(Admin, { me }) :
-          r.page === "features" ? e(Features, null) :
+          r.page === "features" ? e(Features, { slug: null }) :
+          r.page === "featureorg" ? e(Features, { slug: r.slug }) :
           r.page === "how" ? e(HowItWorks, null) :
           r.page === "updates" ? e(Updates, null) :
           e(Reporting, { data }),

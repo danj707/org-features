@@ -344,8 +344,13 @@ app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
 app.get("/login", (req, res) => auth.currentUser(req) ? res.redirect("/ps") : res.sendFile(LOGIN_PAGE));
 app.get("/reset", (_req, res) => res.sendFile(RESET_PAGE));
+// A CLIENT ROUTE THE SERVER DOES NOT SERVE IS A HARD 404 on refresh or on a
+// shared link — the page only routes once it has been loaded. /ps/features/:slug
+// is the per-org drill-in, and it has to be here or the breadcrumb works while
+// pasting the URL does not.
 app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/remittance", "/ps/admin", "/ps/org/:id",
-         "/ps/features", "/ps/how", "/ps/updates"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
+         "/ps/features", "/ps/features/:slug", "/ps/how", "/ps/updates"],
+        auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));
 

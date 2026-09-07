@@ -100,7 +100,12 @@ process.on("exit", () => {
      "the → is gone with it — the arrow advertised an external link");
   /* IT READS THE SAME SNAPSHOT AS THE PUBLIC DASHBOARD, so the two surfaces
      cannot disagree about an adoption score. */
-  const feat = src.slice(src.indexOf("function Features()"), src.indexOf("function HowItWorks()"));
+  // ANCHORED ON `function Features(` — the open paren only. It was pinned to
+  // `function Features()` and broke the moment the component took a prop, a
+  // signature change that altered no behaviour, leaving indexOf at -1 and a
+  // garbage slice. FOURTH instance in this repo family of a slice pinned to a
+  // name rather than to what the code does.
+  const feat = src.slice(src.indexOf("function Features("), src.indexOf("function HowItWorks()"));
   ok(feat.length > 200, "the Features component was found and sliced");
   ok(/fetch\("\/api\/data"\)/.test(feat), "Features reads /api/data, the same snapshot the public dashboard reads");
   /* THE FLEET AVERAGE EXCLUDES UNSCORED ORGS. Folding an org the bake has not
@@ -172,7 +177,7 @@ process.on("exit", () => {
 // which broke this assertion while changing nothing about the ordering.
 // THIRD instance of a slice pinned to a name rather than to behaviour.
 {
-  const feat = src.slice(src.indexOf("function Features()"), src.indexOf("function FeatureSettings"));
+  const feat = src.slice(src.indexOf("function Features("), src.indexOf("function FeatureSettings"));
   const sortLine = (feat.match(/\(d\.orgs \|\| \[\]\)\.slice\(\)\.sort\([\s\S]*?\);\n/) || [""])[0];
   ok(sortLine.length > 20, "the org list's sort was found, by the collection it sorts");
   ok(/localeCompare/.test(sortLine), "orgs are sorted by NAME, with localeCompare");

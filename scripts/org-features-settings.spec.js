@@ -123,7 +123,12 @@ if (!SKIP_SOURCE) {
 
 // ── THE PAGE: SETTINGS SCOPE EVERY SURFACE ─────────────────────────────────
 if (!SKIP_SOURCE) {
-  const feat = srcNC.slice(srcNC.indexOf("function Features()"), srcNC.indexOf("function FeatureSettings"));
+  // ANCHORED ON `function Features(` — the open paren only. It was pinned to
+  // `function Features()` and broke the moment the component took a prop, a
+  // signature change that altered no behaviour, leaving indexOf at -1 and a
+  // garbage slice. FOURTH instance in this repo family of a slice pinned to a
+  // name rather than to what the code does.
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
   ok(feat.length > 500, "the Features component was found and sliced");
 
   ok(/fetch\("\/api\/org-features-settings"\)/.test(feat), "Features reads the shared settings");
@@ -160,11 +165,24 @@ if (!SKIP_SOURCE) {
     ["the org count", /"data-feat-orgs": all\.length/],
   ]) ok(re.test(feat), `${what} reads the excluded-filtered set`);
 
-  // The checklist inside an open row shows the TRACKED set, or it lists
-  // features the score above it ignores.
-  const openRow = (feat.match(/"data-feat-open"[\s\S]{0,400}/) || [""])[0];
-  ok(/shown\.map/.test(openRow), "the per-org checklist shows the tracked set, matching the score above it");
-  ok(!/allMeasured\.map/.test(openRow), "...and not the full measured set");
+  /* EVERY PER-FEATURE SURFACE COMES OFF `groups`, WHICH COMES OFF `shown`.
+     The old expand-on-click checklist iterated `shown` directly and this
+     asserted that; the checklist is now the always-on fingerprint plus the
+     drill-in's per-category panels, so the invariant moved to the one place
+     the categories are built. If `groups` were built from `allMeasured`,
+     every one of those surfaces would list features the score ignores. */
+  ok(/const groups = \(d\.featureCategories \|\| \[\]\)/.test(feat),
+     "the feature groups come from the catalog's own categories");
+  ok(/keys: shown\.filter\(k => byKey\[k\] && byKey\[k\]\.category === cat\)/.test(feat),
+     "...and hold only TRACKED features, so a hidden feature leaves every group surface");
+  ok(/\.filter\(g => g\.keys\.length > 0\)/.test(feat),
+     "a group whose features are all hidden gets no column at all, rather than a permanent 0/0");
+  ok(/const notUsing = \(s2\) => shown\.filter/.test(feat),
+     "the not-using callout is over the tracked set");
+  const fp = (feat.match(/"data-feat-fp"[\s\S]{0,700}/) || [""])[0];
+  ok(fp.length > 200, "the fingerprint row was found");
+  ok(/g\.keys\.map/.test(fp), "the fingerprint draws one dot per tracked feature in each group");
+  ok(!/allMeasured/.test(fp), "...and never the full measured set");
 
   // THE GAP LIST IN THE COMPARISON is over the tracked set too, or A/B
   // reports a difference on a feature the reader untracked.
@@ -358,7 +376,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 // report-goes-last trap recorded in the sibling project is about a spec that
 // PRINTS its summary mid-file; here the print is deferred by a promise.)
 if (!SKIP_SOURCE) {
-  const feat = srcNC.slice(srcNC.indexOf("function Features()"), srcNC.indexOf("function FeatureSettings"));
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
 
   ok(/"data-feat-asof"/.test(feat), "the Features page states when its data is from");
   /* IT READS THE FEATURES SNAPSHOT'S OWN generatedAt. The shell's sidebar
@@ -402,4 +420,139 @@ if (!SKIP_SOURCE) {
     ok(new RegExp("\\." + c + "\\s*\\{").test(css), `.${c} has its own rule`);
   ok(/\.asof-stale\s*\{[^}]*color:/.test(css),
      "the stale warning has its own colour — it is the only thing that makes it read as a warning");
+}
+
+// ── THE LIST/DRILL-IN LAYOUT ───────────────────────────────────────────────
+// Six asks from Dan, and each one has a way of looking right while being
+// wrong, so each is pinned to the thing that would actually regress.
+{
+  const H = new Function(
+    src.slice(src.indexOf("const CAT_SHORT"), src.indexOf("function route()")) +
+    "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat, FP_MISS_SHOWN };")();
+
+  // 1. SHORT COLUMN LABELS FOR EVERY CATEGORY IN THE DATA. A miss falls back
+  //    to the 25-character name and the symptom is a table nobody can read,
+  //    so the catalog is the source of the list rather than this file.
+  const snap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
+  for (const cat of snap.featureCategories) {
+    ok(H.CAT_SHORT[cat], `"${cat}" has a short column label`);
+    ok(H.catShort(cat).length <= 13, `"${cat}" abbreviates to something a column can hold (got "${H.catShort(cat)}")`);
+  }
+  eq(H.catShort("Something Unseen"), "Something Unseen",
+     "an unknown category falls back to its own name rather than to undefined");
+
+  // 2. THE ADMIN LINK IS ABSENT WITHOUT AN ID, never /admin/o/undefined.
+  eq(H.ofRecAdminUrl("abc-123"), "https://www.rec.us/admin/o/abc-123", "the admin link is built from the org uuid");
+  eq(H.ofRecAdminUrl(null), null, "no id means NO link — a 404 is worse than no link");
+  eq(H.ofRecAdminUrl(""), null, "...and an empty id is the same case");
+  // The snapshot really carries the uuid this path wants, or the link 404s
+  // for every org and no source assertion would notice.
+  ok(snap.orgs.every(o => /^[0-9a-f-]{36}$/.test(String(o.id))),
+     "every org in the snapshot carries a uuid for the admin link");
+
+  // 3. A GROUP SCORE IS NULL, NOT 0%, WHEN NOTHING IN IT IS TRACKED.
+  eq(H.ofGroupScore([], () => true), null, "an empty group scores null — 0/0 is not 'uses none of it'");
+  eq(H.ofGroupScore(null, () => true), null, "...and so does a missing one");
+  eq(H.ofGroupScore(["a", "b", "c", "d"], k => k !== "d"), { used: 3, total: 4, pct: 75 },
+     "a group reports used, total and the rounded share");
+  eq(H.ofGroupScore(["a"], () => false), { used: 0, total: 1, pct: 0 },
+     "a real zero still reports as zero");
+
+  // 4. THE RATIO RAMP IS LINEAR, and distinct from the count pills' log ramp.
+  //    4/4 in a group of four must look like 8/8 in a group of eight.
+  eq(H.ofRatioHeat(100).background, H.ofRatioHeat(100).background, "full adoption is one colour");
+  ok(H.ofRatioHeat(null).background !== H.ofRatioHeat(0).background,
+     "an untracked group and a real zero are coloured differently");
+  ok(H.ofRatioHeat(50).background !== H.ofRatioHeat(100).background, "the ramp ramps");
+  {
+    // LINEAR, checked by the midpoint rather than by reading the formula: a
+    // log ramp (what heat() does for counts) puts 50% far above halfway.
+    const alpha = s2 => Number((String(s2).match(/,([\d.]+)\)$/) || [0, 0])[1]);
+    const a0 = alpha(H.ofRatioHeat(1).background), a50 = alpha(H.ofRatioHeat(50).background),
+          a100 = alpha(H.ofRatioHeat(100).background);
+    const half = (a50 - a0) / (a100 - a0);
+    ok(Math.abs(half - 0.5) < 0.03, `50% sits halfway up the ramp (got ${half.toFixed(3)})`);
+  }
+
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
+
+  // 5. THE COUNT PILLS ARE OFF THE LIST (Dan: "Kill the pills"), and the
+  //    group columns replaced them. The core counts moved to the drill-in,
+  //    where size is context rather than the headline.
+  const listPanel = feat.slice(feat.indexOf('"Feature adoption by organization"'));
+  ok(listPanel.length > 500, "the list panel was found");
+  ok(!/metrics\.map\(m => e\("td"/.test(listPanel),
+     "the list no longer renders a column per core COUNT — those measured size, not adoption");
+  ok(/groups\.map\(g => e\("th"/.test(listPanel), "the header has one column per feature group");
+  ok(/ofGroupScore\(g\.keys/.test(listPanel), "...and each cell is that group's own share");
+  ok(/"data-feat-grp"/.test(listPanel), "the group cells are addressable");
+
+  // 6. THE FINGERPRINT IS THE DEFAULT VIEW, not an expand-on-click.
+  ok(/className: "fp-row"/.test(listPanel), "every org row is followed by its fingerprint row");
+  ok(!/isOpen \?/.test(listPanel) && !/setOpen\(/.test(listPanel),
+     "it is not gated behind a click any more — the strip Dan called a great quick visual is always on");
+  // AND OFF IS AN OUTLINE, NOT A PALER FILL. At 7px a light grey square and a
+  // light green one are the same smudge, which defeats the strip.
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  ok(/\.fp-dot\s*\{[^}]*background:\s*#fff/.test(css), "an unused feature's dot is empty, not tinted");
+  ok(/\.fp-dot\.on\s*\{[^}]*background:\s*var\(--brand\)/.test(css), "...and a used one is filled");
+
+  // 7. WHAT THEY ARE NOT USING, NAMED. A count with nowhere to go is the dead
+  //    end this repo keeps writing down.
+  ok(/"data-feat-miss"/.test(listPanel), "the not-using callout is addressable");
+  ok(/Not using \(/.test(listPanel), "it names the count");
+  ok(/miss\.slice\(0, FP_MISS_SHOWN\)\.map\(label\)/.test(listPanel),
+     "...and the features themselves, by name");
+  ok(/\+" more"|" more"/.test(listPanel), "a capped list says how many it did not name");
+  ok(/Using every tracked feature/.test(listPanel),
+     "a fully-adopted org says so rather than rendering an empty callout");
+  ok(H.FP_MISS_SHOWN > 0 && H.FP_MISS_SHOWN <= 20,
+     `the inline cap is a readable number (got ${H.FP_MISS_SHOWN})`);
+
+  // 8. CLICKING AN ORG STAYS IN THE SHELL. A plain href would be a full page
+  //    load out of the app; every other drill-in here routes through nav().
+  ok(/nav\("\/ps\/features\/" \+ encodeURIComponent\(r\.o\.slug\)\)/.test(listPanel),
+     "a row opens the drill-in through nav(), keeping the sidebar");
+  ok(/onClick: ev => ev\.stopPropagation\(\)/.test(feat),
+     "the admin link does not also trigger the row's own navigation");
+
+  // 9. THE ROUTE, ITS TITLE AND ITS SERVER ENTRY. The header reads
+  //    titles[r.page][0], so a route with no title BLANKS the dashboard; and
+  //    a client route the server does not serve is a hard 404 on refresh.
+  const routeFn = src.slice(src.indexOf("function route()"), src.indexOf("function nav("));
+  ok(/\^\\\/ps\\\/features\\\/\(\.\+\)\$/.test(routeFn), "/ps/features/<slug> is parsed");
+  ok(routeFn.indexOf("featureorg") < routeFn.indexOf('p.startsWith("/ps/features")'),
+     "...BEFORE the bare prefix test, which would otherwise swallow the slug");
+  ok(/featureorg: \["Org Features"/.test(src), "featureorg has a titles entry");
+  ok(/"\/ps\/features\/:slug"/.test(server), "the server serves the drill-in path");
+
+  // 10. THE DRILL-IN. One component owns the fetch and the settings, so the
+  //     list and the detail cannot disagree about the tracked set.
+  ok(/function Features\(\{ slug \}\)/.test(feat), "the component takes the slug");
+  ok(/if \(slug\) \{/.test(feat), "...and renders the drill-in from the same data");
+  ok((src.match(/fetch\("\/api\/org-features-settings"\)/g) || []).length === 1,
+     "the settings are fetched in exactly ONE place");
+  ok((src.match(/fetch\("\/api\/data"\)/g) || []).length === 1,
+     "...and so is the snapshot");
+  ok(/"data-feat-crumb"/.test(feat), "the drill-in carries a breadcrumb");
+  ok(/link\("\/ps\/features", "Org Features"\)/.test(feat),
+     "...whose back link routes in-shell rather than reloading the page");
+  ok(/is in this snapshot/.test(feat),
+     "an unknown slug says so rather than rendering an empty page");
+  ok(/"data-feat-exclnote"/.test(feat),
+     "a deep link to an EXCLUDED org still works and says why it is not in the list");
+
+  // 11. EVERY CATEGORY, USED AND UNUSED, with the measured figure beside what
+  //     is in use — read from the snapshot's own `detail` string rather than
+  //     re-derived, so the page cannot phrase a number differently.
+  ok(/"data-feat-cat"/.test(feat), "the drill-in renders a panel per category");
+  ok(/const detailOf = \(s2, k\) =>/.test(feat), "there is one accessor for a feature's measured detail");
+  ok(/\.detail \|\| ""/.test(feat), "...reading the snapshot's own phrasing");
+  ok(/catlab on/.test(feat) && /catlab off/.test(feat), "each category shows in-use AND not-in-use");
+  ok(/"data-feat-gaps"/.test(feat), "the gaps panel is addressable");
+  ok(/Fully adopted: /.test(feat),
+     "a group with no gaps is still reported — otherwise the panel silently omits whole groups");
+  ok(/"data-feat-orgscore"/.test(feat), "the drill-in states the org's adoption score");
+  ok(/metrics\.map\(m => e\("div", \{ className: "card", key: m\.key \}/.test(feat),
+     "the core counts moved to the drill-in rather than being deleted");
 }

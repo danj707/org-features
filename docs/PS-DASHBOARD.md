@@ -469,3 +469,140 @@ and an unguessable URL is not an access control.
 connector inside a session. With a Linear API key in the same Actions secrets it
 becomes the identical four-step job and the "Dan must create a Routine by hand"
 ask goes away entirely.
+
+## THE ORG FEATURES PAGE, REBUILT AROUND ADOPTION (2026-09-07)
+
+Dan's six asks, verbatim, and what each one turned into.
+
+### The list is twelve group columns, not six count pills
+
+*"The main org list of feature adoption has a ton of space for improved
+metrics. Kill the pills and give me a list of the top 10 or so columns of
+features by group."*
+
+The six pills were `programs / registrations / memberships / passes /
+facilities / reservations` — **measures of SIZE, not adoption.** Apex has
+98,197 registrations and Aspen has none, which tells you which org is big on
+a page about which features are configured. They are replaced by one column
+per feature category (twelve), each reading `used/total` for the **tracked**
+features in that group, on a **linear** ramp — `heat()` is a log ramp over
+counts, and here every cell is already a share of its own denominator, so
+4/4 in a group of four must look identical to 8/8 in a group of eight.
+
+The core counts are **not deleted** — they moved to the drill-in, where size
+is context beside the gaps rather than the headline.
+
+**AND THE "TON OF SPACE" HAD A CAUSE.** The org slug was rendered with the
+global `.note` class, which is the **centred empty-state style with 26px of
+vertical padding**. That padding is what made every row three lines tall with
+the slug adrift in the middle. `.subslug` fixed it: a row pair is 94px now.
+Generalise it: a utility class named for one job (an empty-state message)
+carries that job's spacing wherever it is reused.
+
+### The fingerprint strip is the default view
+
+*"Add this pill style view to the default view, below the metrics for each
+org, this is a great quick visual representation."*
+
+It used to render only on click, which is why nobody saw it and why the table
+had bands of dead space. Every org row is now followed by a strip of **56
+dots grouped into the twelve categories** — 8,064 dots on the page, which
+paints in ~1s.
+
+**OFF IS AN OUTLINE, NOT A PALER FILL.** At 7px a light grey square and a
+light green one are the same smudge, and telling them apart at a glance is
+the entire point of the strip.
+
+### What they are NOT using, named
+
+*"Callout what the org is NOT using specifically."*
+
+A `Not using (N): …` line under each fingerprint, naming up to
+`FP_MISS_SHOWN` (12) features and saying `+N more` beyond that — an org at 2%
+adoption is missing 55, and printing all of them turns the table into prose.
+A fully-adopted org says so rather than rendering an empty callout.
+
+On the drill-in the gaps **lead**, above the per-category detail, grouped by
+category so a reader sees *where* the gaps are rather than one alphabetical
+list. A **fully-adopted group is not a gap and so is not listed** — which
+would silently omit whole groups, so there is a `Fully adopted: …` line.
+
+### An admin link per org
+
+*"Add a link to the admin page for each org after the org name."*
+
+`ofRecAdminUrl(orgId)` → `https://www.rec.us/admin/o/<uuid>`, on the list and
+the drill-in. **NULL without an id**, so the link is absent rather than
+pointing at `/admin/o/undefined` — a link that 404s is worse than no link,
+and the snapshot's org id really is the uuid that path wants (all 144
+verified). It carries `stopPropagation`, because the row itself navigates.
+
+### Clicking an org opens a drill-in inside the shell
+
+*"When clicking on an org, I want it to open another window but still in the
+same navigation screen, with a breadcrumb link at the top to go back."*
+
+`/ps/features/<slug>`, routed through `nav()` so the sidebar stays. Three
+things had to line up or it half-works:
+
+- **The slug is parsed BEFORE the bare `/ps/features` prefix test**, which
+  would otherwise swallow it and land every drill-in back on the list.
+- **`featureorg` needs a `titles` entry.** The header renders
+  `titles[r.page][0]`, so a route with no title does not degrade — it throws
+  and React unmounts the whole dashboard.
+- **The server must serve `/ps/features/:slug`.** A client route the server
+  does not serve is a hard 404 on refresh or on a pasted link.
+
+**ONE COMPONENT OWNS BOTH VIEWS.** The drill-in renders from `Features`
+rather than being its own top-level component, because a second component
+would fetch the snapshot again and resolve the settings again, and the two
+copies would disagree about the tracked set the first time either changed.
+The spec asserts each fetch appears exactly once.
+
+An unknown slug says so. A deep link to an **excluded** org still renders and
+says why it is not in the list — it is reachable from the settings sheet and
+from a link somebody was sent.
+
+### Every category, used and unused, with the measured figure
+
+*"The expanded org feature adoption page should give me each feature category
+and a full set of metrics of what they are using and what they aren't."*
+
+Twelve panels, each with `n of m in use` and its share, split into **In use**
+(with the figure) and **Not in use**. The figure is the snapshot's own
+`detail` string — *"4,573 sections with age rules"* — read rather than
+re-derived, so the page cannot phrase a number differently from the bake.
+
+### Guards
+
+`org-features-settings.spec.js` 103 → **182 assertions**, lifting and RUNNING
+`catShort`, `ofRecAdminUrl`, `ofGroupScore` and `ofRatioHeat`, and checking
+the short labels against the **catalog** rather than a transcribed list.
+
+Mutation-tested **22 ways, all failing by name**: a category losing its short
+label, the admin link built without its id guard, an empty group scoring 0%
+instead of null, the ratio ramp going logarithmic (caught by measuring the
+midpoint, not by reading the formula), the count-pill columns coming back,
+the fingerprint hidden behind a click again, the not-using list reduced to a
+bare count, an all-hidden group still getting a column, groups built from the
+full measured set, the row navigating with a full page load, the admin link
+swallowing the row click, the route parsed after the prefix, `featureorg`
+losing its title, the server not serving the drill-in, the settings fetched
+twice, the breadcrumb becoming a plain anchor, an unknown slug rendering
+blank, an excluded org silently 404ing, the detail re-deriving its own
+figures, fully-adopted groups omitted, the core counts deleted rather than
+moved, and an unused dot tinted instead of outlined.
+
+Verified in a browser end to end: 14 columns with no count pills, 12 group
+cells per row reading `9/9`, 56 dots in 12 boxes per org (8,064 total, ~1s
+paint), the admin href carrying the real uuid, `Not using (6): SMS
+Messaging, …` on Apex and `Not using (55): … +43 more` on Aardvark, a click
+landing on `/ps/features/apex-…` with the sidebar intact, 12 category panels
+with 50 used + 6 unused rows summing to the tracked 56, the breadcrumb
+returning to all 144 rows in-shell, a pasted drill-in URL answering 200, and
+an unknown slug explaining itself. No uncaught page errors.
+
+**A FOURTH SLICE PINNED TO A NAME.** Giving `Features` a prop broke four spec
+slices anchored on the literal `"function Features()"` — a signature change
+that altered no behaviour, leaving `indexOf` at -1 and garbage slices. They
+anchor on `"function Features("` now. Fourth instance in this repo family.
