@@ -490,7 +490,11 @@ if (!SKIP_SOURCE) {
   ok(listPanel.length > 500, "the list panel was found");
   ok(!/metrics\.map\(m => e\("td"/.test(listPanel),
      "the list no longer renders a column per core COUNT — those measured size, not adoption");
-  ok(/groups\.map\(g => e\("th"/.test(listPanel), "the header has one column per feature group");
+  // Matched through the shared header renderer rather than on a literal
+  // e("th") — the columns went sortable and every header now goes through
+  // sortTh(), which is the point.
+  ok(/groups\.map\(g => sortTh\(catShort\(g\.cat\), g\.cat/.test(listPanel),
+     "the header has one column per feature group");
   ok(/ofGroupScore\(g\.keys/.test(listPanel), "...and each cell is that group's own share");
   ok(/"data-feat-grp"/.test(listPanel), "the group cells are addressable");
 
@@ -676,8 +680,8 @@ if (!SKIP_SOURCE) {
   ok(/"data-feat-qvchip"/.test(feat), "the chips are addressable");
   ok(/setQv\(qv === v\.id \? "" : v\.id\); setOnly\(""\)/.test(feat),
      "clicking the active chip clears it, and picking one clears the single-org pulldown");
-  ok(/setOnly\(ev\.target\.value\); if \(ev\.target\.value\) setQv\(""\)/.test(feat),
-     "...and picking an org clears the chip — two controls producing one state looks broken");
+  ok(/setOnly\(ev\.target\.value\); if \(ev\.target\.value\) \{ setQv\(""\); setSort\(null\); \}/.test(feat),
+     "...and picking an org clears the chip AND any manual column sort — two controls producing one state looks broken");
   ok(/v\.kind !== "feature" \|\| shown\.indexOf\(v\.key\) >= 0/.test(feat),
      "a chip whose feature the settings hide is not offered");
   ok(/\.filter\(x => x\.n > 0\)/.test(feat), "a chip with nothing behind it is not offered");
@@ -694,4 +698,154 @@ if (!SKIP_SOURCE) {
   for (const c of ["qv", "qvchip", "qvnote"]) ok(new RegExp("\\." + c + "\\s*\\{").test(css), `.${c} has its own rule`);
   ok(/\.qvchip\.on\s*\{[^}]*background:\s*var\(--brand\)/.test(css),
      "the active chip is visibly active — otherwise nothing on screen says which view is on");
+}
+
+// ── SORTABLE COLUMNS ───────────────────────────────────────────────────────
+// Dan: "make these top column headers sortable, so I can click to sort and
+// then click again to sort, descending and ascending". LIFTED AND RUN — the
+// only mistake that matters is a direction, and no regex over a comparator
+// can see one.
+{
+  const S = new Function(
+    src.slice(src.indexOf("function ofSortRows"), src.indexOf("const OF_QUICK_VIEWS") >= 0
+      ? src.indexOf("function route()") : src.indexOf("function route()")) +
+    "; return { ofSortRows, ofFirstDir };")();
+
+  const row = (slug, v) => ({ o: { slug, displayName: slug }, v });
+  const get = (r) => r.v;
+  const order = (rows, dir) => S.ofSortRows(rows, "k", dir, get, true).map(r => r.o.slug);
+
+  eq(order([row("a", 1), row("b", 3), row("c", 2)], -1), ["b", "c", "a"], "descending puts the biggest first");
+  eq(order([row("a", 1), row("b", 3), row("c", 2)], 1), ["a", "c", "b"], "ascending puts the smallest first");
+  ok(order([row("a", 1), row("b", 3)], -1).join() !== order([row("a", 1), row("b", 3)], 1).join(),
+     "the two directions really are opposite — a click and a second click differ");
+
+  /* FIRST CLICK ON A NUMBER GOES DESCENDING, on a name ascending. Clicking
+     "Payments" means "who uses the most of it"; making the reader click
+     twice for the obvious question is the small wrongness that makes a
+     control feel broken. */
+  eq(S.ofFirstDir(true), -1, "a numeric column opens high-to-low");
+  eq(S.ofFirstDir(false), 1, "a name column opens A-Z");
+
+  /* A NULL NEVER SORTS AS A VALUE. An unmeasured org has no score, and
+     letting null compare as 0 puts "we cannot tell" at one end of a list
+     that claims to rank. Nulls go LAST in BOTH directions, the only
+     arrangement honest either way round. */
+  eq(order([row("a", 5), row("nul", null), row("b", 1)], -1), ["a", "b", "nul"],
+     "nulls sort last descending");
+  eq(order([row("a", 5), row("nul", null), row("b", 1)], 1), ["b", "a", "nul"],
+     "...and last ascending too, rather than flipping to the top");
+
+  // Deterministic on a tie, or two runs of one sort disagree.
+  eq(order([row("zeta", 2), row("alpha", 2), row("mid", 2)], -1), ["alpha", "mid", "zeta"],
+     "ties break by name");
+
+  // A name column compares as text, numerically aware, case-insensitively —
+  // "Aspen" must not sort after "apex" because of capitalisation.
+  const names = [{ o: { slug: "b", displayName: "Barton" }, v: "Barton" },
+                 { o: { slug: "a", displayName: "apex" }, v: "apex" },
+                 { o: { slug: "c", displayName: "Aspen" }, v: "Aspen" }];
+  eq(S.ofSortRows(names, "k", 1, get, false).map(r => r.o.slug), ["a", "c", "b"],
+     "a name column sorts case-insensitively");
+
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
+  ok(/const sortTh = \(label, key, extra\)/.test(feat),
+     "ONE header renderer for all fourteen columns, so the arrow and the click cannot drift apart");
+  ok(/s2 && s2\[0\] === key \? -s2\[1\] : ofFirstDir\(numericCol\(key\)\)/.test(feat),
+     "clicking the same column flips the direction; a new column takes its own first direction");
+  ok(/"data-feat-thdir"/.test(feat), "the sorted column and its direction are addressable");
+  ok(/\\u2193" : " \\u2191"/.test(feat) || /↓" : " ↑/.test(feat),
+     "the sorted header shows an arrow — otherwise nothing on screen says which column is sorting");
+  ok(/sortTh\("Organization", "name"/.test(feat) && /sortTh\("Adoption", "score"/.test(feat),
+     "the name and adoption columns are sortable too, not just the groups");
+
+  /* A HEADER CLICK OVERRIDES THE ORDER, NOT THE SCOPE. Sorting inside "Top
+     SMS users" re-orders those 20 orgs; it must not bring the other 124
+     back. */
+  ok(/const rows = sort\s*\?\s*ofSortRows\(qvOut\.rows/.test(feat),
+     "the sort is applied to the quick view's OUTPUT, so it re-orders without re-scoping");
+
+  /* AND THE VIEW'S NOTE MUST STOP CLAIMING AN ORDER IT NO LONGER SETS. A
+     view says "by volume"; once a column is clicked the table is in that
+     column's order, and a note still promising the view's ranking is two
+     surfaces disagreeing on one screen. */
+  ok(/sort \? e\("span", null, "re-sorted by the "/.test(feat),
+     "an active view says when a column has taken over the ordering");
+  ok(/"data-feat-sortnote"/.test(feat),
+     "a manual sort with no view active still says so — an arrow in a header is not enough");
+  ok(/back to alphabetical/.test(feat), "...and offers the way back");
+  ok(/setQv\(qv === v\.id \? "" : v\.id\); setOnly\(""\); setSort\(null\)/.test(feat),
+     "picking a view clears a stale column sort, or last click's order silently governs a new view");
+
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  ok(/\.feattable th:hover\s*\{/.test(css), "the headers look clickable on hover");
+}
+
+// ── RING METERS AND THE SIDE-BY-SIDE COMPARISON ────────────────────────────
+{
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
+  const ring = srcNC.slice(srcNC.indexOf("function Ring("), srcNC.indexOf("function RingCard("));
+  ok(ring.length > 300, "the Ring component was found");
+
+  /* A SINGLE RATIO IS A METER, NOT A TWO-SLICE PIE. Dan asked for donut
+     charts; all three tiles are one ratio against a limit, and the dataviz
+     guidance is blunt that the honest form is one data arc on a recessive
+     track — the anti-pattern is the second competing slice, not the shape. */
+  eq((ring.match(/e\("circle"/g) || []).length, 2,
+     "the ring is ONE data arc on ONE track — not a two-slice pie");
+  ok(/strokeDasharray/.test(ring) && /strokeDashoffset/.test(ring),
+     "the arc is drawn by dash offset, so it is a real proportion rather than a picture");
+  /* A NULL RATIO DRAWS THE TRACK ALONE. "We could not measure this" must not
+     render as a confident zero. */
+  ok(/p == null \? null : e\("circle"/.test(ring),
+     "an unmeasured ratio draws the empty track rather than a zero arc");
+  ok(/Math\.max\(0, Math\.min\(100, pct\)\)/.test(ring),
+     "the arc is clamped, so a bad input cannot wrap the ring past full");
+  ok(/rotate\(-90 /.test(ring), "it starts at twelve o'clock, which is how a progress ring is read");
+  ok(/role: "img"/.test(ring) && /aria-label/.test(ring), "the ring carries an accessible label");
+  /* NO LIBRARY. A CDN chart library on this page is one more thing that can
+     fail to load, and an inline SVG scales with the card. */
+  ok(!/chart\.js|d3|recharts|cdnjs/i.test(ring), "it is inline SVG with no library behind it");
+  /* THE ARC CARRIES THE COLOUR AND THE FIGURE STAYS IN INK — text wears text
+     tokens, never the series colour. */
+  const ringCard = srcNC.slice(srcNC.indexOf("function RingCard("), srcNC.indexOf("function ofSortRows"));
+  ok(!/color: color/.test(ringCard), "the tile's figure is not painted in the arc's colour");
+
+  ok(/"Feature Adoption"/.test(feat), "the tile is called Feature Adoption");
+  ok(!/"Fleet adoption"/.test(feat), "...and the old Fleet adoption label is gone");
+  ok((feat.match(/e\(Ring, \{/g) || []).length === 3, "all three KPI tiles are rings");
+  ok(/pct: avg, color: avg == null \? null : scoreColor\(avg\)/.test(feat),
+     "the adoption ring takes the same threshold colour as the rest of the page");
+  ok(/pct: all\.length \? \(launched \/ all\.length\) \* 100 : null/.test(feat),
+     "the organizations ring shows the LIVE share, which is the only ratio that tile has");
+  ok(/data-feat-avg|data-feat-orgs|data-feat-shown/.test(feat),
+     "the tiles keep their addressable values, so the render checks still read them");
+
+  /* SIDE BY SIDE MEANS LEFT AND RIGHT. Dan: "This isn't side by side, it's
+     top and bottom." It was two table rows; a three-column grid puts one
+     label against both values so the eye travels along a row. */
+  const cmp = feat.slice(feat.indexOf('"data-feat-cmp"'));
+  ok(cmp.length > 500, "the comparison block was found");
+  ok(/className: "cmprow"/.test(cmp), "the comparison is a row-per-metric grid");
+  ok(/"data-feat-cmpcol"/.test(cmp), "each organization has its own COLUMN");
+  ok(!/"data-feat-cmprow"/.test(feat), "...and the old row-per-organization table is gone");
+  ok(!/e\("tbody", null, \[A, B\]/.test(feat), "there is no two-row table left");
+  ok(/metrics\.map\(m => e\("div", \{ className: "cmprow", key: m\.key \}/.test(cmp),
+     "every core metric gets its own aligned row");
+  ok(/groups\.map\(g => \{/.test(cmp), "...and so does every feature group");
+  /* THE GAP LISTS SIT UNDER THEIR OWN ORG. They ran full-width and stacked,
+     which is what made the panel read top-and-bottom even where the numbers
+     did not. */
+  ok(/className: "cmprow cmpgaps"/.test(cmp), "the gap lists are in the same two columns");
+  ok(/Nothing " \+ orgName\(y\) \+ " does not also have/.test(cmp),
+     "an empty gap list says so rather than rendering nothing");
+  ok(/same organization in both slots/.test(cmp), "picking one org twice says so");
+
+  const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
+  ok(/\.cmprow\s*\{[^}]*grid-template-columns:\s*minmax\(120px, 190px\) 1fr 1fr/.test(css),
+     "the grid really is label + two equal columns");
+  ok(/@media \(max-width: 700px\) \{ \.cmprow \{ grid-template-columns: 1fr/.test(css),
+     "...and it stacks on a narrow screen rather than crushing both columns");
+  ok(/\.ringcard\s*\{[^}]*display:\s*flex/.test(css), "the ring sits beside its figure");
+  ok(/\.ring\s*\{[^}]*flex:\s*none/.test(css), "the ring does not squash when the text is long");
 }

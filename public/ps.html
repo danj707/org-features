@@ -189,10 +189,35 @@
   .qvnote { font-size: 12px; color: var(--muted); padding: 8px 16px;
             background: #fbfcfe; border-bottom: 1px solid var(--line); }
   .qvnote b { color: var(--ink); }
+  /* A/B comparison: a three-column grid, so both values line up against one
+     label and the eye travels along a row to compare one thing. */
+  .cmp { padding: 4px 16px 14px; }
+  .cmprow { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 1fr; gap: 0 14px;
+            align-items: baseline; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+  .cmprow:last-child { border-bottom: 0; }
+  .cmphead { align-items: end; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  .cmplab { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .cmpcol { min-width: 0; }
+  .cmpval { font-variant-numeric: tabular-nums; }
+  .cmporg { font-size: 14px; }
+  .cmpgaps { align-items: start; padding-top: 10px; }
+  .cmponly { font-size: 11.5px; color: #334155; line-height: 1.45; }
+  .cmponly b { color: #b45309; }
+  .cmponly.none { color: #166534; font-style: italic; }
+  @media (max-width: 700px) { .cmprow { grid-template-columns: 1fr; gap: 2px; } }
+
+  /* Ring meters. The ring is the plot; the figure sits beside it because a
+     five-character value ("56 / 56") cannot be read inside a 76px circle. */
+  .ringcard { display: flex; align-items: center; gap: 14px; }
+  .ring { flex: none; display: block; }
+  .ringtext { min-width: 0; }
+  .ringcard .v { font-size: 26px; line-height: 1.1; }
+  .ringcard .d { margin-top: 3px; }
   .subslug { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
              overflow: hidden; text-overflow: ellipsis; }
   .feattable { min-width: max-content; }
   .feattable th, .feattable td { padding: 7px 8px; }
+  .feattable th:hover { background: #eef2f7; color: var(--ink); }
   .feattable td.l { max-width: 260px; }
   .pill.gpill { min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
   .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
@@ -417,6 +442,87 @@
       title: "Organizations issuing facility rental permits" },
   ];
   function ofQuickView(id) { return OF_QUICK_VIEWS.find(v => v.id === id) || null; }
+
+  /* A RING METER — Dan asked for "donut charts", and this is that shape done
+     honestly. The dataviz guidance is blunt that a single ratio against a
+     limit is a METER on a same-ramp track and NOT a two-slice pie, and all
+     three tiles here are single ratios (35% of tracked features, 73 of 138
+     live, 56 of 56 measured). So: one data arc on one recessive track, with
+     the number in the middle. No second slice competing for attention, which
+     is the actual anti-pattern.
+
+     THE ARC CARRIES THE COLOUR AND THE NUMBER STAYS IN INK. "Text wears text
+     tokens, never the series colour" — the ring sits millimetres from the
+     figure, so nothing is lost by not painting both.
+
+     Pure SVG: no library, so it cannot fail to load, and it scales with the
+     card rather than being a fixed bitmap. */
+  function Ring({ pct, label, color, size, stroke }) {
+    const S2 = size || 76, W = stroke || 9, R = (S2 - W) / 2, C = 2 * Math.PI * R;
+    // A null ratio draws the track ALONE. "We could not measure this" must
+    // not render as a confident zero — the same absent-is-not-zero rule the
+    // rest of this page follows.
+    const p = pct == null ? null : Math.max(0, Math.min(100, pct));
+    return e("svg", { width: S2, height: S2, viewBox: "0 0 " + S2 + " " + S2,
+                      className: "ring", role: "img",
+                      "aria-label": label || ((p == null ? "not measured" : p + "%")) },
+      e("circle", { cx: S2 / 2, cy: S2 / 2, r: R, fill: "none", stroke: "#eef2f7", strokeWidth: W }),
+      p == null ? null : e("circle", {
+        cx: S2 / 2, cy: S2 / 2, r: R, fill: "none",
+        stroke: color || "var(--brand)", strokeWidth: W, strokeLinecap: "round",
+        strokeDasharray: C.toFixed(2),
+        strokeDashoffset: (C * (1 - p / 100)).toFixed(2),
+        // Start at twelve o'clock and run clockwise, which is how a
+        // progress ring is read.
+        transform: "rotate(-90 " + (S2 / 2) + " " + (S2 / 2) + ")" }));
+  }
+
+  /* One tile: the ring on the left, the figure and its context on the right.
+     The figure is NOT inside the ring — at 76px a five-character value
+     ("56 / 56") does not fit inside a 9px-stroked circle without shrinking to
+     unreadable, and a KPI's number should be the biggest thing on the tile. */
+  function RingCard({ k, pct, value, sub, color, title }) {
+    return e("div", { className: "card ringcard", title: title || "" },
+      e(Ring, { pct, color, label: k + ": " + value }),
+      e("div", { className: "ringtext" },
+        e("div", { className: "k" }, k),
+        e("div", { className: "v", "data-ring-v": value }, value),
+        sub ? e("div", { className: "d" }, sub) : null));
+  }
+
+  /* Column sort for the org table. PURE and taking its accessor as an
+     argument, so a spec can run it — the mistake that matters is a direction,
+     and a regex over a comparator cannot see one.
+
+     FIRST CLICK ON A NUMBER GOES DESCENDING, on a name ascending. Clicking
+     "Payments" means "who uses the most of it", and making the reader click
+     twice for the obvious question is the kind of small wrongness that makes
+     a control feel broken. `numeric` says which kind of column it is.
+
+     A NULL NEVER SORTS AS A VALUE. An unmeasured org has no score, and
+     letting null compare as 0 puts "we cannot tell" at one end of the list
+     under a heading that claims to rank. Nulls go LAST in both directions,
+     which is the only arrangement that is honest either way round. */
+  function ofSortRows(rows, key, dir, getVal, numeric) {
+    const withNull = [], withVal = [];
+    for (const r of rows) {
+      const v = getVal(r, key);
+      (v == null ? withNull : withVal).push({ r, v });
+    }
+    withVal.sort((a, b) => {
+      const c = numeric ? (a.v - b.v)
+        : String(a.v).localeCompare(String(b.v), undefined, { numeric: true, sensitivity: "base" });
+      // Name as the tie-break, so two runs of one sort cannot disagree.
+      return (c || 0) * dir
+        || String(a.r.o.displayName || a.r.o.name || a.r.o.slug)
+             .localeCompare(String(b.r.o.displayName || b.r.o.name || b.r.o.slug));
+    });
+    withNull.sort((a, b) => String(a.r.o.displayName || a.r.o.name || a.r.o.slug)
+      .localeCompare(String(b.r.o.displayName || b.r.o.name || b.r.o.slug)));
+    return withVal.concat(withNull).map(x => x.r);
+  }
+  // The first direction a column takes when it has not been clicked yet.
+  function ofFirstDir(numeric) { return numeric ? -1 : 1; }
 
   /* Scope and order for one quick view. PURE, and taking its inputs as
      arguments, so a spec can RUN it over fixtures — a regex over a comparator
@@ -1338,6 +1444,10 @@
     const [cfgErr, setCfgErr] = useState(null);
     const [only, setOnly] = useState("");
     const [qv, setQv] = useState("");
+    // [key, dir] or null. Null means "whatever the quick view or the default
+    // alphabetical order says" — a header click OVERRIDES the order but never
+    // the scope, so sorting inside "Top SMS users" still shows only those 20.
+    const [sort, setSort] = useState(null);
     const [cmpA, setCmpA] = useState("");
     const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
@@ -1387,52 +1497,6 @@
     // compare slots, the fleet average and the count — or the page disagrees
     // with itself about how many orgs there are.
     const all = everyOrg.filter(o => !excluded.has(o.slug));
-
-    const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
-    const countOf = (s2, k) => Number((((d.adoption || {})[s2] || {})[k] || {}).count || 0);
-
-    /* THE QUICK VIEW IS APPLIED TO `all`, which is already settings-scoped,
-       so no view can widen the page past an excluded org. The default order
-       stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
-       the list opens. */
-    const view = ofQuickView(qv);
-    const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
-    const rows = qvOut.rows;
-
-    /* A CHIP WITH NOTHING BEHIND IT IS NOT OFFERED, and one whose feature the
-       settings have hidden is not either — the settings scope this page, so a
-       chip for an untracked feature would rank orgs on something the score
-       ignores. Counts come from the same reducer that does the filtering, or
-       the chip promises a number the click does not deliver. */
-    const qvChips = OF_QUICK_VIEWS
-      .filter(v => v.kind !== "feature" || shown.indexOf(v.key) >= 0)
-      .map(v => ({ v, n: ofApplyQuickView(v, all.map(decorate), countOf).total }))
-      .filter(x => x.n > 0);
-
-    const scoredAll = all.map(decorate).filter(r => r.score != null);
-    const avg = scoredAll.length
-      ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
-    const launched = all.filter(o => o.launched).length;
-
-    const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
-      .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
-    const metricKeys = metrics.map(m => m.key);
-
-    const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
-    const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
-      r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
-      window.RecPills.fmtNum(r.usage[k] == null ? null : Number(r.usage[k])));
-
-    const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
-      r.score == null
-        ? e("span", { className: "zero" }, "not measured")
-        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
-
-    const launchTag = o => o.launched
-      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
-      : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
-
-    const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
 
     /* GROUPS ARE DERIVED FROM THE CATALOG, in the catalog's own order, and
        only over TRACKED features — a group whose features the settings have
@@ -1585,6 +1649,79 @@
         }) : null);
     }
 
+    const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
+    const countOf = (s2, k) => Number((((d.adoption || {})[s2] || {})[k] || {}).count || 0);
+
+    /* THE QUICK VIEW IS APPLIED TO `all`, which is already settings-scoped,
+       so no view can widen the page past an excluded org. The default order
+       stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
+       the list opens. */
+    const view = ofQuickView(qv);
+    const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
+
+    /* A HEADER CLICK OVERRIDES THE ORDER, NOT THE SCOPE. Sorting inside "Top
+       SMS users" re-orders those 20 orgs; it does not bring the other 124
+       back. The quick view is applied first and this re-sorts its output. */
+    const groupPct = (r, cat) => {
+      const g = groups.find(x => x.cat === cat);
+      const gs = g && ofGroupScore(g.keys, k => adoptedIn(r.o.slug, k));
+      return gs ? gs.pct : null;
+    };
+    const sortVal = (r, key) =>
+      key === "name" ? (r.o.displayName || r.o.name || r.o.slug)
+      : key === "score" ? r.score
+      : groupPct(r, key);
+    const numericCol = (key) => key !== "name";
+    const rows = sort
+      ? ofSortRows(qvOut.rows, sort[0], sort[1], sortVal, numericCol(sort[0]))
+      : qvOut.rows;
+
+    /* One header renderer for all fourteen columns, so the arrow and the
+       click cannot drift apart — the same idiom the Account Health table
+       already uses, and deliberately identical so the two tables behave the
+       same way under a click. */
+    const sortTh = (label, key, extra) => e("th", Object.assign({
+      onClick: () => setSort(s2 => [key, s2 && s2[0] === key ? -s2[1] : ofFirstDir(numericCol(key))]),
+      style: { cursor: "pointer" },
+      "data-feat-th": key,
+      "data-feat-thdir": sort && sort[0] === key ? (sort[1] < 0 ? "desc" : "asc") : "",
+    }, extra || {}), label + (sort && sort[0] === key ? (sort[1] < 0 ? " \u2193" : " \u2191") : ""));
+
+    /* A CHIP WITH NOTHING BEHIND IT IS NOT OFFERED, and one whose feature the
+       settings have hidden is not either — the settings scope this page, so a
+       chip for an untracked feature would rank orgs on something the score
+       ignores. Counts come from the same reducer that does the filtering, or
+       the chip promises a number the click does not deliver. */
+    const qvChips = OF_QUICK_VIEWS
+      .filter(v => v.kind !== "feature" || shown.indexOf(v.key) >= 0)
+      .map(v => ({ v, n: ofApplyQuickView(v, all.map(decorate), countOf).total }))
+      .filter(x => x.n > 0);
+
+    const scoredAll = all.map(decorate).filter(r => r.score != null);
+    const avg = scoredAll.length
+      ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
+    const launched = all.filter(o => o.launched).length;
+
+    const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
+      .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
+    const metricKeys = metrics.map(m => m.key);
+
+    const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
+    const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
+      r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
+      window.RecPills.fmtNum(r.usage[k] == null ? null : Number(r.usage[k])));
+
+    const scoreCell = r => e("td", { className: "num", "data-feat-score": r.score == null ? "" : r.score },
+      r.score == null
+        ? e("span", { className: "zero" }, "not measured")
+        : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
+
+    const launchTag = o => o.launched
+      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
+      : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
+
+    const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
+
     const a = cmpA ? all.find(o => o.slug === cmpA) : null;
     const b = cmpB ? all.find(o => o.slug === cmpB) : null;
     const A = a ? decorate(a) : null, B = b ? decorate(b) : null;
@@ -1617,21 +1754,36 @@
           "Baked from the production read replica, daily at 6am ET")),
 
       e("div", { className: "cards" },
-        e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"),
-          e("div", { className: "v", "data-feat-orgs": all.length }, all.length),
-          e("div", { className: "note" }, launched + " live on rec.us, " + (all.length - launched) + " pre-launch")),
-        e("div", { className: "card" }, e("div", { className: "k" }, "Fleet adoption"),
-          e("div", { className: "v", "data-feat-avg": avg == null ? "" : avg },
-            avg == null ? "\u2014" : avg + "%"),
-          e("div", { className: "note" }, scoredAll.length + " of " + all.length + " scored")),
-        e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"),
-          e("div", { className: "v", "data-feat-shown": shown.length }, shown.length + " / " + allMeasured.length),
+        e("div", { className: "card ringcard", "data-feat-orgs": all.length,
+                   title: "Organizations in this view, and how many are live on rec.us" },
+          e(Ring, { pct: all.length ? (launched / all.length) * 100 : null,
+                    color: "#0d5c99", label: "Organizations: " + all.length }),
+          e("div", { className: "ringtext" },
+            e("div", { className: "k" }, "Organizations"),
+            e("div", { className: "v" }, all.length),
+            e("div", { className: "d" }, launched + " live on rec.us \u00b7 " + (all.length - launched) + " pre-launch"))),
+        /* RENAMED from "Fleet adoption" at Dan's request. */
+        e("div", { className: "card ringcard", "data-feat-avg": avg == null ? "" : avg,
+                   title: "The average adoption score across every scored organization in this view" },
+          e(Ring, { pct: avg, color: avg == null ? null : scoreColor(avg),
+                    label: "Feature Adoption: " + (avg == null ? "not measured" : avg + "%") }),
+          e("div", { className: "ringtext" },
+            e("div", { className: "k" }, "Feature Adoption"),
+            e("div", { className: "v" }, avg == null ? "\u2014" : avg + "%"),
+            e("div", { className: "d" }, scoredAll.length + " of " + all.length + " scored"))),
+        e("div", { className: "card ringcard", "data-feat-shown": shown.length,
+                   title: "How many of the measured features this page is counting" },
+          e(Ring, { pct: allMeasured.length ? (shown.length / allMeasured.length) * 100 : null,
+                    color: "#0f6f5c", label: "Features tracked: " + shown.length + " of " + allMeasured.length }),
+          e("div", { className: "ringtext" },
+            e("div", { className: "k" }, "Features tracked"),
+            e("div", { className: "v" }, shown.length + " / " + allMeasured.length),
           /* THE DENOMINATOR IS THE SCORE, so it is stated. A reader comparing
              86% today against 60% later needs to know whether the set moved. */
-          e("div", { className: "note" },
-            hidden.size
-              ? hidden.size + " hidden by settings \u00b7 " + allMeasured.length + " of " + total + " measurable"
-              : allMeasured.length + " of " + total + " catalog features measured"))),
+            e("div", { className: "d" },
+              hidden.size
+                ? hidden.size + " hidden by settings \u00b7 " + allMeasured.length + " of " + total + " measurable"
+                : allMeasured.length + " of " + total + " catalog features measured")))),
 
       // EXCLUSIONS ARE NAMED, NEVER SILENT. A count that quietly drops orgs
       // is how a fleet figure stops being trusted.
@@ -1647,43 +1799,85 @@
 
       e("div", { className: "panel" },
         e("h2", null, "Compare two organizations",
-          e("span", { className: "hint" }, "pick A and B \u2014 same columns, side by side")),
+          e("span", { className: "hint" }, "org A on the left, org B on the right \u2014 one row per metric")),
         e("div", { className: "filters" },
           e("select", { value: cmpA, onChange: ev => setCmpA(ev.target.value), "data-feat-cmpa": cmpA || "none" },
             e("option", { value: "" }, "Organization A\u2026"), orgOptions),
           e("select", { value: cmpB, onChange: ev => setCmpB(ev.target.value), "data-feat-cmpb": cmpB || "none" },
             e("option", { value: "" }, "Organization B\u2026"), orgOptions),
           (cmpA || cmpB) ? e("button", { onClick: () => { setCmpA(""); setCmpB(""); } }, "Clear") : null),
-        (A && B) ? e("div", null,
-          e("div", { className: "tablewrap" }, e("table", { "data-feat-cmp": A.o.slug + "|" + B.o.slug },
-            e("thead", null, e("tr", null,
-              e("th", { className: "l" }, "Organization"), e("th", null, "Adoption"),
-              metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
-            e("tbody", null, [A, B].map((r, i) => e("tr", { key: r.o.slug + i, "data-feat-cmprow": i === 0 ? "a" : "b" },
-              e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o), " ", adminLink(r.o),
-                e("div", { className: "subslug" }, r.o.slug)),
-              scoreCell(r),
-              metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))))))),
+        /* GENUINELY SIDE BY SIDE — Dan: "actually make it org 1 on the left,
+           org 2 on the right. This isn't side by side, it's top and bottom."
+           It was two table ROWS, which is a comparison you read vertically
+           one column at a time.
+
+           A THREE-COLUMN GRID rather than two independent cards: the metric
+           label sits on the left and both values line up against it, so the
+           eye travels along one row to compare one thing. Two stacked cards
+           would put "Adoption" in two different places on screen and the
+           reader would have to hunt for the pair. */
+        (A && B) ? e("div", { className: "cmp", "data-feat-cmp": A.o.slug + "|" + B.o.slug },
+          e("div", { className: "cmprow cmphead" },
+            e("div", { className: "cmplab" }),
+            [A, B].map((r, i2) => e("div", { key: i2, className: "cmpcol",
+                                             "data-feat-cmpcol": i2 === 0 ? "a" : "b" },
+              e("div", { className: "cmporg" }, e("b", null, orgName(r.o)), " ", launchTag(r.o), " ", adminLink(r.o)),
+              e("div", { className: "subslug" }, r.o.slug)))),
+
+          /* Adoption first, then the core counts, then a row per feature
+             group — the same order as the table's columns, so the two
+             surfaces read the same way round. */
+          e("div", { className: "cmprow" },
+            e("div", { className: "cmplab" }, "Adoption"),
+            [A, B].map((r, i2) => e("div", { key: i2, className: "cmpcol cmpval" },
+              r.score == null
+                ? e("span", { className: "zero" }, "not measured")
+                : e("span", { style: { color: scoreColor(r.score), fontWeight: 800, fontSize: 17 } },
+                    r.score + "%")))),
+
+          metrics.map(m => e("div", { className: "cmprow", key: m.key },
+            e("div", { className: "cmplab", title: m.description }, m.icon + " " + m.label),
+            [A, B].map((r, i2) => e("div", { key: i2, className: "cmpcol cmpval" },
+              pill(r, m.key))))),
+
+          groups.map(g => {
+            const ga = ofGroupScore(g.keys, k => adoptedIn(A.o.slug, k));
+            const gb = ofGroupScore(g.keys, k => adoptedIn(B.o.slug, k));
+            return e("div", { className: "cmprow", key: g.cat },
+              e("div", { className: "cmplab", title: g.cat }, catShort(g.cat)),
+              [ga, gb].map((gs, i2) => e("div", { key: i2, className: "cmpcol cmpval" },
+                e("span", { className: "pill gpill", style: ofRatioHeat(gs && gs.pct) },
+                  gs ? gs.used + "/" + gs.total : "—"))));
+          }),
+
+          /* THE GAP LISTS SIT UNDER THEIR OWN ORG, in the same two columns.
+             They used to run the full width stacked, which is what made the
+             panel read top-and-bottom even where the numbers did not. */
           A.o.slug === B.o.slug
             ? e("div", { className: "note" }, "That is the same organization in both slots.")
-            : e("div", { className: "catlist", "data-feat-gap": 1 },
-                [[A.o, B.o], [B.o, A.o]].map(([x, y], i) => {
+            : e("div", { className: "cmprow cmpgaps", "data-feat-gap": 1 },
+                e("div", { className: "cmplab" }, "Only here"),
+                [[A.o, B.o], [B.o, A.o]].map(([x, y], i2) => {
                   const g = gap(x, y);
-                  return e("div", { key: i, className: "note" },
-                    e("b", null, "Only " + orgName(x) + ": "),
-                    g.length ? g.join(", ") : "nothing " + orgName(y) + " does not also have");
+                  return e("div", { key: i2, className: "cmpcol" },
+                    g.length
+                      ? e("div", { className: "cmponly" },
+                          e("b", null, g.length + " feature" + (g.length === 1 ? "" : "s") + " "),
+                          orgName(y) + " does not have: " + g.join(", "))
+                      : e("div", { className: "cmponly none" },
+                          "Nothing " + orgName(y) + " does not also have."));
                 }))
         ) : e("div", { className: "note" }, "Pick an organization in both slots to compare them."),
       ),
 
       e("div", { className: "panel" },
         e("h2", null, "Feature adoption by organization",
-          e("span", { className: "hint" }, "one column per feature group — click a row for the full breakdown"),
+          e("span", { className: "hint" }, "click a column to sort \u00b7 click a row for the full breakdown"),
           e("button", { onClick: () => setShowSettings(true), "data-feat-gear": 1,
                         title: "Choose which features and organizations this page counts",
                         style: { float: "right", marginTop: -2 } }, "⚙")),
         e("div", { className: "filters" },
-          e("select", { value: only, onChange: ev => { setOnly(ev.target.value); if (ev.target.value) setQv(""); },
+          e("select", { value: only, onChange: ev => { setOnly(ev.target.value); if (ev.target.value) { setQv(""); setSort(null); } },
                         "data-feat-only": only || "all" },
             e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
           /* ONE ACTIVE VIEW AT A TIME, and picking one clears the single-org
@@ -1695,7 +1889,7 @@
             e("button", { key: v.id, title: v.title,
                           className: "qvchip" + (qv === v.id ? " on" : ""),
                           "data-feat-qvchip": v.id,
-                          onClick: () => { setQv(qv === v.id ? "" : v.id); setOnly(""); } },
+                          onClick: () => { setQv(qv === v.id ? "" : v.id); setOnly(""); setSort(null); } },
               v.label,
               // The count is what the click will actually show. A ranked view
               // is capped rather than scoped, so it says the cap instead.
@@ -1705,17 +1899,32 @@
            for 144 — the same reason the settings scope note exists. */
         view ? e("div", { className: "qvnote", "data-feat-qvnote": view.id },
           e("b", null, view.title), " \u00b7 ",
+          /* THE NOTE MUST NOT CLAIM AN ORDER IT NO LONGER SETS. A view says
+             "by volume"; once a column is clicked the table is in that
+             column's order, and a note still promising the view's ranking is
+             two surfaces disagreeing on one screen. */
+          sort ? e("span", null, "re-sorted by the ", e("b", null, sort[0] === "name" ? "organization"
+                    : sort[0] === "score" ? "adoption" : catShort(sort[0])),
+                  " column \u00b7 ") : null,
           qvOut.capped
             ? "showing " + rows.length + " of " + qvOut.total
             : "showing all " + rows.length,
           " \u00b7 ",
-          e("a", { href: "#", onClick: ev => { ev.preventDefault(); setQv(""); } },
+          e("a", { href: "#", onClick: ev => { ev.preventDefault(); setQv(""); setSort(null); } },
             "clear and go back to all " + all.length + " alphabetically")) : null,
+        /* WITHOUT A VIEW, a manual sort still needs somewhere to say so and a
+           way back — otherwise the only clue is a small arrow in a header. */
+        (sort && !view) ? e("div", { className: "qvnote", "data-feat-sortnote": sort[0] },
+          e("b", null, "Sorted by " + (sort[0] === "name" ? "organization"
+            : sort[0] === "score" ? "adoption" : catShort(sort[0]))),
+          " " + (sort[1] < 0 ? "high to low" : "low to high"), " \u00b7 ",
+          e("a", { href: "#", onClick: ev => { ev.preventDefault(); setSort(null); } },
+            "back to alphabetical")) : null,
         e("div", { className: "tablewrap" },
           e("table", { className: "feattable" },
             e("thead", null, e("tr", null,
-              e("th", { className: "l" }, "Organization"),
-              e("th", null, "Adoption"),
+              sortTh("Organization", "name", { className: "l" }),
+              sortTh("Adoption", "score"),
               /* ONE COLUMN PER FEATURE GROUP, replacing the six raw count
                  pills. The counts were a measure of SIZE — Apex has 98,197
                  registrations and Aspen has none, which says which org is
@@ -1723,8 +1932,10 @@
                  about adoption, so every column is now a share of its own
                  group and the core counts moved to the drill-in, where size
                  is context rather than the headline. */
-              groups.map(g => e("th", { key: g.cat, title: g.cat + " — " + g.keys.length + " tracked feature" + (g.keys.length === 1 ? "" : "s") },
-                catShort(g.cat))))),
+              groups.map(g => sortTh(catShort(g.cat), g.cat,
+                { key: g.cat,
+                  title: g.cat + " \u2014 " + g.keys.length + " tracked feature" + (g.keys.length === 1 ? "" : "s")
+                       + " \u00b7 click to sort by how much of it is in use" })))),
             e("tbody", null, rows.map(r => {
               const miss = notUsing(r.o.slug);
               const open2 = () => nav("/ps/features/" + encodeURIComponent(r.o.slug));
