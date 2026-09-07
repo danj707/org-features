@@ -241,10 +241,13 @@
   .catlab.off { color: #b45309; }
   .catrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
             font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
-  .catrow.off .catname { color: var(--muted); }
+  .catrow.off { display: block; }
+  .catrow.off .catname { color: #334155; }
   .catname { font-weight: 600; color: #1a2333; }
   .catdetail { color: var(--muted); font-size: 11.5px; text-align: right;
                font-variant-numeric: tabular-nums; }
+  .catdesc { font-size: 11px; color: var(--muted); font-weight: 400; line-height: 1.4;
+             margin-top: 1px; max-width: 46ch; }
   .catnone { font-size: 12px; color: #94a3b8; font-style: italic; padding: 4px 0; }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
@@ -322,8 +325,15 @@
      worse than no link, and the snapshot's org id is the uuid this path
      wants (the same trap as check-ins, where `Member ID` is a 6-char rec_id
      that looks identical and 404s). */
+  /* `/home` IS PART OF THE PATH. Dan corrected this: /admin/o/<uuid> alone
+     is not the org's admin page — the landing route is
+     /admin/o/<uuid>/home, and his own example is
+     https://www.rec.us/admin/o/aeba47d0-c97f-49cb-a0e9-93c5af3a68fa/home
+     A link that resolves to the wrong place is worse than no link, and this
+     is the kind of thing only the person clicking it can tell you. */
+  const REC_ADMIN_PATH = "/home";
   function ofRecAdminUrl(orgId) {
-    return orgId ? "https://www.rec.us/admin/o/" + orgId : null;
+    return orgId ? "https://www.rec.us/admin/o/" + orgId + REC_ADMIN_PATH : null;
   }
 
   /* A category's adoption for one org. NULL when the category has no tracked
@@ -1508,7 +1518,10 @@
                   e("div", { className: "gaphead" }, catShort(g.cat),
                     e("span", { className: "gapn" }, gm.length + "/" + g.keys.length)),
                   gm.map(k => e("div", { key: k, className: "gapitem",
-                                         title: (byKey[k] && byKey[k].description) || "" }, label(k))));
+                                         title: (byKey[k] && byKey[k].description) || "" },
+                    label(k),
+                    (byKey[k] && byKey[k].description)
+                      ? e("div", { className: "catdesc" }, byKey[k].description) : null)));
               }))
             : e("div", { className: "note" },
                 "Every feature this page tracks is in use at " + orgName(o) + "."),
@@ -1546,9 +1559,22 @@
               e("div", null,
                 e("div", { className: "catlab off" }, "Not in use (" + unused.length + ")"),
                 unused.length
-                  ? unused.map(k => e("div", { key: k, className: "catrow off",
-                                               title: (byKey[k] && byKey[k].description) || "" },
-                      e("span", { className: "catname" }, label(k))))
+                  /* THE DESCRIPTION IS ON SCREEN, not in a title attribute.
+                     Dan, on the Apex page: "unclear on some of these features
+                     like 'guest participation' and 'instructor
+                     certifications'" — and both were in the not-in-use list.
+                     A gap you cannot name is not an actionable gap, and the
+                     catalog already carries a one-line answer for all 57
+                     (median 78 characters). It goes on the NOT-IN-USE side
+                     only: an in-use row already explains itself with its
+                     measured figure, and a second line on all 56 rows would
+                     double the length of the page. */
+                  ? unused.map(k => e("div", { key: k, className: "catrow off" },
+                      e("div", null,
+                        e("span", { className: "catname" }, label(k)),
+                        (byKey[k] && byKey[k].description)
+                          ? e("div", { className: "catdesc" }, byKey[k].description)
+                          : null)))
                   : e("div", { className: "catnone" }, "All of it is in use."))));
         }),
 

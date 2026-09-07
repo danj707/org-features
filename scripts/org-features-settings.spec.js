@@ -444,7 +444,12 @@ if (!SKIP_SOURCE) {
      "an unknown category falls back to its own name rather than to undefined");
 
   // 2. THE ADMIN LINK IS ABSENT WITHOUT AN ID, never /admin/o/undefined.
-  eq(H.ofRecAdminUrl("abc-123"), "https://www.rec.us/admin/o/abc-123", "the admin link is built from the org uuid");
+  /* `/home` IS PART OF THE PATH — Dan corrected this after clicking one.
+     /admin/o/<uuid> alone is not the org's admin page. Pinned to his own
+     example verbatim, so the suffix cannot be dropped as "tidying". */
+  eq(H.ofRecAdminUrl("aeba47d0-c97f-49cb-a0e9-93c5af3a68fa"),
+     "https://www.rec.us/admin/o/aeba47d0-c97f-49cb-a0e9-93c5af3a68fa/home",
+     "the admin link is the real admin landing path, /admin/o/<uuid>/home");
   eq(H.ofRecAdminUrl(null), null, "no id means NO link — a 404 is worse than no link");
   eq(H.ofRecAdminUrl(""), null, "...and an empty id is the same case");
   // The snapshot really carries the uuid this path wants, or the link 404s
@@ -551,6 +556,28 @@ if (!SKIP_SOURCE) {
   ok(/const detailOf = \(s2, k\) =>/.test(feat), "there is one accessor for a feature's measured detail");
   ok(/\.detail \|\| ""/.test(feat), "...reading the snapshot's own phrasing");
   ok(/catlab on/.test(feat) && /catlab off/.test(feat), "each category shows in-use AND not-in-use");
+  /* A GAP YOU CANNOT NAME IS NOT AN ACTIONABLE GAP. Dan: "unclear on some of
+     these features like 'guest participation' and 'instructor
+     certifications'" — both were in the not-in-use list with their
+     explanation hidden in a title attribute. */
+  // SCOPED TO EACH SURFACE. Asserted file-wide, a mutation that reverted the
+  // per-category column to a hover still matched the gaps panel's copy and
+  // failed by the wrong name. A guard that fires on the wrong assertion has
+  // told the next person the wrong thing.
+  const catCols = (feat.match(/catlab off[\s\S]{0,700}/) || [""])[0];
+  ok(catCols.length > 200, "the not-in-use column was found");
+  ok(/className: "catdesc"/.test(catCols),
+     "an unused feature carries its description ON SCREEN in its category panel, not in a hover");
+  const gapsPanel = (feat.match(/className: "gapitem"[\s\S]{0,400}/) || [""])[0];
+  ok(gapsPanel.length > 100, "the leading gaps panel was found");
+  ok(/className: "catdesc"/.test(gapsPanel),
+     "...and in the leading gaps panel too, which is where a reader looks first");
+  {
+    const snap2 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
+    const missing = snap2.features.filter(f => !f.description || f.description.length < 20);
+    eq(missing.length, 0,
+       `every catalog feature has a real one-line description, or the fix renders nothing for it — missing: ${missing.map(f => f.key).join(", ")}`);
+  }
   ok(/"data-feat-gaps"/.test(feat), "the gaps panel is addressable");
   ok(/Fully adopted: /.test(feat),
      "a group with no gaps is still reported — otherwise the panel silently omits whole groups");
