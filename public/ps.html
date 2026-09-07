@@ -100,6 +100,66 @@
   .legend { display: flex; gap: 14px; padding: 0 16px 12px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
   .foot { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  /* ── The Org Features settings sheet ─────────────────────────────────────
+     It is PORTALLED onto <body> (see FeatureSettings), so none of this has to
+     fight a container's cascade — the sibling project has twice shipped a
+     sheet rendered inside a styled toolbar whose rows came out uppercase and
+     whose Save button lost to the toolbar's own button rule. There is no
+     global button style on this page, so the sheet states its own. */
+  .ofs-back { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999;
+              display: flex; align-items: flex-start; justify-content: center; padding: 4vh 16px; overflow: auto; }
+  .ofs { background: var(--card); color: var(--ink); border-radius: 14px; width: 100%; max-width: 720px;
+         box-shadow: 0 24px 64px rgba(15,23,42,.28); display: flex; flex-direction: column; max-height: 92vh; }
+  .ofs-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+              padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .ofs-head b { font-size: 15px; }
+  .ofs-sub { font-size: 12px; color: var(--muted); margin-top: 2px; max-width: 52ch; }
+  .ofs-head button { background: none; border: 0; font-size: 15px; color: var(--muted); cursor: pointer;
+                     line-height: 1; padding: 4px 6px; border-radius: 6px; }
+  .ofs-head button:hover { background: #f1f5f9; color: var(--ink); }
+  .ofs-body { padding: 14px 16px; overflow-y: auto; }
+  /* NOT STICKY, and that was tried. Two sticky headers in one scroll box at
+     top:0 only hand over when the second one reaches the top — and the org
+     section's own list scrolls inside a 232px box, so the second header
+     never gets there. The result was "FEATURES COUNTED" pinned above the
+     organization list. A stale pinned label is worse than no pinned label. */
+  .ofs-secthead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+                  font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700;
+                  color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .ofs-secthead > span { text-transform: none; letter-spacing: 0; font-weight: 600; color: #334155; font-size: 12px; }
+  .ofs-acts { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; }
+  .ofs-note { font-size: 12px; color: var(--muted); margin: 7px 0 10px; max-width: 68ch; }
+  .ofs-grp { margin-bottom: 12px; }
+  .ofs-grphead { display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; margin-bottom: 4px; }
+  .ofs-count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+  .ofs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 2px 12px; }
+  /* A label is the whole hit target, so the row highlights rather than only
+     the 13px box, and long feature names wrap instead of being clipped. */
+  .ofs-chk { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; color: #334155;
+             padding: 4px 6px; border-radius: 6px; cursor: pointer; line-height: 1.35; }
+  .ofs-chk:hover { background: #f1f5f9; }
+  .ofs-chk input { margin: 2px 0 0; flex: none; accent-color: var(--brand); }
+  .ofs-chk.ofs-on { background: #fef3c7; color: #92400e; }
+  .ofs-chk.ofs-on:hover { background: #fde68a; }
+  .ofs-gone { color: var(--muted); font-size: 11px; font-style: italic; }
+  .ofs-search { width: 100%; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px;
+                font-size: 13px; margin: 8px 0 6px; color: var(--ink); background: #fff; }
+  /* The org list is the long one — 144 accounts — so it scrolls in its own
+     box rather than pushing Save off the bottom of the sheet. */
+  .ofs-scroll { max-height: 232px; overflow-y: auto; padding-right: 4px; }
+  .ofs-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+              padding: 12px 16px; border-top: 1px solid var(--line); background: #fbfcfe;
+              border-radius: 0 0 14px 14px; }
+  .ofs-footnote { font-size: 12px; color: var(--muted); max-width: 46ch; }
+  .ofs-foot button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+                     color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .ofs-foot button:hover { background: #f1f5f9; }
+  .ofs-foot button.ofs-save { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .ofs-foot button.ofs-save:hover { background: #0c5b4b; }
+  /* A disabled Save says why in .ofs-footnote — greying it with no
+     explanation is what invites "it didn't save". */
+  .ofs-foot button.ofs-save:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+  .ofs-meta { padding: 8px 16px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
 </head>
@@ -1003,26 +1063,54 @@
      adoption score. Rows expand in place rather than linking out: the whole
      point of this view is that the nav item stops throwing you out of the
      shell, and a drill-in that navigated away would reintroduce that. */
+  /* ── ORG FEATURES SETTINGS ──────────────────────────────────────────────
+     SHARED BY EVERY USER (Dan's call), so it lives server-side rather than in
+     localStorage and the sheet says so on screen. It is a VIEW preference and
+     never a gate: hiding a feature or excluding an org changes what this page
+     shows and what its score is taken over, and changes nothing about the
+     bake — everything hidden is still in /api/data. That is why the default
+     is "show everything" and why a failed load falls back to it rather than
+     to empty. Failing the other way would render an empty dashboard and look
+     like the snapshot had gone. */
+  const OF_DEFAULT_SETTINGS = { hiddenFeatures: [], excludedOrgs: [] };
+
   function Features() {
     const [d, setD] = useState(null);
     const [err, setErr] = useState(null);
-    const [only, setOnly] = useState("");          // a single org, from the pulldown
+    const [cfg, setCfg] = useState(null);        // null until the fetch settles
+    const [cfgErr, setCfgErr] = useState(null);
+    const [only, setOnly] = useState("");
     const [cmpA, setCmpA] = useState("");
     const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
+    const [showSettings, setShowSettings] = useState(false);
+
     useEffect(() => {
       fetch("/api/data")
         .then(r => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
         .then(setD).catch(e => setErr(e.message));
+      fetch("/api/org-features-settings")
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
+        .then(x => setCfg(x))
+        .catch(e => { setCfgErr(e.message); setCfg(OF_DEFAULT_SETTINGS); });
     }, []);
-    if (err) return e("div", { className: "note" }, "Could not load the features snapshot: " + err);
-    if (!d) return e("div", { className: "note" }, "Loading feature adoption\u2026");
 
-    const measured = (d.measuredFeatures || []).length;
+    if (err) return e("div", { className: "note" }, "Could not load the features snapshot: " + err);
+    if (!d || !cfg) return e("div", { className: "note" }, "Loading feature adoption\u2026");
+
+    const hidden = new Set(cfg.hiddenFeatures || []);
+    const excluded = new Set(cfg.excludedOrgs || []);
+
     const total = (d.features || []).length;
     const byKey = {};
     (d.features || []).forEach(f => { byKey[f.key || f.id || f.name] = f; });
     const label = k => (byKey[k] && (byKey[k].name || byKey[k].label)) || k;
+
+    // The measured set, minus whatever is unticked. THE SCORE IS TAKEN OVER
+    // THIS, which is the whole point of the setting — "how adopted is this
+    // org" only means something against the features you care about.
+    const allMeasured = d.measuredFeatures || [];
+    const shown = allMeasured.filter(k => !hidden.has(k));
 
     const adoptedIn = (slug, k) => {
       const v = ((d.adoption || {})[slug] || {})[k];
@@ -1030,37 +1118,30 @@
     };
     const scoreOf = (slug) => {
       const a = (d.adoption || {})[slug];
-      // No adoption record at all is NOT a zero — it is unmeasured, and it
-      // must not be averaged in or coloured as if it were a real 0%.
-      if (!a) return null;
-      const hits = (d.measuredFeatures || []).filter(k => adoptedIn(slug, k)).length;
-      return measured ? Math.round((hits / measured) * 100) : null;
+      if (!a) return null;                      // unmeasured is not zero
+      if (!shown.length) return null;           // nothing ticked is not 0%
+      return Math.round((shown.filter(k => adoptedIn(slug, k)).length / shown.length) * 100);
     };
 
     const orgName = o => o.displayName || o.name || o.slug;
-    // ALPHABETICAL, by the name actually on screen, with localeCompare so
-    // accents and case sort the way a reader expects. Sorting by adoption
-    // (which this did) makes an org impossible to find in a list of 69.
-    const all = (d.orgs || []).slice().sort((a, b) => orgName(a).localeCompare(orgName(b)));
+    const everyOrg = (d.orgs || []).slice().sort((a, b) => orgName(a).localeCompare(orgName(b)));
+    // Excluded orgs leave EVERY surface — the table, the pulldown, both
+    // compare slots, the fleet average and the count — or the page disagrees
+    // with itself about how many orgs there are.
+    const all = everyOrg.filter(o => !excluded.has(o.slug));
 
     const decorate = o => ({ o, score: scoreOf(o.slug), usage: (d.usage || {})[o.slug] || {} });
     const rows = all.filter(o => !only || o.slug === only).map(decorate);
 
-    /* THE FLEET AVERAGE IS OVER ORGS WE COULD SCORE, not over every org, and
-       it is over ALL of them rather than whatever the pulldown has narrowed
-       to — a fleet figure that moves when you filter is not a fleet figure. */
     const scoredAll = all.map(decorate).filter(r => r.score != null);
     const avg = scoredAll.length
       ? Math.round(scoredAll.reduce((s, r) => s + r.score, 0) / scoredAll.length) : null;
+    const launched = all.filter(o => o.launched).length;
 
     const metrics = (d.coreMetrics || []).filter(m => m.key || m.id)
       .map(m => ({ key: m.key || m.id, label: m.label || m.key, icon: m.icon || "", description: m.description || "" }));
     const metricKeys = metrics.map(m => m.key);
 
-    // Pills are scaled per COLUMN, against every org rather than the filtered
-    // set — otherwise picking one org paints all its cells dark, which says
-    // nothing. Shared with the standalone dashboard so the two cannot
-    // disagree about what a number looks like.
     const maxes = window.RecPills.columnMaxes(all.map(decorate), metricKeys, (r, k) => r.usage[k]);
     const pill = (r, k) => e("span", { className: "pill mpill", style: window.RecPills.heat(
       r.usage[k] == null ? null : Number(r.usage[k]), maxes[k]) },
@@ -1071,32 +1152,46 @@
         ? e("span", { className: "zero" }, "not measured")
         : e("span", { style: { color: scoreColor(r.score), fontWeight: 700 } }, r.score + "%"));
 
+    const launchTag = o => o.launched
+      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
+      : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
+
     const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
 
-    // ── A vs B ──────────────────────────────────────────────────────────
-    const a = cmpA ? decorate(all.find(o => o.slug === cmpA)) : null;
-    const b = cmpB ? decorate(all.find(o => o.slug === cmpB)) : null;
-    // The interesting half of a comparison is not the numbers side by side,
-    // it is which features one org has configured and the other has not — so
-    // that is spelled out rather than left to be read off two rows of pills.
-    // Only over the MEASURED set: an unmeasured feature is not a difference.
-    const gap = (x, y) => (d.measuredFeatures || [])
-      .filter(k => adoptedIn(x.o.slug, k) && !adoptedIn(y.o.slug, k)).map(label);
+    const a = cmpA ? all.find(o => o.slug === cmpA) : null;
+    const b = cmpB ? all.find(o => o.slug === cmpB) : null;
+    const A = a ? decorate(a) : null, B = b ? decorate(b) : null;
+    const gap = (x, y) => shown.filter(k => adoptedIn(x.slug, k) && !adoptedIn(y.slug, k)).map(label);
 
     return e("div", null,
       e("div", { className: "cards" },
         e("div", { className: "card" }, e("div", { className: "k" }, "Organizations"),
-          e("div", { className: "v", "data-feat-orgs": all.length }, all.length)),
+          e("div", { className: "v", "data-feat-orgs": all.length }, all.length),
+          e("div", { className: "note" }, launched + " live on rec.us, " + (all.length - launched) + " pre-launch")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Fleet adoption"),
           e("div", { className: "v", "data-feat-avg": avg == null ? "" : avg },
             avg == null ? "\u2014" : avg + "%"),
           e("div", { className: "note" }, scoredAll.length + " of " + all.length + " scored")),
-        e("div", { className: "card" }, e("div", { className: "k" }, "Features measured"),
-          e("div", { className: "v" }, measured + " / " + total),
-          /* SAID OUT LOUD, because the denominator IS the score. A reader
-             comparing 86% today against 60% later needs to know the
-             denominator grew rather than the org regressed. */
-          e("div", { className: "note" }, "scores re-baseline as more are measured"))),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Features tracked"),
+          e("div", { className: "v", "data-feat-shown": shown.length }, shown.length + " / " + allMeasured.length),
+          /* THE DENOMINATOR IS THE SCORE, so it is stated. A reader comparing
+             86% today against 60% later needs to know whether the set moved. */
+          e("div", { className: "note" },
+            hidden.size
+              ? hidden.size + " hidden by settings \u00b7 " + allMeasured.length + " of " + total + " measurable"
+              : allMeasured.length + " of " + total + " catalog features measured"))),
+
+      // EXCLUSIONS ARE NAMED, NEVER SILENT. A count that quietly drops orgs
+      // is how a fleet figure stops being trusted.
+      (excluded.size || hidden.size) ? e("div", { className: "note", "data-feat-scopenote": 1 },
+        "Scoped by settings: " +
+        [hidden.size ? hidden.size + " feature" + (hidden.size === 1 ? "" : "s") + " hidden" : null,
+         excluded.size ? excluded.size + " organization" + (excluded.size === 1 ? "" : "s") + " excluded" : null]
+          .filter(Boolean).join(" \u00b7 ") +
+        ". Adoption scores are taken over the " + shown.length + " tracked feature" + (shown.length === 1 ? "" : "s") +
+        ", so they are not comparable with a differently-scoped view. Nothing is deleted \u2014 changing the settings brings it all back.") : null,
+      cfgErr ? e("div", { className: "note", style: { color: "#b45309" } },
+        "\u26a0 Settings could not be loaded (" + cfgErr + "), so nothing is hidden. This is the full view.") : null,
 
       e("div", { className: "panel" },
         e("h2", null, "Compare two organizations",
@@ -1107,37 +1202,35 @@
           e("select", { value: cmpB, onChange: ev => setCmpB(ev.target.value), "data-feat-cmpb": cmpB || "none" },
             e("option", { value: "" }, "Organization B\u2026"), orgOptions),
           (cmpA || cmpB) ? e("button", { onClick: () => { setCmpA(""); setCmpB(""); } }, "Clear") : null),
-        // Absent until both are chosen. A one-row "comparison" is not one,
-        // and a half-filled table reads as a loading failure.
-        (a && b) ? e("div", null,
-          e("div", { className: "tablewrap" }, e("table", { "data-feat-cmp": a.o.slug + "|" + b.o.slug },
+        (A && B) ? e("div", null,
+          e("div", { className: "tablewrap" }, e("table", { "data-feat-cmp": A.o.slug + "|" + B.o.slug },
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"), e("th", null, "Adoption"),
               metrics.map(m => e("th", { key: m.key, title: m.description }, m.label)))),
-            e("tbody", null, [a, b].map((r, i) => e("tr", { key: r.o.slug + i, "data-feat-cmprow": i === 0 ? "a" : "b" },
-              e("td", { className: "l" }, e("b", null, orgName(r.o)), e("div", { className: "note" }, r.o.slug)),
+            e("tbody", null, [A, B].map((r, i) => e("tr", { key: r.o.slug + i, "data-feat-cmprow": i === 0 ? "a" : "b" },
+              e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o),
+                e("div", { className: "note" }, r.o.slug)),
               scoreCell(r),
               metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))))))),
-          // Same org twice is a legitimate thing to do by accident; say so
-          // rather than rendering an empty diff that reads as "identical".
-          a.o.slug === b.o.slug
+          A.o.slug === B.o.slug
             ? e("div", { className: "note" }, "That is the same organization in both slots.")
             : e("div", { className: "catlist", "data-feat-gap": 1 },
-                [[a, b], [b, a]].map(([x, y], i) => {
+                [[A.o, B.o], [B.o, A.o]].map(([x, y], i) => {
                   const g = gap(x, y);
                   return e("div", { key: i, className: "note" },
-                    e("b", null, "Only " + orgName(x.o) + ": "),
-                    g.length ? g.join(", ") : "nothing " + orgName(y.o) + " does not also have");
+                    e("b", null, "Only " + orgName(x) + ": "),
+                    g.length ? g.join(", ") : "nothing " + orgName(y) + " does not also have");
                 }))
         ) : e("div", { className: "note" }, "Pick an organization in both slots to compare them."),
       ),
 
       e("div", { className: "panel" },
         e("h2", null, "Feature usage by organization",
-          e("span", { className: "hint" }, "click a row for its feature checklist")),
+          e("span", { className: "hint" }, "click a row for its feature checklist"),
+          e("button", { onClick: () => setShowSettings(true), "data-feat-gear": 1,
+                        title: "Choose which features and organizations this page counts",
+                        style: { float: "right", marginTop: -2 } }, "\u2699")),
         e("div", { className: "filters" },
-          // A PULLDOWN, not free text: the org set is known and closed, so a
-          // typo in a search box can only ever produce an empty table.
           e("select", { value: only, onChange: ev => setOnly(ev.target.value), "data-feat-only": only || "all" },
             e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
           only ? e("button", { onClick: () => setOnly("") }, "Show all") : null),
@@ -1151,19 +1244,180 @@
               const isOpen = open === r.o.slug;
               return e(React.Fragment, { key: r.o.slug },
                 e("tr", { onClick: () => setOpen(isOpen ? null : r.o.slug),
-                          style: { cursor: "pointer" }, "data-feat-row": r.o.slug },
-                  e("td", { className: "l" }, e("b", null, orgName(r.o)),
+                          style: { cursor: "pointer" }, "data-feat-row": r.o.slug,
+                          "data-feat-launched": r.o.launched ? "1" : "0" },
+                  e("td", { className: "l" }, e("b", null, orgName(r.o)), " ", launchTag(r.o),
                     e("div", { className: "note" }, r.o.slug)),
                   scoreCell(r),
                   metrics.map(m => e("td", { key: m.key, className: "num" }, pill(r, m.key)))),
                 isOpen ? e("tr", { key: "x" }, e("td", { colSpan: 2 + metrics.length },
                   e("div", { className: "note", "data-feat-open": r.o.slug },
-                    (d.measuredFeatures || []).map(k =>
+                    // The checklist shows the TRACKED set, so it matches the
+                    // score above it rather than listing features the score
+                    // ignores.
+                    shown.map(k =>
                       e("span", { key: k, className: "chip",
                                   style: { opacity: adoptedIn(r.o.slug, k) ? 1 : .45 } },
                         (adoptedIn(r.o.slug, k) ? "\u25cf " : "\u25cb ") + label(k)))))) : null);
             })))),
-        rows.length ? null : e("div", { className: "note" }, "No organizations match.")));
+        rows.length ? null : e("div", { className: "note" }, "No organizations match.")),
+
+      showSettings ? e(FeatureSettings, {
+        data: d, cfg,
+        onClose: () => setShowSettings(false),
+        onSaved: (next) => { setCfg(next); setCfgErr(null); setShowSettings(false); },
+      }) : null);
+  }
+
+  /* ── THE SETTINGS SHEET ─────────────────────────────────────────────────
+     PORTALLED ONTO <body>, not rendered in place. The sibling project records
+     this twice: a panel that renders inside a styled container inherits
+     text-transform, colour and flex-direction from it, and its Save button
+     loses to the container's own button rule and renders inert — which reads
+     as "the settings page doesn't work" rather than as a CSS problem. A modal
+     also belongs on body for z-index and overflow.
+
+     Editing is DRAFT-THEN-SAVE, never auto-save: this is shared state, so a
+     half-made change must not reach everyone else the moment a box is
+     ticked. Save is disabled until the draft actually differs from what the
+     server holds, and the footnote says which of those two states you are
+     in — a greyed button with no explanation is what invites "it didn't
+     save". */
+  function FeatureSettings({ data, cfg, onClose, onSaved }) {
+    const measured = data.measuredFeatures || [];
+    const byKey = {};
+    (data.features || []).forEach(f => { byKey[f.key] = f; });
+    const nameOf = k => (byKey[k] && (byKey[k].name || k)) || k;
+
+    const [hidden, setHidden] = useState(new Set(cfg.hiddenFeatures || []));
+    const [excluded, setExcluded] = useState(new Set(cfg.excludedOrgs || []));
+    const [orgQ, setOrgQ] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [saveErr, setSaveErr] = useState(null);
+
+    // Features grouped by their catalog category, which is the "type" the
+    // catalog already carries — no second taxonomy invented here.
+    const groups = [];
+    (data.featureCategories || []).forEach(cat => {
+      const keys = measured.filter(k => byKey[k] && byKey[k].category === cat);
+      if (keys.length) groups.push([cat, keys]);
+    });
+    const grouped = new Set(groups.flatMap(([, ks]) => ks));
+    const orphans = measured.filter(k => !grouped.has(k));
+    if (orphans.length) groups.push(["Other", orphans]);
+
+    const orgName = o => o.displayName || o.name || o.slug;
+    const orgs = (data.orgs || []).slice().sort((x, y) => orgName(x).localeCompare(orgName(y)));
+    const visibleOrgs = orgs.filter(o =>
+      !orgQ || (orgName(o) + " " + o.slug).toLowerCase().includes(orgQ.toLowerCase()));
+
+    const toggle = (set, setter, k) => {
+      const n = new Set(set);
+      if (n.has(k)) n.delete(k); else n.add(k);
+      setter(n);
+    };
+    const sameSet = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
+    const dirty = !sameSet(hidden, new Set(cfg.hiddenFeatures || []))
+                || !sameSet(excluded, new Set(cfg.excludedOrgs || []));
+
+    const save = () => {
+      setSaving(true); setSaveErr(null);
+      fetch("/api/org-features-settings", {
+        method: "PUT", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ hiddenFeatures: [...hidden], excludedOrgs: [...excluded] }),
+      })
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
+        // The response is what was STORED, not what was sent, so an entry
+        // that got clamped or de-duplicated is visible rather than assumed.
+        .then(saved => onSaved(saved))
+        .catch(err => { setSaveErr(err.message); setSaving(false); });
+    };
+
+    const sheet = e("div", { className: "ofs-back", onClick: ev => { if (ev.target === ev.currentTarget) onClose(); } },
+      e("div", { className: "ofs", "data-feat-settings": 1, role: "dialog", "aria-label": "Org Features settings" },
+        e("div", { className: "ofs-head" },
+          e("div", null,
+            e("b", null, "Org Features settings"),
+            e("div", { className: "ofs-sub" },
+              "Shared by everyone on the CX dashboard \u2014 saving changes this page for all users.")),
+          e("button", { onClick: onClose, "aria-label": "Close" }, "\u2715")),
+
+        e("div", { className: "ofs-body" },
+          e("div", { className: "ofs-secthead" },
+            "Features counted",
+            e("span", null, hidden.size ? (measured.length - hidden.size) + " of " + measured.length + " tracked"
+                                        : "all " + measured.length + " tracked"),
+            e("span", { className: "ofs-acts" },
+              e("a", { href: "#", onClick: ev => { ev.preventDefault(); setHidden(new Set()); } }, "all"),
+              " \u00b7 ",
+              e("a", { href: "#", onClick: ev => { ev.preventDefault(); setHidden(new Set(measured)); } }, "none"))),
+          e("div", { className: "ofs-note" },
+            "Unticking a feature hides its column from the checklist AND takes it out of the adoption score, so the score only counts what you care about. Nothing is deleted."),
+          groups.map(([cat, keys]) => {
+            const on = keys.filter(k => !hidden.has(k)).length;
+            return e("div", { className: "ofs-grp", key: cat },
+              e("div", { className: "ofs-grphead" },
+                e("b", null, cat), " ",
+                e("span", { className: "ofs-count" }, on + "/" + keys.length),
+                e("span", { className: "ofs-acts" },
+                  e("a", { href: "#", onClick: ev => { ev.preventDefault();
+                    const n = new Set(hidden); keys.forEach(k => n.delete(k)); setHidden(n); } }, "all"),
+                  " \u00b7 ",
+                  e("a", { href: "#", onClick: ev => { ev.preventDefault();
+                    const n = new Set(hidden); keys.forEach(k => n.add(k)); setHidden(n); } }, "none"))),
+              e("div", { className: "ofs-grid" }, keys.map(k =>
+                e("label", { key: k, className: "ofs-chk", title: (byKey[k] && byKey[k].description) || "" },
+                  e("input", { type: "checkbox", checked: !hidden.has(k),
+                               "data-feat-fchk": k,
+                               onChange: () => toggle(hidden, setHidden, k) }),
+                  e("span", null, nameOf(k))))));
+          }),
+
+          e("div", { className: "ofs-secthead", style: { marginTop: 18 } },
+            "Organizations excluded",
+            e("span", null, excluded.size ? excluded.size + " excluded of " + orgs.length
+                                          : "none excluded of " + orgs.length),
+            excluded.size ? e("span", { className: "ofs-acts" },
+              e("a", { href: "#", onClick: ev => { ev.preventDefault(); setExcluded(new Set()); } }, "clear")) : null),
+          e("div", { className: "ofs-note" },
+            "Tick an organization to drop it from this page entirely \u2014 the table, the pulldown, the comparison and the fleet average. For test and retired accounts."),
+          // Already-excluded orgs are pinned to the top, or an org you
+          // excluded last month is unfindable without remembering its name.
+          excluded.size ? e("div", { className: "ofs-grid" }, [...excluded].sort().map(slug => {
+            const o = orgs.find(x => x.slug === slug);
+            return e("label", { key: slug, className: "ofs-chk ofs-on" },
+              e("input", { type: "checkbox", checked: true, "data-feat-ochk": slug,
+                           onChange: () => toggle(excluded, setExcluded, slug) }),
+              e("span", null, o ? orgName(o) : slug,
+                // An entry whose org is no longer in the snapshot stays
+                // listed and says so, or it could never be unticked.
+                o ? null : e("span", { className: "ofs-gone" }, " not in this snapshot")));
+          })) : null,
+          e("input", { className: "ofs-search", type: "text", placeholder: "Search organizations\u2026",
+                       value: orgQ, onChange: ev => setOrgQ(ev.target.value) }),
+          e("div", { className: "ofs-grid ofs-scroll" }, visibleOrgs.filter(o => !excluded.has(o.slug)).map(o =>
+            e("label", { key: o.slug, className: "ofs-chk", title: o.slug },
+              e("input", { type: "checkbox", checked: false, "data-feat-ochk": o.slug,
+                           onChange: () => toggle(excluded, setExcluded, o.slug) }),
+              e("span", null, orgName(o), o.launched ? null : e("span", { className: "ofs-gone" }, " pre-launch"))))),
+          visibleOrgs.length ? null : e("div", { className: "ofs-note" }, "No organization matches that search.")),
+
+        e("div", { className: "ofs-foot" },
+          e("div", { className: "ofs-footnote", "data-feat-footnote": dirty ? "dirty" : "clean" },
+            saveErr ? e("span", { style: { color: "#b91c1c" } }, "Could not save: " + saveErr)
+                    : dirty ? "Save applies this to everyone on the CX dashboard."
+                            : "Nothing to save \u2014 tick or untick something first."),
+          e("div", null,
+            e("button", { onClick: onClose }, "Cancel"), " ",
+            e("button", { className: "ofs-save", disabled: !dirty || saving, onClick: save,
+                          "data-feat-save": dirty ? "on" : "off" },
+              saving ? "Saving\u2026" : "Save"))),
+
+        cfg.updatedAt ? e("div", { className: "ofs-meta" },
+          "Last changed " + new Date(cfg.updatedAt).toLocaleString() +
+          (cfg.updatedBy ? " by " + cfg.updatedBy : "")) : null));
+
+    return ReactDOM.createPortal ? ReactDOM.createPortal(sheet, document.body) : sheet;
   }
 
   /* ── HOW THIS WORKS ──────────────────────────────────────────────────────

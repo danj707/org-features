@@ -166,10 +166,15 @@ process.on("exit", () => {
 // a list of 69 — you have to already know its score. Asserted on the
 // comparator's INPUT rather than its exact spelling: what must not come back
 // is ordering by score.
+// Scoped to the COMPARATOR, found by the collection it sorts rather than by
+// the variable it is assigned to: the settings work renamed that variable
+// (`all` is now the excluded-filtered set and the sort moved to `everyOrg`),
+// which broke this assertion while changing nothing about the ordering.
+// THIRD instance of a slice pinned to a name rather than to behaviour.
 {
-  const feat = src.slice(src.indexOf("function Features()"), src.indexOf("function HowItWorks()"));
-  const sortLine = (feat.match(/const all = [\s\S]*?;\n/) || [""])[0];
-  ok(sortLine.length > 20, "the org list's sort was found");
+  const feat = src.slice(src.indexOf("function Features()"), src.indexOf("function FeatureSettings"));
+  const sortLine = (feat.match(/\(d\.orgs \|\| \[\]\)\.slice\(\)\.sort\([\s\S]*?\);\n/) || [""])[0];
+  ok(sortLine.length > 20, "the org list's sort was found, by the collection it sorts");
   ok(/localeCompare/.test(sortLine), "orgs are sorted by NAME, with localeCompare");
   ok(!/score/i.test(sortLine), "the org list is NOT ordered by adoption score");
 }

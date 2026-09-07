@@ -3,6 +3,18 @@
   "updates": [
     {
       "date": "2026-09-07",
+      "title": "Org Features has settings — choose which features count, and exclude organizations",
+      "body": "The gear on the Feature usage panel opens a shared settings sheet. It scopes the page; it never deletes anything.",
+      "items": [
+        "Untick a feature and it leaves the adoption score's denominator, the per-organization checklist and the A/B gap list. \"How adopted is this org\" only means something against the features you care about.",
+        "Tick an organization to drop it from the page entirely — the table, the pulldown, both comparison slots, the fleet average and the count. For test and retired accounts.",
+        "The settings are SHARED by everyone on the CX dashboard, so Save is a deliberate action rather than an auto-save, and the page records who last changed them.",
+        "Whatever the settings scope out is stated on screen above the table, with a note that the scores are not comparable with a differently-scoped view. A count that quietly drops organizations is how a fleet figure stops being trusted.",
+        "Nothing ticked reads as \"not measured\", never as 0% — an empty denominator is not an organization that adopted nothing."
+      ]
+    },
+    {
+      "date": "2026-09-07",
       "title": "All 56 measurable features are now measured, and the org list includes accounts that have not launched",
       "body": "The dashboard measured 18 of 57 catalogued features. It now measures 56 — everything the database can actually answer.",
       "items": [

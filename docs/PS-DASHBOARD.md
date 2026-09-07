@@ -235,3 +235,124 @@ page. The auth plumbing built here (roles, per-user records, gated APIs) is
 the foundation that needs; what's missing is per-org response filtering and
 a partner-safe subset of the data (they shouldn't see other orgs' bugs or
 internal health flags).
+
+## Org Features settings — scoping, not deleting (2026-09-07)
+
+Dan: *"of all the measured features, we'll need a 'settings' option for the org
+features page, lets me toggle on/off via a checkbox what I care about"*, then
+*"settings toggle is every user. Let's skip the sub features for now, but build
+out the settings. Keep it high level, main features are checkboxes. and include
+the ability to exclude specific orgs, I'm already seeing some test orgs that I'd
+need to exclude."*
+
+The gear on the Feature usage panel opens a sheet with two lists. Stored under
+the store key **`org-features-settings`** as
+`{ hiddenFeatures[], excludedOrgs[], updatedAt, updatedBy }`, read by
+`GET /api/org-features-settings` and written by `PUT`.
+
+### IT IS SHARED, AND IT IS EVERY USER
+
+Both routes are behind `auth.requireAuth` and **deliberately not
+`requireAdmin`** — Dan's call. The consequence is the whole shape of the sheet:
+because a save reaches everyone, it is **draft-then-save**, Save is disabled
+until the draft actually differs from what the server holds, the footnote says
+which of those two states you are in, and `updatedBy` records who last changed
+it. Auto-save would push a half-made change to every reader the moment a box was
+ticked.
+
+`updatedBy` is taken from `req.user`, **never from the body** — a caller can
+claim to be anyone.
+
+### THE SCOPE APPLIES ONCE, ABOVE EVERY SURFACE
+
+- `shown = measuredFeatures − hiddenFeatures` is the tracked set, and
+  **`scoreOf` takes its numerator AND its denominator from it.** That is the
+  point of the setting: "how adopted is this org" only means something against
+  the features you care about. The per-org checklist and the A/B gap list read
+  the same set, or they list features the score above them ignores.
+- `all = everyOrg − excludedOrgs` is what the table, the pulldown, both compare
+  slots, the fleet average and the org count all read. Filtering in each place
+  separately is how the facility Summary came to disagree with itself about how
+  many bookings there were, one project over.
+
+### THREE STATES, NOT TWO — the absent-is-not-zero rule again
+
+`scoreOf` returns **null**, not 0, when the bake never measured that org *and*
+when nothing is ticked. An empty denominator is not an organization that adopted
+nothing, and 0% reads as a verdict.
+
+Same asymmetry on the fetch: **a settings fetch that fails falls back to showing
+everything**, with an amber note saying so. Failing the other way renders an
+empty dashboard, which reads as "nobody has adopted anything" — and the reader
+has no way to tell that from the truth.
+
+### EXCLUDED IS NEVER HIDDEN
+
+`data-feat-scopenote` states what the settings removed and that scores taken
+over a narrowed set are not comparable with a differently-scoped view. A count
+that quietly drops organizations is how a fleet figure stops being trusted.
+
+### The sheet's own traps
+
+- **PORTALLED ONTO `<body>`.** The sibling project shipped this bug twice: a
+  sheet rendered inside a styled container inherits its `text-transform`,
+  colour and `flex-direction`, and its Save button loses to the container's own
+  button rule and renders as inert grey — which is reported as "the settings
+  page doesn't work", not as a CSS problem.
+- **The sheet states its own button style.** There is no global `button` rule on
+  `ps.html`, so without `.ofs-foot button.ofs-save` the primary action renders
+  as a browser default beside Cancel.
+- **Already-excluded orgs are pinned to the top**, and an excluded slug whose
+  org has left the snapshot **stays listed and says so** — otherwise an org
+  excluded last month could never be un-excluded.
+- **Section headers are NOT sticky**, and that was tried: two sticky headers in
+  one scroll box only hand over when the second reaches the top, and the org
+  list scrolls inside its own 232px box so the second never gets there. The
+  result was "FEATURES COUNTED" pinned above the organization list.
+- **The org list scrolls in its own box** — 144 accounts would otherwise push
+  Save off the bottom of the sheet.
+- Features are grouped by the catalog's **existing** `category`. Dan deferred
+  sub-features, so no second taxonomy is invented here.
+
+### The validator
+
+`normalizeOfSettings` bounds a stored list on every axis it can grow along —
+200 features, 500 orgs, 120 chars each — trims, drops blanks and non-strings,
+de-duplicates and **sorts** (so two saves of the same set compare equal, which
+is what `dirty` depends on), and drops unknown keys rather than carrying them.
+The PUT **echoes what was stored, not what was sent**, so a clamped or
+de-duplicated entry is visible rather than assumed.
+
+`_ofSettings` is a module cache, invalidated through `store.onKeyChange` — a
+change on one replica must not leave the other serving a stale record until it
+restarts.
+
+### Guards
+
+`scripts/org-features-settings.spec.js` (**90 assertions, in CI**) has a source
+half and a **live half that boots a real server, signs up, saves, reads back,
+restarts and reads back again** — a regex over our own patch is not evidence the
+server behaves. `SKIP_SOURCE=1` drops the source half so the live half can be
+shown to catch a regression alone.
+
+Mutation-tested **29 ways, all failing by name**: the score taken over every
+measured feature (so settings do nothing), nothing-ticked scoring 0%, the
+exclusion filter removed, the pulldown keeping excluded orgs, the checklist and
+the A/B gap list showing untracked features, the settings-fetch failure hiding
+everything, the PUT made admin-only, the body stored verbatim, `updatedBy`
+trusted from the body, the replica cache never invalidated, de-duplication and
+the blank/length/unknown-key clamps each dropped, the GET unauthenticated, the
+PUT echoing the request, the sheet rendered in place instead of portalled, Save
+always enabled, auto-save on every tick, excluded orgs not pinned, a departed
+org silently unlistable, the sheet adopting its own draft, the scope note
+removed, the launch flag dropped, four CSS rules removed, and `writeJSON`
+dropped so nothing survives a restart.
+
+Verified in a real browser end to end: the gear opens the sheet on `<body>` with
+56 feature checkboxes across 12 groups and 144 org checkboxes, rows neither
+uppercased nor stacked, Save disabled at rest and enabled on the first tick;
+unticking one feature moves the tracked count 56 → 55 and the open checklist to
+55 chips, excluding one org moves the count 144 → 143 and the pulldown 145 → 144
+options and drops that row from the table; the settings survive a reload; and
+clearing them brings all 144 organizations and 56 features back with the scope
+note gone. No uncaught page errors.

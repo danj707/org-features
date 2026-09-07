@@ -86,6 +86,9 @@ const storeReady = Promise.race([
 store.onKeyChange(keys => {
   if (keys.includes("launches-data")) _launchCache = null;
   if (keys.includes("features-data")) _snapshot = loadSnapshot() || _snapshot;
+  /* Settings are SHARED, so a change made on the other replica has to reach
+     this one's cache or two people editing see different pages. */
+  if (keys.includes("org-features-settings")) _ofSettings = null;
 });
 
 auth.init(DATA_DIR, store);
@@ -167,6 +170,82 @@ app.get("/api/updates", auth.requireAuth, (_req, res) => {
   }
   /* AN EMPTY LOG IS A REAL STATE, not an error — a fresh checkout has one. */
   res.json({ updates: [] });
+});
+
+/* ── ORG FEATURES SETTINGS ────────────────────────────────────────────────
+   SHARED BY EVERY USER, not per person: Dan's call, and it is the right one
+   for a five-person CX dashboard where "which features do we care about" is
+   a team decision rather than a personal preference. So it goes through the
+   store (durable across a deploy, visible to both replicas) rather than into
+   localStorage, and the panel says on screen that a change applies to
+   everyone.
+
+   IT IS A VIEW PREFERENCE, NOT A GATE. Hiding a feature or excluding an org
+   changes what this page shows and what its adoption score is taken over. It
+   changes nothing about the bake, and every hidden thing is still in
+   /api/data — so a stale or malformed setting can only ever narrow the view,
+   never lose data. That is why the defaults below are "show everything" and
+   why an unreadable stored value falls back to them rather than to empty.
+
+   Writes require a signed-in user and NOT admin, because every user shares
+   the result and any of them may need to adjust it. `updatedBy` records who
+   last changed it, which is the audit trail that matters when a setting is
+   shared. Body parsing is the app-wide express.json() — a second parser on
+   the route would never see the body, since the first one already consumed
+   it. */
+let _ofSettings = null;
+const OF_SETTINGS_KEY = "org-features-settings";
+const OF_SETTINGS_DEFAULT = { hiddenFeatures: [], excludedOrgs: [], updatedAt: null, updatedBy: null };
+
+function ofSettings() {
+  if (_ofSettings) return _ofSettings;
+  const raw = store.readJSON(OF_SETTINGS_KEY, null);
+  _ofSettings = normalizeOfSettings(raw);
+  return _ofSettings;
+}
+
+/* Bounded on every axis a stored list can grow along, and every entry
+   clamped — this is read back into a page and a 10MB array or a 5,000-char
+   slug would break it far from here. Unknown keys are dropped rather than
+   carried, so a hand-edited row cannot smuggle anything through. */
+function normalizeOfSettings(raw) {
+  const cleanList = (v, cap) => {
+    if (!Array.isArray(v)) return [];
+    const out = [];
+    for (const x of v) {
+      if (typeof x !== "string") continue;
+      const t = x.trim().slice(0, 120);
+      // A blank entry can never match anything and would sit in the panel
+      // looking like a bug.
+      if (t && !out.includes(t)) out.push(t);
+      if (out.length >= cap) break;
+    }
+    return out.sort();
+  };
+  const r = raw && typeof raw === "object" ? raw : {};
+  return {
+    hiddenFeatures: cleanList(r.hiddenFeatures, 200),
+    excludedOrgs: cleanList(r.excludedOrgs, 500),
+    updatedAt: typeof r.updatedAt === "string" ? r.updatedAt.slice(0, 40) : null,
+    updatedBy: typeof r.updatedBy === "string" ? r.updatedBy.slice(0, 120) : null,
+  };
+}
+
+app.get("/api/org-features-settings", auth.requireAuth, (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.json(ofSettings());
+});
+
+app.put("/api/org-features-settings", auth.requireAuth, (req, res) => {
+  const next = normalizeOfSettings(req.body);
+  next.updatedAt = new Date().toISOString();
+  next.updatedBy = (req.user && (req.user.name || req.user.email)) || null;
+  store.writeJSON(OF_SETTINGS_KEY, next);
+  _ofSettings = next;
+  /* Echo what was STORED rather than what was sent, so a caller can see its
+     own entries having been clamped or de-duplicated instead of assuming
+     they landed verbatim. */
+  res.json(next);
 });
 
 // Launch pipeline (CX Reporting gantt) — baked from the Airtable Services
