@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T13:05:02.745Z",
+  "generatedAt": "2026-09-07T13:48:55.045Z",
   "source": "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
   "status": "adoption-wave-1",
   "orgs": [
@@ -1063,9 +1063,9 @@
       "programs": 620,
       "registrations": 98197,
       "memberships": 24811,
-      "passes": 4921,
+      "passes": 4920,
       "facilities": 332,
-      "reservations": 90715
+      "reservations": 90721
     },
     "barrie": {
       "programs": 0,
@@ -1405,11 +1405,11 @@
     },
     "city-of-milford": {
       "programs": 0,
-      "registrations": 15093,
+      "registrations": 15097,
       "memberships": 1034,
       "passes": 0,
       "facilities": 33,
-      "reservations": 26594
+      "reservations": 26600
     },
     "city-of-mountain-view": {
       "programs": 24,
@@ -1446,7 +1446,7 @@
     "city-of-norman": {
       "programs": 135,
       "registrations": 10499,
-      "memberships": 7955,
+      "memberships": 7956,
       "passes": 10956,
       "facilities": 403,
       "reservations": 9577
@@ -1550,7 +1550,7 @@
     "city-of-tullahoma": {
       "programs": 12,
       "registrations": 254,
-      "memberships": 1953,
+      "memberships": 1954,
       "passes": 0,
       "facilities": 49,
       "reservations": 545
@@ -1637,11 +1637,11 @@
     },
     "el-segundo-recreation": {
       "programs": 107,
-      "registrations": 7984,
+      "registrations": 8006,
       "memberships": 5157,
       "passes": 758,
       "facilities": 160,
-      "reservations": 24947
+      "reservations": 24966
     },
     "emeryville": {
       "programs": 134,
@@ -1829,8 +1829,8 @@
     },
     "needham": {
       "programs": 51,
-      "registrations": 571,
-      "memberships": 331,
+      "registrations": 576,
+      "memberships": 333,
       "passes": 0,
       "facilities": 93,
       "reservations": 793
@@ -2001,7 +2001,7 @@
       "memberships": 0,
       "passes": 0,
       "facilities": 114,
-      "reservations": 558935
+      "reservations": 558936
     },
     "santacruzcounty": {
       "programs": 99,
@@ -2077,7 +2077,7 @@
     },
     "town-of-clarkstown": {
       "programs": 62,
-      "registrations": 815,
+      "registrations": 817,
       "memberships": 5379,
       "passes": 0,
       "facilities": 78,
@@ -2119,7 +2119,7 @@
       "programs": 178,
       "registrations": 3818,
       "memberships": 1992,
-      "passes": 7,
+      "passes": 9,
       "facilities": 157,
       "reservations": 4491
     },
@@ -2165,7 +2165,7 @@
     },
     "watertown": {
       "programs": 164,
-      "registrations": 10516,
+      "registrations": 10518,
       "memberships": 2240,
       "passes": 0,
       "facilities": 133,
@@ -3173,8 +3173,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 3053,
-        "detail": "3,053 sections with a skill level"
+        "count": 3054,
+        "detail": "3,054 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -3218,8 +3218,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 8060,
-        "detail": "8,060 facility rentals"
+        "count": 8061,
+        "detail": "8,061 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -3238,8 +3238,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 494,
-        "detail": "494 permits issued"
+        "count": 495,
+        "detail": "495 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -8062,8 +8062,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 7533,
-        "detail": "7,533 cash/check payments"
+        "count": 7537,
+        "detail": "7,537 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -9704,13 +9704,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 307,
-        "detail": "307 facility rentals"
+        "count": 308,
+        "detail": "308 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 7,
-        "detail": "7 rental applications"
+        "count": 8,
+        "detail": "8 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -9719,8 +9719,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 279,
-        "detail": "279 deposits taken"
+        "count": 281,
+        "detail": "281 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -12574,8 +12574,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 4480,
-        "detail": "4,480 cash/check payments"
+        "count": 4481,
+        "detail": "4,481 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -15344,8 +15344,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 16010,
-        "detail": "16,010 facility rentals"
+        "count": 16014,
+        "detail": "16,014 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -23522,8 +23522,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 7515,
-        "detail": "7,515 facility rentals"
+        "count": 7532,
+        "detail": "7,532 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -23572,8 +23572,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 374,
-        "detail": "374 cash/check payments"
+        "count": 375,
+        "detail": "375 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -36137,8 +36137,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 14377,
-        "detail": "14,377 registration windows"
+        "count": 14378,
+        "detail": "14,378 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -36212,8 +36212,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 415871,
-        "detail": "415,871 facility rentals"
+        "count": 415886,
+        "detail": "415,886 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -40774,8 +40774,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 6051,
-        "detail": "6,051 cash/check payments"
+        "count": 6052,
+        "detail": "6,052 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
