@@ -150,6 +150,25 @@ app.get("/api/ps-data", auth.requireAuth, (_req, res) => {
   res.status(503).json({ error: "no PS snapshot baked yet" });
 });
 
+/* The running update log behind /ps/updates. A committed file rather than a
+   table or a page-embedded array: an entry then arrives in the same commit as
+   the change it describes and is reviewable in the diff. Behind auth with the
+   rest of the CX dashboard — it names internal work. */
+const UPDATES_BAKED  = path.join(__dirname, "data", "updates.json");
+const UPDATES_VOLUME = path.join(DATA_DIR, "updates.json");
+app.get("/api/updates", auth.requireAuth, (_req, res) => {
+  const stored = store.readsDb() ? store.readJSON("updates", null) : null;
+  if (stored) { res.setHeader("Cache-Control", "no-cache"); return res.json(stored); }
+  for (const file of [UPDATES_VOLUME, UPDATES_BAKED]) {
+    try {
+      res.setHeader("Cache-Control", "no-cache");
+      return res.json(JSON.parse(fs.readFileSync(file, "utf8")));
+    } catch { /* try next */ }
+  }
+  /* AN EMPTY LOG IS A REAL STATE, not an error — a fresh checkout has one. */
+  res.json({ updates: [] });
+});
+
 // Launch pipeline (CX Reporting gantt) — baked from the Airtable Services
 // view by scripts/refresh/bake-launches.js. Same volume-override rules.
 // POST /api/launches/refresh re-bakes live from Airtable when the server
@@ -246,7 +265,8 @@ app.get("/", (_req, res) => res.sendFile(PAGE));
 app.get("/org/:slug", (_req, res) => res.sendFile(PAGE));
 app.get("/login", (req, res) => auth.currentUser(req) ? res.redirect("/ps") : res.sendFile(LOGIN_PAGE));
 app.get("/reset", (_req, res) => res.sendFile(RESET_PAGE));
-app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/remittance", "/ps/admin", "/ps/org/:id"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
+app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/remittance", "/ps/admin", "/ps/org/:id",
+         "/ps/features", "/ps/how", "/ps/updates"], auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));
 
