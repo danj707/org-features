@@ -72,6 +72,23 @@
 --                       a default window, so this is a structural fact rather
 --                       than a differentiator. Kept because it is a real
 --                       catalog feature and the page can hide it.
+--   calendar_sync       THE ONLY ORG-SCOPED SIGNAL IS saved_filter_view.
+--                       `oauth_connection` has NO organization_id, and
+--                       resolving it through organization_association gives
+--                       82 orgs from 29 connections — Rec staff are members
+--                       of dozens of orgs, so the obvious join is out by 4x.
+--                       Nor is it saved_filter_view alone: that table is
+--                       1,017 views across 68 orgs and only 46 views at 18
+--                       orgs carry a calendar connection.
+--                       DISCONNECTING CLEARS oauth_connection_id AND LEAVES
+--                       last_synced_at, so the two readings differ: 18 orgs
+--                       are connected today, 20 have ever synced. The OR is
+--                       the lifetime one, which is the question this
+--                       dashboard asks everywhere else.
+--                       Cross-validated against calendar_sync_record, which
+--                       carries organization_id directly and returns the
+--                       same 18 currently-connected orgs — neither side has
+--                       an org the other lacks.
 --
 -- NOT MEASURED, deliberately: restricted_registration_mode. The catalog said
 -- section.registration_mode carries values "other than 'open', e.g.
@@ -184,7 +201,8 @@ SELECT json_agg(json_build_array(
     'cash_reconciliation', COALESCE(a_cash_reconciliation.n,0),
     'custom_staff_roles', COALESCE(a_custom_staff_roles.n,0),
     'alternate_identities', COALESCE(a_alternate_identities.n,0),
-    'crm_household_notes', COALESCE(a_crm_household_notes.n,0)
+    'crm_household_notes', COALESCE(a_crm_household_notes.n,0),
+    'calendar_sync', COALESCE(a_calendar_sync.n,0)
   )
   )::json
 ) ORDER BY o.slug)::text AS payload
@@ -251,3 +269,4 @@ LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM cash_summary_report 
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM organization_role WHERE name NOT IN ('Full Access','Limited Access') GROUP BY 1) a_custom_staff_roles ON a_custom_staff_roles.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM user_alternate_identity GROUP BY 1) a_alternate_identities ON a_alternate_identities.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM household_note GROUP BY 1) a_crm_household_notes ON a_crm_household_notes.oid=o.id
+LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM saved_filter_view WHERE oauth_connection_id IS NOT NULL OR last_synced_at IS NOT NULL GROUP BY 1) a_calendar_sync ON a_calendar_sync.oid=o.id
