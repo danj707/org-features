@@ -12,6 +12,11 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      # PUPPETEER IS A DEV DEPENDENCY NOW, and installing it downloads a
+      # ~170MB Chrome by default. Only the `render` job needs the browser;
+      # here it would be two minutes of nothing on every push.
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -60,14 +65,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # THIS JOB DELIBERATELY DOES NOT SUPPRESS THE BROWSER FETCH - it is the
+      # one job that drives a browser, and letting `npm ci` bring it down as
+      # part of the dependency install is what makes the library and the
+      # browser arrive TOGETHER. The shape before this fetched a browser on
+      # its own and never the library, so ci-check-render.js could not
+      # `require("puppeteer")`, printed its skip line and exited 0 - a green
+      # tick on a check that had never opened a browser. The script fails
+      # rather than skips when CI is set now, so that cannot recur silently.
       - run: npm ci --no-audit --no-fund
-      - name: Install a browser for the render check
-        run: npx --yes puppeteer browsers install chrome
       - name: Every page renders in a real browser
         run: npm run render
 
   boot:
     runs-on: ubuntu-latest
+    env:
+      # PUPPETEER IS A DEV DEPENDENCY NOW, and installing it downloads a
+      # ~170MB Chrome by default. Only the `render` job needs the browser;
+      # here it would be two minutes of nothing on every push.
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

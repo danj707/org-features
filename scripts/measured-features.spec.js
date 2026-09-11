@@ -53,7 +53,7 @@ const NEW = ["events", "ticket_sales", "ai_assistant", "ai_routines"];
 const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   "group_pricing_tiers", "waivers_contracts", "cash_check_payments",
   "custom_email_domains", "prerequisites", "facility_rentals", "rental_permits",
-  "calendar_sync"];
+  "calendar_sync", "payment_plan_autopay", "marketing_email", "automated_waitlist"];
 
 // ── THE THREE LISTS MUST AGREE, OR THE PAGE RENDERS RAW KEYS ──────────────
 // merge-snapshot maps payload columns onto ADOPTION_KEYS by POSITION, and the
@@ -379,5 +379,102 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   const one = orgs.map(s2 => snap.adoption[s2].calendar_sync).find(c => c.count === 1);
   ok(one && /1 calendar synced/.test(one.detail),
      'an org with one calendar reads "1 calendar synced", not "1 calendars synced"');
+}
+
+// ── THREE METRICS THAT ARE NOT THE METRIC BESIDE THEM ─────────────────────
+// Added 2026-09-11. Dan: "what about automatic payments on payment plans?" and
+// "are we tracking things like sms, CRM and marketing email use, automated
+// waitlists, etc?" Two of those four turned out to be folded into a bigger
+// number that flatters them, and the whole risk here is a definition that
+// quietly duplicates its neighbour.
+{
+  const code = sql.replace(/^\s*--.*$/gm, "");
+  const byKey = {}; snap.features.forEach(f => { byKey[f.key] = f; });
+  const orgs = Object.keys(snap.adoption);
+  const live = new Set(snap.orgs.filter(o => o.launched).map(o => o.slug));
+  const usedBy = k => orgs.filter(s2 => snap.adoption[s2][k] && snap.adoption[s2][k].adopted);
+
+  ["payment_plan_autopay", "marketing_email", "automated_waitlist"].forEach(k => {
+    ok(byKey[k], k + " has a catalog entry");
+    ok(snap.measuredFeatures.includes(k), k + " is measured");
+    const missing = orgs.filter(s2 => snap.adoption[s2][k] === undefined);
+    eq(missing.length, 0, "every org has a " + k + " cell");
+    ok(usedBy(k).length > 0, k + " is adopted somewhere (a metric measuring zero everywhere is a broken filter)");
+  });
+
+  /* 1. AUTO-PAY IS A SECTION SETTING, NOT A COUNT OF REGISTRATIONS. This is
+        the same shape as the Payment Plans metric beside it - "does any
+        section offer this" - and deliberately NOT payment_plan.autopay_enabled,
+        which is one row per registration and answers how many HOUSEHOLDS are
+        enrolled. It shipped the wrong way round first and Dan corrected it. */
+  ok(/section s, LATERAL jsonb_array_elements\([\s\S]{0,200}?requireAutopay'\) = 'true'/.test(code),
+     "auto-pay counts SECTIONS whose payment plan requires it");
+  ok(/FROM section WHERE deleted_at IS NULL AND \(CASE WHEN available_payment_plans/.test(code),
+     "...and the any-payment-plan metric it is a subset of is untouched, so the pair stays comparable");
+  ok(!/FROM payment_plan WHERE autopay_enabled/.test(code),
+     "...NOT payment_plan.autopay_enabled, which is one row per REGISTRATION and answers how many households are enrolled rather than whether the organization turned it on");
+  ok(!/payment_plan_autopay_attempt/.test(code),
+     "...and NOT charge attempts, which measure whether a due date has passed rather than whether it is configured");
+  /* A LATERAL OVER A NON-ARRAY ERRORS rather than yielding nothing, and this
+     column is not always an array - the refresh would fail outright. */
+  ok(/jsonb_array_elements\(CASE WHEN jsonb_typeof\(s\.available_payment_plans\)='array'/.test(code),
+     "the lateral is guarded on the column being an array at all - without it the whole fleet refresh errors on one bad row");
+  //    ...and it is not the membership feature under a second name.
+  ok(/group_schema WHERE auto_renewal = true/.test(code),
+     "auto-renewing MEMBERSHIPS is still measured separately");
+  const apd = byKey.payment_plan_autopay.adoption_definition;
+  ok(apd.indexOf("auto_renewal") > 0,
+     "the catalog entry records that the two are different questions");
+  ok(/8,622|per REGISTRATION/.test(apd),
+     "...and what the per-registration figure is, since that is the number this used to report");
+  /* THE KEY IS NEWER THAN THE FEATURE, which is the one thing that makes a
+     zero here untrustworthy, so it has to be written down beside the number. */
+  ok(/2,111|absent rather than false/.test(apd),
+     "...and that requireAutopay is ABSENT rather than false on most plan objects, so an early adopter can read as not using it");
+  ok(/requireCardOnFile/.test(apd),
+     "...and that requireCardOnFile is a different switch rather than a proxy for it");
+  ok(usedBy("payment_plan_autopay").length < usedBy("payment_plans").length,
+     "auto-pay is a subset of the orgs offering plans at all, not a bigger number than its parent");
+  /* A STRICT SUBSET, checked org by org rather than on the totals - a smaller
+     count can still contain an organization its parent does not. */
+  {
+    const parent = new Set(usedBy("payment_plans"));
+    const stray = usedBy("payment_plan_autopay").filter(s2 => !parent.has(s2));
+    eq(stray.length, 0,
+       "every organization requiring auto-pay also shows as offering payment plans" + (stray.length ? " - " + stray.join(", ") : ""));
+  }
+
+  // 2. MARKETING EMAIL IS NOT EMAIL. email_messaging counts every delivery on
+  //    the email channel and is 90% of live orgs because it is dominated by
+  //    transactional mail the platform sends by itself.
+  ok(/type='marketing' AND channel='email'/.test(code),
+     "marketing email filters BOTH the type and the channel");
+  ok(/message_delivery WHERE channel='email'/.test(code),
+     "...and the all-email metric it sits beside is untouched");
+  const me = usedBy("marketing_email").filter(s2 => live.has(s2)).length;
+  const em = usedBy("email_messaging").filter(s2 => live.has(s2)).length;
+  ok(me < em, `marketing email reaches fewer live orgs than all email — ${me} against ${em}, which is the whole reason it is its own metric`);
+  ok(/9,993|transactional/i.test(byKey.marketing_email.adoption_definition),
+     "the catalog entry records what the combined figure is actually made of");
+  //    A marketing SMS carries the same type on a different channel.
+  ok(/45 rows|channel is filtered/i.test(byKey.marketing_email.adoption_definition),
+     "...and why the channel has to be filtered as well");
+
+  // 3. AUTOMATED WAITLISTS ARE NOT WAITLISTS. 32,220 manual sections against
+  //    SIXTEEN automated ones, at two orgs, neither of them live.
+  ok(/waitlist_config ->> 'type' = 'automated'/.test(code),
+     "automated waitlists key on the type, not on the config existing");
+  ok(/section WHERE deleted_at IS NULL AND waitlist_config IS NOT NULL/.test(code),
+     "...and the any-waitlist metric it sits beside is untouched");
+  const aw = usedBy("automated_waitlist").filter(s2 => live.has(s2)).length;
+  const wl = usedBy("waitlist").filter(s2 => live.has(s2)).length;
+  ok(aw < wl, `automated waitlists reach fewer live orgs than waitlists — ${aw} against ${wl}`);
+  /* ZERO LIVE ORGS IS AN ANSWER, NOT A BROKEN FILTER, and it is the reading
+     the combined 82% hides. The guard is that the metric still finds the two
+     PRE-LAUNCH orgs that have configured it — a filter matching nothing at
+     all anywhere would be the broken case. */
+  eq(aw, 0, "no LIVE organization has an automated waitlist yet — that is the honest answer the combined waitlist figure hides");
+  ok(usedBy("automated_waitlist").length >= 2,
+     "...while the metric does find the pre-launch organizations that configured it, so it is not simply matching nothing");
 }
 

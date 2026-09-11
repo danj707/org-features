@@ -937,35 +937,39 @@
      same reason Account Health keeps `scoreColor` rather than reusing
      `ofGradeColor`.
 
-     THE TWO DISTRIBUTIONS HAPPEN TO BE CLOSE TODAY, which is why the numbers
-     start identical and why the separation has to be deliberate rather than
-     accidental. Measured 2026-09-11 over the 57 measured features against 73
-     live orgs: min 1%, median 52%, mean 50.2%, max 99% (facility rentals, on
-     72 of 73). Against the org distribution — median 57%, mean 50% — those are
-     near enough to share thresholds and not near enough to share a constant.
+     CURVED TO THE QUINTILES OF THE MEASURED DISTRIBUTION. Over the 60
+     measured features against 73 live orgs (2026-09-11): min 0%, median 50%,
+     mean 48.8%, max 99% — facility rentals, on 72 of 73. The 20/40/60/80th
+     percentiles fall at 22 / 41 / 59 / 81, so the ramp is the round numbers
+     nearest them and each grade is about a fifth of the catalog: A 12 · B 10 ·
+     C 14 · D 13 · F 11.
 
-     At the same 75/60/45/25 the 57 features spread A 14 · B 8 · C 11 · D 11 ·
-     F 13, so no band is empty and the modal grade is not F. The spec measures
-     that spread rather than trusting this comment.
+     IT STARTED IDENTICAL TO THE ORG RAMP AND NO LONGER IS, which is the
+     argument for the separate constant making itself. Adding three features
+     on 2026-09-11 — two of them barely adopted — made F the commonest grade
+     on the old thresholds (F 15 against A 14), and a scale whose modal grade
+     is F carries no information. Sharing one constant with the org ramp would
+     have meant re-curving THAT to fix THIS. The spec measures the spread
+     rather than trusting this paragraph, which is how the problem was caught.
 
      THE COPY IS NOT THE ORG COPY. "Getting nearly everything out of the
      platform" is a sentence about an organization and nonsense about a
      feature, so every `says` here is about fleet penetration instead. */
   const FEATURE_GRADE_RAMP = [
-    { min: 75, letter: "A", color: "#15803d", band: "#dcfce7",
+    { min: 80, letter: "A", color: "#15803d", band: "#dcfce7",
       says: "Standard equipment — nearly every live organization has this" },
     { min: 60, letter: "B", color: "#16a34a", band: "#ecfdf5",
       says: "Widely adopted, with a real tail left to convert" },
-    { min: 45, letter: "C", color: "#b45309", band: "#fffbeb",
+    { min: 40, letter: "C", color: "#b45309", band: "#fffbeb",
       says: "About half the fleet; the rest is addressable" },
-    { min: 25, letter: "D", color: "#ea580c", band: "#fff7ed",
+    { min: 20, letter: "D", color: "#ea580c", band: "#fff7ed",
       says: "Early — a minority have turned it on" },
     { min: 0,  letter: "F", color: "#dc2626", band: "#fef2f2",
       says: "Barely adopted — new, niche, or not landing" },
   ];
   const FEATURE_GRADE_BASIS = "Graded against how far features actually spread on rec.us, "
-    + "not a 90/80/70 school scale — the most-adopted feature reaches 99% of live "
-    + "organizations and the median reaches 52%.";
+    + "not a 90/80/70 school scale — the bands are the quintiles of the catalog, so the "
+    + "most-adopted feature reaches 99% of live organizations and the median reaches 50%.";
   // NULL, NEVER AN F — same absent-is-not-zero rule as the org grade.
   function ofFeatureGrade(pct) {
     if (pct == null || typeof pct !== "number" || !isFinite(pct)) return null;
@@ -1118,6 +1122,30 @@
     const d2 = Math.round(t.delta);
     return (d2 > 0 ? "+" : d2 < 0 ? "\u2212" : "") + Math.abs(d2) + " pts";
   }
+  /* ── THE SEARCH BOX ───────────────────────────────────────────────────
+     Dan: "we need a text search box here to focus on a feature, if I know the
+     name, like 'calendar', should match against everything that it filters
+     down on."
+
+     SO IT MATCHES EVERY FIELD THE ROW CARRIES, not just the displayed name —
+     the key, the short label, the category and the one-line description as
+     well. Typing "sync" finds Calendar Sync, "money" finds nothing and
+     "payments" finds the whole Payments & Pricing group. A box that silently
+     searched the name alone would make half of those reads look like the
+     feature is missing.
+
+     AND over whitespace-separated terms, so "auto pay" and "pay auto" find
+     the same row. The fields are joined with a separator no query can
+     contain, or a term could match across the boundary between two of them
+     and "sync calendar" would hit something that is neither. */
+  function ofFeatureMatch(row, q) {
+    const terms = String(q || "").toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return true;
+    const hay = [row.key, row.name, row.short, row.cat, catShort(row.cat), row.description]
+      .filter(Boolean).join("\u0001").toLowerCase();
+    return terms.every(t => hay.indexOf(t) >= 0);
+  }
+
   /* ── A FEATURE'S OWN TREND ─────────────────────────────────────────────
      NOT the org trend with a different argument. Each history point's
      `scores` map is per ORGANIZATION, and no amount of averaging it answers
@@ -1166,9 +1194,14 @@
     return keys.map(k => {
       const live = fleet.used[k] || 0;
       const all = orgs.filter(o => dv.adoptedIn(o.slug, k)).length;
+      const f = dv.byKey[k] || {};
       return {
         key: k, name: dv.label(k),
-        cat: (dv.byKey[k] && dv.byKey[k].category) || "",
+        cat: f.category || "",
+        /* THE SEARCHABLE TEXT IS BUILT HERE, in the same reducer that builds
+           the row, so the box can never be searching a different set of
+           fields from the one the table is showing. */
+        short: f.short || "", description: f.description || "",
         live, liveOrgs: fleet.liveOrgs, all, allOrgs: orgs.length,
         /* NULL, NEVER 0%, WITH NO DENOMINATOR. A view scoped to nothing but
            pre-launch orgs has no live fleet to be a share of, and "0% of
@@ -2112,6 +2145,11 @@
     // have different columns, so one shared state would carry a key the other
     // cannot resolve and silently fall back to its default order.
     const [fsort, setFsort] = useState(null);
+    // The by-feature search. Not in the URL, because nothing else on this
+    // page's toolbars is either — a search that deep-linked while the sort
+    // and the picker beside it did not would be one control behaving
+    // differently from its neighbours for no reason a reader can see.
+    const [fq, setFq] = useState("");
     const [cmpA, setCmpA] = useState("");
     const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
@@ -2384,7 +2422,12 @@
        SAME COMPONENT AGAIN, so the tracked set, the exclusions and the
        snapshot are resolved once. */
     if (featureList) {
-      const frows = ofFeatureRows(d, dv);
+      const fall = ofFeatureRows(d, dv);
+      /* THE SEARCH NARROWS THE TABLE AND NOTHING ELSE. The KPI row above it
+         keeps describing the whole tracked set — a median that moved as you
+         typed would be a different statistic every keystroke, and "median
+         adoption 25%" over one matching row is not a median of anything. */
+      const frows = fq ? fall.filter(r => ofFeatureMatch(r, fq)) : fall;
       /* DEFAULT ORDER IS MOST-ADOPTED FIRST. Alphabetical is right for the
          org table, where the reader is looking someone up; here nobody
          arrives looking for "Gift Cards", they arrive asking what is and is
@@ -2402,35 +2445,35 @@
         "data-feat-fthdir": fsort && fsort[0] === key ? (fsort[1] < 0 ? "desc" : "asc") : "",
       }, extra || {}), label2 + (fsort && fsort[0] === key ? (fsort[1] < 0 ? " \u2193" : " \u2191") : ""));
 
-      const pcts = frows.map(r => r.pct).filter(x => x != null).sort((x, y) => x - y);
+      const pcts = fall.map(r => r.pct).filter(x => x != null).sort((x, y) => x - y);
       const median = pcts.length
         ? (pcts.length % 2 ? pcts[(pcts.length - 1) / 2]
            : Math.round((pcts[pcts.length / 2 - 1] + pcts[pcts.length / 2]) / 2))
         : null;
-      const moving = frows.filter(r => r.trend && r.trend.ready && r.trend.delta !== 0);
+      const moving = fall.filter(r => r.trend && r.trend.ready && r.trend.delta !== 0);
       const up = moving.filter(r => r.trend.delta > 0).length;
       const down = moving.filter(r => r.trend.delta < 0).length;
       /* HOW MANY ROWS CAN EVEN HAVE A TREND, stated rather than left to be
          inferred from a column of dots. A feature measured for the first time
          today has no history, and "0 moving" over 57 features reads as a dead
          platform when the truth is that the series has just started. */
-      const trendable = frows.filter(r => r.trend && r.trend.ready).length;
+      const trendable = fall.filter(r => r.trend && r.trend.ready).length;
 
       return e("div", null,
         e(SliceTabs, { page: "featurelist" }),
         e(AsOf, { generatedAt: d.generatedAt,
-          note: "Adoption is the share of the " + (frows[0] ? frows[0].liveOrgs : 0)
+          note: "Adoption is the share of the " + (fall[0] ? fall[0].liveOrgs : 0)
               + " organizations live on rec.us \u2014 pre-launch orgs have configured almost "
               + "nothing, and counting them makes every feature look unpopular" }),
 
         e("div", { className: "cards" },
-          e("div", { className: "card ringcard", "data-feat-fcount": frows.length,
+          e("div", { className: "card ringcard", "data-feat-fcount": fall.length,
                      title: "Features this page is counting, after the settings" },
             e(Ring, { pct: allMeasured.length ? (shown.length / allMeasured.length) * 100 : null,
-                      color: "#0f6f5c", label: "Features tracked: " + frows.length }),
+                      color: "#0f6f5c", label: "Features tracked: " + fall.length }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Features tracked"),
-              e("div", { className: "v" }, frows.length),
+              e("div", { className: "v" }, fall.length),
               e("div", { className: "d" }, hidden.size ? hidden.size + " hidden by settings"
                                                        : allMeasured.length + " of " + total + " in the catalog"))),
           e("div", { className: "card ringcard", "data-feat-fmedian": median == null ? "" : median,
@@ -2449,7 +2492,7 @@
               e("span", { style: { color: "#94a3b8", fontWeight: 400 } }, "  \u00b7  "),
               e("span", { style: { color: up || down ? "#dc2626" : "#94a3b8" } }, "\u25bc " + down)),
             e("div", { className: "d" }, trendable
-              ? trendable + " of " + frows.length + " have enough history to say"
+              ? trendable + " of " + fall.length + " have enough history to say"
               : "no feature has two comparable measurements yet"))),
 
         (excluded.size || hidden.size) ? e("div", { className: "note", "data-feat-fscopenote": 1 },
@@ -2466,6 +2509,20 @@
             e("button", { onClick: () => setShowSettings(true), "data-feat-gear": 1,
                           title: "Choose which features and organizations this page counts",
                           style: { float: "right", marginTop: -2 } }, "\u2699")),
+          e("div", { className: "filters" },
+            e("input", { type: "text", value: fq, "data-feat-fq": fq,
+              placeholder: "Search features \u2014 name, category or description\u2026",
+              onChange: ev => setFq(ev.target.value) }),
+            fq ? e("button", { onClick: () => setFq(""), "data-feat-fqclear": 1 }, "Clear") : null),
+          /* WHAT THE SEARCH DID, stated. A table that silently went from 60
+             rows to 1 looks like a broken page, and a reader who cannot see
+             that the list is narrowed reads a match count as the fleet. */
+          fq ? e("div", { className: "qvnote", "data-feat-fqnote": frows.length },
+            e("b", null, "Search \u201c" + fq + "\u201d"), " \u00b7 ",
+            frows.length + " of " + fall.length + " feature" + (fall.length === 1 ? "" : "s"),
+            " \u00b7 matched on name, key, category and description \u00b7 ",
+            e("a", { href: "#", onClick: ev => { ev.preventDefault(); setFq(""); } },
+              "clear and go back to all " + fall.length)) : null,
           e("div", { className: "tablewrap stickywrap" },
             e("table", { className: "feattable" },
               e("thead", null, e("tr", null,
@@ -2502,8 +2559,14 @@
                   e("td", { className: "num", "data-feat-fall": r.all },
                     e("span", { className: "pill gpill", style: ofRatioHeat(r.pctAll) },
                       r.all + "/" + r.allOrgs))))))),
-          frows.length ? null : e("div", { className: "note" },
-            "Every measured feature is hidden by the settings, so there is nothing to rank.")),
+          frows.length ? null : e("div", { className: "note", "data-feat-fempty": fq || "none" },
+            /* TWO DIFFERENT EMPTIES. "Nothing matches your search" and "the
+               settings have hidden everything" have different fixes, and one
+               message for both sends the reader to the wrong control. */
+            fq ? e("span", null, "No feature matches \u201c", e("b", null, fq), "\u201d. ",
+                   e("a", { href: "#", onClick: ev => { ev.preventDefault(); setFq(""); } },
+                     "Clear the search"), " to see all " + fall.length + ".")
+               : "Every measured feature is hidden by the settings, so there is nothing to rank.")),
 
         showSettings ? e(FeatureSettings, {
           data: d, cfg,

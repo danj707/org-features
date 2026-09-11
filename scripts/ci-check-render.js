@@ -30,20 +30,30 @@ const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
+/* PUPPETEER IS A REAL devDependency NOW. It used not to be, and this block
+   carried two hand-written fallback paths to find a copy belonging to another
+   project on one machine - which is precisely why nobody noticed that CI
+   could not load it at all. Plain resolution, and the gate below. */
 let puppeteer;
 try { puppeteer = require("puppeteer"); }
-catch { /* resolved below */ }
-if (!puppeteer) {
-  for (const guess of ["/home/user/rental-report/node_modules/puppeteer",
-                       path.join(__dirname, "..", "node_modules", "puppeteer")]) {
-    try { puppeteer = require(guess); break; } catch { /* keep looking */ }
-  }
-}
-/* SKIPS WITH A MESSAGE, never passes silently. A render check that reports
+catch { /* handled below */ }
+/* SKIPS WITH A MESSAGE locally, and FAILS IN CI. A render check that reports
    success without having opened a browser is the warm-cache sign-off this
-   repo family already has a rule about. */
+   repo family already has a rule about - and that is exactly what the `render`
+   job did from the day it was written: the workflow installed a BROWSER
+   (`puppeteer browsers install chrome`) and never the LIBRARY, so every run
+   printed this line and exited 0. A green tick on a check that never ran is
+   worse than no check, because it is trusted. On a developer's machine a skip
+   is still the right answer; in CI it is the failure. */
 if (!puppeteer) {
-  console.log("⊘ ci-check-render.js SKIPPED — puppeteer is not installed. This check proves nothing without it.");
+  const msg = "ci-check-render.js could not load puppeteer.";
+  if (process.env.CI) {
+    console.error("✗ " + msg + " In CI this is a FAILURE, not a skip - "
+      + "add puppeteer to devDependencies so `npm ci` installs it. "
+      + "This check proves nothing without it.");
+    process.exit(1);
+  }
+  console.log("⊘ " + msg + " SKIPPED - this check proves nothing without it.");
   process.exit(0);
 }
 const EXECUTABLE = process.env.PUPPETEER_EXECUTABLE_PATH
@@ -400,6 +410,49 @@ const CASES = [
           fewest + " has " + pts(fewest) + " point(s), line=" + line(fewest) + " · "
           + most + " has " + pts(most) + ", line=" + line(most));
       });
+    } },
+  /* THE SEARCH MUST REACH FIELDS THAT ARE NOT ON SCREEN. "calendar" matching
+     Calendar Sync proves almost nothing — the name is right there. The
+     discriminating term is one that appears ONLY in the description, because
+     a box wired to the visible name renders identically and finds nothing.
+     And the KPI row above must NOT move, or the median becomes a different
+     statistic every keystroke. */
+  { name: "org features · the search reaches the description, and the KPIs do not move",
+    path: "/ps/feature", needs: '[data-rc-fsearch="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fq]");
+      const before = await pg.evaluate(() => ({
+        rows: document.querySelectorAll("[data-feat-frow]").length,
+        tracked: document.querySelector("[data-feat-fcount]").getAttribute("data-feat-fcount"),
+        median: document.querySelector("[data-feat-fmedian]").getAttribute("data-feat-fmedian"),
+      }));
+      await pg.type("[data-feat-fq]", "outlook");
+      await pg.waitForFunction(() =>
+        document.querySelector("[data-feat-fqnote]") !== null);
+      await pg.evaluate((b) => {
+        const keys = [...document.querySelectorAll("[data-feat-frow]")]
+          .map(t => t.getAttribute("data-feat-frow"));
+        const after = {
+          tracked: document.querySelector("[data-feat-fcount]").getAttribute("data-feat-fcount"),
+          median: document.querySelector("[data-feat-fmedian]").getAttribute("data-feat-fmedian"),
+        };
+        const good = b.rows > 20 && keys.length > 0 && keys.length < b.rows
+          && keys.indexOf("calendar_sync") >= 0
+          && after.tracked === b.tracked && after.median === b.median;
+        document.body.setAttribute("data-rc-fsearch", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fsearch-seen",
+          b.rows + " rows before, " + keys.length + " after (" + keys.join(",") + ")"
+          + ", tracked " + b.tracked + "→" + after.tracked
+          + ", median " + b.median + "→" + after.median);
+      }, before);
+    } },
+  /* A SEARCH THAT MATCHES NOTHING IS ITS OWN EMPTY STATE, naming the query,
+     rather than the settings message — the two have different fixes. */
+  { name: "org features · a search matching nothing says which search",
+    path: "/ps/feature", needs: '[data-feat-fempty="zzzznotafeature"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fq]");
+      await pg.type("[data-feat-fq]", "zzzznotafeature");
     } },
   { name: "org features · the slice tabs link the two views", path: "/ps/feature",
     needs: '[data-rc-fslicetab="1"]',
