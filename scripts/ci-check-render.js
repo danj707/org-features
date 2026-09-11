@@ -401,6 +401,49 @@ const CASES = [
           + most + " has " + pts(most) + ", line=" + line(most));
       });
     } },
+  /* THE SEARCH MUST REACH FIELDS THAT ARE NOT ON SCREEN. "calendar" matching
+     Calendar Sync proves almost nothing — the name is right there. The
+     discriminating term is one that appears ONLY in the description, because
+     a box wired to the visible name renders identically and finds nothing.
+     And the KPI row above must NOT move, or the median becomes a different
+     statistic every keystroke. */
+  { name: "org features · the search reaches the description, and the KPIs do not move",
+    path: "/ps/feature", needs: '[data-rc-fsearch="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fq]");
+      const before = await pg.evaluate(() => ({
+        rows: document.querySelectorAll("[data-feat-frow]").length,
+        tracked: document.querySelector("[data-feat-fcount]").getAttribute("data-feat-fcount"),
+        median: document.querySelector("[data-feat-fmedian]").getAttribute("data-feat-fmedian"),
+      }));
+      await pg.type("[data-feat-fq]", "outlook");
+      await pg.waitForFunction(() =>
+        document.querySelector("[data-feat-fqnote]") !== null);
+      await pg.evaluate((b) => {
+        const keys = [...document.querySelectorAll("[data-feat-frow]")]
+          .map(t => t.getAttribute("data-feat-frow"));
+        const after = {
+          tracked: document.querySelector("[data-feat-fcount]").getAttribute("data-feat-fcount"),
+          median: document.querySelector("[data-feat-fmedian]").getAttribute("data-feat-fmedian"),
+        };
+        const good = b.rows > 20 && keys.length > 0 && keys.length < b.rows
+          && keys.indexOf("calendar_sync") >= 0
+          && after.tracked === b.tracked && after.median === b.median;
+        document.body.setAttribute("data-rc-fsearch", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fsearch-seen",
+          b.rows + " rows before, " + keys.length + " after (" + keys.join(",") + ")"
+          + ", tracked " + b.tracked + "→" + after.tracked
+          + ", median " + b.median + "→" + after.median);
+      }, before);
+    } },
+  /* A SEARCH THAT MATCHES NOTHING IS ITS OWN EMPTY STATE, naming the query,
+     rather than the settings message — the two have different fixes. */
+  { name: "org features · a search matching nothing says which search",
+    path: "/ps/feature", needs: '[data-feat-fempty="zzzznotafeature"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fq]");
+      await pg.type("[data-feat-fq]", "zzzznotafeature");
+    } },
   { name: "org features · the slice tabs link the two views", path: "/ps/feature",
     needs: '[data-rc-fslicetab="1"]',
     act: async (pg) => {

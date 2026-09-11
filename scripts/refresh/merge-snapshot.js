@@ -92,6 +92,9 @@ const ADOPTION_KEYS = [
   "alternate_identities",
   "crm_household_notes",
   "calendar_sync",
+  "payment_plan_autopay",
+  "marketing_email",
+  "automated_waitlist",
 ];
 
 const TEMPLATES = {
@@ -160,6 +163,11 @@ const TEMPLATES = {
   // using this have exactly one connected calendar — "1 calendars synced"
   // would be the commonest reading of this cell rather than an edge case.
   calendar_sync: n => `${fmt(n)} calendar${n === 1 ? "" : "s"} synced`,
+  payment_plan_autopay: n => `${fmt(n)} plans on auto-pay`,
+  // "marketing emails", never "emails" — the whole point of this metric is
+  // that it is NOT the 90%-of-the-fleet transactional figure beside it.
+  marketing_email: n => `${fmt(n)} marketing emails sent`,
+  automated_waitlist: n => `${fmt(n)} sections on an automated waitlist`,
 };
 
 

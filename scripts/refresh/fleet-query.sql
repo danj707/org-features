@@ -72,6 +72,35 @@
 --                       a default window, so this is a structural fact rather
 --                       than a differentiator. Kept because it is a real
 --                       catalog feature and the page can hide it.
+--   payment_plan_autopay  NOT payment_plan_autopay_attempt. That table holds
+--                       115 successful charges across FOUR orgs, because it
+--                       records whether an installment date has come round
+--                       yet rather than whether anyone configured this — it
+--                       would report 4 where 17 have set it up. Also NOT the
+--                       same question as auto_renew_memberships, which is
+--                       group_schema.auto_renewal on a membership plan (16
+--                       orgs). autopay_enabled is never NULL (0 of 40,110),
+--                       so there is no absent-versus-false ambiguity here.
+--                       Worth knowing when reading it: require_autopay is
+--                       true on 8,611 of the 8,622, so these are
+--                       org-MANDATED rather than household-chosen, and 1,507
+--                       across 14 orgs carry no saved card yet.
+--   marketing_email     DELIBERATELY NOT email_messaging. That metric counts
+--                       every message_delivery on the email channel and
+--                       reaches 90% of live orgs because it is dominated by
+--                       transactional mail the platform sends by itself —
+--                       receipts, reminders, confirmations. message.type
+--                       separates them: 9,993 'transaction' across 79 orgs
+--                       against 699 'marketing' across 42. The channel is
+--                       filtered too, because a marketing SMS carries the
+--                       same type on a different channel (45 rows).
+--   automated_waitlist  DELIBERATELY NOT waitlist. That metric counts any
+--                       waitlist_config at all and reaches 82% of live orgs;
+--                       the split is 32,220 'manual' sections against SIXTEEN
+--                       'automated' ones, at 2 orgs, NEITHER of them live. So
+--                       this reads 0% of the live fleet — which is the honest
+--                       answer about a feature nobody has switched on yet,
+--                       not a broken filter.
 --   calendar_sync       THE ONLY ORG-SCOPED SIGNAL IS saved_filter_view.
 --                       `oauth_connection` has NO organization_id, and
 --                       resolving it through organization_association gives
@@ -202,7 +231,10 @@ SELECT json_agg(json_build_array(
     'custom_staff_roles', COALESCE(a_custom_staff_roles.n,0),
     'alternate_identities', COALESCE(a_alternate_identities.n,0),
     'crm_household_notes', COALESCE(a_crm_household_notes.n,0),
-    'calendar_sync', COALESCE(a_calendar_sync.n,0)
+    'calendar_sync', COALESCE(a_calendar_sync.n,0),
+    'payment_plan_autopay', COALESCE(a_payment_plan_autopay.n,0),
+    'marketing_email', COALESCE(a_marketing_email.n,0),
+    'automated_waitlist', COALESCE(a_automated_waitlist.n,0)
   )
   )::json
 ) ORDER BY o.slug)::text AS payload
@@ -270,3 +302,6 @@ LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM organization_role WH
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM user_alternate_identity GROUP BY 1) a_alternate_identities ON a_alternate_identities.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM household_note GROUP BY 1) a_crm_household_notes ON a_crm_household_notes.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM saved_filter_view WHERE oauth_connection_id IS NOT NULL OR last_synced_at IS NOT NULL GROUP BY 1) a_calendar_sync ON a_calendar_sync.oid=o.id
+LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM payment_plan WHERE autopay_enabled GROUP BY 1) a_payment_plan_autopay ON a_payment_plan_autopay.oid=o.id
+LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM message WHERE deleted_at IS NULL AND type='marketing' AND channel='email' GROUP BY 1) a_marketing_email ON a_marketing_email.oid=o.id
+LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM section WHERE deleted_at IS NULL AND waitlist_config ->> 'type' = 'automated' GROUP BY 1) a_automated_waitlist ON a_automated_waitlist.oid=o.id

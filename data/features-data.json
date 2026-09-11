@@ -2333,6 +2333,17 @@
       "why": "Captures demand you would otherwise lose. A full section with a waitlist tells you what to open next; a full section without one just turns people away."
     },
     {
+      "key": "automated_waitlist",
+      "name": "Automated Waitlists",
+      "category": "Registration & Eligibility",
+      "description": "Letting the platform offer an open spot to the next person on the waitlist by itself, rather than staff working down the list by phone.",
+      "signal": "section.waitlist_config ->> 'type' = 'automated'; the only other value the key takes is 'manual'",
+      "adoption_definition": "Has at least one section whose waitlist is configured as automated. SEPARATE from Section Waitlists, which counts any waitlist_config at all and reaches 82% of live organizations — that figure is 32,220 'manual' sections against SIXTEEN 'automated' ones. Measured 2026-09-11 the automated type exists at 2 organizations and NEITHER is live on rec.us, so this reads 0% of the live fleet. That is the honest answer about something nobody has switched on yet rather than a broken filter, and it is exactly the reading the combined 82% hides.",
+      "measure_question": "How many sections has this organization configured with an automated waitlist?",
+      "short": "Auto Waitlist",
+      "why": "Working a waitlist by phone is how an open spot goes unfilled. Offering it automatically fills the place while the family is still interested."
+    },
+    {
       "key": "required_participant_info",
       "name": "Required Participant Info",
       "category": "Registration & Eligibility",
@@ -2694,6 +2705,17 @@
       "why": "Fills programs you have already built. Reaching last season's participants is the cheapest registration you will ever get."
     },
     {
+      "key": "marketing_email",
+      "name": "Marketing Email Campaigns",
+      "category": "Communications",
+      "description": "Sending promotional email to a list — a season announcement, a campaign, a win-back — as distinct from the receipts and reminders the platform sends on its own.",
+      "signal": "message.type = 'marketing' AND message.channel = 'email', excluding deleted rows. message.type holds 'marketing' or 'transaction'; message.channel holds 'email' or 'sms'",
+      "adoption_definition": "Has sent at least one email whose type is 'marketing'. DELIBERATELY SEPARATE from Email Messaging, which counts every delivery on the email channel and reaches 90% of live organizations because it is dominated by transactional mail the platform sends by itself — receipts, reminders, confirmations. Marketing email is something a person chose to do: 699 messages across 42 organizations, against 9,993 transactional ones across 79. The channel is filtered as well, because a marketing SMS carries the same type value on a different channel (45 rows).",
+      "measure_question": "How many marketing emails has this organization sent?",
+      "short": "Marketing Email",
+      "why": "A department that can announce its own season fills it. Without this the only mail a resident ever gets is a receipt for something they already bought."
+    },
+    {
       "key": "custom_email_domains",
       "name": "Custom Sending Email Domains",
       "category": "Settings & Configuration",
@@ -2793,6 +2815,17 @@
       "adoption_definition": "Has >=1 note recorded against a household. Gated in the product by organization_role.can_manage_crm. Measured 2026-09-07: 55 of 73 launched orgs (69 of 144 including unlaunched), 5,850 in total.",
       "measure_question": "How many household notes has this organization's staff created, and how many households are associated with the organization?",
       "why": "Keeps the history of a family in one place, so whoever picks up the phone next already knows the context."
+    },
+    {
+      "key": "payment_plan_autopay",
+      "name": "Payment Plan Auto-Pay",
+      "category": "Payments & Pricing",
+      "description": "Charging a saved card automatically on each installment date of a payment plan, instead of waiting for the customer to pay every one by hand.",
+      "signal": "payment_plan.autopay_enabled (boolean, never null across 40,110 rows), with payment_plan.require_autopay saying the organization mandated it and payment_plan.autopay_payment_method_id saying a card is actually attached; payment_plan_autopay_attempt.status records what happened when a charge fell due",
+      "adoption_definition": "Has at least one payment plan with autopay_enabled. NOT measured through payment_plan_autopay_attempt, which holds 115 successful charges across only 4 organizations: that records whether an installment date has come round yet rather than whether anyone configured this, and would report 4 where 17 have set it up. Also NOT the same question as Auto-Renewing Memberships, which is group_schema.auto_renewal on a membership plan (16 organizations) rather than an installment schedule. Two things worth knowing when reading the count: require_autopay is true on 8,611 of the 8,622 plans, so these are overwhelmingly organization-mandated rather than household-chosen, and 1,507 of them across 14 organizations carry no saved card yet.",
+      "measure_question": "How many payment plans has this organization set to charge automatically?",
+      "short": "Auto-Pay",
+      "why": "An installment nobody has to remember to pay is an installment that gets paid. It is the difference between chasing a balance every month and simply collecting it."
     },
     {
       "key": "calendar_sync",
@@ -3136,6 +3169,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "allegheny-county": {
@@ -3420,6 +3468,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -3710,6 +3773,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 7682,
+        "detail": "7,682 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 84,
+        "detail": "84 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "barrie": {
@@ -3994,6 +4072,21 @@
         "detail": "2 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4284,6 +4377,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "bellflower": {
@@ -4568,6 +4676,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4858,6 +4981,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "braintree": {
@@ -5142,6 +5280,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -5432,6 +5585,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "carmichael-district": {
@@ -5716,6 +5884,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -6006,6 +6189,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "chicago-park-district-golf": {
@@ -6290,6 +6488,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -6580,6 +6793,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 24,
+        "detail": "24 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-aspen": {
@@ -6864,6 +7092,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -7154,6 +7397,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-battle-ground": {
@@ -7438,6 +7696,21 @@
         "detail": "5 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -7728,6 +8001,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-belton": {
@@ -8015,6 +8303,21 @@
         "adopted": true,
         "count": 3,
         "detail": "3 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-bloomington": {
@@ -8302,6 +8605,21 @@
         "adopted": true,
         "count": 11,
         "detail": "11 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-boerne": {
@@ -8586,6 +8904,21 @@
         "detail": "3 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -8876,6 +9209,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-buffalo": {
@@ -9163,6 +9511,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-calabasas": {
@@ -9447,6 +9810,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -9737,6 +10115,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-duarte": {
@@ -10021,6 +10414,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -10311,6 +10719,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-euclid": {
@@ -10598,6 +11021,21 @@
         "adopted": true,
         "count": 3,
         "detail": "3 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-goodyear": {
@@ -10882,6 +11320,21 @@
         "detail": "1 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -11172,6 +11625,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-indianapolis": {
@@ -11456,6 +11924,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -11746,6 +12229,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-joplin": {
@@ -12030,6 +12528,21 @@
         "detail": "10 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -12320,6 +12833,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-las-vegas": {
@@ -12604,6 +13132,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -12894,6 +13437,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lewisburg": {
@@ -13178,6 +13736,21 @@
         "detail": "10 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -13468,6 +14041,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lodi": {
@@ -13752,6 +14340,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -14042,6 +14645,21 @@
         "adopted": true,
         "count": 3,
         "detail": "3 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-madison": {
@@ -14326,6 +14944,21 @@
         "detail": "24 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -14616,6 +15249,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-medford": {
@@ -14900,6 +15548,21 @@
         "detail": "2 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -15190,6 +15853,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 61,
+        "detail": "61 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-miamisburg": {
@@ -15474,6 +16152,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -15764,6 +16457,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-milford": {
@@ -16048,6 +16756,21 @@
         "detail": "1 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -16338,6 +17061,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-nashville": {
@@ -16622,6 +17360,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -16912,6 +17665,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-niagara-falls": {
@@ -17199,6 +17967,21 @@
         "adopted": true,
         "count": 10,
         "detail": "10 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 154,
+        "detail": "154 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 59,
+        "detail": "59 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": true,
+        "count": 15,
+        "detail": "15 sections on an automated waitlist"
       }
     },
     "city-of-norman": {
@@ -17483,6 +18266,21 @@
         "detail": "58 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 58,
+        "detail": "58 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -17773,6 +18571,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-orinda": {
@@ -18057,6 +18870,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -18347,6 +19175,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-pawnee": {
@@ -18634,6 +19477,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 17,
+        "detail": "17 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections on an automated waitlist"
       }
     },
     "city-of-pflugerville": {
@@ -18918,6 +19776,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -19208,6 +20081,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 26,
+        "detail": "26 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-pleasant-hill": {
@@ -19492,6 +20380,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -19782,6 +20685,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-santa-cruz": {
@@ -20066,6 +20984,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -20356,6 +21289,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-stanwood": {
@@ -20640,6 +21588,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -20930,6 +21893,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-tullahoma": {
@@ -21214,6 +22192,21 @@
         "detail": "588 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -21504,6 +22497,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-watsonville": {
@@ -21788,6 +22796,21 @@
         "detail": "1 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -22078,6 +23101,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 107,
+        "detail": "107 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-west-linn": {
@@ -22362,6 +23400,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -22652,6 +23705,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 14,
+        "detail": "14 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "clark-county": {
@@ -22936,6 +24004,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -23226,6 +24309,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "concord-township": {
@@ -23510,6 +24608,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -23800,6 +24913,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "d4cprs": {
@@ -24084,6 +25212,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -24374,6 +25517,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 6,
+        "detail": "6 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "el-segundo-recreation": {
@@ -24658,6 +25816,21 @@
         "detail": "95 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -24948,6 +26121,21 @@
         "adopted": true,
         "count": 5,
         "detail": "5 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 25,
+        "detail": "25 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "essex-junction": {
@@ -25232,6 +26420,21 @@
         "detail": "7 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 741,
+        "detail": "741 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -25522,6 +26725,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "folsom": {
@@ -25806,6 +27024,21 @@
         "detail": "3 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -26096,6 +27329,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "glenview-park-district": {
@@ -26380,6 +27628,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -26670,6 +27933,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "hammond-area-recreation-district": {
@@ -26954,6 +28232,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -27244,6 +28537,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "indy-parks--recreation": {
@@ -27528,6 +28836,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -27818,6 +29141,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "iv2pp-on": {
@@ -28102,6 +29440,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -28392,6 +29745,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "jurupa-area-recreation-and-park-district": {
@@ -28679,6 +30047,21 @@
         "adopted": true,
         "count": 2,
         "detail": "2 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "laguna-beach": {
@@ -28963,6 +30346,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -29253,6 +30651,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "lincoln": {
@@ -29537,6 +30950,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -29827,6 +31255,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "maple-grove": {
@@ -30111,6 +31554,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -30401,6 +31859,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mashantucket-pequot-tribal-nation": {
@@ -30685,6 +32158,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -30975,6 +32463,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mission-oaks-rpd": {
@@ -31259,6 +32762,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -31549,6 +33067,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 8,
+        "detail": "8 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "norris": {
@@ -31833,6 +33366,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -32123,6 +33671,21 @@
         "adopted": true,
         "count": 3,
         "detail": "3 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "north-logan": {
@@ -32407,6 +33970,21 @@
         "detail": "3 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -32697,6 +34275,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "oro-valley": {
@@ -32981,6 +34574,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -33271,6 +34879,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "pittsburg": {
@@ -33555,6 +35178,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -33845,6 +35483,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "prescott-valley": {
@@ -34129,6 +35782,21 @@
         "detail": "76 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -34419,6 +36087,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "putnam-county": {
@@ -34706,6 +36389,21 @@
         "adopted": true,
         "count": 2,
         "detail": "2 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rec-demo-org": {
@@ -34990,6 +36688,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -35280,6 +36993,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rec-mountain": {
@@ -35564,6 +37292,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -35854,6 +37597,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rec-staging": {
@@ -36138,6 +37896,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -36428,6 +38201,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "redwood-city": {
@@ -36712,6 +38500,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -37002,6 +38805,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sacramento-county": {
@@ -37289,6 +39107,21 @@
         "adopted": true,
         "count": 2,
         "detail": "2 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "san-francisco-rec-park": {
@@ -37573,6 +39406,21 @@
         "detail": "36 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -37863,6 +39711,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "scotts-valley": {
@@ -38147,6 +40010,21 @@
         "detail": "1 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -38437,6 +40315,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "suffolk-parks-and-recreation": {
@@ -38721,6 +40614,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -39011,6 +40919,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sunrise-rpd": {
@@ -39295,6 +41218,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -39585,6 +41523,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "the-ranch": {
@@ -39869,6 +41822,21 @@
         "detail": "37 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 48,
+        "detail": "48 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -40159,6 +42127,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-clarkstown": {
@@ -40443,6 +42426,21 @@
         "detail": "69 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -40733,6 +42731,21 @@
         "adopted": true,
         "count": 2,
         "detail": "2 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 plans on auto-pay"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-corte-madera": {
@@ -41017,6 +43030,21 @@
         "detail": "2 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -41307,6 +43335,21 @@
         "adopted": true,
         "count": 2,
         "detail": "2 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 9,
+        "detail": "9 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-reading": {
@@ -41591,6 +43634,21 @@
         "detail": "210 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -41881,6 +43939,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-taylor": {
@@ -42165,6 +44238,21 @@
         "detail": "7 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 marketing emails sent"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -42455,6 +44543,21 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-wellesley-old": {
@@ -42739,6 +44842,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -43029,6 +45147,21 @@
         "adopted": true,
         "count": 5,
         "detail": "5 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 42,
+        "detail": "42 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "upson-county": {
@@ -43313,6 +45446,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -43603,6 +45751,21 @@
         "adopted": true,
         "count": 3,
         "detail": "3 calendars synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 4,
+        "detail": "4 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "woodmen-hills-metro-district": {
@@ -43887,6 +46050,21 @@
         "detail": "1 household notes"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -44177,6 +46355,21 @@
         "adopted": true,
         "count": 1,
         "detail": "1 calendar synced"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 marketing emails sent"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "zzzarchivenorthern-door-sports-and-recreation": {
@@ -44461,6 +46654,21 @@
         "detail": "Not using"
       },
       "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -44751,10 +46959,25 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     }
   },
-  "notes": "57 of 58 catalog features measured, re-baked 2026-09-10 from the production read replica via scripts/refresh/fleet-query.sql; calendar_sync was measured 2026-09-11 and folded in ahead of the next bake. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 146 organizations are live on rec.us.",
+  "notes": "60 of 61 catalog features measured, re-baked 2026-09-11 from the production read replica via scripts/refresh/fleet-query.sql; calendar_sync, payment_plan_autopay, marketing_email and automated_waitlist were measured 2026-09-11 and folded in ahead of the next bake. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 146 organizations are live on rec.us.",
   "measuredFeatures": [
     "age_eligibility",
     "waitlist",
@@ -44812,7 +47035,10 @@
     "custom_staff_roles",
     "alternate_identities",
     "crm_household_notes",
-    "calendar_sync"
+    "calendar_sync",
+    "payment_plan_autopay",
+    "marketing_email",
+    "automated_waitlist"
   ],
   "history": [
     {
@@ -45896,155 +48122,155 @@
     },
     {
       "date": "2026-09-11",
-      "setKey": "57:4xkh1v",
-      "measured": 57,
+      "setKey": "60:14h8gt2",
+      "measured": 60,
       "scores": {
-        "aardvark-city": 4,
+        "aardvark-city": 3,
         "allegheny-county": 5,
-        "apex-park-and-recreation-district": 88,
-        "barrie": 32,
+        "apex-park-and-recreation-district": 87,
+        "barrie": 30,
         "barton-springs": 18,
-        "bellflower": 4,
-        "boston-bcyf": 40,
-        "braintree": 28,
-        "brookline-recreation": 14,
+        "bellflower": 3,
+        "boston-bcyf": 38,
+        "braintree": 27,
+        "brookline-recreation": 13,
         "carmichael-district": 7,
-        "central-point-recreation": 49,
+        "central-point-recreation": 47,
         "chicago-park-district-golf": 7,
-        "chicorec": 72,
-        "city-of-aspen": 19,
+        "chicorec": 70,
+        "city-of-aspen": 18,
         "city-of-ball-ground": 5,
-        "city-of-battle-ground": 25,
-        "city-of-belmont": 11,
-        "city-of-belton": 65,
-        "city-of-bloomington": 54,
-        "city-of-boerne": 61,
-        "city-of-brisbane": 25,
-        "city-of-buffalo": 61,
-        "city-of-calabasas": 4,
-        "city-of-cedar-rapids": 23,
-        "city-of-duarte": 35,
-        "city-of-easton": 44,
-        "city-of-euclid": 65,
-        "city-of-goodyear": 46,
+        "city-of-battle-ground": 23,
+        "city-of-belmont": 10,
+        "city-of-belton": 63,
+        "city-of-bloomington": 52,
+        "city-of-boerne": 60,
+        "city-of-brisbane": 23,
+        "city-of-buffalo": 60,
+        "city-of-calabasas": 3,
+        "city-of-cedar-rapids": 22,
+        "city-of-duarte": 33,
+        "city-of-easton": 42,
+        "city-of-euclid": 63,
+        "city-of-goodyear": 43,
         "city-of-hermosa-beach": 72,
-        "city-of-indianapolis": 4,
-        "city-of-jeffersonville": 67,
-        "city-of-joplin": 54,
-        "city-of-lakeland": 51,
-        "city-of-las-vegas": 19,
-        "city-of-league-city": 19,
-        "city-of-lewisburg": 60,
-        "city-of-lockhart": 14,
+        "city-of-indianapolis": 3,
+        "city-of-jeffersonville": 63,
+        "city-of-joplin": 52,
+        "city-of-lakeland": 50,
+        "city-of-las-vegas": 18,
+        "city-of-league-city": 18,
+        "city-of-lewisburg": 57,
+        "city-of-lockhart": 13,
         "city-of-lodi": 0,
         "city-of-madeira-beach": 42,
-        "city-of-madison": 58,
-        "city-of-malibu": 56,
-        "city-of-medford": 23,
+        "city-of-madison": 57,
+        "city-of-malibu": 55,
+        "city-of-medford": 22,
         "city-of-menifee": 60,
         "city-of-miamisburg": 12,
-        "city-of-midland": 60,
-        "city-of-milford": 12,
+        "city-of-midland": 57,
+        "city-of-milford": 13,
         "city-of-mountain-view": 12,
-        "city-of-nashville": 21,
-        "city-of-natchez": 47,
-        "city-of-niagara-falls": 96,
-        "city-of-norman": 82,
+        "city-of-nashville": 20,
+        "city-of-natchez": 45,
+        "city-of-niagara-falls": 97,
+        "city-of-norman": 80,
         "city-of-oakland": 0,
         "city-of-orinda": 0,
-        "city-of-palm-springs": 14,
-        "city-of-pawnee": 91,
+        "city-of-palm-springs": 13,
+        "city-of-pawnee": 90,
         "city-of-pflugerville": 0,
-        "city-of-piedmont": 65,
+        "city-of-piedmont": 63,
         "city-of-pleasant-hill": 0,
         "city-of-san-francisco": 7,
         "city-of-santa-cruz": 0,
-        "city-of-smyrna": 81,
-        "city-of-stanwood": 11,
-        "city-of-torrance": 74,
+        "city-of-smyrna": 80,
+        "city-of-stanwood": 10,
+        "city-of-torrance": 72,
         "city-of-tullahoma": 58,
         "city-of-university-park": 12,
-        "city-of-watsonville": 28,
-        "city-of-west-haven": 67,
-        "city-of-west-linn": 25,
-        "city-of-west-sacramento": 81,
+        "city-of-watsonville": 27,
+        "city-of-west-haven": 65,
+        "city-of-west-linn": 23,
+        "city-of-west-sacramento": 80,
         "clark-county": 0,
         "coab-recreation": 5,
         "concord-township": 0,
-        "conference": 30,
+        "conference": 28,
         "d4cprs": 2,
         "douglas-county-nv": 75,
         "el-segundo-recreation": 68,
-        "emeryville": 74,
-        "essex-junction": 61,
-        "fairfax-county": 74,
-        "folsom": 28,
-        "foster-city": 23,
+        "emeryville": 72,
+        "essex-junction": 60,
+        "fairfax-county": 72,
+        "folsom": 27,
+        "foster-city": 22,
         "glenview-park-district": 2,
-        "golden-gate-village": 11,
-        "hammond-area-recreation-district": 18,
-        "haverford-township": 54,
-        "indy-parks--recreation": 40,
-        "iv2pp-off": 19,
-        "iv2pp-on": 26,
+        "golden-gate-village": 10,
+        "hammond-area-recreation-district": 17,
+        "haverford-township": 53,
+        "indy-parks--recreation": 38,
+        "iv2pp-off": 18,
+        "iv2pp-on": 25,
         "jasons-sanbox": 0,
-        "jurupa-area-recreation-and-park-district": 75,
+        "jurupa-area-recreation-and-park-district": 73,
         "laguna-beach": 2,
-        "lake-county": 30,
-        "lincoln": 30,
-        "littleton": 58,
-        "maple-grove": 4,
-        "marin-county-parks": 25,
-        "mashantucket-pequot-tribal-nation": 37,
-        "mesa": 9,
-        "mission-oaks-rpd": 19,
-        "needham": 44,
-        "norris": 19,
-        "northern-door-sports-and-recreation": 61,
-        "north-logan": 44,
+        "lake-county": 28,
+        "lincoln": 28,
+        "littleton": 57,
+        "maple-grove": 3,
+        "marin-county-parks": 23,
+        "mashantucket-pequot-tribal-nation": 35,
+        "mesa": 8,
+        "mission-oaks-rpd": 18,
+        "needham": 45,
+        "norris": 18,
+        "northern-door-sports-and-recreation": 60,
+        "north-logan": 42,
         "orangevale-recreation--park-district": 0,
-        "oro-valley": 33,
-        "paradise-recreation-and-park-district": 63,
-        "pittsburg": 14,
-        "pleasant-hill": 51,
-        "prescott-valley": 61,
-        "pueblo-county": 58,
-        "putnam-county": 44,
-        "rec-demo-org": 11,
+        "oro-valley": 32,
+        "paradise-recreation-and-park-district": 62,
+        "pittsburg": 13,
+        "pleasant-hill": 50,
+        "prescott-valley": 60,
+        "pueblo-county": 57,
+        "putnam-county": 43,
+        "rec-demo-org": 10,
         "rec-east-bay": 0,
-        "rec-mountain": 19,
+        "rec-mountain": 18,
         "RecSF": 32,
         "rec-staging": 5,
-        "rec-university": 49,
+        "rec-university": 47,
         "redwood-city": 5,
-        "rocklin": 30,
-        "sacramento-county": 54,
-        "san-francisco-rec-park": 39,
-        "santacruzcounty": 46,
+        "rocklin": 28,
+        "sacramento-county": 52,
+        "san-francisco-rec-park": 38,
+        "santacruzcounty": 43,
         "scotts-valley": 30,
-        "sebastopol": 46,
-        "suffolk-parks-and-recreation": 32,
-        "sunrise-pickleball-club": 21,
-        "sunrise-rpd": 16,
-        "the-dance-palace": 40,
-        "the-ranch": 58,
+        "sebastopol": 43,
+        "suffolk-parks-and-recreation": 30,
+        "sunrise-pickleball-club": 20,
+        "sunrise-rpd": 15,
+        "the-dance-palace": 38,
+        "the-ranch": 57,
         "torranceca": 5,
-        "town-of-clarkstown": 65,
-        "town-of-clarksville": 68,
-        "town-of-corte-madera": 14,
-        "town-of-danvers": 74,
-        "town-of-reading": 46,
-        "town-of-shrewsbury": 67,
-        "town-of-taylor": 51,
+        "town-of-clarkstown": 63,
+        "town-of-clarksville": 67,
+        "town-of-corte-madera": 13,
+        "town-of-danvers": 72,
+        "town-of-reading": 43,
+        "town-of-shrewsbury": 63,
+        "town-of-taylor": 50,
         "town-of-wellesley": 2,
         "town-of-wellesley-old": 7,
-        "town-of-windham": 82,
+        "town-of-windham": 80,
         "upson-county": 7,
-        "watertown": 74,
-        "woodmen-hills-metro-district": 49,
-        "yerba-buena-gardens": 58,
+        "watertown": 72,
+        "woodmen-hills-metro-district": 47,
+        "yerba-buena-gardens": 57,
         "zzzarchivenorthern-door-sports-and-recreation": 0,
-        "zzzyerba-buena-gardens": 4
+        "zzzyerba-buena-gardens": 3
       },
       "orgs": 146,
       "liveOrgs": 73,
@@ -46105,7 +48331,10 @@
         "custom_staff_roles": 45,
         "alternate_identities": 23,
         "crm_household_notes": 55,
-        "calendar_sync": 18
+        "calendar_sync": 18,
+        "payment_plan_autopay": 16,
+        "marketing_email": 34,
+        "automated_waitlist": 0
       },
       "featureAll": {
         "age_eligibility": 86,
@@ -46164,7 +48393,10 @@
         "custom_staff_roles": 62,
         "alternate_identities": 25,
         "crm_household_notes": 69,
-        "calendar_sync": 20
+        "calendar_sync": 20,
+        "payment_plan_autopay": 17,
+        "marketing_email": 42,
+        "automated_waitlist": 2
       }
     }
   ]

@@ -3,6 +3,18 @@
   "updates": [
     {
       "date": "2026-09-11",
+      "title": "Three features the catalog was reporting as something else",
+      "body": "Each of these was already inside a broader metric that read high and hid it. Auto-pay sat inside \"payment plans\", marketing email inside \"email\", automated waitlists inside \"waitlists\" — so the combined figure was true and the question underneath it was unanswerable. All three are now measured on their own, and one of the answers is zero.",
+      "items": [
+        "Payment plan auto-pay — 17 organizations, 16 of them live (22%). It is a subset of the 30-odd offering payment plans at all. Measured on the plan's own setting rather than on charge attempts, which only record whether an installment date has come round: that route would have reported four.",
+        "These plans are overwhelmingly organization-MANDATED rather than household-chosen — 8,611 of 8,622 require auto-pay to enroll — so this is a policy setting, not an adoption rate among families.",
+        "Marketing email — 42 organizations, 34 live (47%), against 90% for email overall. The gap is transactional mail the platform sends by itself: 9,993 of those deliveries against 699 marketing ones. The channel is filtered as well as the type, because a marketing SMS carries the same type.",
+        "Automated waitlists — two organizations, neither of them live, so 0% adoption. The combined waitlist figure is 82% and is 32,220 sections on a MANUAL waitlist against sixteen on an automated one. That zero is the finding, not a broken filter.",
+        "A search box on the by-feature tab, matching the name, the key, the category and the description — so \"outlook\" finds Calendar Sync. The cards above it deliberately do not move: the median is a statistic about every tracked feature, not about whatever is on screen."
+      ]
+    },
+    {
+      "date": "2026-09-11",
       "title": "Adoption by feature — a second slice of Org Features",
       "body": "The report has always answered \"how much of the platform does this organization use\". It now also answers \"how far has this feature spread\", which is the same data transposed and a genuinely different question. Two tabs at the top switch between them.",
       "items": [

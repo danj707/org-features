@@ -84,7 +84,7 @@ const H = (() => {
       " ofGapClusters, GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN," +
       " GRADE_RAMP, GRADE_BASIS, ofGrade, ofGradeColor, ofDerive, ofFleetUse, ofRank," +
       " FEATURE_GRADE_RAMP, FEATURE_GRADE_BASIS, ofFeatureGrade, ofFeatureGradeColor," +
-      " ofFeatureTrend, ofFeatureRows, OF_SLICES," +
+      " ofFeatureTrend, ofFeatureRows, ofFeatureMatch, OF_SLICES," +
       " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell };")(EL);
   } catch (err) {
     LIFT_ERR = err;
@@ -99,7 +99,7 @@ const H = (() => {
              ofFleetUse: () => ({ liveOrgs: 0, used: {} }), ofRank: () => null,
              FEATURE_GRADE_RAMP: [], FEATURE_GRADE_BASIS: "", ofFeatureGrade: () => null,
              ofFeatureGradeColor: () => "", ofFeatureTrend: () => null,
-             ofFeatureRows: () => [], OF_SLICES: [],
+             ofFeatureRows: () => [], ofFeatureMatch: () => true, OF_SLICES: [],
              TREND_MIN_POINTS: 0, ofTrend: () => null, ofTrendLabel: () => null,
              ofTrendColor: () => "", Trendline: () => null, TrendCell: () => null };
   }
@@ -615,6 +615,39 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(rows.some(r => r.trend && r.trend.ready),
      "at least one feature has enough history to show a trend on the page today");
 
+  // ── THE SEARCH BOX ────────────────────────────────────────────────────
+  /* Dan: "we need a text search box here to focus on a feature, if I know the
+     name, like 'calendar', should match against everything that it filters
+     down on." LIFTED AND RUN, because "matches the name" and "matches every
+     field" render an identical box and differ only in what they find. */
+  {
+    const row = rows.find(r => r.key === "calendar_sync");
+    ok(row, "calendar sync is a feature row");
+    ok(H.ofFeatureMatch(row, "calendar"), "the name matches");
+    ok(H.ofFeatureMatch(row, "CALENDAR"), "...case-insensitively");
+    ok(H.ofFeatureMatch(row, "calendar_sync"), "the key matches");
+    ok(H.ofFeatureMatch(row, "integrations"), "the category matches");
+    ok(H.ofFeatureMatch(row, "outlook"),
+       "and so does the DESCRIPTION — searching the name alone would make half of these reads look like the feature is missing");
+    ok(H.ofFeatureMatch(row, ""), "an empty query matches everything rather than nothing");
+    ok(H.ofFeatureMatch(row, "   "), "...and so does whitespace");
+    ok(!H.ofFeatureMatch(row, "scholarship"), "an unrelated term does not match");
+    // AND over terms, in any order.
+    ok(H.ofFeatureMatch(row, "calendar outlook"), "multiple terms are ANDed");
+    ok(H.ofFeatureMatch(row, "outlook calendar"), "...in either order");
+    ok(!H.ofFeatureMatch(row, "calendar scholarship"), "...so one miss is a miss");
+    /* THE FIELDS ARE JOINED WITH A SEPARATOR NO QUERY CAN CONTAIN, or a term
+       could match across the boundary between two of them and find a row that
+       is neither thing. */
+    const fake = { key: "a", name: "Alpha", short: "", cat: "Beta", description: "" };
+    ok(!H.ofFeatureMatch(fake, "alphabeta"),
+       "a term cannot straddle two fields — the join separator is what stops it");
+    // Every row the table can show must be searchable by its own name.
+    const unfindable = rows.filter(r => !H.ofFeatureMatch(r, r.name.split(/\s+/)[0]));
+    eq(unfindable.length, 0,
+       "every feature is findable by the first word of its own name" + (unfindable.length ? " — " + unfindable[0].key : ""));
+  }
+
   // ── the slice, and one sorter behind both tables ──────────────────────
   eq(H.OF_SLICES.length, 2, "there are two slices of this dataset");
   ok(H.OF_SLICES.some(x => x.href === "/ps/features") && H.OF_SLICES.some(x => x.href === "/ps/feature"),
@@ -640,6 +673,18 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(/const \[fsort, setFsort\]/.test(feat),
      "the feature table keeps its own sort state — one shared state would carry a key the other table cannot resolve");
   ok(/"data-feat-frow"/.test(feat), "its rows are addressable");
+  ok(/"data-feat-fq"/.test(feat), "the search box is addressable");
+  ok(/fq \? fall\.filter\(r => ofFeatureMatch\(r, fq\)\) : fall/.test(feat),
+     "the table is filtered through the ONE predicate a spec can run");
+  /* THE KPI ROW READS THE UNFILTERED SET. A median that moved as you typed
+     would be a different statistic every keystroke, and "median adoption 25%"
+     over one matching row is not a median of anything. */
+  ok(/const pcts = fall\.map/.test(feat), "the median is taken over every tracked feature, not the search result");
+  ok(/"data-feat-fcount": fall\.length/.test(feat), "...and so is the features-tracked card");
+  ok(/"data-feat-fqnote"/.test(feat),
+     "a narrowed table says so — a list that silently went from 60 rows to 1 reads as a broken page");
+  ok(/"data-feat-fempty"/.test(feat) && /No feature matches/.test(feat),
+     "an empty search names the query rather than blaming the settings, which is a different fix");
   ok(/nav\("\/ps\/feature\/" \+ encodeURIComponent\(r\.key\)\)/.test(feat),
      "...and each row opens the organizations behind it");
   ok(/\^\\\/ps\\\/feature\\\/\(\.\+\)\$/.test(routeFn) && /=== "\/ps\/feature"/.test(routeFn),
