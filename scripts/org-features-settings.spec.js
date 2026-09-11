@@ -256,6 +256,19 @@ if (!SKIP_SOURCE) {
     eq(fu.liveOrgs, 2, "the denominator is LIVE organizations, not every org");
     eq(fu.used.a1, 1, "...and the numerator counts only the live ones that adopted it");
     eq(fu.used.e1, 0, "a feature nobody uses counts 0 rather than being absent");
+    /* AN EXPLICIT KEY LIST, so the per-feature page can ask about ONE feature
+       instead of doing 57 x 145 adoption lookups to answer a question about
+       one — and, more importantly, so it can ask about a feature the settings
+       have HIDDEN. A hidden key is not in `shown`, so the default would come
+       back undefined and render as a blank where a real count belongs, on a
+       page that is deliberately still reachable for exactly that feature. */
+    const hidA1 = H.ofDerive(D, { hiddenFeatures: ["a1"] });
+    ok(hidA1.shown.indexOf("a1") < 0, "the fixture's a1 really is hidden");
+    eq(H.ofFleetUse(D, hidA1).used.a1, undefined, "...so the default set does not compute it");
+    eq(H.ofFleetUse(D, hidA1, ["a1"]).used.a1, H.ofFleetUse(D, dv).used.a1,
+       "...and asking for it by name gives the same count the unhidden set would");
+    eq(H.ofFleetUse(D, exc, []).liveOrgs, H.ofFleetUse(D, exc).liveOrgs,
+       "the denominator is the live fleet whatever keys are asked for");
 
     /* RANK, NOT A GAP TO THE MEAN. And null where it would be noise. */
     eq(H.ofRank(D.orgs[3], dv), null, "a pre-launch org gets no rank against launched peers");
@@ -778,6 +791,10 @@ if (!SKIP_SOURCE) {
         it was unlabelled, so telling which box was which meant hovering. The
         row now carries what the columns CANNOT: which features are missing. */
   ok(/className: "gap-row"/.test(listPanel), "every org row is followed by its gap line");
+  /* LITERAL ON PURPOSE. Any later attribute that happens to start
+     `data-feat-fp` trips this, which is a nuisance exactly once and is worth
+     more than a cleverer pattern: the feature picker added in the same
+     change hit it and was renamed rather than this being loosened. */
   ok(!/fp-dot|fp-grp|data-feat-fp/.test(src),
      "the unreadable dot strip is gone, not merely hidden");
   ok(!/isOpen \?/.test(listPanel) && !/setOpen\(/.test(listPanel),
@@ -969,10 +986,29 @@ if (!SKIP_SOURCE) {
   ok(/featureorg: \["Org Features"/.test(src), "featureorg has a titles entry");
   ok(/"\/ps\/features\/:slug"/.test(server), "the server serves the drill-in path");
 
+  /* ── ONE FEATURE ACROSS EVERY ORGANIZATION ─────────────────────────────
+     A DIFFERENT PREFIX, not a path nested under /ps/features/. The drill-in
+     regex above already claims everything under that prefix, so a nested
+     spelling would make this a question of which regex is tested first — and
+     an ordering dependency between two routes is how one of them quietly
+     starts landing on the other's page. A separate prefix cannot collide at
+     all, which is why this asserts the SHAPE rather than the order. */
+  ok(/\^\\\/ps\\\/feature\\\/\(\.\+\)\$/.test(routeFn), "/ps/feature/<key> is parsed");
+  ok(!/\/ps\/features\/f\//.test(src),
+     "...and it is NOT nested under /ps/features/, where it would depend on regex order");
+  ok(/feature: \["Org Features"/.test(src), "the feature page has a titles entry");
+  ok(/"\/ps\/feature\/:key"/.test(server),
+     "the server serves it, or a refresh or a shared link is a hard 404");
+  ok(/r\.page === "feature" \? e\(Features, \{ featureKey: r\.key \}\)/.test(src),
+     "it renders through the SAME component, so the list, the drill-in and this page resolve one tracked set");
+
   // 10. THE DRILL-IN. One component owns the fetch and the settings, so the
   //     list and the detail cannot disagree about the tracked set.
-  ok(/function Features\(\{ slug \}\)/.test(feat), "the component takes the slug");
+  ok(/function Features\(\{ slug, featureKey \}\)/.test(feat),
+     "the component takes the org slug AND the feature key");
   ok(/if \(slug\) \{/.test(feat), "...and renders the drill-in from the same data");
+  ok(/if \(featureKey\) \{/.test(feat),
+     "...and the per-feature page too, so all three surfaces resolve ONE tracked set");
   ok((src.match(/fetch\("\/api\/org-features-settings"\)/g) || []).length === 1,
      "the settings are fetched in exactly ONE place");
   ok((src.match(/fetch\("\/api\/data"\)/g) || []).length === 1,
@@ -1033,7 +1069,7 @@ if (!SKIP_SOURCE) {
 {
   const Q = new Function(
     src.slice(src.indexOf("const OF_QUICK_VIEWS"), src.indexOf("function route()")) +
-    "; return { OF_QUICK_VIEWS, ofQuickView, ofApplyQuickView };")();
+    "; return { OF_QUICK_VIEWS, ofQuickView, ofApplyQuickView, ofFeatureViewId, ofFeatureViewKey };")();
   const snap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
   const measured = new Set(snap.measuredFeatures);
 
@@ -1114,8 +1150,8 @@ if (!SKIP_SOURCE) {
   ok(/ofApplyQuickView\(view, all\.filter/.test(feat),
      "the view is applied to the settings-scoped set, so it cannot widen past an exclusion");
   ok(/"data-feat-qvchip"/.test(feat), "the chips are addressable");
-  ok(/setQv\(qv === v\.id \? "" : v\.id\); setOnly\(""\)/.test(feat),
-     "clicking the active chip clears it, and picking one clears the single-org pulldown");
+  ok(/setQv\(\(qv === v\.id \|\| \(v\.key && v\.key === activeFeature\)\) \? "" : v\.id\); setOnly\(""\)/.test(feat),
+     "clicking the active chip clears it — by its own id OR by the feature the picker set — and picking one clears the single-org pulldown");
   ok(/setOnly\(ev\.target\.value\); if \(ev\.target\.value\) \{ setQv\(""\); setSort\(null\); \}/.test(feat),
      "...and picking an org clears the chip AND any manual column sort — two controls producing one state looks broken");
   ok(/v\.kind !== "feature" \|\| shown\.indexOf\(v\.key\) >= 0/.test(feat),
@@ -1129,6 +1165,75 @@ if (!SKIP_SOURCE) {
   ok(/No organization matches/.test(feat),
      "an empty view names itself rather than reading as a broken page");
   ok(/clear and go back to all/.test(feat), "there is a way back to the full alphabetical list");
+
+  /* ── ANY FEATURE, NOT JUST THE EIGHT WITH A CHIP ──────────────────────
+     Dan, 2026-09-11: "need a way to quickly filter to a specific feature and
+     see how many orgs are using it... I'm trying to see how many are using
+     the calendar sync, and it's not in the list of features, nor can I filter
+     to find how many orgs are using it."
+
+     The chips were, and remain, a measured shortlist — but they were the ONLY
+     feature control, so forty-nine of the fifty-seven tracked features could
+     not be filtered on at all. LIFTED AND RUN, because the mistake that
+     matters is a synthesised view that scopes or sorts differently from a
+     chip, and a regex over the builder cannot see one. */
+  {
+    eq(Q.ofFeatureViewKey(Q.ofFeatureViewId("calendar_sync")), "calendar_sync",
+       "a feature key round-trips through the view id");
+    eq(Q.ofFeatureViewKey("sms"), null,
+       "a chip's own id is NOT read as a feature key — the namespace is what keeps the two apart");
+    eq(Q.ofFeatureViewKey(""), null, "...and neither is an empty id");
+    eq(Q.ofFeatureViewId(""), "", "no key means no view, not the string \"f:\"");
+
+    const fv = Q.ofQuickView("f:calendar_sync", k => k === "calendar_sync" ? "Calendar Sync" : k);
+    ok(fv, "a picked feature synthesises a view");
+    eq(fv.kind, "feature", "...of exactly the kind the chips carry, so ONE reducer scopes both");
+    eq(fv.key, "calendar_sync", "...naming the feature it was asked for");
+    eq(fv.label, "Calendar Sync", "...and labelled from the catalog, not with a raw key");
+    /* NO CAP. A ranked view is capped at 25 because it is a leaderboard;
+       "who uses calendar sync" is a complete answer, and truncating it would
+       silently drop organizations from a count about to be acted on. */
+    ok(fv.limit == null, "a picked feature is NOT capped — a leaderboard is capped, an answer is not");
+    /* A CHIP STILL WINS ITS OWN ID. If the synthetic branch ran first, every
+       chip would resolve to a feature view without its title or its cap. */
+    eq(Q.ofQuickView("top").id, "top", "a chip id still resolves to the chip, not to a synthesised view");
+    eq(Q.ofQuickView("nonsense"), null, "an id that is neither is null rather than an empty view");
+    eq(Q.ofQuickView("f:whatever").label, "whatever",
+       "an unlabelled key falls back to the key rather than rendering undefined");
+
+    // A synthesised view and its hand-written chip must SCOPE THE SAME SET.
+    // If they diverged, "SMS" the chip and "SMS Messaging" the option would
+    // answer one question two ways on one screen.
+    const rows = [
+      { o: { slug: "a", displayName: "A", launched: true }, score: 50 },
+      { o: { slug: "b", displayName: "B", launched: true }, score: 50 },
+      { o: { slug: "c", displayName: "C", launched: false }, score: 50 },
+    ];
+    const counts = { a: { sms_messaging: 9 }, b: { sms_messaging: 0 }, c: { sms_messaging: 4 } };
+    const countOf2 = (slug, k) => (counts[slug] || {})[k] || 0;
+    const viaChip = Q.ofApplyQuickView(Q.ofQuickView("sms"), rows, countOf2);
+    const viaPick = Q.ofApplyQuickView(Q.ofQuickView("f:sms_messaging", k => k), rows, countOf2);
+    eq(viaPick.rows.map(r => r.o.slug).join(","), viaChip.rows.map(r => r.o.slug).join(","),
+       "the picker and the chip scope and order identically — one reducer, two entry points");
+    eq(viaPick.total, 2, "...and both drop the org that does not use it");
+  }
+
+  // ── THE PICKER ITSELF ──────────────────────────────────────────────────
+  ok(/"data-feat-fsel"/.test(feat), "the feature picker is addressable");
+  ok(/setQv\(ofFeatureViewId\(ev\.target\.value\)\); setOnly\(""\); setSort\(null\)/.test(feat),
+     "picking a feature clears the single-org pulldown and a stale column sort, exactly as a chip does");
+  ok(/const activeFeature = view && view\.kind === "feature" \? view\.key : null/.test(feat),
+     "the active feature is derived from the VIEW, so a chip and the picker cannot disagree about the scope");
+  ok(/value: activeFeature \|\| ""/.test(feat),
+     "...and the picker shows the feature a chip set, rather than reading blank under a lit chip");
+  ok(/shown\.forEach\(k => \{ featureOrgs\[k\] = all\.filter/.test(feat),
+     "each option's org count is taken over the settings-scoped set, so it cannot promise an excluded org");
+  ok(/featureOrgs\[k\] \+ " org"/.test(feat),
+     "the count is IN the label — a picker you must click 57 times to read is not a filter");
+  ok(/groups\.map\(g => e\("optgroup"/.test(feat),
+     "the options are grouped by the catalog's own category, and so cannot offer a feature the settings hide");
+  ok(/No organization in this view uses/.test(feat),
+     'an empty feature view says nobody uses it yet, rather than "no organizations match" — that reads as a broken filter');
 
   const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
   for (const c of ["qv", "qvchip", "qvnote"]) ok(new RegExp("\\." + c + "\\s*\\{").test(css), `.${c} has its own rule`);
@@ -1210,7 +1315,7 @@ if (!SKIP_SOURCE) {
   ok(/"data-feat-sortnote"/.test(feat),
      "a manual sort with no view active still says so — an arrow in a header is not enough");
   ok(/back to alphabetical/.test(feat), "...and offers the way back");
-  ok(/setQv\(qv === v\.id \? "" : v\.id\); setOnly\(""\); setSort\(null\)/.test(feat),
+  ok(/setQv\(.*?\); setOnly\(""\); setSort\(null\)/.test(feat),
      "picking a view clears a stale column sort, or last click's order silently governs a new view");
 
   const css = (src.match(/<style>[\s\S]*?<\/style>/) || [""])[0];
@@ -1249,7 +1354,13 @@ if (!SKIP_SOURCE) {
 
   ok(/"Feature Adoption"/.test(feat), "the tile is called Feature Adoption");
   ok(!/"Fleet adoption"/.test(feat), "...and the old Fleet adoption label is gone");
-  ok((feat.match(/e\(Ring, \{/g) || []).length === 3, "all three KPI tiles are rings");
+  /* SCOPED TO THE LIST'S OWN KPI ROW. The per-feature page carries three
+     rings of its own, so a file-wide count stopped meaning "the list has
+     three" the moment that page existed — and would have gone on passing at
+     six while the list had none. */
+  const featList = feat.slice(feat.indexOf("const a = cmpA"));
+  ok(featList.length > 400, "the list's own return was sliced");
+  ok((featList.match(/e\(Ring, \{/g) || []).length === 3, "all three KPI tiles are rings");
   ok(/pct: avg, color: avg == null \? null : ofGradeColor\(avg\)/.test(feat),
      "the adoption ring takes its colour from the GRADE ramp, like every other org-features surface");
   ok(!/data-of-grade[\s\S]{0,400}"data-feat-avg"|"data-feat-avg"[\s\S]{0,300}e\(Grade/.test(feat),

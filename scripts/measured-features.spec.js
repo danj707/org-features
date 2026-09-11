@@ -52,7 +52,8 @@ process.on("exit", () => {
 const NEW = ["events", "ticket_sales", "ai_assistant", "ai_routines"];
 const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   "group_pricing_tiers", "waivers_contracts", "cash_check_payments",
-  "custom_email_domains", "prerequisites", "facility_rentals", "rental_permits"];
+  "custom_email_domains", "prerequisites", "facility_rentals", "rental_permits",
+  "calendar_sync"];
 
 // ── THE THREE LISTS MUST AGREE, OR THE PAGE RENDERS RAW KEYS ──────────────
 // merge-snapshot maps payload columns onto ADOPTION_KEYS by POSITION, and the
@@ -312,3 +313,71 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   ok(!snap.orgs.some(o => /sandbox/i.test(o.slug) || /sandbox/i.test(o.name || "")),
     "no sandbox org reached the snapshot");
 }
+
+// ── CALENDAR SYNC, AND THE FOUR WAYS TO COUNT IT WRONG ────────────────────
+// Added 2026-09-11 after Dan asked how many organizations use calendar sync
+// and found it was not in the catalog at all. Every filter below was measured
+// against production, and every one of the rejected ones returns a plausible
+// WRONG NUMBER rather than an error — which is the only reason this is worth
+// a guard on a snapshot whose figures move daily.
+{
+  const code = sql.replace(/^\s*--.*$/gm, "");
+  const f = snap.features.find(x => x.key === "calendar_sync");
+  ok(f, "calendar sync is in the catalog at all — it was missing until 2026-09-11");
+  ok(snap.measuredFeatures.includes("calendar_sync"), "...and it is measured");
+
+  // 1. THE ORG-SCOPED SIGNAL IS saved_filter_view. oauth_connection has no
+  //    organization_id, and resolving it through organization_association
+  //    returns 82 orgs from 29 connections, because Rec staff are members of
+  //    dozens of orgs. That is the obvious join and it is out by 4x.
+  ok(/FROM saved_filter_view WHERE oauth_connection_id IS NOT NULL/.test(code),
+     "calendar sync is measured off saved_filter_view, the only org-scoped signal");
+  ok(!/organization_association/.test(code),
+     "nothing is counted through organization_association — 29 oauth connections resolve to 82 orgs that way");
+  ok(!/FROM oauth_connection/.test(code),
+     "oauth_connection is not counted directly either: it has no organization_id");
+
+  // 2. IT IS NOT saved_filter_view ALONE. That table is 1,017 views across 68
+  //    orgs; only 46 views at 18 orgs carry a calendar connection, so an
+  //    unfiltered count reports 68 orgs using a feature 20 have ever touched.
+  const join = (code.match(/FROM saved_filter_view[^)]*/) || [""])[0];
+  ok(/WHERE/.test(join), "the saved_filter_view count is FILTERED — the bare table is 68 orgs, not 20");
+
+  // 3. DISCONNECTING CLEARS oauth_connection_id AND LEAVES last_synced_at, so
+  //    18 orgs are connected today and 20 have ever synced. This dashboard
+  //    asks the lifetime question everywhere else, so it asks it here.
+  ok(/oauth_connection_id IS NOT NULL OR last_synced_at IS NOT NULL/.test(code),
+     "an org that has synced and since disconnected still counts — the lifetime reading, as everywhere else here");
+
+  // 4. sync_enabled IS NOT THE TEST. Eight connected views are disabled at six
+  //    orgs, thirteen of them auto-disabled by an OAuth failure; keying on the
+  //    flag would report those orgs as never having used the feature.
+  ok(!/sync_enabled/.test(code),
+     "sync_enabled is not the adoption test — a disabled view is a broken integration, not a non-user");
+
+  // The catalog records all of it, so the next person does not re-derive it.
+  ok(/82/.test(f.adoption_definition),
+     "the catalog entry records the 82-org figure the obvious join returns");
+  ok(/18/.test(f.adoption_definition) && /20/.test(f.adoption_definition),
+     "...and the connected-today against ever-synced split");
+  ok(/calendar_sync_record/.test(f.signal),
+     "...and names the table that cross-validates it");
+
+  // The snapshot carries it for every org, and somebody actually uses it.
+  const orgs = Object.keys(snap.adoption);
+  const missing = orgs.filter(s2 => !snap.adoption[s2] || snap.adoption[s2].calendar_sync === undefined);
+  eq(missing.length, 0, "every org has a calendar_sync cell" + (missing.length ? " — " + missing.length + " missing" : ""));
+  const on = orgs.filter(s2 => snap.adoption[s2].calendar_sync.adopted);
+  ok(on.length > 0, "at least one org uses it (a metric measuring zero everywhere is a broken filter)");
+  /* ...AND NOT EVERY ORG. A filter that matches the whole fleet is as broken
+     as one that matches nobody, and this one nearly did: the rejected
+     readings above return 68 and 82 orgs out of 145. */
+  ok(on.length < orgs.length / 2,
+     `calendar sync is a minority feature — ${on.length} of ${orgs.length} orgs, not the 68 or 82 the wrong joins give`);
+  // A single connected calendar is the commonest case, so the cell pluralises
+  // where its neighbours do not.
+  const one = orgs.map(s2 => snap.adoption[s2].calendar_sync).find(c => c.count === 1);
+  ok(one && /1 calendar synced/.test(one.detail),
+     'an org with one calendar reads "1 calendar synced", not "1 calendars synced"');
+}
+

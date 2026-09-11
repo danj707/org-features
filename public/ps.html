@@ -363,6 +363,31 @@
   .catdesc { font-size: 11px; color: var(--muted); font-weight: 400; line-height: 1.4;
              margin-top: 1px; max-width: 46ch; }
   .catnone { font-size: 12px; color: #94a3b8; font-style: italic; padding: 4px 0; }
+
+  /* ── the per-feature page ─────────────────────────────────────────────
+     The provenance block is deliberately readable prose at body size rather
+     than a tooltip: every count on that page rests on one filter, and this
+     project has already measured four different wrong ways to count the
+     newest one. A definition behind a hover is a definition nobody reads. */
+  .fabout { padding: 14px 16px; }
+  .fdesc { margin: 0 0 8px; font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .fwhy { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: #334155; }
+  .fdef { margin-top: 10px; }
+  .flab { font-size: 11px; color: var(--muted); text-transform: uppercase;
+          letter-spacing: .4px; font-weight: 700; margin-bottom: 3px; }
+  .fdef > div:last-child { font-size: 12.5px; line-height: 1.55; color: #475569; }
+  .fsig { display: block; font-size: 11.5px; line-height: 1.5; color: #475569;
+          background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
+          padding: 8px 10px; white-space: pre-wrap; word-break: break-word; }
+  .fnot { padding: 12px 16px; }
+  /* A WRAPPED ROW OF NAMES, not a table. This list runs to 120 organizations
+     on a feature nobody has adopted, and a 120-row table of one column is a
+     scroll rather than a list you can read in one look. */
+  .fnotwrap { display: flex; flex-wrap: wrap; gap: 5px; }
+  .fnotorg { display: inline-block; background: #f1f5f9; border: 1px solid var(--line);
+             border-radius: 999px; padding: 2px 9px; font-size: 12px; color: #334155;
+             text-decoration: none; }
+  .fnotorg:hover { background: #e2e8f0; text-decoration: none; }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
 </head>
@@ -601,7 +626,36 @@
     { id: "permits",    label: "Rental permits",      kind: "feature", key: "rental_permits",
       title: "Organizations issuing facility rental permits" },
   ];
-  function ofQuickView(id) { return OF_QUICK_VIEWS.find(v => v.id === id) || null; }
+  /* ── ANY FEATURE, NOT JUST THE EIGHT WITH A CHIP ────────────────────────
+     The chips above are a measured shortlist and they are still the right
+     shortlist — but they are also the ONLY way this page could be filtered by
+     feature, so forty-nine of the fifty-seven tracked features had no control
+     at all. "How many organizations use calendar sync" was unanswerable on a
+     page whose entire subject is which organizations use what.
+
+     A picked feature SYNTHESISES a view of exactly the shape a chip carries,
+     so the chips and the picker both go through `ofApplyQuickView` and there
+     is ONE scoping-and-sorting path rather than two that can drift apart —
+     the same one-reducer-N-readers rule `ofDerive` already follows for the
+     score. The id is namespaced `f:<key>` so it can never collide with a
+     chip's own id, and `ofFeatureViewKey` is the single reader of that
+     spelling: a second place that parses the prefix is a second chance to
+     get it wrong. */
+  function ofFeatureViewId(key) { return key ? "f:" + key : ""; }
+  function ofFeatureViewKey(id) { const m = /^f:(.+)$/.exec(id || ""); return m ? m[1] : null; }
+  function ofQuickView(id, label) {
+    const v = OF_QUICK_VIEWS.find(x => x.id === id);
+    if (v) return v;
+    const key = ofFeatureViewKey(id);
+    if (!key) return null;
+    const name = (typeof label === "function" ? label(key) : null) || key;
+    /* NO `limit`, deliberately. A ranked view is capped at 25 because "top
+       adoption" is a leaderboard; "who uses calendar sync" is a complete
+       answer and truncating it at 25 would silently drop organizations from
+       a count the reader is about to act on. */
+    return { id, key, kind: "feature", label: name, synthetic: true,
+             title: "Organizations using " + name + ", by volume" };
+  }
 
   /* A RING METER — Dan asked for "donut charts", and this is that shape done
      honestly. The dataviz guidance is blunt that a single ratio against a
@@ -726,6 +780,16 @@
     if (p.startsWith("/ps/reporting")) return { page: "reporting" };
     if (p.startsWith("/ps/remittance")) return { page: "remittance" };
     if (p.startsWith("/ps/admin")) return { page: "admin" };
+    /* ONE FEATURE ACROSS EVERY ORG, on its own prefix rather than nested
+       inside the drill-in's. The drill-in below already owns every path
+       under the plural prefix, so a nested spelling would make this a matter
+       of which regex is tested first — and an ordering dependency between
+       two routes is the shape that quietly sends one of them to the wrong
+       page. A different prefix cannot collide at all. (The spec asserts the
+       nested spelling is absent, so it must not be written out even in a
+       comment.) */
+    const fk = p.match(/^\/ps\/feature\/(.+)$/);
+    if (fk) return { page: "feature", key: decodeURIComponent(fk[1]) };
     /* BEFORE the bare prefix test, which would otherwise swallow the slug
        and land every drill-in back on the list. */
     const fm = p.match(/^\/ps\/features\/(.+)$/);
@@ -878,10 +942,16 @@
      and has configured almost nothing, so counting them makes every feature
      look unpopular — the same reason the row already says "live" or
      "pre-launch". */
-  function ofFleetUse(d, dv) {
+  function ofFleetUse(d, dv, keys) {
     const live = (dv.all || []).filter(o => o.launched);
     const out = { liveOrgs: live.length, used: {} };
-    (dv.shown || []).forEach(k => {
+    /* `keys` is optional and defaults to the tracked set, so every existing
+       caller is unchanged. The per-feature page passes ONE key — both because
+       57 x 145 adoption lookups to answer a question about one feature is
+       waste, and because that page must work for a feature the settings have
+       HIDDEN, which is not in `shown` and would otherwise come back
+       undefined and render as a blank where a real count belongs. */
+    (keys || dv.shown || []).forEach(k => {
       out.used[k] = live.filter(o => dv.adoptedIn(o.slug, k)).length;
     });
     return out;
@@ -1840,7 +1910,7 @@
      like the snapshot had gone. */
   const OF_DEFAULT_SETTINGS = { hiddenFeatures: [], excludedOrgs: [] };
 
-  function Features({ slug }) {
+  function Features({ slug, featureKey }) {
     const [d, setD] = useState(null);
     const [err, setErr] = useState(null);
     const [cfg, setCfg] = useState(null);        // null until the fetch settles
@@ -1895,7 +1965,23 @@
        so no view can widen the page past an excluded org. The default order
        stays ALPHABETICAL — a quick view re-sorts, it does not redefine how
        the list opens. */
-    const view = ofQuickView(qv);
+    /* HOW MANY ORGANIZATIONS USE EACH TRACKED FEATURE, over `all` and so
+       already settings-scoped. It is the number the picker puts in every
+       option label, and the same reducer feeds the per-feature page below —
+       an option promising "20 orgs" and a page then listing 18 is two
+       surfaces disagreeing on one click. */
+    const featureOrgs = {};
+    shown.forEach(k => { featureOrgs[k] = all.filter(o => adoptedIn(o.slug, k)).length; });
+
+    const view = ofQuickView(qv, label);
+    /* ONE STATE, TWO REFLECTIONS. A chip and the picker can both name the
+       same feature, so whichever set it, BOTH show it selected. That is not
+       the two-controls-one-state trap the chips' own comment warns about —
+       that is about two controls each able to set a different half of the
+       state. Here there is one active view and it is simply shown twice;
+       leaving the picker blank while an SMS chip is lit would be the surface
+       lying about its own scope. */
+    const activeFeature = view && view.kind === "feature" ? view.key : null;
     const qvOut = ofApplyQuickView(view, all.filter(o => !only || o.slug === only).map(decorate), countOf);
 
     /* A HEADER CLICK OVERRIDES THE ORDER, NOT THE SCOPE. Sorting inside "Top
@@ -2097,6 +2183,172 @@
         }) : null);
     }
 
+    /* ── ONE FEATURE, EVERY ORGANIZATION ──────────────────────────────────
+       The inverse of the drill-in above, and the half this page could not do
+       at all until now: the table answers "what does this org use", and
+       nothing answered "who uses this feature".
+
+       SAME COMPONENT AGAIN, for the same reason the org drill-in is — one
+       fetch, one settings resolution, one derived set. Two top-level
+       components would each resolve the tracked set and would disagree about
+       it the first time either changed.
+
+       THE "NOT USING" LIST IS THE POINT. A count of users is a fact; the
+       organizations that have not turned it on are the work, which is why
+       they get their own panel and are split live from pre-launch — a
+       pre-launch org has not configured anything yet, so folding it into an
+       action list makes half the fleet look like a gap. */
+    if (featureKey) {
+      const f = byKey[featureKey];
+      const fname = (f && (f.name || f.label)) || featureKey;
+      const crumb = e("div", { className: "crumb", "data-feat-fcrumb": featureKey },
+        link("/ps/features", "Org Features"), " / ", e("b", null, fname));
+      if (!f) {
+        return e("div", null, crumb,
+          e("div", { className: "note" },
+            "No feature with the key \u201c" + featureKey + "\u201d is in this catalog. ",
+            "It may have been renamed, or the link predates it."));
+      }
+
+      const measuredHere = allMeasured.indexOf(featureKey) >= 0;
+      const users = all.filter(o => adoptedIn(o.slug, featureKey)).map(decorate)
+        .sort((x, y) => countOf(y.o.slug, featureKey) - countOf(x.o.slug, featureKey)
+          // Name as the tie-break, so two loads of one page cannot disagree.
+          || orgName(x.o).localeCompare(orgName(y.o)));
+      const missLive = all.filter(o => o.launched && !adoptedIn(o.slug, featureKey));
+      const missPre = all.filter(o => !o.launched && !adoptedIn(o.slug, featureKey));
+      /* THROUGH `ofFleetUse`, which is the one definition of "live
+         organizations using X" — the same number the printed report and any
+         future ranking must read, and it was computed by nothing until now. */
+      const fleet = ofFleetUse(d, dv, [featureKey]);
+      const liveUsing = fleet.used[featureKey] || 0;
+      const preOrgs = all.length - fleet.liveOrgs;
+      const preUsing = users.length - liveUsing;
+      const orgLink = (o) => link("/ps/features/" + encodeURIComponent(o.slug), orgName(o), "fnotorg");
+
+      return e("div", null, crumb,
+        e("div", { className: "org-h" },
+          e("h2", null, fname),
+          e("span", { className: "chip" }, f.category || "Uncategorised"),
+          e("div", { className: "links" },
+            link("/ps/features", "\u2190 back to all organizations"))),
+
+        /* A FEATURE THE SETTINGS HAVE HIDDEN IS STILL REACHABLE — the same
+           rule the excluded-org drill-in follows. It says why it is missing
+           from the list rather than pretending not to exist, because the
+           link may be one somebody was sent. */
+        hidden.has(featureKey) ? e("div", { className: "note", "data-feat-fhidden": 1,
+            style: { color: "#b45309", fontWeight: 600 } },
+          "\u26a0 This feature is hidden in the settings, so it is not counted in any adoption score. "
+          + "The figures below are unaffected \u2014 they are about this feature alone.") : null,
+        measuredHere ? null : e("div", { className: "note", "data-feat-funmeasured": 1,
+            style: { color: "#b45309", fontWeight: 600 } },
+          "\u26a0 This feature is in the catalog but is NOT measured, so nobody can be shown as using it. "
+          + (f.not_measurable || "")),
+
+        e("div", { className: "cards" },
+          e("div", { className: "card ringcard", "data-feat-fusers": users.length,
+                     title: "Organizations in this view that have this feature configured or in use" },
+            e(Ring, { pct: all.length ? (users.length / all.length) * 100 : null, color: "#0d5c99",
+                      label: "Using it: " + users.length }),
+            e("div", { className: "ringtext" },
+              e("div", { className: "k" }, "Using it"),
+              e("div", { className: "v" }, users.length),
+              e("div", { className: "d" }, "of " + all.length + " organizations"))),
+          /* LIVE IS ITS OWN CARD, and it is the one worth quoting. Half the
+             fleet is mid-setup and has configured almost nothing, so a
+             fleet-wide share makes every feature look unpopular — "62 of 73
+             live organizations use this" is the sentence a Director cannot
+             wave away. */
+          e("div", { className: "card ringcard", "data-feat-flive": liveUsing,
+                     title: "Organizations live on rec.us that use it \u2014 the honest denominator" },
+            e(Ring, { pct: fleet.liveOrgs ? (liveUsing / fleet.liveOrgs) * 100 : null, color: "#0f6f5c",
+                      label: "Live orgs using it: " + liveUsing }),
+            e("div", { className: "ringtext" },
+              e("div", { className: "k" }, "Live on rec.us"),
+              e("div", { className: "v" }, liveUsing),
+              e("div", { className: "d" }, "of " + fleet.liveOrgs + " live organizations"))),
+          e("div", { className: "card ringcard", "data-feat-preusing": preUsing,
+                     title: "Organizations not yet live that have already configured it" },
+            e(Ring, { pct: preOrgs ? (preUsing / preOrgs) * 100 : null, color: "#6b7280",
+                      label: "Pre-launch orgs using it: " + preUsing }),
+            e("div", { className: "ringtext" },
+              e("div", { className: "k" }, "Pre-launch"),
+              e("div", { className: "v" }, preUsing),
+              e("div", { className: "d" }, "of " + preOrgs + " not yet live")))),
+
+        /* WHAT THE NUMBER ACTUALLY COUNTS, on the page rather than in the
+           SQL. Every figure above rests on one filter, and this project has
+           already measured four different wrong ways to count this one; a
+           reader who cannot see the definition has to take the count on
+           trust. The catalog carries all of it, so nothing here is written
+           twice. */
+        e("div", { className: "panel", "data-feat-fabout": featureKey },
+          e("h2", null, "What this measures"),
+          e("div", { className: "fabout" },
+            f.description ? e("p", { className: "fdesc" }, f.description) : null,
+            f.why ? e("p", { className: "fwhy" }, e("b", null, "Why it matters. "), f.why) : null,
+            f.adoption_definition ? e("div", { className: "fdef" },
+              e("div", { className: "flab" }, "How adoption is counted"),
+              e("div", null, f.adoption_definition)) : null,
+            f.signal ? e("div", { className: "fdef" },
+              e("div", { className: "flab" }, "Where the number comes from"),
+              e("code", { className: "fsig" }, f.signal)) : null)),
+
+        e("div", { className: "panel" },
+          e("h2", null, "Using it",
+            e("span", { className: "hint" },
+              users.length ? "busiest first \u00b7 click a row for that organization" : "nobody yet")),
+          users.length
+            ? e("div", { className: "tablewrap" },
+                e("table", { className: "feattable" },
+                  e("thead", null, e("tr", null,
+                    e("th", { className: "l" }, "Organization"),
+                    e("th", { className: "l" }, "Measured"),
+                    e("th", null, "Adoption"))),
+                  e("tbody", null, users.map(r =>
+                    e("tr", { key: r.o.slug, "data-feat-fuser": r.o.slug, style: { cursor: "pointer" },
+                              onClick: () => nav("/ps/features/" + encodeURIComponent(r.o.slug)) },
+                      e("td", { className: "l" },
+                        e("b", null, orgName(r.o)), " ", launchTag(r.o), " ", adminLink(r.o),
+                        e("div", { className: "subslug" }, r.o.slug)),
+                      /* THE SNAPSHOT'S OWN SENTENCE, not a number re-phrased
+                         here. The bake already decided how this metric reads
+                         ("3 calendars synced"), and a second wording is how
+                         two surfaces start describing one figure differently. */
+                      e("td", { className: "l", "data-feat-fdetail": countOf(r.o.slug, featureKey) },
+                        detailOf(r.o.slug, featureKey) || "in use"),
+                      scoreCell(r))))))
+            : e("div", { className: "note" },
+                "No organization in this view uses " + fname + " yet."),
+        ),
+
+        /* THE ACTION LIST. Live organizations first and on their own, because
+           "this org is live and does not have it" is a conversation and "this
+           org has not opened yet" is not. */
+        e("div", { className: "panel", "data-feat-fmiss": missLive.length + missPre.length },
+          e("h2", null, "Not using it",
+            e("span", { className: "hint" },
+              missLive.length + " live \u00b7 " + missPre.length + " pre-launch")),
+          e("div", { className: "fnot" },
+            e("div", { className: "flab" }, "Live on rec.us \u2014 " + missLive.length),
+            missLive.length
+              ? e("div", { className: "fnotwrap", "data-feat-fmisslive": missLive.length },
+                  missLive.map(o => e(React.Fragment, { key: o.slug }, orgLink(o))))
+              : e("div", { className: "catnone" }, "Every live organization uses it."),
+            e("div", { className: "flab", style: { marginTop: 12 } }, "Pre-launch \u2014 " + missPre.length),
+            missPre.length
+              ? e("div", { className: "fnotwrap", "data-feat-fmisspre": missPre.length },
+                  missPre.map(o => e(React.Fragment, { key: o.slug }, orgLink(o))))
+              : e("div", { className: "catnone" }, "Every pre-launch organization has already configured it."))),
+
+        showSettings ? e(FeatureSettings, {
+          data: d, cfg,
+          onClose: () => setShowSettings(false),
+          onSaved: (next) => { setCfg(next); setCfgErr(null); setShowSettings(false); },
+        }) : null);
+    }
+
     const a = cmpA ? all.find(o => o.slug === cmpA) : null;
     const b = cmpB ? all.find(o => o.slug === cmpB) : null;
     const A = a ? decorate(a) : null, B = b ? decorate(b) : null;
@@ -2260,6 +2512,27 @@
           e("select", { value: only, onChange: ev => { setOnly(ev.target.value); if (ev.target.value) { setQv(""); setSort(null); } },
                         "data-feat-only": only || "all" },
             e("option", { value: "" }, "All organizations (" + all.length + ")"), orgOptions),
+          /* THE FEATURE PICKER. Every tracked feature, grouped by the
+             catalog's own category so it reads in the same order as the
+             table's columns, with the org count IN THE LABEL — a picker that
+             makes you select something to find out whether it has anything
+             behind it is a control you have to click 57 times to read.
+
+             A ZERO IS OFFERED RATHER THAN HIDDEN, which is the opposite of
+             the chip rule directly below, and deliberately: a chip promising
+             nothing is a dead click, but here the count is on screen BEFORE
+             the click, so "nobody uses this" is an answer the reader can see
+             without making a choice. Hiding it would make a feature nobody
+             has adopted the one thing this page cannot say anything about. */
+          e("select", { value: activeFeature || "",
+                        "data-feat-fsel": activeFeature || "none",
+                        title: "Filter the table to organizations using one feature",
+                        onChange: ev => { setQv(ofFeatureViewId(ev.target.value)); setOnly(""); setSort(null); } },
+            e("option", { value: "" }, "Filter to a feature\u2026"),
+            groups.map(g => e("optgroup", { key: g.cat, label: g.cat },
+              g.keys.slice().sort((x, y) => label(x).localeCompare(label(y))).map(k =>
+                e("option", { key: k, value: k },
+                  label(k) + " \u2014 " + featureOrgs[k] + " org" + (featureOrgs[k] === 1 ? "" : "s")))))),
           /* ONE ACTIVE VIEW AT A TIME, and picking one clears the single-org
              pulldown (and vice versa). Two controls producing one state is a
              control that looks broken — the same rule as the season and
@@ -2267,9 +2540,9 @@
              clears it, so there is no separate "off" chip. */
           e("div", { className: "qv", "data-feat-qv": qv || "none" }, qvChips.map(({ v, n }) =>
             e("button", { key: v.id, title: v.title,
-                          className: "qvchip" + (qv === v.id ? " on" : ""),
+                          className: "qvchip" + ((qv === v.id || (v.key && v.key === activeFeature)) ? " on" : ""),
                           "data-feat-qvchip": v.id,
-                          onClick: () => { setQv(qv === v.id ? "" : v.id); setOnly(""); setSort(null); } },
+                          onClick: () => { setQv((qv === v.id || (v.key && v.key === activeFeature)) ? "" : v.id); setOnly(""); setSort(null); } },
               v.label,
               // The count is what the click will actually show. A ranked view
               // is capped rather than scoped, so it says the cap instead.
@@ -2290,6 +2563,15 @@
             ? "showing " + rows.length + " of " + qvOut.total
             : "showing all " + rows.length,
           " \u00b7 ",
+          /* THE OTHER HALF OF THE ANSWER. This table can only show the orgs
+             that DO use the feature — "who does not" is the list somebody
+             acts on, and it is a different page rather than a longer table
+             because it wants its own denominators and its own split between
+             live and pre-launch. */
+          activeFeature ? e(React.Fragment, null,
+            link("/ps/feature/" + encodeURIComponent(activeFeature),
+                 "who is not using it, and what this measures"),
+            " \u00b7 ") : null,
           e("a", { href: "#", onClick: ev => { ev.preventDefault(); setQv(""); setSort(null); } },
             "clear and go back to all " + all.length + " alphabetically")) : null,
         /* WITHOUT A VIEW, a manual sort still needs somewhere to say so and a
@@ -2422,9 +2704,15 @@
                           : null);
                     })())));
             }))),
-        rows.length ? null : e("div", { className: "note" },
-          view ? "No organization matches “" + view.label + "” in this snapshot."
-               : "No organizations match.")),
+        rows.length ? null : e("div", { className: "note", "data-feat-empty": view ? view.id : "none" },
+          activeFeature
+            /* NOT "no organizations match", which reads as a broken filter.
+               Nobody using a feature is a real answer, so the page says so
+               and points at the one surface that can enlarge on it. */
+            ? e("span", null, "No organization in this view uses ", e("b", null, view.label), " yet. ",
+                link("/ps/feature/" + encodeURIComponent(activeFeature), "See what it measures"), ".")
+            : view ? "No organization matches “" + view.label + "” in this snapshot."
+                   : "No organizations match.")),
 
       showSettings ? e(FeatureSettings, {
         data: d, cfg,
@@ -2715,7 +3003,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], featureorg: ["Org Features", "Feature adoption for one organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], featureorg: ["Org Features", "Feature adoption for one organization"], feature: ["Org Features", "One feature across every organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         /* Renamed PS -> CX at Dan's request. THE LABEL ONLY: the /ps/* routes,
@@ -2770,6 +3058,7 @@
           r.page === "admin" ? e(Admin, { me }) :
           r.page === "features" ? e(Features, { slug: null }) :
           r.page === "featureorg" ? e(Features, { slug: r.slug }) :
+          r.page === "feature" ? e(Features, { featureKey: r.key }) :
           r.page === "how" ? e(HowItWorks, null) :
           r.page === "updates" ? e(Updates, null) :
           e(Reporting, { data }),

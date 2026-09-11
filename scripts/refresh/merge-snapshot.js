@@ -91,6 +91,7 @@ const ADOPTION_KEYS = [
   "custom_staff_roles",
   "alternate_identities",
   "crm_household_notes",
+  "calendar_sync",
 ];
 
 const TEMPLATES = {
@@ -155,6 +156,10 @@ const TEMPLATES = {
   custom_staff_roles: n => `${fmt(n)} custom roles`,
   alternate_identities: n => `${fmt(n)} alternate IDs`,
   crm_household_notes: n => `${fmt(n)} household notes`,
+  // Pluralised, unlike its neighbours, because SEVEN of the twenty orgs
+  // using this have exactly one connected calendar — "1 calendars synced"
+  // would be the commonest reading of this cell rather than an edge case.
+  calendar_sync: n => `${fmt(n)} calendar${n === 1 ? "" : "s"} synced`,
 };
 
 

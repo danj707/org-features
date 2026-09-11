@@ -2795,6 +2795,17 @@
       "why": "Keeps the history of a family in one place, so whoever picks up the phone next already knows the context."
     },
     {
+      "key": "calendar_sync",
+      "name": "Calendar Sync",
+      "category": "Integrations & Admin",
+      "description": "Pushing bookings from a saved calendar view into an external Google or Outlook calendar, so staff see them in the calendar they already work out of.",
+      "signal": "saved_filter_view.oauth_connection_id / external_calendar_id / sync_enabled / last_synced_at / last_sync_disable_reason on views whose context_id is 'calendar'; calendar_sync_record.provider ('google' | 'microsoft') and sync_status ('synced' | 'error'), which carries organization_id directly and cross-validates the same 18 currently-connected orgs",
+      "adoption_definition": "Has at least one saved calendar view connected to an external calendar, or one that has ever synced to it. Measured on saved_filter_view because it is the ONLY org-scoped signal: oauth_connection has no organization_id at all, and resolving it through organization_association returns 82 orgs from 29 connections, because Rec staff are members of dozens of orgs. Nor is saved_filter_view alone enough — that table is 1,017 views across 68 orgs and only 46 views at 18 orgs carry a calendar connection. Disconnecting clears oauth_connection_id and leaves last_synced_at, so 18 orgs are connected today while 20 have ever synced; the lifetime reading is the one used, as it is everywhere else here.",
+      "measure_question": "How many saved calendar views has this organization connected to an external Google or Outlook calendar, or ever synced to one?",
+      "short": "Calendar Sync",
+      "why": "Staff live in Outlook or Google Calendar, not in a second system. Pushing bookings across is what stops a field being double-booked because nobody thought to go and look."
+    },
+    {
       "key": "events",
       "name": "Events & Ticketing",
       "category": "Events & Ticketing",
@@ -3120,6 +3131,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "allegheny-county": {
@@ -3399,6 +3415,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -3684,6 +3705,11 @@
         "adopted": true,
         "count": 528,
         "detail": "528 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "barrie": {
@@ -3966,6 +3992,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "barton-springs": {
@@ -4245,6 +4276,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -4530,6 +4566,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "boston-bcyf": {
@@ -4812,6 +4853,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "braintree": {
@@ -5091,6 +5137,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -5376,6 +5427,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "carmichael-district": {
@@ -5655,6 +5711,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -5940,6 +6001,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "chicago-park-district-golf": {
@@ -6219,6 +6285,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -6504,6 +6575,11 @@
         "adopted": true,
         "count": 29,
         "detail": "29 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "city-of-aspen": {
@@ -6783,6 +6859,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -7068,6 +7149,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-battle-ground": {
@@ -7350,6 +7436,11 @@
         "adopted": true,
         "count": 5,
         "detail": "5 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-belmont": {
@@ -7629,6 +7720,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -7914,6 +8010,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 calendars synced"
       }
     },
     "city-of-bloomington": {
@@ -8196,6 +8297,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 11,
+        "detail": "11 calendars synced"
       }
     },
     "city-of-boerne": {
@@ -8478,6 +8584,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-brisbane": {
@@ -8760,6 +8871,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-buffalo": {
@@ -9042,6 +9158,11 @@
         "adopted": true,
         "count": 531,
         "detail": "531 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "city-of-calabasas": {
@@ -9321,6 +9442,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -9606,6 +9732,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-duarte": {
@@ -9885,6 +10016,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -10170,6 +10306,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-euclid": {
@@ -10452,6 +10593,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 calendars synced"
       }
     },
     "city-of-goodyear": {
@@ -10734,6 +10880,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-hermosa-beach": {
@@ -11016,6 +11167,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "city-of-indianapolis": {
@@ -11295,6 +11451,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -11580,6 +11741,11 @@
         "adopted": true,
         "count": 19,
         "detail": "19 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-joplin": {
@@ -11862,6 +12028,11 @@
         "adopted": true,
         "count": 10,
         "detail": "10 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lakeland": {
@@ -12144,6 +12315,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-las-vegas": {
@@ -12423,6 +12599,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -12708,6 +12889,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lewisburg": {
@@ -12990,6 +13176,11 @@
         "adopted": true,
         "count": 10,
         "detail": "10 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-lockhart": {
@@ -13269,6 +13460,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -13554,6 +13750,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-madeira-beach": {
@@ -13836,6 +14037,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 calendars synced"
       }
     },
     "city-of-madison": {
@@ -14118,6 +14324,11 @@
         "adopted": true,
         "count": 24,
         "detail": "24 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-malibu": {
@@ -14400,6 +14611,11 @@
         "adopted": true,
         "count": 32,
         "detail": "32 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-medford": {
@@ -14682,6 +14898,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-menifee": {
@@ -14964,6 +15185,11 @@
         "adopted": true,
         "count": 27,
         "detail": "27 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-miamisburg": {
@@ -15243,6 +15469,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -15528,6 +15759,11 @@
         "adopted": true,
         "count": 23,
         "detail": "23 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "city-of-milford": {
@@ -15810,6 +16046,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-mountain-view": {
@@ -16089,6 +16330,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -16374,6 +16620,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-natchez": {
@@ -16656,6 +16907,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-niagara-falls": {
@@ -16938,6 +17194,11 @@
         "adopted": true,
         "count": 56,
         "detail": "56 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 calendars synced"
       }
     },
     "city-of-norman": {
@@ -17220,6 +17481,11 @@
         "adopted": true,
         "count": 58,
         "detail": "58 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-oakland": {
@@ -17499,6 +17765,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -17784,6 +18055,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-palm-springs": {
@@ -18063,6 +18339,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -18348,6 +18629,11 @@
         "adopted": true,
         "count": 30,
         "detail": "30 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-pflugerville": {
@@ -18627,6 +18913,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -18912,6 +19203,11 @@
         "adopted": true,
         "count": 71,
         "detail": "71 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-pleasant-hill": {
@@ -19191,6 +19487,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -19476,6 +19777,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-santa-cruz": {
@@ -19755,6 +20061,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -20040,6 +20351,11 @@
         "adopted": true,
         "count": 8,
         "detail": "8 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-stanwood": {
@@ -20319,6 +20635,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -20604,6 +20925,11 @@
         "adopted": true,
         "count": 1847,
         "detail": "1,847 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-tullahoma": {
@@ -20886,6 +21212,11 @@
         "adopted": true,
         "count": 588,
         "detail": "588 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-university-park": {
@@ -21168,6 +21499,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-watsonville": {
@@ -21450,6 +21786,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-west-haven": {
@@ -21732,6 +22073,11 @@
         "adopted": true,
         "count": 5,
         "detail": "5 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "city-of-west-linn": {
@@ -22011,6 +22357,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -22296,6 +22647,11 @@
         "adopted": true,
         "count": 822,
         "detail": "822 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "clark-county": {
@@ -22575,6 +22931,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -22860,6 +23221,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "concord-township": {
@@ -23139,6 +23505,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -23424,6 +23795,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "d4cprs": {
@@ -23703,6 +24079,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -23988,6 +24369,11 @@
         "adopted": true,
         "count": 78,
         "detail": "78 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "el-segundo-recreation": {
@@ -24270,6 +24656,11 @@
         "adopted": true,
         "count": 95,
         "detail": "95 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "emeryville": {
@@ -24552,6 +24943,11 @@
         "adopted": true,
         "count": 76,
         "detail": "76 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 calendars synced"
       }
     },
     "essex-junction": {
@@ -24834,6 +25230,11 @@
         "adopted": true,
         "count": 7,
         "detail": "7 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "fairfax-county": {
@@ -25116,6 +25517,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "folsom": {
@@ -25398,6 +25804,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "foster-city": {
@@ -25680,6 +26091,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "glenview-park-district": {
@@ -25959,6 +26375,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -26244,6 +26665,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "hammond-area-recreation-district": {
@@ -26523,6 +26949,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -26808,6 +27239,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "indy-parks--recreation": {
@@ -27087,6 +27523,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -27372,6 +27813,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "iv2pp-on": {
@@ -27651,6 +28097,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -27936,6 +28387,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "jurupa-area-recreation-and-park-district": {
@@ -28218,6 +28674,11 @@
         "adopted": true,
         "count": 51,
         "detail": "51 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 calendars synced"
       }
     },
     "laguna-beach": {
@@ -28497,6 +28958,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -28782,6 +29248,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "lincoln": {
@@ -29061,6 +29532,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -29346,6 +29822,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "maple-grove": {
@@ -29625,6 +30106,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -29910,6 +30396,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mashantucket-pequot-tribal-nation": {
@@ -30189,6 +30680,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -30474,6 +30970,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "mission-oaks-rpd": {
@@ -30753,6 +31254,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -31038,6 +31544,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "norris": {
@@ -31317,6 +31828,11 @@
         "detail": "2 alternate IDs"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -31602,6 +32118,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 calendars synced"
       }
     },
     "north-logan": {
@@ -31884,6 +32405,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "orangevale-recreation--park-district": {
@@ -32163,6 +32689,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -32448,6 +32979,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "paradise-recreation-and-park-district": {
@@ -32730,6 +33266,11 @@
         "adopted": true,
         "count": 5,
         "detail": "5 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "pittsburg": {
@@ -33009,6 +33550,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -33294,6 +33840,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "prescott-valley": {
@@ -33576,6 +34127,11 @@
         "adopted": true,
         "count": 76,
         "detail": "76 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "pueblo-county": {
@@ -33858,6 +34414,11 @@
         "adopted": true,
         "count": 21,
         "detail": "21 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "putnam-county": {
@@ -34140,6 +34701,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 calendars synced"
       }
     },
     "rec-demo-org": {
@@ -34419,6 +34985,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -34704,6 +35275,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rec-mountain": {
@@ -34983,6 +35559,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -35268,6 +35849,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "rec-staging": {
@@ -35547,6 +36133,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -35832,6 +36423,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "redwood-city": {
@@ -36111,6 +36707,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -36396,6 +36997,11 @@
         "adopted": true,
         "count": 7,
         "detail": "7 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sacramento-county": {
@@ -36678,6 +37284,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 calendars synced"
       }
     },
     "san-francisco-rec-park": {
@@ -36960,6 +37571,11 @@
         "adopted": true,
         "count": 36,
         "detail": "36 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "santacruzcounty": {
@@ -37242,6 +37858,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "scotts-valley": {
@@ -37524,6 +38145,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sebastopol": {
@@ -37806,6 +38432,11 @@
         "adopted": true,
         "count": 5,
         "detail": "5 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "suffolk-parks-and-recreation": {
@@ -38085,6 +38716,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -38370,6 +39006,11 @@
         "adopted": true,
         "count": 4,
         "detail": "4 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "sunrise-rpd": {
@@ -38649,6 +39290,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -38934,6 +39580,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "the-ranch": {
@@ -39216,6 +39867,11 @@
         "adopted": true,
         "count": 37,
         "detail": "37 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "torranceca": {
@@ -39498,6 +40154,11 @@
         "adopted": true,
         "count": 3,
         "detail": "3 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-clarkstown": {
@@ -39780,6 +40441,11 @@
         "adopted": true,
         "count": 69,
         "detail": "69 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-clarksville": {
@@ -40062,6 +40728,11 @@
         "adopted": true,
         "count": 20,
         "detail": "20 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 calendars synced"
       }
     },
     "town-of-corte-madera": {
@@ -40344,6 +41015,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-danvers": {
@@ -40626,6 +41302,11 @@
         "adopted": true,
         "count": 4,
         "detail": "4 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 2,
+        "detail": "2 calendars synced"
       }
     },
     "town-of-reading": {
@@ -40908,6 +41589,11 @@
         "adopted": true,
         "count": 210,
         "detail": "210 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-shrewsbury": {
@@ -41190,6 +41876,11 @@
         "adopted": true,
         "count": 2,
         "detail": "2 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-taylor": {
@@ -41472,6 +42163,11 @@
         "adopted": true,
         "count": 7,
         "detail": "7 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-wellesley": {
@@ -41751,6 +42447,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -42036,6 +42737,11 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "town-of-windham": {
@@ -42318,6 +43024,11 @@
         "adopted": true,
         "count": 23,
         "detail": "23 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 5,
+        "detail": "5 calendars synced"
       }
     },
     "upson-county": {
@@ -42597,6 +43308,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -42882,6 +43598,11 @@
         "adopted": true,
         "count": 328,
         "detail": "328 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 calendars synced"
       }
     },
     "woodmen-hills-metro-district": {
@@ -43164,6 +43885,11 @@
         "adopted": true,
         "count": 1,
         "detail": "1 household notes"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     },
     "yerba-buena-gardens": {
@@ -43446,6 +44172,11 @@
         "adopted": true,
         "count": 5,
         "detail": "5 household notes"
+      },
+      "calendar_sync": {
+        "adopted": true,
+        "count": 1,
+        "detail": "1 calendar synced"
       }
     },
     "zzzarchivenorthern-door-sports-and-recreation": {
@@ -43725,6 +44456,11 @@
         "detail": "Not using"
       },
       "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
         "adopted": false,
         "count": 0,
         "detail": "Not using"
@@ -44010,10 +44746,15 @@
         "adopted": false,
         "count": 0,
         "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
       }
     }
   },
-  "notes": "56 of 57 catalog features measured, re-baked 2026-09-11 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 146 organizations are live on rec.us.",
+  "notes": "57 of 58 catalog features measured, re-baked 2026-09-10 from the production read replica via scripts/refresh/fleet-query.sql; calendar_sync was measured 2026-09-11 and folded in ahead of the next bake. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 146 organizations are live on rec.us.",
   "measuredFeatures": [
     "age_eligibility",
     "waitlist",
@@ -44070,7 +44811,8 @@
     "cash_reconciliation",
     "custom_staff_roles",
     "alternate_identities",
-    "crm_household_notes"
+    "crm_household_notes",
+    "calendar_sync"
   ],
   "history": [
     {
@@ -44682,126 +45424,126 @@
     },
     {
       "date": "2026-09-11",
-      "setKey": "56:1gz5web",
-      "measured": 56,
+      "setKey": "57:4xkh1v",
+      "measured": 57,
       "scores": {
         "aardvark-city": 4,
         "allegheny-county": 5,
-        "apex-park-and-recreation-district": 89,
+        "apex-park-and-recreation-district": 88,
         "barrie": 32,
         "barton-springs": 18,
         "bellflower": 4,
-        "boston-bcyf": 41,
-        "braintree": 29,
+        "boston-bcyf": 40,
+        "braintree": 28,
         "brookline-recreation": 14,
         "carmichael-district": 7,
-        "central-point-recreation": 50,
+        "central-point-recreation": 49,
         "chicago-park-district-golf": 7,
-        "chicorec": 71,
-        "city-of-aspen": 20,
+        "chicorec": 72,
+        "city-of-aspen": 19,
         "city-of-ball-ground": 5,
         "city-of-battle-ground": 25,
         "city-of-belmont": 11,
-        "city-of-belton": 64,
+        "city-of-belton": 65,
         "city-of-bloomington": 54,
-        "city-of-boerne": 63,
+        "city-of-boerne": 61,
         "city-of-brisbane": 25,
         "city-of-buffalo": 61,
         "city-of-calabasas": 4,
         "city-of-cedar-rapids": 23,
-        "city-of-duarte": 36,
-        "city-of-easton": 45,
-        "city-of-euclid": 64,
+        "city-of-duarte": 35,
+        "city-of-easton": 44,
+        "city-of-euclid": 65,
         "city-of-goodyear": 46,
-        "city-of-hermosa-beach": 71,
+        "city-of-hermosa-beach": 72,
         "city-of-indianapolis": 4,
-        "city-of-jeffersonville": 68,
-        "city-of-joplin": 55,
-        "city-of-lakeland": 52,
-        "city-of-las-vegas": 20,
-        "city-of-league-city": 20,
-        "city-of-lewisburg": 61,
+        "city-of-jeffersonville": 67,
+        "city-of-joplin": 54,
+        "city-of-lakeland": 51,
+        "city-of-las-vegas": 19,
+        "city-of-league-city": 19,
+        "city-of-lewisburg": 60,
         "city-of-lockhart": 14,
         "city-of-lodi": 0,
-        "city-of-madeira-beach": 41,
-        "city-of-madison": 59,
-        "city-of-malibu": 57,
+        "city-of-madeira-beach": 42,
+        "city-of-madison": 58,
+        "city-of-malibu": 56,
         "city-of-medford": 23,
-        "city-of-menifee": 61,
-        "city-of-miamisburg": 13,
-        "city-of-midland": 59,
-        "city-of-milford": 13,
-        "city-of-mountain-view": 13,
+        "city-of-menifee": 60,
+        "city-of-miamisburg": 12,
+        "city-of-midland": 60,
+        "city-of-milford": 12,
+        "city-of-mountain-view": 12,
         "city-of-nashville": 21,
-        "city-of-natchez": 48,
+        "city-of-natchez": 47,
         "city-of-niagara-falls": 96,
-        "city-of-norman": 84,
+        "city-of-norman": 82,
         "city-of-oakland": 0,
         "city-of-orinda": 0,
         "city-of-palm-springs": 14,
-        "city-of-pawnee": 93,
+        "city-of-pawnee": 91,
         "city-of-pflugerville": 0,
-        "city-of-piedmont": 66,
+        "city-of-piedmont": 65,
         "city-of-pleasant-hill": 0,
         "city-of-san-francisco": 7,
         "city-of-santa-cruz": 0,
-        "city-of-smyrna": 82,
+        "city-of-smyrna": 81,
         "city-of-stanwood": 11,
-        "city-of-torrance": 75,
-        "city-of-tullahoma": 59,
-        "city-of-university-park": 13,
-        "city-of-watsonville": 29,
-        "city-of-west-haven": 68,
+        "city-of-torrance": 74,
+        "city-of-tullahoma": 58,
+        "city-of-university-park": 12,
+        "city-of-watsonville": 28,
+        "city-of-west-haven": 67,
         "city-of-west-linn": 25,
-        "city-of-west-sacramento": 82,
+        "city-of-west-sacramento": 81,
         "clark-county": 0,
         "coab-recreation": 5,
         "concord-township": 0,
         "conference": 30,
         "d4cprs": 2,
-        "douglas-county-nv": 77,
-        "el-segundo-recreation": 70,
-        "emeryville": 73,
-        "essex-junction": 63,
-        "fairfax-county": 75,
-        "folsom": 29,
+        "douglas-county-nv": 75,
+        "el-segundo-recreation": 68,
+        "emeryville": 74,
+        "essex-junction": 61,
+        "fairfax-county": 74,
+        "folsom": 28,
         "foster-city": 23,
         "glenview-park-district": 2,
         "golden-gate-village": 11,
         "hammond-area-recreation-district": 18,
-        "haverford-township": 55,
-        "indy-parks--recreation": 41,
-        "iv2pp-off": 20,
-        "iv2pp-on": 27,
+        "haverford-township": 54,
+        "indy-parks--recreation": 40,
+        "iv2pp-off": 19,
+        "iv2pp-on": 26,
         "jasons-sanbox": 0,
         "jurupa-area-recreation-and-park-district": 75,
         "laguna-beach": 2,
         "lake-county": 30,
         "lincoln": 30,
-        "littleton": 59,
+        "littleton": 58,
         "maple-grove": 4,
         "marin-county-parks": 25,
-        "mashantucket-pequot-tribal-nation": 38,
+        "mashantucket-pequot-tribal-nation": 37,
         "mesa": 9,
-        "mission-oaks-rpd": 20,
-        "needham": 45,
-        "norris": 20,
+        "mission-oaks-rpd": 19,
+        "needham": 44,
+        "norris": 19,
         "northern-door-sports-and-recreation": 61,
-        "north-logan": 45,
+        "north-logan": 44,
         "orangevale-recreation--park-district": 0,
-        "oro-valley": 34,
+        "oro-valley": 33,
         "paradise-recreation-and-park-district": 63,
         "pittsburg": 14,
-        "pleasant-hill": 52,
-        "prescott-valley": 63,
-        "pueblo-county": 59,
-        "putnam-county": 43,
+        "pleasant-hill": 51,
+        "prescott-valley": 61,
+        "pueblo-county": 58,
+        "putnam-county": 44,
         "rec-demo-org": 11,
         "rec-east-bay": 0,
-        "rec-mountain": 20,
+        "rec-mountain": 19,
         "RecSF": 32,
         "rec-staging": 5,
-        "rec-university": 50,
+        "rec-university": 49,
         "redwood-city": 5,
         "rocklin": 30,
         "sacramento-county": 54,
@@ -44812,23 +45554,23 @@
         "suffolk-parks-and-recreation": 32,
         "sunrise-pickleball-club": 21,
         "sunrise-rpd": 16,
-        "the-dance-palace": 41,
-        "the-ranch": 59,
+        "the-dance-palace": 40,
+        "the-ranch": 58,
         "torranceca": 5,
-        "town-of-clarkstown": 66,
+        "town-of-clarkstown": 65,
         "town-of-clarksville": 68,
         "town-of-corte-madera": 14,
-        "town-of-danvers": 73,
+        "town-of-danvers": 74,
         "town-of-reading": 46,
-        "town-of-shrewsbury": 68,
-        "town-of-taylor": 52,
+        "town-of-shrewsbury": 67,
+        "town-of-taylor": 51,
         "town-of-wellesley": 2,
         "town-of-wellesley-old": 7,
         "town-of-windham": 82,
         "upson-county": 7,
-        "watertown": 73,
-        "woodmen-hills-metro-district": 50,
-        "yerba-buena-gardens": 57,
+        "watertown": 74,
+        "woodmen-hills-metro-district": 49,
+        "yerba-buena-gardens": 58,
         "zzzarchivenorthern-door-sports-and-recreation": 0,
         "zzzyerba-buena-gardens": 4
       }

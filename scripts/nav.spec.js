@@ -48,7 +48,7 @@ process.on("exit", () => {
   eq(missing.length, 0,
      `every page route() can return has a titles entry — the header reads titles[r.page][0] and a miss BLANKS THE DASHBOARD. Missing: ${missing.join(", ")}`);
 
-  for (const p of ["features", "how", "updates"])
+  for (const p of ["features", "feature", "how", "updates"])
     ok(pages.includes(p), `route() handles /ps/${p}`);
 }
 
@@ -56,7 +56,7 @@ process.on("exit", () => {
 {
   const psRoutes = (server.match(/app\.get\(\[[^\]]*"\/ps"[\s\S]*?\]/) || [""])[0];
   ok(psRoutes.length > 20, "the /ps/* route array was found in server.js");
-  for (const p of ["/ps/features", "/ps/how", "/ps/updates"])
+  for (const p of ["/ps/features", "/ps/feature/:key", "/ps/how", "/ps/updates"])
     ok(psRoutes.includes(`"${p}"`), `server.js serves ${p} (a client route the server does not serve is a hard 404 on refresh or a shared link)`);
   /* NO BOOKMARK MAY BREAK. The rename was to the LABEL; these paths are what
      people have in their history and in links they were sent. */

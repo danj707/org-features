@@ -248,6 +248,95 @@ const CASES = [
       await pg.waitForSelector('[data-feat-qvchip="sms"]');
       await pg.click('[data-feat-qvchip="sms"]');
     } },
+  /* THE PICKER'S PROMISE MUST EQUAL WHAT THE CLICK DELIVERS. Every option
+     carries an org count in its own label, and a picker wired to the wrong
+     key renders a perfectly plausible table of some other feature's users —
+     "a table rendered" and even "the table got shorter" both pass on that.
+     So the case reads the count out of the option's TEXT and requires the
+     row count to equal it. Keyed on calendar_sync because it is the feature
+     this control was built for and it is nowhere near the fleet-wide
+     features, so a wrong key cannot coincide with it. */
+  { name: "org features · the picker filters to exactly what its label promised",
+    path: "/ps/features", needs: '[data-rc-fpick="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fsel]");
+      await pg.select("[data-feat-fsel]", "calendar_sync");
+      /* waitForFunction, NOT waitForSelector: the element was already there
+         and only its attribute VALUE changes, which a selector wait does not
+         reliably see. A fixed sleep here was flaky, and a flaky assertion is
+         not a guard.
+
+         IT WAITS FOR *ANY* ACTIVE FEATURE, not for calendar_sync. Waiting for
+         the right one makes a picker wired to the WRONG key fail as a 30s
+         timeout, which reads as the page being broken rather than as this
+         assertion catching the thing it is named for — so the wait settles
+         and the assertion below is what reports. */
+      await pg.waitForFunction(() => {
+        const el = document.querySelector("[data-feat-fsel]");
+        return el && el.getAttribute("data-feat-fsel") !== "none";
+      });
+      await pg.evaluate(() => {
+        const sel = document.querySelector("[data-feat-fsel]");
+        const active = sel.getAttribute("data-feat-fsel");
+        const opt = [...sel.options].find(o => o.value === active);
+        const promised = Number((((opt && opt.textContent) || "").match(/(\d+)\s+orgs?\s*$/) || [])[1]);
+        const rows = document.querySelectorAll("[data-feat-row]").length;
+        document.body.setAttribute("data-rc-fpick",
+          (active === "calendar_sync" && promised > 0 && rows === promised) ? "1" : "0");
+        document.body.setAttribute("data-rc-fpick-seen",
+          "picked calendar_sync, active " + active
+          + ", label promised " + promised + ", table shows " + rows);
+      });
+    } },
+  /* ONE STATE, TWO REFLECTIONS. Picking a feature that also has a chip must
+     light that chip — a picker and a chip disagreeing about the active scope
+     is the surface lying about what it is showing, and no source assertion
+     can see which of the two is lit. */
+  { name: "org features · picking a feature lights its chip too",
+    path: "/ps/features", needs: '[data-rc-fsync="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fsel]");
+      await pg.select("[data-feat-fsel]", "sms_messaging");
+      await pg.waitForFunction(() =>
+        document.querySelector("[data-feat-fsel]")
+          && document.querySelector("[data-feat-fsel]").getAttribute("data-feat-fsel") === "sms_messaging");
+      await pg.evaluate(() => {
+        const chip = document.querySelector('[data-feat-qvchip="sms"]');
+        document.body.setAttribute("data-rc-fsync",
+          (chip && chip.classList.contains("on")) ? "1" : "0");
+        document.body.setAttribute("data-rc-fsync-seen",
+          chip ? "chip class " + chip.className : "no sms chip");
+      });
+    } },
+  /* THE FEATURE PAGE MUST ACCOUNT FOR EVERY ORGANIZATION. Using it, not using
+     it and live, not using it and pre-launch have to partition the fleet, and
+     the table has to carry one row per user. A page that silently drops an
+     org from one side renders exactly as convincingly as one that does not —
+     this is the only assertion that can tell them apart. */
+  { name: "org features · a feature page accounts for every organization",
+    path: "/ps/feature/calendar_sync", needs: '[data-rc-fpage="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-fusers]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const total = ((d && d.orgs) || []).length;
+        const attr = (sel, name) => {
+          const el = document.querySelector(sel);
+          return el ? Number(el.getAttribute(name)) : 0;
+        };
+        const users = attr("[data-feat-fusers]", "data-feat-fusers");
+        const live = attr("[data-feat-fmisslive]", "data-feat-fmisslive");
+        const pre = attr("[data-feat-fmisspre]", "data-feat-fmisspre");
+        const rows = document.querySelectorAll("[data-feat-fuser]").length;
+        const good = total > 50 && users > 0 && rows === users && users + live + pre === total;
+        document.body.setAttribute("data-rc-fpage", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fpage-seen",
+          users + " using + " + live + " live missing + " + pre + " pre missing = "
+          + (users + live + pre) + " of " + total + " orgs, " + rows + " table rows");
+      });
+    } },
+  { name: "org features · an unknown feature key explains itself",
+    path: "/ps/feature/not_a_real_feature", needs: "[data-feat-fcrumb]" },
   /* The Settings & Configuration category, on both surfaces. It is the one
      category that exists only because features were MOVED into it, so a
      regroup that half-applies (catalog edited, short label missing) shows
@@ -321,6 +410,14 @@ const cases = only ? CASES.filter(c => c.name.includes(only)) : CASES;
       try {
         const bodyLen = await pg.evaluate(() => document.body.innerText.trim().length);
         extra = bodyLen < 40 ? "  (the page came up BLANK — likely an uncaught error unmounting React)" : "";
+        /* WHAT THE CASE ACTUALLY MEASURED. Every act-driven case stamps a
+           `data-rc-*-seen` string and nothing ever read one, so a failure
+           reported "the selector never appeared" and left the numbers that
+           would explain it sitting on the element. */
+        const seen = await pg.evaluate(() => [...document.body.attributes]
+          .filter(a => /^data-rc-.*-seen$/.test(a.name))
+          .map(a => a.name.replace(/^data-rc-|-seen$/g, "") + ": " + a.value).join(" · "));
+        if (seen) extra += "\n    measured — " + seen;
       } catch { /* page is gone */ }
       console.error(`✗ ${c.name}: ${errs[0] || e.message}${extra}`);
       failed++;

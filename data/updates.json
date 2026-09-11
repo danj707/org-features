@@ -2,6 +2,18 @@
   "note": "The running update log shown at /ps/updates, newest first. Add an entry in the SAME commit as the change it describes, so it arrives reviewable in the diff rather than being reconstructed later from git log. Keep it partner-and-team readable: what changed and why it matters, not the file names.",
   "updates": [
     {
+      "date": "2026-09-11",
+      "title": "Filter Org Features to one feature — and calendar sync is now tracked",
+      "body": "Two halves of the same gap: the catalog had no entry for calendar sync, and there was no way to ask \"who uses X\" for anything outside the eight features with a chip.",
+      "items": [
+        "A feature picker beside the organization pulldown lists every tracked feature, grouped by category, with the number of organizations using it printed on each option — so the count is readable without picking anything.",
+        "Every feature now has its own page: how many organizations use it, how many of those are live on rec.us, and — the list that is actually actionable — who does not, split live from pre-launch.",
+        "Calendar sync joins the catalog as the 58th feature. 20 organizations have ever connected a Google or Outlook calendar, 18 are connected today, and 62 calendars are synced between them. City of Bloomington leads on 11.",
+        "Two organizations have a badly broken connection worth chasing: Hermosa Beach has 1,098 failed syncs against 1 success, and Euclid 887 of 1,761. A further 13 calendar views across 12 organizations have been switched off automatically after the sign-in to Google or Outlook stopped working.",
+        "Adoption is now scored over 57 features instead of 56, so every score moves by about a point and the trend sparkline is blank until the daily bake has two readings on the new set. A score taken over a different set of features is a different measurement, so the old points are dropped rather than plotted."
+      ]
+    },
+    {
       "date": "2026-09-07",
       "title": "Org Features has settings — choose which features count, and exclude organizations",
       "body": "The gear on the Feature usage panel opens a shared settings sheet. It scopes the page; it never deletes anything.",
