@@ -379,6 +379,18 @@
   .fsig { display: block; font-size: 11.5px; line-height: 1.5; color: #475569;
           background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
           padding: 8px 10px; white-space: pre-wrap; word-break: break-word; }
+  /* The two slices of one dataset. A tab that only looks like a link is a
+     tab nobody clicks, so the active one is filled rather than underlined —
+     the same treatment .qvchip.on already uses for an active view. */
+  .slicetabs { display: flex; gap: 8px; margin: 2px 0 14px; flex-wrap: wrap; }
+  .slicetab { display: block; border: 1px solid var(--line); border-radius: 10px;
+              padding: 7px 13px; background: var(--card); color: var(--ink);
+              font-size: 13px; font-weight: 700; text-decoration: none; line-height: 1.25; }
+  .slicetab i { display: block; font-style: normal; font-size: 11px; font-weight: 400;
+                color: var(--muted); margin-top: 1px; }
+  .slicetab:hover { background: #f1f5f9; text-decoration: none; }
+  .slicetab.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .slicetab.on i { color: rgba(255,255,255,.75); }
   .fnot { padding: 12px 16px; }
   /* A WRAPPED ROW OF NAMES, not a table. This list runs to 120 organizations
      on a feature nobody has adopted, and a 120-row table of one column is a
@@ -717,7 +729,13 @@
      letting null compare as 0 puts "we cannot tell" at one end of the list
      under a heading that claims to rank. Nulls go LAST in both directions,
      which is the only arrangement that is honest either way round. */
-  function ofSortRows(rows, key, dir, getVal, numeric) {
+  function ofSortRows(rows, key, dir, getVal, numeric, tieBreak) {
+    /* THE TIE-BREAK IS AN ARGUMENT so one sorter serves both tables. It used
+       to reach into `r.o.displayName`, which a FEATURE row does not have —
+       a second copy of this for the feature table would be a second place for
+       a direction to be wrong, and a direction is the only mistake here that
+       matters. */
+    const tb = tieBreak || (r => String((r.o && (r.o.displayName || r.o.name || r.o.slug)) || ""));
     const withNull = [], withVal = [];
     for (const r of rows) {
       const v = getVal(r, key);
@@ -727,12 +745,9 @@
       const c = numeric ? (a.v - b.v)
         : String(a.v).localeCompare(String(b.v), undefined, { numeric: true, sensitivity: "base" });
       // Name as the tie-break, so two runs of one sort cannot disagree.
-      return (c || 0) * dir
-        || String(a.r.o.displayName || a.r.o.name || a.r.o.slug)
-             .localeCompare(String(b.r.o.displayName || b.r.o.name || b.r.o.slug));
+      return (c || 0) * dir || tb(a.r).localeCompare(tb(b.r));
     });
-    withNull.sort((a, b) => String(a.r.o.displayName || a.r.o.name || a.r.o.slug)
-      .localeCompare(String(b.r.o.displayName || b.r.o.name || b.r.o.slug)));
+    withNull.sort((a, b) => tb(a.r).localeCompare(tb(b.r)));
     return withVal.concat(withNull).map(x => x.r);
   }
   // The first direction a column takes when it has not been clicked yet.
@@ -774,6 +789,58 @@
     return { rows: out, total, capped };
   }
 
+  /* ── THE TWO SLICES OF ONE DATASET ────────────────────────────────────
+     Dan: "Right now it's scoped to orgs, but we need a different slice of the
+     metric, by feature. Build that out as a separate tab on the same Org
+     Features page if needed."
+
+     A separate ROUTE rather than local tab state, so the slice is linkable,
+     survives a refresh and can be sent to someone — the same reason the org
+     drill-in is a route. The strip is what makes each findable from the
+     other; without it the feature slice is a URL only its author knows. */
+  const OF_SLICES = [
+    { href: "/ps/features", page: "features", label: "By organization",
+      hint: "how much of the platform each organization uses" },
+    { href: "/ps/feature", page: "featurelist", label: "By feature",
+      hint: "how far each feature has spread across the fleet" },
+  ];
+  /* ── WHEN THIS DATA IS FROM ───────────────────────────────────────────
+     ONE definition, because both slices read the same snapshot and a second
+     copy is a second place for the stale warning to go missing. It did: the
+     by-feature page shipped its own as-of line without the link, and the
+     spec's slice caught it by matching the new copy instead of the old one.
+
+     It states the AGE, measured, rather than claiming "refreshed daily" — a
+     standing promise this project has already broken once. The sidebar's
+     snapshot line describes the PS/bugs snapshot, a different file on a
+     different schedule, and reading that instead is how the features snapshot
+     sat 16 days stale without anyone noticing. */
+  function AsOf({ generatedAt, note }) {
+    return e("div", { className: "asof", "data-feat-asof": snapAgeDays(generatedAt) },
+      e("span", null, e("b", null, "Data as of "),
+        generatedAt ? new Date(generatedAt).toLocaleString("en-US",
+          { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
+          : "an unreadable date"),
+      snapStale(generatedAt)
+        // A WARNING WHOSE FIX A HUMAN MUST PERFORM CARRIES THE LINK to perform
+        // it. The bake is a GitHub Action, so a missed refresh is a red X on a
+        // page one click away.
+        ? e("span", { className: "asof-stale" }, "\u26a0 " + snapAgeLabel(generatedAt),
+            " \u2014 the nightly bake may have failed. ",
+            e("a", { href: "https://github.com/danj707/org-features/actions/workflows/refresh-features.yml",
+                     target: "_blank", rel: "noopener" }, "Check the last run"))
+        : e("span", { className: "asof-age" }, "\u00b7 " + snapAgeLabel(generatedAt)),
+      e("span", { className: "asof-src" },
+        note || "Baked from the production read replica, daily at 6am ET"));
+  }
+
+  function SliceTabs({ page }) {
+    return e("div", { className: "slicetabs", "data-of-slice": page },
+      OF_SLICES.map(sl => link(sl.href,
+        e(React.Fragment, null, sl.label, e("i", null, sl.hint)),
+        "slicetab" + (sl.page === page ? " on" : ""))));
+  }
+
   function route() {
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
@@ -788,6 +855,7 @@
        page. A different prefix cannot collide at all. (The spec asserts the
        nested spelling is absent, so it must not be written out even in a
        comment.) */
+    if (p === "/ps/feature" || p === "/ps/feature/") return { page: "featurelist" };
     const fk = p.match(/^\/ps\/feature\/(.+)$/);
     if (fk) return { page: "feature", key: decodeURIComponent(fk[1]) };
     /* BEFORE the bare prefix test, which would otherwise swallow the slug
@@ -855,15 +923,68 @@
     return GRADE_RAMP.find(g => pct >= g.min) || GRADE_RAMP[GRADE_RAMP.length - 1];
   }
   function ofGradeColor(pct) { const g = ofGrade(pct); return g ? g.color : "#94a3b8"; }
+
+  /* ---------------- the FEATURE adoption grade ----------------
+     Dan: "we also need a way to track feature adoption in general, like a
+     sparkline or metric showing 'Calendar Sync - 15% adoption, F-, trending
+     up'... Right now it's scoped to orgs, but we need a different slice."
+
+     A SEPARATE RAMP, AND THAT IS THE LOAD-BEARING DECISION. The ramp above is
+     curved to what an ORGANIZATION scores across 57 features; this one is
+     curved to how far a FEATURE spreads across 73 live organizations. They are
+     different questions over different denominators, and routing both through
+     one constant means a ramp tuned to one silently re-grades the other — the
+     same reason Account Health keeps `scoreColor` rather than reusing
+     `ofGradeColor`.
+
+     THE TWO DISTRIBUTIONS HAPPEN TO BE CLOSE TODAY, which is why the numbers
+     start identical and why the separation has to be deliberate rather than
+     accidental. Measured 2026-09-11 over the 57 measured features against 73
+     live orgs: min 1%, median 52%, mean 50.2%, max 99% (facility rentals, on
+     72 of 73). Against the org distribution — median 57%, mean 50% — those are
+     near enough to share thresholds and not near enough to share a constant.
+
+     At the same 75/60/45/25 the 57 features spread A 14 · B 8 · C 11 · D 11 ·
+     F 13, so no band is empty and the modal grade is not F. The spec measures
+     that spread rather than trusting this comment.
+
+     THE COPY IS NOT THE ORG COPY. "Getting nearly everything out of the
+     platform" is a sentence about an organization and nonsense about a
+     feature, so every `says` here is about fleet penetration instead. */
+  const FEATURE_GRADE_RAMP = [
+    { min: 75, letter: "A", color: "#15803d", band: "#dcfce7",
+      says: "Standard equipment — nearly every live organization has this" },
+    { min: 60, letter: "B", color: "#16a34a", band: "#ecfdf5",
+      says: "Widely adopted, with a real tail left to convert" },
+    { min: 45, letter: "C", color: "#b45309", band: "#fffbeb",
+      says: "About half the fleet; the rest is addressable" },
+    { min: 25, letter: "D", color: "#ea580c", band: "#fff7ed",
+      says: "Early — a minority have turned it on" },
+    { min: 0,  letter: "F", color: "#dc2626", band: "#fef2f2",
+      says: "Barely adopted — new, niche, or not landing" },
+  ];
+  const FEATURE_GRADE_BASIS = "Graded against how far features actually spread on rec.us, "
+    + "not a 90/80/70 school scale — the most-adopted feature reaches 99% of live "
+    + "organizations and the median reaches 52%.";
+  // NULL, NEVER AN F — same absent-is-not-zero rule as the org grade.
+  function ofFeatureGrade(pct) {
+    if (pct == null || typeof pct !== "number" || !isFinite(pct)) return null;
+    return FEATURE_GRADE_RAMP.find(g => pct >= g.min) || FEATURE_GRADE_RAMP[FEATURE_GRADE_RAMP.length - 1];
+  }
+  function ofFeatureGradeColor(pct) { const g = ofFeatureGrade(pct); return g ? g.color : "#94a3b8"; }
   /* The badge. `size` so one component serves a table cell, a KPI card and the
      printed report rather than three that drift apart. */
-  function Grade({ pct, size, showSays }) {
-    const g = ofGrade(pct);
+  /* ONE COMPONENT, TWO SCALES. How a grade is DRAWN is shared — a pill, the
+     band colour, the basis in the tooltip — and which ramp it is read off is
+     an argument, because the org scale and the feature scale are different
+     measurements that must be free to move apart. */
+  function Grade({ pct, size, showSays, ramp, basis }) {
+    const g = ramp === "feature" ? ofFeatureGrade(pct) : ofGrade(pct);
     if (!g) return null;
     return e("span", { className: "grade" + (size ? " grade-" + size : ""),
                        "data-of-grade": g.letter,
                        style: { color: g.color, background: g.band, borderColor: g.color + "40" },
-                       title: g.says + " — " + GRADE_BASIS },
+                       title: g.says + " — " + (basis || (ramp === "feature" ? FEATURE_GRADE_BASIS : GRADE_BASIS)) },
       g.letter,
       showSays ? e("i", null, g.says) : null);
   }
@@ -997,6 +1118,68 @@
     const d2 = Math.round(t.delta);
     return (d2 > 0 ? "+" : d2 < 0 ? "\u2212" : "") + Math.abs(d2) + " pts";
   }
+  /* ── A FEATURE'S OWN TREND ─────────────────────────────────────────────
+     NOT the org trend with a different argument. Each history point's
+     `scores` map is per ORGANIZATION, and no amount of averaging it answers
+     "how many organizations use calendar sync" — so the series had to be
+     recorded separately (see merge-snapshot.js) and backfilled from the
+     bakes this repo has already committed.
+
+     TWO WAYS A POINT IS DROPPED, and BOTH are about the DENOMINATOR rather
+     than the feature set the org trend guards on:
+
+       * NO LIVE DENOMINATOR. The 25 snapshots committed before 2026-09-07
+         carry 61-69 organizations with NONE flagged launched, so their live
+         count is zero. There is no percentage to take, and taking one anyway
+         would publish a change in who we measure as a change in adoption —
+         the same trap the org trend's setKey guard exists for, one level up.
+       * THE FEATURE IS NOT IN THAT POINT. It was not measured yet, so there
+         is no zero to plot. Plotting one would draw a month of 0% under a
+         feature added yesterday and invent a rise that never happened.
+
+     The shape matches `ofTrend` exactly, so TrendCell and Trendline render
+     both without knowing which they were handed. */
+  function ofFeatureTrend(history, key) {
+    const pts = (history || [])
+      .filter(h => h && h.liveOrgs > 0 && h.featureLive && h.featureLive[key] != null)
+      .map(h => ({ date: h.date, v: Math.round((h.featureLive[key] / h.liveOrgs) * 100) }));
+    if (pts.length < TREND_MIN_POINTS) {
+      return { points: pts, ready: false, delta: null, first: null,
+               last: pts.length ? pts[pts.length - 1].v : null };
+    }
+    const first = pts[0].v, last = pts[pts.length - 1].v;
+    return { points: pts, ready: true, first, last, delta: last - first,
+             from: pts[0].date, to: pts[pts.length - 1].date };
+  }
+
+  /* ONE ROW PER TRACKED FEATURE, and ONE reducer behind every surface that
+     shows one — the table, the KPI row above it and the per-feature page all
+     read this, so none of them can disagree about a percentage.
+
+     THE LIVE HALF GOES THROUGH `ofFleetUse`, which is the existing single
+     definition of "live organizations using X". Recomputing it here would be
+     a second definition of the number this whole tab is about. */
+  function ofFeatureRows(d, dv) {
+    const keys = dv.shown || [];
+    const fleet = ofFleetUse(d, dv, keys);
+    const orgs = dv.all || [];
+    return keys.map(k => {
+      const live = fleet.used[k] || 0;
+      const all = orgs.filter(o => dv.adoptedIn(o.slug, k)).length;
+      return {
+        key: k, name: dv.label(k),
+        cat: (dv.byKey[k] && dv.byKey[k].category) || "",
+        live, liveOrgs: fleet.liveOrgs, all, allOrgs: orgs.length,
+        /* NULL, NEVER 0%, WITH NO DENOMINATOR. A view scoped to nothing but
+           pre-launch orgs has no live fleet to be a share of, and "0% of
+           nobody" is a statement about the filter rather than the feature. */
+        pct: fleet.liveOrgs ? Math.round((live / fleet.liveOrgs) * 100) : null,
+        pctAll: orgs.length ? Math.round((all / orgs.length) * 100) : null,
+        trend: ofFeatureTrend(dv.history, k),
+      };
+    });
+  }
+
   function ofTrendColor(t) {
     if (!t || !t.ready || t.delta == null) return "#94a3b8";
     return t.delta > 0 ? "#16a34a" : t.delta < 0 ? "#dc2626" : "#94a3b8";
@@ -1025,7 +1208,7 @@
                     cy: (h - 2 - ((vs[vs.length - 1] - lo) / span) * (h - 4)).toFixed(1),
                     r: 2, fill: col }));
   }
-  function TrendCell({ t }) {
+  function TrendCell({ t, why }) {
     if (!t || !t.ready) {
       /* NOT A DASH IN A COLUMN HEADED "TREND" WITH NO EXPLANATION. The
          history starts at the first bake carrying it, so for the first day
@@ -1034,8 +1217,12 @@
                          title: (t && t.points.length === 1)
                            ? "Only one measurement so far. The daily bake adds a point every "
                              + "morning, so this fills in from tomorrow."
-                           : "No comparable measurement history yet. Points scored over a "
-                             + "different feature set are deliberately not plotted." },
+                           /* THE REASON IS THE CALLER'S, because the two series
+                              drop points for different reasons and a tooltip
+                              naming the wrong one sends the reader looking in
+                              the wrong place. */
+                           : (why || "No comparable measurement history yet. Points scored over a "
+                             + "different feature set are deliberately not plotted.") },
         "\u00b7");
     }
     return e("span", { className: "trendcell", "data-of-trend": Math.round(t.delta),
@@ -1910,7 +2097,7 @@
      like the snapshot had gone. */
   const OF_DEFAULT_SETTINGS = { hiddenFeatures: [], excludedOrgs: [] };
 
-  function Features({ slug, featureKey }) {
+  function Features({ slug, featureKey, featureList }) {
     const [d, setD] = useState(null);
     const [err, setErr] = useState(null);
     const [cfg, setCfg] = useState(null);        // null until the fetch settles
@@ -1921,6 +2108,10 @@
     // alphabetical order says" — a header click OVERRIDES the order but never
     // the scope, so sorting inside "Top SMS users" still shows only those 20.
     const [sort, setSort] = useState(null);
+    // The feature table's own sort, kept apart from the org table's: the two
+    // have different columns, so one shared state would carry a key the other
+    // cannot resolve and silently fall back to its default order.
+    const [fsort, setFsort] = useState(null);
     const [cmpA, setCmpA] = useState("");
     const [cmpB, setCmpB] = useState("");
     const [open, setOpen] = useState(null);
@@ -2183,6 +2374,144 @@
         }) : null);
     }
 
+    /* ── THE OTHER SLICE: ONE ROW PER FEATURE ─────────────────────────────
+       Everything else on this page asks "how much of the platform does this
+       org use". This asks "how far has this feature spread", which is the
+       same dataset transposed and a genuinely different question — a feature
+       at 25% and an org at 25% are not comparable facts, which is why the
+       grade comes off its own ramp.
+
+       SAME COMPONENT AGAIN, so the tracked set, the exclusions and the
+       snapshot are resolved once. */
+    if (featureList) {
+      const frows = ofFeatureRows(d, dv);
+      /* DEFAULT ORDER IS MOST-ADOPTED FIRST. Alphabetical is right for the
+         org table, where the reader is looking someone up; here nobody
+         arrives looking for "Gift Cards", they arrive asking what is and is
+         not landing. */
+      const fsortVal = (r, k) => k === "name" ? r.name : k === "cat" ? r.cat
+        : k === "trend" ? (r.trend && r.trend.ready ? r.trend.delta : null)
+        : r[k];
+      const fnumeric = (k) => k !== "name" && k !== "cat";
+      const fsorted = ofSortRows(frows, fsort ? fsort[0] : "pct", fsort ? fsort[1] : -1,
+                                 fsortVal, fnumeric(fsort ? fsort[0] : "pct"), r => r.name);
+      const fth = (label2, key, extra) => e("th", Object.assign({
+        onClick: () => setFsort(x => [key, x && x[0] === key ? -x[1] : ofFirstDir(fnumeric(key))]),
+        style: { cursor: "pointer" },
+        "data-feat-fth": key,
+        "data-feat-fthdir": fsort && fsort[0] === key ? (fsort[1] < 0 ? "desc" : "asc") : "",
+      }, extra || {}), label2 + (fsort && fsort[0] === key ? (fsort[1] < 0 ? " \u2193" : " \u2191") : ""));
+
+      const pcts = frows.map(r => r.pct).filter(x => x != null).sort((x, y) => x - y);
+      const median = pcts.length
+        ? (pcts.length % 2 ? pcts[(pcts.length - 1) / 2]
+           : Math.round((pcts[pcts.length / 2 - 1] + pcts[pcts.length / 2]) / 2))
+        : null;
+      const moving = frows.filter(r => r.trend && r.trend.ready && r.trend.delta !== 0);
+      const up = moving.filter(r => r.trend.delta > 0).length;
+      const down = moving.filter(r => r.trend.delta < 0).length;
+      /* HOW MANY ROWS CAN EVEN HAVE A TREND, stated rather than left to be
+         inferred from a column of dots. A feature measured for the first time
+         today has no history, and "0 moving" over 57 features reads as a dead
+         platform when the truth is that the series has just started. */
+      const trendable = frows.filter(r => r.trend && r.trend.ready).length;
+
+      return e("div", null,
+        e(SliceTabs, { page: "featurelist" }),
+        e(AsOf, { generatedAt: d.generatedAt,
+          note: "Adoption is the share of the " + (frows[0] ? frows[0].liveOrgs : 0)
+              + " organizations live on rec.us \u2014 pre-launch orgs have configured almost "
+              + "nothing, and counting them makes every feature look unpopular" }),
+
+        e("div", { className: "cards" },
+          e("div", { className: "card ringcard", "data-feat-fcount": frows.length,
+                     title: "Features this page is counting, after the settings" },
+            e(Ring, { pct: allMeasured.length ? (shown.length / allMeasured.length) * 100 : null,
+                      color: "#0f6f5c", label: "Features tracked: " + frows.length }),
+            e("div", { className: "ringtext" },
+              e("div", { className: "k" }, "Features tracked"),
+              e("div", { className: "v" }, frows.length),
+              e("div", { className: "d" }, hidden.size ? hidden.size + " hidden by settings"
+                                                       : allMeasured.length + " of " + total + " in the catalog"))),
+          e("div", { className: "card ringcard", "data-feat-fmedian": median == null ? "" : median,
+                     title: "The middle feature's reach across live organizations" },
+            e(Ring, { pct: median, color: median == null ? null : ofFeatureGradeColor(median),
+                      label: "Median adoption: " + (median == null ? "not measured" : median + "%") }),
+            e("div", { className: "ringtext" },
+              e("div", { className: "k" }, "Median adoption"),
+              e("div", { className: "v" }, median == null ? "\u2014" : median + "%"),
+              e("div", { className: "d" }, "half of the tracked features reach more than this"))),
+          e("div", { className: "card", "data-feat-fmoving": up + "/" + down,
+                     title: "Features whose share of live organizations has moved since the first comparable bake" },
+            e("div", { className: "k" }, "Moving"),
+            e("div", { className: "v" },
+              e("span", { style: { color: "#15803d" } }, "\u25b2 " + up),
+              e("span", { style: { color: "#94a3b8", fontWeight: 400 } }, "  \u00b7  "),
+              e("span", { style: { color: up || down ? "#dc2626" : "#94a3b8" } }, "\u25bc " + down)),
+            e("div", { className: "d" }, trendable
+              ? trendable + " of " + frows.length + " have enough history to say"
+              : "no feature has two comparable measurements yet"))),
+
+        (excluded.size || hidden.size) ? e("div", { className: "note", "data-feat-fscopenote": 1 },
+          "Scoped by settings: " +
+          [hidden.size ? hidden.size + " feature" + (hidden.size === 1 ? "" : "s") + " hidden" : null,
+           excluded.size ? excluded.size + " organization" + (excluded.size === 1 ? "" : "s") + " excluded" : null]
+            .filter(Boolean).join(" \u00b7 ") +
+          ". An excluded organization leaves the denominator too, so these shares are not "
+          + "comparable with a differently-scoped view.") : null,
+
+        e("div", { className: "panel" },
+          e("h2", null, "Feature adoption across the fleet",
+            e("span", { className: "hint" }, "click a column to sort \u00b7 click a row for the organizations behind it"),
+            e("button", { onClick: () => setShowSettings(true), "data-feat-gear": 1,
+                          title: "Choose which features and organizations this page counts",
+                          style: { float: "right", marginTop: -2 } }, "\u2699")),
+          e("div", { className: "tablewrap stickywrap" },
+            e("table", { className: "feattable" },
+              e("thead", null, e("tr", null,
+                fth("Feature", "name", { className: "l" }),
+                fth("Adoption", "pct"),
+                fth("Trend", "trend", { className: "trend" }),
+                fth("Live orgs", "live"),
+                fth("All orgs", "all"))),
+              e("tbody", null, fsorted.map(r =>
+                e("tr", { key: r.key, "data-feat-frow": r.key, style: { cursor: "pointer" },
+                          onClick: () => nav("/ps/feature/" + encodeURIComponent(r.key)) },
+                  e("td", { className: "l" },
+                    e("b", null, r.name),
+                    e("div", { className: "subslug" }, catShort(r.cat))),
+                  e("td", { className: "num", "data-feat-adopt": r.pct == null ? "" : r.pct },
+                    r.pct == null
+                      ? e("span", { className: "zero" }, "no live orgs in view")
+                      : e("span", { className: "scorecell" },
+                          e(Grade, { pct: r.pct, ramp: "feature" }),
+                          e("b", { style: { color: ofFeatureGradeColor(r.pct) } }, r.pct + "%"))),
+                  e("td", { className: "trend" },
+                    e(TrendCell, { t: r.trend,
+                      /* THE REASON THIS ROW HAS NO LINE, in its own words. A
+                         feature measured for the first time today genuinely
+                         has no history, and the org trend's explanation
+                         ("a different feature set") would send the reader
+                         looking for a setting that is not the cause. */
+                      why: "Not enough history for this feature yet. It is plotted only from "
+                         + "bakes that measured it AND recorded a live-organization count, "
+                         + "so a newly-added feature starts its series on the next bake." })),
+                  e("td", { className: "num", "data-feat-flive": r.live },
+                    e("span", { className: "pill gpill", style: ofRatioHeat(r.pct) },
+                      r.live + "/" + r.liveOrgs)),
+                  e("td", { className: "num", "data-feat-fall": r.all },
+                    e("span", { className: "pill gpill", style: ofRatioHeat(r.pctAll) },
+                      r.all + "/" + r.allOrgs))))))),
+          frows.length ? null : e("div", { className: "note" },
+            "Every measured feature is hidden by the settings, so there is nothing to rank.")),
+
+        showSettings ? e(FeatureSettings, {
+          data: d, cfg,
+          onClose: () => setShowSettings(false),
+          onSaved: (next) => { setCfg(next); setCfgErr(null); setShowSettings(false); },
+        }) : null);
+    }
+
     /* ── ONE FEATURE, EVERY ORGANIZATION ──────────────────────────────────
        The inverse of the drill-in above, and the half this page could not do
        at all until now: the table answers "what does this org use", and
@@ -2224,6 +2553,7 @@
       const liveUsing = fleet.used[featureKey] || 0;
       const preOrgs = all.length - fleet.liveOrgs;
       const preUsing = users.length - liveUsing;
+      const livePct = fleet.liveOrgs ? Math.round((liveUsing / fleet.liveOrgs) * 100) : null;
       const orgLink = (o) => link("/ps/features/" + encodeURIComponent(o.slug), orgName(o), "fnotorg");
 
       return e("div", null, crumb,
@@ -2266,8 +2596,20 @@
                       label: "Live orgs using it: " + liveUsing }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Live on rec.us"),
-              e("div", { className: "v" }, liveUsing),
-              e("div", { className: "d" }, "of " + fleet.liveOrgs + " live organizations"))),
+              /* THE HEADLINE SHARE WEARS THE GRADE AND THE TREND, because
+                 this is the same number the by-feature table ranks on and a
+                 drill-in that states it differently from the list it was
+                 opened from is two surfaces disagreeing on one click. */
+              e("div", { className: "v" }, liveUsing,
+                fleet.liveOrgs ? e("span", { style: { fontSize: 15, color: "#94a3b8", fontWeight: 600 } },
+                  " \u00b7 " + livePct + "%") : null),
+              fleet.liveOrgs ? e("div", { className: "gradeline" },
+                e(Grade, { pct: livePct, ramp: "feature", size: "lg", showSays: true })) : null,
+              e("div", { className: "d" }, "of " + fleet.liveOrgs + " live organizations"),
+              e("div", { className: "d" },
+                e(TrendCell, { t: ofFeatureTrend(dv.history, featureKey),
+                  why: "Not enough history for this feature yet \u2014 it is plotted only from "
+                     + "bakes that measured it AND recorded a live-organization count." })))),
           e("div", { className: "card ringcard", "data-feat-preusing": preUsing,
                      title: "Organizations not yet live that have already configured it" },
             e(Ring, { pct: preOrgs ? (preUsing / preOrgs) * 100 : null, color: "#6b7280",
@@ -2363,22 +2705,11 @@
          features snapshot's own `generatedAt`, and it states the AGE
          (measured) rather than claiming "refreshed daily" (a standing
          promise this project has already broken once). */
-      e("div", { className: "asof", "data-feat-asof": snapAgeDays(d.generatedAt) },
-        e("span", null, e("b", null, "Data as of "),
-          d.generatedAt ? new Date(d.generatedAt).toLocaleString("en-US",
-            { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
-            : "an unreadable date"),
-        snapStale(d.generatedAt)
-          // A WARNING WHOSE FIX A HUMAN MUST PERFORM CARRIES THE LINK to
-          // perform it. The bake is a GitHub Action now, so a missed refresh
-          // is a red X on a page one click away.
-          ? e("span", { className: "asof-stale" }, "\u26a0 " + snapAgeLabel(d.generatedAt),
-              " \u2014 the nightly bake may have failed. ",
-              e("a", { href: "https://github.com/danj707/org-features/actions/workflows/refresh-features.yml",
-                       target: "_blank", rel: "noopener" }, "Check the last run"))
-          : e("span", { className: "asof-age" }, "\u00b7 " + snapAgeLabel(d.generatedAt)),
-        e("span", { className: "asof-src" },
-          "Baked from the production read replica, daily at 6am ET")),
+      /* BOTH WAYS. The strip was on the by-feature page alone at first, which
+         left that slice reachable only by someone who already knew the URL —
+         a one-way door, and the spec named it as one. */
+      e(SliceTabs, { page: "features" }),
+      e(AsOf, { generatedAt: d.generatedAt }),
 
       e("div", { className: "cards" },
         e("div", { className: "card ringcard", "data-feat-orgs": all.length,
@@ -3003,7 +3334,7 @@
     if (!data || !me) return e("div", { className: "note" }, "Loading…");
 
     const item = (href, label, active, cnt) => link(href, [label, cnt != null ? e("span", { key: "c", className: "cnt" }, cnt) : null], "item" + (active ? " active" : ""));
-    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], featureorg: ["Org Features", "Feature adoption for one organization"], feature: ["Org Features", "One feature across every organization"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
+    const titles = { health: ["Account Health", "PS/CX snapshot of every account — bugs, adoption, requests, engagement"], bugs: ["Bug Management", "All open bugs · categorize, deduplicate, and jump to Linear"], reporting: ["CX Team Reporting", "Launch pipeline · live from the Airtable Services table"], remittance: ["Remittance", "Item Log exports by billing period — one CSV per organization"], org: ["Account Health", "Account drill-in"], admin: ["Admin", "User management"], features: ["Org Features", "Feature usage and adoption across every published organization"], featureorg: ["Org Features", "Feature adoption for one organization"], feature: ["Org Features", "One feature across every organization"], featurelist: ["Org Features", "How far each feature has spread across the fleet"], how: ["How This Works", "What this project is, where its data comes from, and how it is deployed"], updates: ["Updates", "A running log of what has shipped on this project"] };
     return e("div", { className: "layout" },
       e("nav", { className: "side" },
         /* Renamed PS -> CX at Dan's request. THE LABEL ONLY: the /ps/* routes,
@@ -3058,6 +3389,7 @@
           r.page === "admin" ? e(Admin, { me }) :
           r.page === "features" ? e(Features, { slug: null }) :
           r.page === "featureorg" ? e(Features, { slug: r.slug }) :
+          r.page === "featurelist" ? e(Features, { featureList: true }) :
           r.page === "feature" ? e(Features, { featureKey: r.key }) :
           r.page === "how" ? e(HowItWorks, null) :
           r.page === "updates" ? e(Updates, null) :

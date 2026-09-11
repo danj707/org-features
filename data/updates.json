@@ -3,6 +3,18 @@
   "updates": [
     {
       "date": "2026-09-11",
+      "title": "Adoption by feature — a second slice of Org Features",
+      "body": "The report has always answered \"how much of the platform does this organization use\". It now also answers \"how far has this feature spread\", which is the same data transposed and a genuinely different question. Two tabs at the top switch between them.",
+      "items": [
+        "One row per feature: its share of the organizations live on rec.us, a letter grade, a trend sparkline and the signed change since the first comparable measurement. Sortable on every column, and a row opens the organizations behind it.",
+        "Pre-launch organizations are out of the denominator. Half the fleet is mid-setup and has configured almost nothing, so counting them makes every feature look unpopular — the all-organization figure is still on every row beside it.",
+        "The grade comes off its own scale. An organization using 25% of the platform and a feature reaching 25% of the fleet are not comparable facts, so the feature ramp is a separate measurement — currently A 14 · B 8 · C 11 · D 11 · F 13 across the 57 tracked features.",
+        "The trend works from today rather than in two days: the per-feature series was backfilled from the daily snapshots this project has already committed. Seb is up 4 points since 7 September, store credit and desk locations 2, SMS 2.",
+        "25 older snapshots were deliberately left out of the series. They predate the launch flag, so their live-organization count is zero and there is no share to take from them — plotting one anyway would publish a change in who we measure as a change in adoption."
+      ]
+    },
+    {
+      "date": "2026-09-11",
       "title": "Filter Org Features to one feature — and calendar sync is now tracked",
       "body": "Two halves of the same gap: the catalog had no entry for calendar sync, and there was no way to ask \"who uses X\" for anything outside the eight features with a chip.",
       "items": [

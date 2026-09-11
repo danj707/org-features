@@ -337,6 +337,85 @@ const CASES = [
     } },
   { name: "org features · an unknown feature key explains itself",
     path: "/ps/feature/not_a_real_feature", needs: "[data-feat-fcrumb]" },
+  /* THE DENOMINATOR IS THE WHOLE CLAIM. "Calendar Sync — 25%" and
+     "Calendar Sync — 14%" are both arithmetically true (18 of 73 live, 20 of
+     146 all) and only one of them is what this page says it shows. A row
+     computed against the wrong denominator renders a perfectly plausible
+     percentage, so the case recomputes every row from the feed and requires
+     an exact match — and requires the default order to be most-adopted
+     first, because a reader arrives asking what is not landing rather than
+     looking a feature up alphabetically. */
+  { name: "org features · by-feature ranks by adoption, scoped to live orgs",
+    path: "/ps/feature", needs: '[data-rc-fslice="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-frow]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const live = ((d && d.orgs) || []).filter(o => o.launched).map(o => o.slug);
+        const on = (s, k) => {
+          const v = (((d.adoption || {})[s] || {})[k]) || null;
+          return !!(v && (v === true || v.adopted === true || Number(v.count) > 0));
+        };
+        const rows = [...document.querySelectorAll("[data-feat-frow]")];
+        const seen = rows.map(tr => ({
+          key: tr.getAttribute("data-feat-frow"),
+          pct: Number(tr.querySelector("[data-feat-adopt]").getAttribute("data-feat-adopt")),
+        }));
+        const wrong = seen.filter(x =>
+          x.pct !== Math.round((live.filter(s => on(s, x.key)).length / live.length) * 100));
+        const descending = seen.every((x, i) => i === 0 || seen[i - 1].pct >= x.pct);
+        document.body.setAttribute("data-rc-fslice",
+          (seen.length >= 40 && !wrong.length && descending && live.length > 20) ? "1" : "0");
+        document.body.setAttribute("data-rc-fslice-seen",
+          seen.length + " rows over " + live.length + " live orgs, " + wrong.length
+          + " mis-scoped" + (wrong.length ? " (e.g. " + wrong[0].key + " at " + wrong[0].pct + "%)" : "")
+          + ", descending=" + descending);
+      });
+    } },
+  /* A FEATURE MEASURED FOR THE FIRST TIME TODAY HAS NO TREND, and one
+     measured all week does. The case requires BOTH, because "no row draws a
+     line" passes on a trend that is broken outright and "every row draws one"
+     passes on a series that invents a month of zeroes under a feature added
+     yesterday. */
+  { name: "org features · a feature with no history draws no trend line",
+    path: "/ps/feature", needs: '[data-rc-ftrend="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-feat-frow]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const hist = (d && d.history) || [];
+        const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
+                                          && h.featureLive[k] != null).length;
+        const row = k => document.querySelector('[data-feat-frow="' + k + '"]');
+        const line = k => !!(row(k) && row(k).querySelector("svg.trendline polyline"));
+        // Picked from the feed rather than hardcoded: whichever feature has
+        // the fewest points against whichever has the most.
+        const keys = [...document.querySelectorAll("[data-feat-frow]")]
+          .map(t => t.getAttribute("data-feat-frow"));
+        const sorted = keys.slice().sort((a, b) => pts(a) - pts(b));
+        const fewest = sorted[0], most = sorted[sorted.length - 1];
+        const good = pts(fewest) < 2 && pts(most) >= 2 && !line(fewest) && line(most);
+        document.body.setAttribute("data-rc-ftrend", good ? "1" : "0");
+        document.body.setAttribute("data-rc-ftrend-seen",
+          fewest + " has " + pts(fewest) + " point(s), line=" + line(fewest) + " · "
+          + most + " has " + pts(most) + ", line=" + line(most));
+      });
+    } },
+  { name: "org features · the slice tabs link the two views", path: "/ps/feature",
+    needs: '[data-rc-fslicetab="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector(".slicetabs");
+      await pg.evaluate(() => {
+        const tabs = [...document.querySelectorAll(".slicetab")];
+        const on = tabs.filter(t => t.classList.contains("on"));
+        const good = tabs.length === 2 && on.length === 1
+          && on[0].getAttribute("href") === "/ps/feature"
+          && tabs.some(t => t.getAttribute("href") === "/ps/features");
+        document.body.setAttribute("data-rc-fslicetab", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fslicetab-seen",
+          tabs.length + " tabs, " + on.length + " lit" + (on[0] ? " (" + on[0].getAttribute("href") + ")" : ""));
+      });
+    } },
   /* The Settings & Configuration category, on both surfaces. It is the one
      category that exists only because features were MOVED into it, so a
      regroup that half-applies (catalog edited, short label missing) shows
