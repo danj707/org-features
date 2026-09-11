@@ -349,7 +349,7 @@ app.get("/reset", (_req, res) => res.sendFile(RESET_PAGE));
 // is the per-org drill-in, and it has to be here or the breadcrumb works while
 // pasting the URL does not.
 app.get(["/ps", "/ps/bugs", "/ps/reporting", "/ps/remittance", "/ps/admin", "/ps/org/:id",
-         "/ps/features", "/ps/features/:slug", "/ps/feature/:key", "/ps/how", "/ps/updates"],
+         "/ps/features", "/ps/features/:slug", "/ps/feature", "/ps/feature/:key", "/ps/how", "/ps/updates"],
         auth.requireAuth, (_req, res) => res.sendFile(PS_PAGE));
 
 app.use(express.static(path.join(__dirname, "public")));

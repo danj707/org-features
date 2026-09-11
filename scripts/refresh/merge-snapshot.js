@@ -263,8 +263,34 @@ for (const o of orgs) {
     ? Math.round((used / ADOPTION_KEYS.length) * 100)
     : null;
 }
+/* ── AND THE OTHER SLICE: HOW FAR EACH FEATURE HAS SPREAD ────────────────
+   `scores` answers "how much of the platform does this org use". It cannot
+   answer "how many organizations use calendar sync", which is a different
+   question with a different denominator — and the per-org series cannot be
+   made to answer it afterwards, because a mean of org scores says nothing
+   about any one feature.
+
+   TWO DENOMINATORS, BOTH STORED. The live count is the one worth quoting —
+   half the fleet is pre-launch and has configured almost nothing, so a
+   fleet-wide share makes every feature look unpopular — but the all-org
+   figure is real context and storing it now costs 57 integers and saves a
+   re-bake if the headline ever changes.
+
+   `liveOrgs` TRAVELS WITH THE POINT because it IS the denominator. A point
+   that does not carry it cannot be turned into a percentage, and the 25
+   snapshots this repo committed before 2026-09-07 are exactly that shape:
+   61-69 orgs, none of them flagged launched, so their live denominator is
+   zero. The page drops them rather than dividing by it. */
+const liveSlugs = orgs.filter(o => o.launched).map(o => o.slug);
+const featureLive = {}, featureAll = {};
+for (const k of ADOPTION_KEYS) {
+  featureLive[k] = liveSlugs.filter(s => (adoption[s] || {})[k] && adoption[s][k].adopted).length;
+  featureAll[k] = orgs.filter(o => (adoption[o.slug] || {})[k] && adoption[o.slug][k].adopted).length;
+}
 const point = { date: today, setKey: setKeyOf(ADOPTION_KEYS),
-                measured: ADOPTION_KEYS.length, scores };
+                measured: ADOPTION_KEYS.length, scores,
+                orgs: orgs.length, liveOrgs: liveSlugs.length,
+                featureLive, featureAll };
 /* IDEMPOTENT PER DATE. The workflow can be re-run by hand on the same day —
    it was, three times, the day it was written — and appending each run would
    put three points on one date and make a day look like a week. */

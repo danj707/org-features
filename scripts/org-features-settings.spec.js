@@ -83,6 +83,8 @@ const H = (() => {
       "; return { CAT_SHORT, catShort, ofRecAdminUrl, ofGroupScore, ofRatioHeat, RATIO_BANDS," +
       " ofGapClusters, GAP_GROUPS_SHOWN, GAP_NAMES_SHOWN," +
       " GRADE_RAMP, GRADE_BASIS, ofGrade, ofGradeColor, ofDerive, ofFleetUse, ofRank," +
+      " FEATURE_GRADE_RAMP, FEATURE_GRADE_BASIS, ofFeatureGrade, ofFeatureGradeColor," +
+      " ofFeatureTrend, ofFeatureRows, OF_SLICES," +
       " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell };")(EL);
   } catch (err) {
     LIFT_ERR = err;
@@ -95,6 +97,9 @@ const H = (() => {
                                 adoptedIn: () => false, label: x => x, notUsing: () => [],
                                 detailOf: () => "" }),
              ofFleetUse: () => ({ liveOrgs: 0, used: {} }), ofRank: () => null,
+             FEATURE_GRADE_RAMP: [], FEATURE_GRADE_BASIS: "", ofFeatureGrade: () => null,
+             ofFeatureGradeColor: () => "", ofFeatureTrend: () => null,
+             ofFeatureRows: () => [], OF_SLICES: [],
              TREND_MIN_POINTS: 0, ofTrend: () => null, ofTrendLabel: () => null,
              ofTrendColor: () => "", Trendline: () => null, TrendCell: () => null };
   }
@@ -486,6 +491,170 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   .catch(e => { ok(false, "the live half threw: " + e.message + "\n" + log); })
   .then(() => { try { child.kill(); } catch { /* already gone */ } report(); });
 
+// ── THE OTHER SLICE: ADOPTION BY FEATURE ───────────────────────────────────
+// Dan: "we also need a way to track feature adoption in general, like a
+// sparkline or metric showing 'Calendar Sync - 15% adoption, F-, trending
+// up'... Right now it's scoped to orgs, but we need a different slice."
+//
+// LIFTED AND RUN. Every mistake worth guarding here is a DENOMINATOR — a
+// share taken over the wrong population, or a trend plotted across points
+// whose population changed — and none of them is visible in a regex over the
+// arithmetic that produces them.
+{
+  const snap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "features-data.json"), "utf8"));
+  const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
+  const routeFn = srcNC.slice(srcNC.indexOf("function route()"), srcNC.indexOf("function nav("));
+  const merge2 = fs.readFileSync(path.join(ROOT, "scripts", "refresh", "merge-snapshot.js"), "utf8");
+  ok(feat.length > 500 && routeFn.length > 50 && merge2.length > 500,
+     "the page, the router and the bake were all found and sliced");
+
+  // ── the ramp is its own constant ──────────────────────────────────────
+  /* THE LOAD-BEARING DECISION. The org ramp grades how much of 57 features an
+     ORGANIZATION uses; this one grades how far one FEATURE spreads across 73
+     live organizations. The two distributions are close enough today to share
+     thresholds (org median 57%, feature median 52%) and that is exactly why
+     the separation has to be deliberate: one constant means a ramp tuned to
+     one silently re-grades the other. Same reason Account Health keeps
+     `scoreColor` instead of reusing `ofGradeColor`. */
+  ok(H.FEATURE_GRADE_RAMP.length >= 5, "there is a feature grade ramp");
+  ok(H.FEATURE_GRADE_RAMP !== H.GRADE_RAMP,
+     "...and it is its OWN constant, not the org ramp under a second name");
+  const orgSays = new Set(H.GRADE_RAMP.map(g => g.says));
+  ok(H.FEATURE_GRADE_RAMP.every(g => !orgSays.has(g.says)),
+     "every band says something about a FEATURE — the org copy is a sentence about an organization and nonsense about a feature");
+  ok(H.FEATURE_GRADE_BASIS && H.FEATURE_GRADE_BASIS !== H.GRADE_BASIS,
+     "...and it carries its own basis, because a bare letter reads as an absolute judgement");
+  ok(/live organi/i.test(H.FEATURE_GRADE_BASIS),
+     "...which names the denominator it is graded against");
+  // NULL, NEVER AN F — the absent-is-not-zero rule, on both scales.
+  eq(H.ofFeatureGrade(null), null, "an unmeasured feature has no grade rather than an F");
+  eq(H.ofFeatureGrade(NaN), null, "...and neither does a NaN");
+  eq(H.ofFeatureGrade(0).letter, "F", "...but a real zero is an F");
+  eq(H.ofFeatureGrade(100).letter, "A", "...and a real hundred is an A");
+
+  /* THE SPREAD IS MEASURED, not asserted in a comment. A ramp whose modal
+     grade is F carries no information, and one with an empty band is a scale
+     with a rung nobody can stand on. */
+  const dvAll = H.ofDerive(snap, {});
+  const rows = H.ofFeatureRows(snap, dvAll);
+  eq(rows.length, snap.measuredFeatures.length, "one row per tracked feature");
+  const byLetter = {};
+  rows.forEach(r => { const g = H.ofFeatureGrade(r.pct); if (g) byLetter[g.letter] = (byLetter[g.letter] || 0) + 1; });
+  const spread = ["A", "B", "C", "D", "F"].map(l => l + " " + (byLetter[l] || 0)).join(" · ");
+  ok(["A", "B", "C", "D", "F"].every(l => byLetter[l] > 0),
+     "every band has at least one feature in it — " + spread);
+  const modal = Object.entries(byLetter).sort((a, b) => b[1] - a[1])[0][0];
+  ok(modal !== "F", "the modal grade is not F — a scale whose commonest grade is F says nothing (" + spread + ")");
+
+  // ── the denominator ───────────────────────────────────────────────────
+  const liveCount = (snap.orgs || []).filter(o => o.launched).length;
+  ok(liveCount > 20, "the fixture snapshot has a real live fleet");
+  rows.forEach(r => {
+    ok(r.liveOrgs === liveCount,
+       r.key + " is a share of the LIVE fleet, not of every organization");
+    ok(r.live <= r.all, r.key + ": the live count cannot exceed the all-org count");
+  });
+  /* THE HEADLINE IS THE LIVE SHARE, and the two really do differ enough to
+     matter — half the fleet is pre-launch and has configured almost nothing,
+     so a fleet-wide share makes every feature look unpopular. */
+  const cs = rows.find(r => r.key === "calendar_sync");
+  ok(cs, "calendar sync is in the feature rows");
+  ok(cs.pct > cs.pctAll,
+     "the live share and the all-org share differ — " + cs.pct + "% of live against " + cs.pctAll + "% of all");
+
+  /* NULL, NEVER 0%, WITH NO DENOMINATOR. A view scoped so that no live org
+     survives has no fleet to be a share of, and "0% of nobody" is a statement
+     about the filter rather than about the feature. */
+  const noLive = H.ofDerive({ ...snap, orgs: (snap.orgs || []).map(o => ({ ...o, launched: false })) }, {});
+  const nlRows = H.ofFeatureRows(snap, noLive);
+  ok(nlRows.length && nlRows.every(r => r.pct === null),
+     "with no live organization in view every share is null rather than a confident 0%");
+
+  /* THROUGH ofFleetUse, which is the ONE definition of "live organizations
+     using X". A second count here would be a second definition of the number
+     this whole slice is about. */
+  const fleet = H.ofFleetUse(snap, dvAll, dvAll.shown);
+  rows.forEach(r => eq(r.live, fleet.used[r.key],
+    r.key + ": the row's live count IS ofFleetUse's, not a recount"));
+
+  // ── the trend ─────────────────────────────────────────────────────────
+  /* A FEATURE TREND IS NOT THE ORG TREND. Each history point's `scores` map is
+     per organization; no amount of averaging it answers "how many
+     organizations use calendar sync", which is why the series is recorded
+     separately by the bake. */
+  const hist = [
+    { date: "2026-09-01", orgs: 60, liveOrgs: 0, featureLive: { a: 30 } },   // no denominator
+    { date: "2026-09-07", orgs: 144, liveOrgs: 70, featureLive: { a: 7 } },
+    { date: "2026-09-08", orgs: 145, liveOrgs: 70, featureLive: { a: 14, b: 7 } },
+  ];
+  const ta = H.ofFeatureTrend(hist, "a");
+  eq(ta.points.length, 2, "a point with NO live denominator is dropped — 61-69 orgs with none launched is not a zero, it is a different question");
+  ok(ta.ready, "...and two comparable points are a trend");
+  eq(ta.first, 10, "the share is taken against that point's OWN live count");
+  eq(ta.last, 20, "...at both ends");
+  eq(ta.delta, 10, "...so the delta is in points of adoption");
+  const tb = H.ofFeatureTrend(hist, "b");
+  eq(tb.points.length, 1,
+     "a point that never measured the feature is dropped — there is no zero to plot, and drawing one invents a rise that never happened");
+  ok(!tb.ready, "...so a feature measured for the first time today has no trend yet");
+  eq(H.ofFeatureTrend(hist, "nope").points.length, 0, "an unknown key plots nothing rather than throwing");
+  eq(H.ofFeatureTrend(null, "a").points.length, 0, "...and so does a missing history");
+
+  // The shipped snapshot must actually carry the series, or the column is
+  // decorative on the page it was built for.
+  const carrying = (snap.history || []).filter(h => h.featureLive && h.liveOrgs > 0);
+  ok(carrying.length >= 2,
+     "the snapshot carries at least two points with a live denominator, or nothing can trend (" + carrying.length + ")");
+  carrying.forEach(h => {
+    ok(typeof h.liveOrgs === "number" && h.liveOrgs > 0,
+       h.date + ": the denominator travels with the point — a point that does not carry it cannot be turned into a percentage");
+    Object.entries(h.featureLive).forEach(([k, v]) =>
+      ok(v <= h.liveOrgs, h.date + "/" + k + ": a feature cannot be used by more organizations than are live"));
+  });
+  const moved = rows.filter(r => r.trend && r.trend.ready && r.trend.delta !== 0);
+  ok(rows.some(r => r.trend && r.trend.ready),
+     "at least one feature has enough history to show a trend on the page today");
+
+  // ── the slice, and one sorter behind both tables ──────────────────────
+  eq(H.OF_SLICES.length, 2, "there are two slices of this dataset");
+  ok(H.OF_SLICES.some(x => x.href === "/ps/features") && H.OF_SLICES.some(x => x.href === "/ps/feature"),
+     "...by organization and by feature, each at its own URL so the slice is linkable");
+  /* ONE SORTER, TIE-BREAK AS AN ARGUMENT. A feature row has no `.o`, so the
+     old hardcoded tie-break would have thrown — and a second copy of this
+     comparator for the feature table would be a second place for a direction
+     to be wrong, which is the only mistake here that matters. */
+  const S2 = new Function(src.slice(src.indexOf("function ofSortRows"), src.indexOf("function ofFirstDir"))
+    + "; return ofSortRows;")();
+  const fr = [{ name: "Beta", pct: 50 }, { name: "Alpha", pct: 50 }, { name: "Gamma", pct: 90 }];
+  eq(S2(fr, "pct", -1, (r, k) => r[k], true, r => r.name).map(r => r.name).join(","),
+     "Gamma,Alpha,Beta", "feature rows sort by value and tie-break on their own name");
+  eq(S2(fr, "pct", 1, (r, k) => r[k], true, r => r.name).map(r => r.name).join(","),
+     "Alpha,Beta,Gamma", "...and the direction really inverts");
+
+  // ── the wiring ────────────────────────────────────────────────────────
+  ok(/e\(SliceTabs, \{ page: "featurelist" \}\)/.test(feat), "the by-feature slice renders the tab strip");
+  ok(/e\(SliceTabs, \{ page: "features" \}\)/.test(feat), "...and so does the by-organization one, or it is a one-way door");
+  ok(/ramp: "feature"/.test(feat),
+     "the feature table grades off the FEATURE ramp — the org ramp would grade a feature against what an organization reaches");
+  ok(/ofFeatureGradeColor/.test(feat), "...and colours from it too");
+  ok(/const \[fsort, setFsort\]/.test(feat),
+     "the feature table keeps its own sort state — one shared state would carry a key the other table cannot resolve");
+  ok(/"data-feat-frow"/.test(feat), "its rows are addressable");
+  ok(/nav\("\/ps\/feature\/" \+ encodeURIComponent\(r\.key\)\)/.test(feat),
+     "...and each row opens the organizations behind it");
+  ok(/\^\\\/ps\\\/feature\\\/\(\.\+\)\$/.test(routeFn) && /=== "\/ps\/feature"/.test(routeFn),
+     "both the index and the drill-in are routed, and the exact-match index is tested before the keyed one");
+  ok(/featurelist: \["Org Features"/.test(src), "the by-feature slice has a titles entry");
+  ok(/"\/ps\/feature",/.test(server), "the server serves it, or a refresh is a hard 404");
+
+  // ── the bake records it, or none of the above has a series tomorrow ───
+  ok(/featureLive\[k\] = liveSlugs\.filter/.test(merge2),
+     "the bake records how many LIVE organizations use each feature");
+  ok(/featureAll\[k\] = orgs\.filter/.test(merge2), "...and the all-org count beside it");
+  ok(/liveOrgs: liveSlugs\.length/.test(merge2),
+     "...and the denominator, which is what makes the point usable as a percentage");
+}
+
 // ── WHEN THIS DATA IS FROM ─────────────────────────────────────────────────
 // Appended after the live half's .then(report) intentionally: these are
 // synchronous source assertions and `pass`/`failures` are module-level, so
@@ -495,24 +664,34 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 if (!SKIP_SOURCE) {
   const feat = srcNC.slice(srcNC.indexOf("function Features("), srcNC.indexOf("function FeatureSettings"));
 
-  ok(/"data-feat-asof"/.test(feat), "the Features page states when its data is from");
-  /* IT READS THE FEATURES SNAPSHOT'S OWN generatedAt. The shell's sidebar
-     line reads the PS/bugs snapshot — a different file on a different
-     schedule — and renders at the foot of this page too. Reading that one
-     here would put a fresh-looking date over 16-day-old numbers, which is
-     the exact failure that went unnoticed. */
-  ok(/data-feat-asof": snapAgeDays\(d\.generatedAt\)/.test(feat),
-     "...from the FEATURES snapshot's generatedAt, not the shell's ps-data snapshot");
-  ok(/snapStale\(d\.generatedAt\)/.test(feat),
-     "it reuses the shared staleness helper rather than growing its own comparison");
-  ok(/snapAgeLabel\(d\.generatedAt\)/.test(feat), "...and the shared age label");
-
   /* THE AGE IS MEASURED; "refreshed daily" IS A PROMISE. That exact phrase
      stood on this project for 38 days while nothing refreshed at all. The
      line may describe the SCHEDULE, but the freshness claim has to come
      from the timestamp. */
-  const asof = (feat.match(/data-feat-asof[\s\S]*?e\("div", \{ className: "cards" \}/) || [""])[0];
-  ok(asof.length > 200, "the as-of block was found and sliced");
+  /* SLICED FROM THE COMPONENT, not from the page. Both slices of this report
+     render an as-of line, and while it was inline the non-greedy match simply
+     took whichever came first in the file — which is how the by-feature page
+     shipped one WITHOUT the stale link and this assertion caught it by
+     matching the wrong copy. One definition, one slice. */
+  const asof = srcNC.slice(srcNC.indexOf("function AsOf("), srcNC.indexOf("function SliceTabs("));
+  ok(asof.length > 200, "the as-of component was found and sliced");
+  eq((srcNC.match(/className: "asof"/g) || []).length, 1,
+     "there is exactly ONE as-of line in the source — a second copy is a second place for the stale warning to go missing");
+  ok(/"data-feat-asof"/.test(asof), "it states when its data is from");
+  /* IT READS THE FEATURES SNAPSHOT'S OWN generatedAt, passed in. The shell's
+     sidebar line reads the PS/bugs snapshot — a different file on a different
+     schedule — and renders at the foot of this page too. Reading that one
+     here would put a fresh-looking date over 16-day-old numbers, which is the
+     exact failure that went unnoticed for 16 days. */
+  ok(/data-feat-asof": snapAgeDays\(generatedAt\)/.test(asof),
+     "...from the generatedAt it is handed, not the shell's ps-data snapshot");
+  ok(/e\(AsOf, \{ generatedAt: d\.generatedAt/.test(feat),
+     "...and what it is handed is the FEATURES snapshot's own timestamp");
+  ok(/snapStale\(generatedAt\)/.test(asof),
+     "it reuses the shared staleness helper rather than growing its own comparison");
+  ok(/snapAgeLabel\(generatedAt\)/.test(asof), "...and the shared age label");
+  ok(/e\(AsOf, \{ generatedAt/.test(feat),
+     "...and the pages render it rather than rebuilding it");
   ok(!/refreshed daily|updated daily/i.test(asof),
      "it does not assert freshness as a standing fact — the age is read from the timestamp");
   /* A WARNING WHOSE FIX ONLY A HUMAN CAN PERFORM CARRIES THE LINK. The bake
@@ -1004,8 +1183,10 @@ if (!SKIP_SOURCE) {
 
   // 10. THE DRILL-IN. One component owns the fetch and the settings, so the
   //     list and the detail cannot disagree about the tracked set.
-  ok(/function Features\(\{ slug, featureKey \}\)/.test(feat),
-     "the component takes the org slug AND the feature key");
+  ok(/function Features\(\{ slug, featureKey, featureList \}\)/.test(feat),
+     "the component takes the org slug, the feature key and the feature-list flag");
+  ok(/if \(featureList\) \{/.test(feat),
+     "...and renders the by-feature slice from the same data, so all four surfaces resolve ONE tracked set");
   ok(/if \(slug\) \{/.test(feat), "...and renders the drill-in from the same data");
   ok(/if \(featureKey\) \{/.test(feat),
      "...and the per-feature page too, so all three surfaces resolve ONE tracked set");
