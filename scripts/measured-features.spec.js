@@ -402,23 +402,47 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
     ok(usedBy(k).length > 0, k + " is adopted somewhere (a metric measuring zero everywhere is a broken filter)");
   });
 
-  // 1. AUTO-PAY IS CONFIGURATION, NOT COLLECTION. payment_plan_autopay_attempt
-  //    holds 115 successes across FOUR orgs because it records whether an
-  //    installment date has come round yet — it would report 4 where 17 have
-  //    set this up.
-  ok(/FROM payment_plan WHERE autopay_enabled GROUP BY/.test(code),
-     "auto-pay counts payment plans with autopay_enabled");
+  /* 1. AUTO-PAY IS A SECTION SETTING, NOT A COUNT OF REGISTRATIONS. This is
+        the same shape as the Payment Plans metric beside it - "does any
+        section offer this" - and deliberately NOT payment_plan.autopay_enabled,
+        which is one row per registration and answers how many HOUSEHOLDS are
+        enrolled. It shipped the wrong way round first and Dan corrected it. */
+  ok(/section s, LATERAL jsonb_array_elements\([\s\S]{0,200}?requireAutopay'\) = 'true'/.test(code),
+     "auto-pay counts SECTIONS whose payment plan requires it");
+  ok(/FROM section WHERE deleted_at IS NULL AND \(CASE WHEN available_payment_plans/.test(code),
+     "...and the any-payment-plan metric it is a subset of is untouched, so the pair stays comparable");
+  ok(!/FROM payment_plan WHERE autopay_enabled/.test(code),
+     "...NOT payment_plan.autopay_enabled, which is one row per REGISTRATION and answers how many households are enrolled rather than whether the organization turned it on");
   ok(!/payment_plan_autopay_attempt/.test(code),
-     "...NOT charge attempts, which measure whether a due date has passed rather than whether it is configured");
+     "...and NOT charge attempts, which measure whether a due date has passed rather than whether it is configured");
+  /* A LATERAL OVER A NON-ARRAY ERRORS rather than yielding nothing, and this
+     column is not always an array - the refresh would fail outright. */
+  ok(/jsonb_array_elements\(CASE WHEN jsonb_typeof\(s\.available_payment_plans\)='array'/.test(code),
+     "the lateral is guarded on the column being an array at all - without it the whole fleet refresh errors on one bad row");
   //    ...and it is not the membership feature under a second name.
   ok(/group_schema WHERE auto_renewal = true/.test(code),
      "auto-renewing MEMBERSHIPS is still measured separately");
-  ok(byKey.payment_plan_autopay.adoption_definition.indexOf("auto_renewal") > 0,
+  const apd = byKey.payment_plan_autopay.adoption_definition;
+  ok(apd.indexOf("auto_renewal") > 0,
      "the catalog entry records that the two are different questions");
-  ok(/8,611|8,622/.test(byKey.payment_plan_autopay.adoption_definition),
-     "...and that these plans are overwhelmingly org-MANDATED rather than household-chosen");
+  ok(/8,622|per REGISTRATION/.test(apd),
+     "...and what the per-registration figure is, since that is the number this used to report");
+  /* THE KEY IS NEWER THAN THE FEATURE, which is the one thing that makes a
+     zero here untrustworthy, so it has to be written down beside the number. */
+  ok(/2,111|absent rather than false/.test(apd),
+     "...and that requireAutopay is ABSENT rather than false on most plan objects, so an early adopter can read as not using it");
+  ok(/requireCardOnFile/.test(apd),
+     "...and that requireCardOnFile is a different switch rather than a proxy for it");
   ok(usedBy("payment_plan_autopay").length < usedBy("payment_plans").length,
      "auto-pay is a subset of the orgs offering plans at all, not a bigger number than its parent");
+  /* A STRICT SUBSET, checked org by org rather than on the totals - a smaller
+     count can still contain an organization its parent does not. */
+  {
+    const parent = new Set(usedBy("payment_plans"));
+    const stray = usedBy("payment_plan_autopay").filter(s2 => !parent.has(s2));
+    eq(stray.length, 0,
+       "every organization requiring auto-pay also shows as offering payment plans" + (stray.length ? " - " + stray.join(", ") : ""));
+  }
 
   // 2. MARKETING EMAIL IS NOT EMAIL. email_messaging counts every delivery on
   //    the email channel and is 90% of live orgs because it is dominated by

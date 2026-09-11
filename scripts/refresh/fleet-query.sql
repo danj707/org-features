@@ -72,19 +72,33 @@
 --                       a default window, so this is a structural fact rather
 --                       than a differentiator. Kept because it is a real
 --                       catalog feature and the page can hide it.
---   payment_plan_autopay  NOT payment_plan_autopay_attempt. That table holds
---                       115 successful charges across FOUR orgs, because it
---                       records whether an installment date has come round
---                       yet rather than whether anyone configured this — it
---                       would report 4 where 17 have set it up. Also NOT the
---                       same question as auto_renew_memberships, which is
---                       group_schema.auto_renewal on a membership plan (16
---                       orgs). autopay_enabled is never NULL (0 of 40,110),
---                       so there is no absent-versus-false ambiguity here.
---                       Worth knowing when reading it: require_autopay is
---                       true on 8,611 of the 8,622, so these are
---                       org-MANDATED rather than household-chosen, and 1,507
---                       across 14 orgs carry no saved card yet.
+--   payment_plan_autopay  A SECTION SETTING, not a count of registrations.
+--                       section.available_payment_plans[].requireAutopay is
+--                       the switch an admin flips; payment_plan.autopay_enabled
+--                       is one row per REGISTRATION and reads 8,622 rows over
+--                       17 orgs, which is how many households are enrolled
+--                       rather than whether anyone turned it on. The two
+--                       disagree both ways: 7 orgs in both, 5 configured with
+--                       nobody enrolled yet (Bloomington has 60 such sections
+--                       and zero registrations), and 10 with households on
+--                       auto-pay and no section currently requiring it. Same
+--                       shape as payment_plans beside it, and a strict subset
+--                       of it (0 of the 12 fall outside).
+--                       Also NOT payment_plan_autopay_attempt: 115 successful
+--                       charges across FOUR orgs, because it records whether
+--                       an installment date has come round yet.
+--                       Also NOT auto_renew_memberships, which is
+--                       group_schema.auto_renewal on a membership plan.
+--                       READ THE ZEROES CAREFULLY: requireAutopay is ABSENT
+--                       rather than false on 2,111 of the 2,389 plan objects
+--                       on live sections - it is a newer key - so an org that
+--                       set this up long ago can read as not using it.
+--                       requireCardOnFile is NOT a proxy: 536 plans want a
+--                       card and not auto-pay, 13 want auto-pay without
+--                       requiring a card.
+--                       The CASE around jsonb_array_elements is load-bearing;
+--                       a LATERAL over a non-array errors rather than
+--                       returning nothing, and the column is not always one.
 --   marketing_email     DELIBERATELY NOT email_messaging. That metric counts
 --                       every message_delivery on the email channel and
 --                       reaches 90% of live orgs because it is dominated by
@@ -302,6 +316,6 @@ LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM organization_role WH
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM user_alternate_identity GROUP BY 1) a_alternate_identities ON a_alternate_identities.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM household_note GROUP BY 1) a_crm_household_notes ON a_crm_household_notes.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM saved_filter_view WHERE oauth_connection_id IS NOT NULL OR last_synced_at IS NOT NULL GROUP BY 1) a_calendar_sync ON a_calendar_sync.oid=o.id
-LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM payment_plan WHERE autopay_enabled GROUP BY 1) a_payment_plan_autopay ON a_payment_plan_autopay.oid=o.id
+LEFT JOIN (SELECT s.organization_id oid, COUNT(DISTINCT s.id)::int n FROM section s, LATERAL jsonb_array_elements(CASE WHEN jsonb_typeof(s.available_payment_plans)='array' THEN s.available_payment_plans ELSE '[]'::jsonb END) pp WHERE s.deleted_at IS NULL AND (pp ->> 'requireAutopay') = 'true' GROUP BY 1) a_payment_plan_autopay ON a_payment_plan_autopay.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM message WHERE deleted_at IS NULL AND type='marketing' AND channel='email' GROUP BY 1) a_marketing_email ON a_marketing_email.oid=o.id
 LEFT JOIN (SELECT organization_id oid, COUNT(*)::int n FROM section WHERE deleted_at IS NULL AND waitlist_config ->> 'type' = 'automated' GROUP BY 1) a_automated_waitlist ON a_automated_waitlist.oid=o.id

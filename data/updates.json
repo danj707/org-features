@@ -3,11 +3,22 @@
   "updates": [
     {
       "date": "2026-09-11",
+      "title": "The render check had never once opened a browser",
+      "body": "Every page here is one React block inside an HTML file, so a value read above its own declaration is a blank page that parses, boots, serves a 200 and renders nothing. One CI job exists to catch that, and it had been passing without running: the workflow installed a browser and never the library, so the script printed its skip line and exited 0 while GitHub drew a green tick.",
+      "items": [
+        "The library is a declared, locked dependency now, so the install brings it and the browser down together.",
+        "And the skip is a FAILURE when it runs in CI. A check that cannot run should go red, not quietly green - that is the half that stops this recurring. On a laptop without a browser it still skips, because a contributor should not be blocked.",
+        "Guarded by a spec that RUNS the gate both ways rather than reading the branch, mutation-tested seven ways including the bug exactly as it stood."
+      ]
+    },
+    {
+      "date": "2026-09-11",
       "title": "Three features the catalog was reporting as something else",
       "body": "Each of these was already inside a broader metric that read high and hid it. Auto-pay sat inside \"payment plans\", marketing email inside \"email\", automated waitlists inside \"waitlists\" — so the combined figure was true and the question underneath it was unanswerable. All three are now measured on their own, and one of the answers is zero.",
       "items": [
-        "Payment plan auto-pay — 17 organizations, 16 of them live (22%). It is a subset of the 30-odd offering payment plans at all. Measured on the plan's own setting rather than on charge attempts, which only record whether an installment date has come round: that route would have reported four.",
-        "These plans are overwhelmingly organization-MANDATED rather than household-chosen — 8,611 of 8,622 require auto-pay to enroll — so this is a policy setting, not an adoption rate among families.",
+        "Payment plan auto-pay - 11 organizations, 8 of them live (11%). Counted the same way as \"payment plans\" beside it: does any live section have auto-pay switched on. It is a strict subset of the organizations offering plans at all.",
+        "The per-registration table says something different and is deliberately not what this reports. 8,622 plans across 17 organizations are households enrolled on auto-pay, which is depth rather than whether the organization turned the feature on - and the two disagree in both directions: Bloomington has 60 sections requiring auto-pay and nobody enrolled yet, while ten organizations have households on auto-pay with no section currently requiring it.",
+        "Read the zeroes with one caveat, which is on the feature's own page: requireAutopay is absent rather than false on 2,111 of the 2,389 plan objects on live sections, because it is a newer key. An organization that set this up long ago can read as not using it.",
         "Marketing email — 42 organizations, 34 live (47%), against 90% for email overall. The gap is transactional mail the platform sends by itself: 9,993 of those deliveries against 699 marketing ones. The channel is filtered as well as the type, because a marketing SMS carries the same type.",
         "Automated waitlists — two organizations, neither of them live, so 0% adoption. The combined waitlist figure is 82% and is 32,220 sections on a MANUAL waitlist against sixteen on an automated one. That zero is the finding, not a broken filter.",
         "A search box on the by-feature tab, matching the name, the key, the category and the description — so \"outlook\" finds Calendar Sync. The cards above it deliberately do not move: the median is a statistic about every tracked feature, not about whatever is on screen."

@@ -30,20 +30,30 @@ const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
+/* PUPPETEER IS A REAL devDependency NOW. It used not to be, and this block
+   carried two hand-written fallback paths to find a copy belonging to another
+   project on one machine - which is precisely why nobody noticed that CI
+   could not load it at all. Plain resolution, and the gate below. */
 let puppeteer;
 try { puppeteer = require("puppeteer"); }
-catch { /* resolved below */ }
-if (!puppeteer) {
-  for (const guess of ["/home/user/rental-report/node_modules/puppeteer",
-                       path.join(__dirname, "..", "node_modules", "puppeteer")]) {
-    try { puppeteer = require(guess); break; } catch { /* keep looking */ }
-  }
-}
-/* SKIPS WITH A MESSAGE, never passes silently. A render check that reports
+catch { /* handled below */ }
+/* SKIPS WITH A MESSAGE locally, and FAILS IN CI. A render check that reports
    success without having opened a browser is the warm-cache sign-off this
-   repo family already has a rule about. */
+   repo family already has a rule about - and that is exactly what the `render`
+   job did from the day it was written: the workflow installed a BROWSER
+   (`puppeteer browsers install chrome`) and never the LIBRARY, so every run
+   printed this line and exited 0. A green tick on a check that never ran is
+   worse than no check, because it is trusted. On a developer's machine a skip
+   is still the right answer; in CI it is the failure. */
 if (!puppeteer) {
-  console.log("⊘ ci-check-render.js SKIPPED — puppeteer is not installed. This check proves nothing without it.");
+  const msg = "ci-check-render.js could not load puppeteer.";
+  if (process.env.CI) {
+    console.error("✗ " + msg + " In CI this is a FAILURE, not a skip - "
+      + "add puppeteer to devDependencies so `npm ci` installs it. "
+      + "This check proves nothing without it.");
+    process.exit(1);
+  }
+  console.log("⊘ " + msg + " SKIPPED - this check proves nothing without it.");
   process.exit(0);
 }
 const EXECUTABLE = process.env.PUPPETEER_EXECUTABLE_PATH

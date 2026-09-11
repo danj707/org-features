@@ -2820,10 +2820,10 @@
       "key": "payment_plan_autopay",
       "name": "Payment Plan Auto-Pay",
       "category": "Payments & Pricing",
-      "description": "Charging a saved card automatically on each installment date of a payment plan, instead of waiting for the customer to pay every one by hand.",
-      "signal": "payment_plan.autopay_enabled (boolean, never null across 40,110 rows), with payment_plan.require_autopay saying the organization mandated it and payment_plan.autopay_payment_method_id saying a card is actually attached; payment_plan_autopay_attempt.status records what happened when a charge fell due",
-      "adoption_definition": "Has at least one payment plan with autopay_enabled. NOT measured through payment_plan_autopay_attempt, which holds 115 successful charges across only 4 organizations: that records whether an installment date has come round yet rather than whether anyone configured this, and would report 4 where 17 have set it up. Also NOT the same question as Auto-Renewing Memberships, which is group_schema.auto_renewal on a membership plan (16 organizations) rather than an installment schedule. Two things worth knowing when reading the count: require_autopay is true on 8,611 of the 8,622 plans, so these are overwhelmingly organization-mandated rather than household-chosen, and 1,507 of them across 14 organizations carry no saved card yet.",
-      "measure_question": "How many payment plans has this organization set to charge automatically?",
+      "description": "Setting a section's payment plan so enrolling means putting a card on file and letting each installment charge itself, rather than the household paying every one by hand.",
+      "signal": "section.available_payment_plans[].requireAutopay (JSONB, boolean); the resulting per-registration rows are payment_plan.autopay_enabled, with payment_plan_autopay_attempt.status recording what happened when a charge fell due",
+      "adoption_definition": "Has >=1 live section offering a payment plan with requireAutopay set true - the same shape as Payment Plans / Installments beside it, which asks whether any section offers a plan at all, and a strict subset of it. DELIBERATELY NOT payment_plan.autopay_enabled, which is one row per REGISTRATION: 8,622 of them across 17 organizations, so it measures how many households are enrolled rather than whether the organization turned the feature on. The two disagree in both directions and that is the interesting part - 7 organizations show up in both, 5 have configured sections nobody has enrolled in yet (Bloomington has 60 of them and zero registrations), and 10 have households on auto-pay with no section currently requiring it. Also NOT payment_plan_autopay_attempt, which holds 115 successful charges across 4 organizations because it records whether an installment date has come round yet. And NOT the same question as Auto-Renewing Memberships, which is group_schema.auto_renewal on a membership plan. One caveat to read the zeroes with: requireAutopay is absent rather than false on 2,111 of the 2,389 plan objects on live sections, because it is a newer key - so an organization that set this up long ago may read as not using it. requireCardOnFile is a separate switch and is not a proxy for it: 536 plans ask for a card without auto-pay, and 13 ask for auto-pay without requiring a card.",
+      "measure_question": "How many of this organization's sections require auto-pay on their payment plan?",
       "short": "Auto-Pay",
       "why": "An installment nobody has to remember to pay is an installment that gets paid. It is the difference between chasing a balance every month and simply collecting it."
     },
@@ -3173,7 +3173,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -3475,7 +3475,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -3776,8 +3776,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 7682,
-        "detail": "7,682 plans on auto-pay"
+        "count": 11,
+        "detail": "11 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -4079,7 +4079,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -4381,7 +4381,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -4683,7 +4683,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -4985,7 +4985,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -5287,7 +5287,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -5589,7 +5589,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -5891,7 +5891,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -6193,7 +6193,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -6495,7 +6495,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -6797,7 +6797,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -7099,7 +7099,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -7401,7 +7401,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -7703,7 +7703,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -8005,7 +8005,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -8307,7 +8307,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -8607,9 +8607,9 @@
         "detail": "11 calendars synced"
       },
       "payment_plan_autopay": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 60,
+        "detail": "60 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -8911,7 +8911,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -9213,7 +9213,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -9513,9 +9513,9 @@
         "detail": "1 calendar synced"
       },
       "payment_plan_autopay": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 section require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -9817,7 +9817,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -10119,7 +10119,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -10421,7 +10421,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -10723,7 +10723,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -11025,7 +11025,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -11327,7 +11327,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -11629,7 +11629,7 @@
       "payment_plan_autopay": {
         "adopted": true,
         "count": 1,
-        "detail": "1 plans on auto-pay"
+        "detail": "1 section require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -11931,7 +11931,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -12233,7 +12233,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -12535,7 +12535,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -12837,7 +12837,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -13139,7 +13139,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -13441,7 +13441,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -13743,7 +13743,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -14045,7 +14045,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -14347,7 +14347,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -14649,7 +14649,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -14951,7 +14951,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -15253,7 +15253,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -15555,7 +15555,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -15855,9 +15855,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 6,
-        "detail": "6 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -16159,7 +16159,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -16461,7 +16461,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -16763,7 +16763,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -17065,7 +17065,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -17367,7 +17367,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -17669,7 +17669,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -17970,8 +17970,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 154,
-        "detail": "154 plans on auto-pay"
+        "count": 22,
+        "detail": "22 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -18271,9 +18271,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 section require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -18575,7 +18575,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -18877,7 +18877,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -19179,7 +19179,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -19479,9 +19479,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 section require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -19783,7 +19783,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -20085,7 +20085,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -20387,7 +20387,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -20689,7 +20689,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -20991,7 +20991,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -21291,9 +21291,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 1,
-        "detail": "1 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -21595,7 +21595,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -21897,7 +21897,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -22197,9 +22197,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 1,
-        "detail": "1 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -22501,7 +22501,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -22803,7 +22803,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -23105,7 +23105,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -23407,7 +23407,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -23708,8 +23708,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 plans on auto-pay"
+        "count": 6,
+        "detail": "6 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -24011,7 +24011,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -24313,7 +24313,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -24615,7 +24615,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -24917,7 +24917,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -25219,7 +25219,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -25519,9 +25519,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 6,
-        "detail": "6 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -25821,9 +25821,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 5,
-        "detail": "5 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -26125,7 +26125,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -26426,8 +26426,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 741,
-        "detail": "741 plans on auto-pay"
+        "count": 9,
+        "detail": "9 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -26729,7 +26729,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -27031,7 +27031,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -27333,7 +27333,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -27635,7 +27635,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -27937,7 +27937,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -28239,7 +28239,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -28541,7 +28541,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -28843,7 +28843,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -29145,7 +29145,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -29447,7 +29447,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -29749,7 +29749,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -30051,7 +30051,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -30353,7 +30353,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -30655,7 +30655,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -30957,7 +30957,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -31257,9 +31257,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 5,
-        "detail": "5 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -31561,7 +31561,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -31863,7 +31863,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -32165,7 +32165,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -32467,7 +32467,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -32769,7 +32769,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -33069,9 +33069,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 8,
-        "detail": "8 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -33373,7 +33373,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -33673,9 +33673,9 @@
         "detail": "3 calendars synced"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 4,
-        "detail": "4 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -33977,7 +33977,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -34279,7 +34279,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -34581,7 +34581,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -34882,8 +34882,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 plans on auto-pay"
+        "count": 1,
+        "detail": "1 section require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -35185,7 +35185,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -35487,7 +35487,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -35787,9 +35787,9 @@
         "detail": "Not using"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 1,
-        "detail": "1 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -36091,7 +36091,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -36391,9 +36391,9 @@
         "detail": "2 calendars synced"
       },
       "payment_plan_autopay": {
-        "adopted": true,
-        "count": 1,
-        "detail": "1 plans on auto-pay"
+        "adopted": false,
+        "count": 0,
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -36695,7 +36695,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -36997,7 +36997,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -37299,7 +37299,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -37601,7 +37601,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -37903,7 +37903,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -38205,7 +38205,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -38507,7 +38507,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -38809,7 +38809,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -39111,7 +39111,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -39413,7 +39413,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -39715,7 +39715,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -40017,7 +40017,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -40319,7 +40319,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -40621,7 +40621,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -40923,7 +40923,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -41225,7 +41225,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -41527,7 +41527,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -41829,7 +41829,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -42131,7 +42131,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -42433,7 +42433,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -42734,8 +42734,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 plans on auto-pay"
+        "count": 4,
+        "detail": "4 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -43037,7 +43037,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -43339,7 +43339,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -43641,7 +43641,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -43943,7 +43943,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -44245,7 +44245,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -44547,7 +44547,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -44849,7 +44849,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -45151,7 +45151,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -45453,7 +45453,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -45755,7 +45755,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -46057,7 +46057,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -46359,7 +46359,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -46661,7 +46661,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -46963,7 +46963,7 @@
       "payment_plan_autopay": {
         "adopted": false,
         "count": 0,
-        "detail": "Not using"
+        "detail": "0 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": false,
@@ -48332,7 +48332,7 @@
         "alternate_identities": 23,
         "crm_household_notes": 55,
         "calendar_sync": 18,
-        "payment_plan_autopay": 16,
+        "payment_plan_autopay": 8,
         "marketing_email": 34,
         "automated_waitlist": 0
       },
@@ -48394,7 +48394,7 @@
         "alternate_identities": 25,
         "crm_household_notes": 69,
         "calendar_sync": 20,
-        "payment_plan_autopay": 17,
+        "payment_plan_autopay": 11,
         "marketing_email": 42,
         "automated_waitlist": 2
       }

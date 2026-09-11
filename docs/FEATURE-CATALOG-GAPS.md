@@ -58,7 +58,7 @@ Over 146 non-sandbox organizations, 73 of them live.
 | **Staff assignment ("Assigned to")** | `admin_assignment` | **54** | 15,384 |
 | Admin notification routing | `organization_admin_notification_assignments` | 34 | 104 |
 | **Custom report builder** | `custom_report_organization` | **31** | 240 |
-| ~~**Payment-plan auto-pay**~~ **BUILT** | `payment_plan.autopay_enabled` | **17** | 8,622 plans |
+| ~~**Payment-plan auto-pay**~~ **BUILT** | `section.available_payment_plans[].requireAutopay` (**not** `payment_plan.autopay_enabled` — see below) | **11** | 117 sections |
 | Campsites / nightly booking | `court.type = 'campsite'` | 7 | 69 sites |
 | Donation funds | `donation_fund` | 6 | 21 |
 | Facility rental approvals | `facility_rental_approval` | 3 | 64 |
@@ -95,16 +95,36 @@ Over 146 non-sandbox organizations, 73 of them live.
    curve is worth watching.
 3. **Custom report builder** — 31 orgs, and it is what Partner Support hands to
    an org instead of building them a report.
-4. ~~**Payment-plan auto-pay**~~ — **BUILT 2026-09-11.** 17 orgs, 16 of them
-   live (22%). Distinct from `auto_renew_memberships`, which is a membership
-   plan setting. Two things worth keeping from the measurement: it is counted
-   on `payment_plan.autopay_enabled` rather than on
-   `payment_plan_autopay_attempt`, which holds 115 successes across **four**
-   orgs because it records whether an installment date has come round yet
-   rather than whether anyone configured this; and `require_autopay` is true on
-   **8,611 of the 8,622**, so these are org-mandated rather than
-   household-chosen. 1,507 plans across 14 orgs are on auto-pay with no saved
-   card, which is a support question rather than a reporting one.
+4. ~~**Payment-plan auto-pay**~~ — **BUILT 2026-09-11**, and **the first
+   version measured the wrong thing.** It counted `payment_plan.autopay_enabled`
+   — 8,622 rows across 17 orgs — which is one row per REGISTRATION, so it
+   answered *how many households are enrolled* rather than *has the org turned
+   this on*. Dan: *"it's more, 'does an org have any auto-payment sections set
+   on', similar to 'does an org have any sections set for payment plans'"*.
+   Corrected to `section.available_payment_plans[].requireAutopay`, which is
+   the switch an admin flips and the same shape as the parent metric: **11
+   orgs, 8 live (11%)**, a strict subset of the 49 offering plans at all.
+
+   **The generalisation is the one this table is built on, inverted.** The rest
+   of this document looks for tables nothing reads. This was a case of reading
+   the right table at the wrong GRAIN, and the tell was that the number was too
+   big and too detailed — a *configuration* dashboard should almost never be
+   counting transactions. Three things stay worth knowing:
+
+   * The two signals disagree **in both directions**: 7 orgs in both, 5
+     configured with nobody enrolled (Bloomington has **60** such sections and
+     zero registrations — invisible to the old metric), and 10 with households
+     on auto-pay and no section currently requiring it.
+   * **`requireAutopay` is absent rather than false on 2,111 of the 2,389** plan
+     objects on live sections, because it is a newer key. An org that set this
+     up long ago can read as not using it, and that caveat is printed on the
+     feature's own page rather than only here.
+   * **`requireCardOnFile` is a different switch, not a proxy** — 536 plans want
+     a card and not auto-pay, 13 want auto-pay without requiring a card.
+   * `require_autopay` on the plan row is true on **8,611 of 8,622**, so where
+     households ARE enrolled it is overwhelmingly org-mandated. And 1,507 plans
+     across 14 orgs are on auto-pay with no saved card — a support question
+     rather than a reporting one.
 5. **Donation funds** and **campsites** — small, but both are self-contained
    products an org either sells or does not, which is exactly what this
    dashboard is for.

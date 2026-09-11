@@ -163,7 +163,7 @@ const TEMPLATES = {
   // using this have exactly one connected calendar — "1 calendars synced"
   // would be the commonest reading of this cell rather than an edge case.
   calendar_sync: n => `${fmt(n)} calendar${n === 1 ? "" : "s"} synced`,
-  payment_plan_autopay: n => `${fmt(n)} plans on auto-pay`,
+  payment_plan_autopay: n => `${fmt(n)} section${n === 1 ? "" : "s"} require auto-pay`,
   // "marketing emails", never "emails" — the whole point of this metric is
   // that it is NOT the 90%-of-the-fleet transactional figure beside it.
   marketing_email: n => `${fmt(n)} marketing emails sent`,
