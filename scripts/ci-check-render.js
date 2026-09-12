@@ -382,12 +382,32 @@ const CASES = [
           + ", descending=" + descending);
       });
     } },
-  /* A FEATURE MEASURED FOR THE FIRST TIME TODAY HAS NO TREND, and one
-     measured all week does. The case requires BOTH, because "no row draws a
-     line" passes on a trend that is broken outright and "every row draws one"
-     passes on a series that invents a month of zeroes under a feature added
-     yesterday. */
-  { name: "org features · a feature with no history draws no trend line",
+  /* A ROW DRAWS A TREND LINE IFF IT HAS TWO COMPARABLE POINTS, and the line
+     carries one vertex per point.
+
+     THIS CASE USED TO REQUIRE A FEATURE WITH NO HISTORY, picked from the feed
+     as whichever had the fewest points. THAT PREMISE EXPIRED ON 2026-09-12.
+     calendar_sync, payment_plan_autopay, marketing_email and automated_waitlist
+     were measured for the first time on the 11th, so the moment the 12th's bake
+     landed EVERY tracked feature had two points and there was no fresh feature
+     left to be the negative half. The case then went red on a page that was
+     working perfectly, and its own diagnostic said as much:
+     "marketing_email has 2 point(s), line=true".
+
+     SO THE NEGATIVE HALF IS NO LONGER SOURCED FROM PRODUCTION DATA. It is the
+     one claim here that can be made deterministically, and
+     org-features-settings.spec.js already makes it: ofFeatureTrend over a
+     one-point history returns ready:false, and Trendline run directly returns
+     null for it. What only a browser can say is that the PAGE wires that up
+     over the real feed, which is the iff below — and unlike the old form it
+     keeps discriminating whatever the population happens to be that morning.
+
+     THE VERTEX COUNT IS WHAT REPLACES THE OLD NEGATIVE HALF. That half existed
+     to catch a series inventing a month of zeroes under a feature added
+     yesterday; a line whose vertex count does not equal its comparable point
+     count fails on exactly that, and goes on failing once every feature has
+     history. */
+  { name: "org features · a row draws a trend line iff it has comparable history",
     path: "/ps/feature", needs: '[data-rc-ftrend="1"]',
     act: async (pg) => {
       await pg.waitForSelector("[data-feat-frow]");
@@ -397,18 +417,29 @@ const CASES = [
         const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
                                           && h.featureLive[k] != null).length;
         const row = k => document.querySelector('[data-feat-frow="' + k + '"]');
-        const line = k => !!(row(k) && row(k).querySelector("svg.trendline polyline"));
-        // Picked from the feed rather than hardcoded: whichever feature has
-        // the fewest points against whichever has the most.
+        const poly = k => row(k) && row(k).querySelector("svg.trendline polyline");
+        const verts = k => { const p = poly(k);
+          return p ? (p.getAttribute("points") || "").trim().split(/\s+/).filter(Boolean).length : 0; };
         const keys = [...document.querySelectorAll("[data-feat-frow]")]
           .map(t => t.getAttribute("data-feat-frow"));
-        const sorted = keys.slice().sort((a, b) => pts(a) - pts(b));
-        const fewest = sorted[0], most = sorted[sorted.length - 1];
-        const good = pts(fewest) < 2 && pts(most) >= 2 && !line(fewest) && line(most);
+        // A line where the feed carries no history, or none where it does.
+        const wrongLine = keys.filter(k => !!poly(k) !== (pts(k) >= 2));
+        // A line drawn from a different series than the one the feed carries.
+        const wrongLen = keys.filter(k => poly(k) && verts(k) !== pts(k));
+        // ...and at least one row must actually draw one, or both checks above
+        // pass on a page that renders no trend at all.
+        const drawn = keys.filter(k => poly(k)).length;
+        const good = keys.length > 20 && drawn > 0
+                     && !wrongLine.length && !wrongLen.length;
         document.body.setAttribute("data-rc-ftrend", good ? "1" : "0");
         document.body.setAttribute("data-rc-ftrend-seen",
-          fewest + " has " + pts(fewest) + " point(s), line=" + line(fewest) + " · "
-          + most + " has " + pts(most) + ", line=" + line(most));
+          drawn + " of " + keys.length + " rows draw a line · "
+          + wrongLine.length + " wrong presence"
+          + (wrongLine.length ? " (e.g. " + wrongLine[0] + " has " + pts(wrongLine[0])
+             + " point(s), line=" + !!poly(wrongLine[0]) + ")" : "")
+          + " · " + wrongLen.length + " wrong length"
+          + (wrongLen.length ? " (e.g. " + wrongLen[0] + " draws " + verts(wrongLen[0])
+             + " vertices for " + pts(wrongLen[0]) + " points)" : ""));
       });
     } },
   /* THE SEARCH MUST REACH FIELDS THAT ARE NOT ON SCREEN. "calendar" matching
