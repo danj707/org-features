@@ -3407,9 +3407,13 @@
         e("div", { className: "logo" },
           e("img", { src: "/rec-logo.jpg", alt: "rec", width: 24, height: 24 }),
           e("span", null, "CX dashboard")),
-        e("div", { className: "sec" }, "Partner success"),
+        e("div", { className: "sec" }, "Account Health"),
         item("/ps", "Account Health", r.page === "health" || r.page === "org"),
         item("/ps/bugs", "Bug Management", r.page === "bugs", data.bugs.length),
+        /* CX Reporting lives under CX Forecasting: the page is the launch
+           pipeline — forecast revenue by quarter, ACV by stage. THE LABEL AND
+           GROUPING ONLY; the route stays /ps/reporting so bookmarks hold. */
+        e("div", { className: "sec" }, "CX Forecasting"),
         item("/ps/reporting", "CX Reporting", r.page === "reporting"),
         e("div", { className: "sec" }, "Finance"),
         item("/ps/remittance", "Remittance", r.page === "remittance"),

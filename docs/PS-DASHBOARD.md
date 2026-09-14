@@ -7,15 +7,28 @@ below is what it does today and how it grows into the real thing.
 ## Page structure
 
 ```
-┌────────────┬────────────────────────────────────────────────┐
-│ Left nav   │  Account Health  (/ps)          ← default      │
-│            │    └─ Account drill-in (/ps/org/:hubspotId)    │
-│  Account   │  Bug Management  (/ps/bugs)                    │
-│   Health   │  CX Reporting    (/ps/reporting)               │
-│  Bugs      │                                                │
-│  Reporting │  Platform ▸ Org Features (existing dashboard)  │
-└────────────┴────────────────────────────────────────────────┘
+┌──────────────────┬─────────────────────────────────────────────┐
+│ Left nav         │  Account Health  (/ps)         ← default    │
+│                  │    └─ Account drill-in (/ps/org/:hubspotId) │
+│ ACCOUNT HEALTH   │  Bug Management  (/ps/bugs)                 │
+│  Account Health  │  CX Reporting    (/ps/reporting)            │
+│  Bug Management  │  Remittance      (/ps/remittance)           │
+│ CX FORECASTING   │  Org Features    (/ps/features)             │
+│  CX Reporting    │  Users           (/ps/admin — admin only)   │
+│ FINANCE          │  How This Works  (/ps/how)                  │
+│  Remittance      │  Updates         (/ps/updates)              │
+│ PLATFORM         │                                             │
+│  Org Features    │                                             │
+│ ABOUT            │                                             │
+│  How This Works  │                                             │
+│  Updates         │                                             │
+└──────────────────┴─────────────────────────────────────────────┘
 ```
+
+Nav section labels are grouping only — every route keeps its original path,
+so bookmarks survive regroupings. CX Reporting sits under **CX Forecasting**
+because the page is the launch pipeline: forecast revenue by quarter and ACV
+by stage.
 
 - **Account Health** — one row per account: status, health signals, feature
   adoption, open bugs + 6-month report trend, feature-request rollup,
