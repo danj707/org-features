@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-14T16:08:35.433Z",
+  "generatedAt": "2026-09-15T14:37:24.454Z",
   "source": "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
   "status": "adoption-wave-1",
   "orgs": [
@@ -7,6 +7,13 @@
       "id": "8cc23ecb-cf2a-4449-be26-f29f9166c09b",
       "slug": "aardvark-city",
       "name": "Aardvark City Parks and Rec",
+      "displayName": null,
+      "launched": false
+    },
+    {
+      "id": "5188269b-02d4-495d-bb9e-8b7bd4043f89",
+      "slug": "alameda",
+      "name": "Alameda",
       "displayName": null,
       "launched": false
     },
@@ -998,6 +1005,13 @@
       "launched": false
     },
     {
+      "id": "bb699700-5b6a-43ee-a8b5-4d971e98cc4d",
+      "slug": "village-of-jackson",
+      "name": "Village of Jackson",
+      "displayName": "Jackson",
+      "launched": false
+    },
+    {
       "id": "d781690b-c5a0-43c5-8443-9ae43899528c",
       "slug": "watertown",
       "name": "Watertown Recreation",
@@ -1080,21 +1094,29 @@
       "facilities": 0,
       "reservations": 0
     },
-    "allegheny-county": {
-      "programs": 1,
+    "alameda": {
+      "programs": 0,
       "registrations": 0,
       "memberships": 0,
       "passes": 0,
-      "facilities": 29,
+      "facilities": 32,
       "reservations": 0
     },
+    "allegheny-county": {
+      "programs": 7,
+      "registrations": 0,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 49,
+      "reservations": 20
+    },
     "apex-park-and-recreation-district": {
-      "programs": 626,
-      "registrations": 99708,
-      "memberships": 24942,
-      "passes": 4942,
+      "programs": 627,
+      "registrations": 99925,
+      "memberships": 24972,
+      "passes": 4949,
       "facilities": 332,
-      "reservations": 92404
+      "reservations": 92688
     },
     "barrie": {
       "programs": 0,
@@ -1154,11 +1176,11 @@
     },
     "central-point-recreation": {
       "programs": 50,
-      "registrations": 360,
-      "memberships": 239,
+      "registrations": 368,
+      "memberships": 241,
       "passes": 0,
       "facilities": 70,
-      "reservations": 718
+      "reservations": 1142
     },
     "chicago-park-district-golf": {
       "programs": 7,
@@ -1170,11 +1192,11 @@
     },
     "chicorec": {
       "programs": 186,
-      "registrations": 10773,
+      "registrations": 10814,
       "memberships": 1233,
       "passes": 8,
       "facilities": 144,
-      "reservations": 18005
+      "reservations": 18017
     },
     "city-of-aspen": {
       "programs": 3,
@@ -1194,59 +1216,59 @@
     },
     "city-of-battle-ground": {
       "programs": 0,
-      "registrations": 477,
+      "registrations": 481,
       "memberships": 65,
       "passes": 0,
       "facilities": 7,
-      "reservations": 1893
+      "reservations": 1897
     },
     "city-of-belmont": {
       "programs": 1,
-      "registrations": 10779,
+      "registrations": 10803,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 15547
+      "reservations": 15578
     },
     "city-of-belton": {
       "programs": 43,
       "registrations": 4001,
-      "memberships": 203,
+      "memberships": 204,
       "passes": 3,
       "facilities": 48,
-      "reservations": 820
+      "reservations": 821
     },
     "city-of-bloomington": {
-      "programs": 43,
+      "programs": 46,
       "registrations": 60,
       "memberships": 6,
       "passes": 0,
       "facilities": 406,
-      "reservations": 4499
+      "reservations": 4512
     },
     "city-of-boerne": {
-      "programs": 51,
-      "registrations": 2365,
-      "memberships": 383,
+      "programs": 54,
+      "registrations": 2374,
+      "memberships": 384,
       "passes": 0,
       "facilities": 47,
-      "reservations": 4379
+      "reservations": 4382
     },
     "city-of-brisbane": {
       "programs": 26,
-      "registrations": 896,
+      "registrations": 898,
       "memberships": 122,
       "passes": 0,
       "facilities": 3,
-      "reservations": 1772
+      "reservations": 1774
     },
     "city-of-buffalo": {
       "programs": 34,
-      "registrations": 1546,
-      "memberships": 3096,
+      "registrations": 1551,
+      "memberships": 3109,
       "passes": 0,
       "facilities": 41,
-      "reservations": 2863
+      "reservations": 2867
     },
     "city-of-calabasas": {
       "programs": 1,
@@ -1274,19 +1296,19 @@
     },
     "city-of-easton": {
       "programs": 14,
-      "registrations": 899,
-      "memberships": 627,
+      "registrations": 907,
+      "memberships": 628,
       "passes": 0,
       "facilities": 23,
       "reservations": 2403
     },
     "city-of-euclid": {
       "programs": 23,
-      "registrations": 358,
-      "memberships": 1325,
-      "passes": 5,
+      "registrations": 361,
+      "memberships": 1338,
+      "passes": 6,
       "facilities": 21,
-      "reservations": 1594
+      "reservations": 1744
     },
     "city-of-goodyear": {
       "programs": 5,
@@ -1298,11 +1320,11 @@
     },
     "city-of-hermosa-beach": {
       "programs": 37,
-      "registrations": 1114,
-      "memberships": 1653,
+      "registrations": 1142,
+      "memberships": 1678,
       "passes": 0,
       "facilities": 80,
-      "reservations": 5454
+      "reservations": 5470
     },
     "city-of-indianapolis": {
       "programs": 0,
@@ -1314,27 +1336,27 @@
     },
     "city-of-jeffersonville": {
       "programs": 22,
-      "registrations": 4619,
-      "memberships": 2324,
+      "registrations": 4625,
+      "memberships": 2328,
       "passes": 0,
       "facilities": 74,
-      "reservations": 2065
+      "reservations": 2066
     },
     "city-of-joplin": {
       "programs": 21,
-      "registrations": 831,
+      "registrations": 832,
       "memberships": 4,
       "passes": 7,
       "facilities": 87,
-      "reservations": 618
+      "reservations": 622
     },
     "city-of-lakeland": {
       "programs": 18,
-      "registrations": 1381,
-      "memberships": 314,
+      "registrations": 1455,
+      "memberships": 316,
       "passes": 0,
       "facilities": 34,
-      "reservations": 3318
+      "reservations": 3319
     },
     "city-of-las-vegas": {
       "programs": 6,
@@ -1354,8 +1376,8 @@
     },
     "city-of-lewisburg": {
       "programs": 26,
-      "registrations": 127,
-      "memberships": 532,
+      "registrations": 133,
+      "memberships": 534,
       "passes": 0,
       "facilities": 40,
       "reservations": 535
@@ -1378,23 +1400,23 @@
     },
     "city-of-madeira-beach": {
       "programs": 24,
-      "registrations": 2165,
-      "memberships": 289,
+      "registrations": 2167,
+      "memberships": 337,
       "passes": 0,
       "facilities": 39,
       "reservations": 2068
     },
     "city-of-madison": {
       "programs": 83,
-      "registrations": 1968,
+      "registrations": 1970,
       "memberships": 552,
       "passes": 22,
       "facilities": 25,
-      "reservations": 3519
+      "reservations": 3520
     },
     "city-of-malibu": {
       "programs": 78,
-      "registrations": 10359,
+      "registrations": 10427,
       "memberships": 572,
       "passes": 122,
       "facilities": 19,
@@ -1410,35 +1432,35 @@
     },
     "city-of-menifee": {
       "programs": 179,
-      "registrations": 15864,
-      "memberships": 3907,
+      "registrations": 15930,
+      "memberships": 3925,
       "passes": 0,
       "facilities": 94,
-      "reservations": 10122
+      "reservations": 10132
     },
     "city-of-miamisburg": {
       "programs": 0,
-      "registrations": 1776,
+      "registrations": 1784,
       "memberships": 0,
       "passes": 0,
       "facilities": 15,
-      "reservations": 5293
+      "reservations": 5301
     },
     "city-of-midland": {
       "programs": 8,
-      "registrations": 2668,
-      "memberships": 1230,
+      "registrations": 2681,
+      "memberships": 1231,
       "passes": 0,
       "facilities": 124,
-      "reservations": 14945
+      "reservations": 14964
     },
     "city-of-milford": {
       "programs": 0,
-      "registrations": 15389,
+      "registrations": 15455,
       "memberships": 1034,
       "passes": 0,
       "facilities": 33,
-      "reservations": 26951
+      "reservations": 27026
     },
     "city-of-mountain-view": {
       "programs": 24,
@@ -1465,20 +1487,20 @@
       "reservations": 152
     },
     "city-of-niagara-falls": {
-      "programs": 596,
-      "registrations": 81249,
-      "memberships": 1831,
+      "programs": 599,
+      "registrations": 81250,
+      "memberships": 1837,
       "passes": 77,
-      "facilities": 185,
-      "reservations": 14400
+      "facilities": 186,
+      "reservations": 14405
     },
     "city-of-norman": {
       "programs": 136,
-      "registrations": 10584,
-      "memberships": 7995,
-      "passes": 6653,
+      "registrations": 10608,
+      "memberships": 8003,
+      "passes": 6657,
       "facilities": 404,
-      "reservations": 9671
+      "reservations": 9685
     },
     "city-of-oakland": {
       "programs": 1,
@@ -1522,11 +1544,11 @@
     },
     "city-of-piedmont": {
       "programs": 29,
-      "registrations": 7889,
-      "memberships": 6449,
-      "passes": 814,
+      "registrations": 7910,
+      "memberships": 6450,
+      "passes": 815,
       "facilities": 35,
-      "reservations": 4053
+      "reservations": 4050
     },
     "city-of-pleasant-hill": {
       "programs": 1,
@@ -1554,11 +1576,11 @@
     },
     "city-of-smyrna": {
       "programs": 103,
-      "registrations": 18002,
-      "memberships": 3917,
+      "registrations": 18069,
+      "memberships": 3933,
       "passes": 64,
       "facilities": 98,
-      "reservations": 6784
+      "reservations": 6791
     },
     "city-of-stanwood": {
       "programs": 0,
@@ -1570,19 +1592,19 @@
     },
     "city-of-torrance": {
       "programs": 671,
-      "registrations": 74733,
-      "memberships": 14398,
+      "registrations": 74727,
+      "memberships": 14408,
       "passes": 392,
       "facilities": 408,
-      "reservations": 72179
+      "reservations": 72522
     },
     "city-of-tullahoma": {
       "programs": 12,
-      "registrations": 268,
+      "registrations": 269,
       "memberships": 2009,
       "passes": 0,
       "facilities": 49,
-      "reservations": 559
+      "reservations": 558
     },
     "city-of-university-park": {
       "programs": 7,
@@ -1601,28 +1623,28 @@
       "reservations": 2589
     },
     "city-of-west-haven": {
-      "programs": 106,
-      "registrations": 3844,
-      "memberships": 2061,
-      "passes": 52,
+      "programs": 107,
+      "registrations": 3848,
+      "memberships": 2064,
+      "passes": 54,
       "facilities": 119,
-      "reservations": 6208
+      "reservations": 6212
     },
     "city-of-west-linn": {
-      "programs": 2,
+      "programs": 3,
       "registrations": 0,
       "memberships": 0,
       "passes": 0,
       "facilities": 29,
-      "reservations": 23
+      "reservations": 61
     },
     "city-of-west-sacramento": {
       "programs": 95,
-      "registrations": 25997,
-      "memberships": 7572,
-      "passes": 243,
+      "registrations": 26187,
+      "memberships": 7602,
+      "passes": 251,
       "facilities": 175,
-      "reservations": 9910
+      "reservations": 9922
     },
     "clark-county": {
       "programs": 0,
@@ -1637,7 +1659,7 @@
       "registrations": 0,
       "memberships": 0,
       "passes": 0,
-      "facilities": 0,
+      "facilities": 4,
       "reservations": 0
     },
     "concord-township": {
@@ -1666,35 +1688,35 @@
     },
     "douglas-county-nv": {
       "programs": 89,
-      "registrations": 2755,
-      "memberships": 2415,
+      "registrations": 2803,
+      "memberships": 2443,
       "passes": 0,
       "facilities": 192,
-      "reservations": 8846
+      "reservations": 8868
     },
     "el-segundo-recreation": {
       "programs": 108,
-      "registrations": 10204,
-      "memberships": 5537,
-      "passes": 814,
+      "registrations": 10451,
+      "memberships": 5581,
+      "passes": 823,
       "facilities": 161,
-      "reservations": 28661
+      "reservations": 29360
     },
     "emeryville": {
       "programs": 136,
-      "registrations": 11117,
-      "memberships": 3244,
-      "passes": 1218,
+      "registrations": 11113,
+      "memberships": 3250,
+      "passes": 1215,
       "facilities": 113,
-      "reservations": 16775
+      "reservations": 16777
     },
     "essex-junction": {
       "programs": 40,
-      "registrations": 3102,
-      "memberships": 525,
+      "registrations": 3120,
+      "memberships": 530,
       "passes": 0,
       "facilities": 19,
-      "reservations": 2737
+      "reservations": 2802
     },
     "fairfax-county": {
       "programs": 11,
@@ -1706,35 +1728,35 @@
     },
     "folsom": {
       "programs": 39,
-      "registrations": 2522,
-      "memberships": 539,
+      "registrations": 2524,
+      "memberships": 540,
       "passes": 0,
       "facilities": 36,
-      "reservations": 4856
+      "reservations": 4860
     },
     "foster-city": {
       "programs": 4,
-      "registrations": 5357,
-      "memberships": 656,
+      "registrations": 5373,
+      "memberships": 657,
       "passes": 0,
       "facilities": 8,
-      "reservations": 6840
+      "reservations": 6857
     },
     "glenview-park-district": {
       "programs": 1,
       "registrations": 1,
       "memberships": 0,
       "passes": 0,
-      "facilities": 242,
+      "facilities": 291,
       "reservations": 1
     },
     "golden-gate-village": {
       "programs": 1,
-      "registrations": 61,
+      "registrations": 62,
       "memberships": 11,
       "passes": 0,
       "facilities": 4,
-      "reservations": 174
+      "reservations": 175
     },
     "hammond-area-recreation-district": {
       "programs": 0,
@@ -1757,7 +1779,7 @@
       "registrations": 3,
       "memberships": 18,
       "passes": 0,
-      "facilities": 1161,
+      "facilities": 1159,
       "reservations": 126
     },
     "iv2pp-off": {
@@ -1785,12 +1807,12 @@
       "reservations": 0
     },
     "jurupa-area-recreation-and-park-district": {
-      "programs": 102,
-      "registrations": 4372,
-      "memberships": 3677,
+      "programs": 104,
+      "registrations": 4422,
+      "memberships": 3683,
       "passes": 0,
       "facilities": 102,
-      "reservations": 11648
+      "reservations": 11660
     },
     "laguna-beach": {
       "programs": 4,
@@ -1810,19 +1832,19 @@
     },
     "lincoln": {
       "programs": 65,
-      "registrations": 3120,
+      "registrations": 3133,
       "memberships": 0,
       "passes": 0,
       "facilities": 24,
-      "reservations": 4708
+      "reservations": 4727
     },
     "littleton": {
       "programs": 23,
-      "registrations": 757,
-      "memberships": 319,
+      "registrations": 766,
+      "memberships": 320,
       "passes": 0,
       "facilities": 57,
-      "reservations": 1030
+      "reservations": 1031
     },
     "maple-grove": {
       "programs": 0,
@@ -1866,11 +1888,11 @@
     },
     "needham": {
       "programs": 51,
-      "registrations": 744,
-      "memberships": 405,
+      "registrations": 750,
+      "memberships": 411,
       "passes": 0,
       "facilities": 93,
-      "reservations": 793
+      "reservations": 800
     },
     "nnerpc": {
       "programs": 1,
@@ -1882,19 +1904,19 @@
     },
     "norris": {
       "programs": 0,
-      "registrations": 956,
+      "registrations": 961,
       "memberships": 137,
       "passes": 0,
       "facilities": 10,
-      "reservations": 6218
+      "reservations": 6225
     },
     "northern-door-sports-and-recreation": {
       "programs": 19,
-      "registrations": 428,
-      "memberships": 111,
+      "registrations": 430,
+      "memberships": 113,
       "passes": 24,
       "facilities": 23,
-      "reservations": 1135
+      "reservations": 1137
     },
     "north-logan": {
       "programs": 58,
@@ -1922,8 +1944,8 @@
     },
     "paradise-recreation-and-park-district": {
       "programs": 19,
-      "registrations": 147,
-      "memberships": 246,
+      "registrations": 153,
+      "memberships": 247,
       "passes": 5,
       "facilities": 97,
       "reservations": 1808
@@ -1938,16 +1960,16 @@
     },
     "pleasant-hill": {
       "programs": 71,
-      "registrations": 2649,
-      "memberships": 975,
+      "registrations": 2653,
+      "memberships": 974,
       "passes": 0,
       "facilities": 67,
-      "reservations": 3582
+      "reservations": 3583
     },
     "prescott-valley": {
       "programs": 95,
-      "registrations": 6821,
-      "memberships": 1333,
+      "registrations": 6843,
+      "memberships": 1337,
       "passes": 0,
       "facilities": 123,
       "reservations": 10669
@@ -1955,18 +1977,18 @@
     "pueblo-county": {
       "programs": 22,
       "registrations": 1820,
-      "memberships": 661,
-      "passes": 97,
+      "memberships": 664,
+      "passes": 100,
       "facilities": 21,
       "reservations": 1592
     },
     "putnam-county": {
       "programs": 24,
-      "registrations": 1113,
+      "registrations": 1115,
       "memberships": 0,
       "passes": 0,
       "facilities": 57,
-      "reservations": 1153
+      "reservations": 1154
     },
     "rec-demo-org": {
       "programs": 21,
@@ -2026,35 +2048,35 @@
     },
     "rocklin": {
       "programs": 101,
-      "registrations": 1579,
-      "memberships": 950,
+      "registrations": 1580,
+      "memberships": 952,
       "passes": 0,
       "facilities": 21,
-      "reservations": 3264
+      "reservations": 3265
     },
     "sacramento-county": {
       "programs": 47,
-      "registrations": 2486,
+      "registrations": 2500,
       "memberships": 0,
       "passes": 0,
       "facilities": 140,
-      "reservations": 4108
+      "reservations": 4111
     },
     "san-francisco-rec-park": {
       "programs": 228,
-      "registrations": 380041,
+      "registrations": 380359,
       "memberships": 0,
       "passes": 0,
       "facilities": 116,
-      "reservations": 562792
+      "reservations": 563197
     },
     "santacruzcounty": {
-      "programs": 101,
-      "registrations": 6329,
+      "programs": 102,
+      "registrations": 6331,
       "memberships": 1681,
       "passes": 0,
       "facilities": 251,
-      "reservations": 9571
+      "reservations": 9574
     },
     "scotts-valley": {
       "programs": 63,
@@ -2066,11 +2088,11 @@
     },
     "sebastopol": {
       "programs": 73,
-      "registrations": 1191,
+      "registrations": 1193,
       "memberships": 6,
       "passes": 0,
       "facilities": 11,
-      "reservations": 6031
+      "reservations": 6032
     },
     "suffolk-parks-and-recreation": {
       "programs": 3,
@@ -2098,19 +2120,19 @@
     },
     "the-dance-palace": {
       "programs": 6,
-      "registrations": 166,
+      "registrations": 167,
       "memberships": 5,
       "passes": 0,
       "facilities": 12,
-      "reservations": 1606
+      "reservations": 1607
     },
     "the-ranch": {
       "programs": 41,
-      "registrations": 8382,
-      "memberships": 1687,
-      "passes": 92,
+      "registrations": 8401,
+      "memberships": 1688,
+      "passes": 91,
       "facilities": 14,
-      "reservations": 9141
+      "reservations": 9186
     },
     "torranceca": {
       "programs": 0,
@@ -2121,56 +2143,56 @@
       "reservations": 0
     },
     "town-of-clarkstown": {
-      "programs": 66,
-      "registrations": 934,
-      "memberships": 5979,
+      "programs": 69,
+      "registrations": 967,
+      "memberships": 6110,
       "passes": 0,
-      "facilities": 78,
-      "reservations": 1203
+      "facilities": 81,
+      "reservations": 1224
     },
     "town-of-clarksville": {
       "programs": 31,
-      "registrations": 1719,
-      "memberships": 685,
+      "registrations": 1732,
+      "memberships": 688,
       "passes": 54,
       "facilities": 21,
-      "reservations": 2953
+      "reservations": 2974
     },
     "town-of-corte-madera": {
       "programs": 0,
-      "registrations": 14469,
+      "registrations": 14496,
       "memberships": 0,
       "passes": 0,
       "facilities": 10,
-      "reservations": 21341
+      "reservations": 21376
     },
     "town-of-danvers": {
       "programs": 138,
       "registrations": 8234,
-      "memberships": 2137,
-      "passes": 358,
+      "memberships": 2138,
+      "passes": 363,
       "facilities": 72,
-      "reservations": 9251
+      "reservations": 9257
     },
     "town-of-reading": {
-      "programs": 122,
-      "registrations": 5625,
-      "memberships": 729,
+      "programs": 123,
+      "registrations": 5640,
+      "memberships": 731,
       "passes": 0,
       "facilities": 80,
-      "reservations": 993
+      "reservations": 996
     },
     "town-of-shrewsbury": {
       "programs": 178,
-      "registrations": 3922,
-      "memberships": 1936,
+      "registrations": 3967,
+      "memberships": 1946,
       "passes": 0,
-      "facilities": 157,
-      "reservations": 4497
+      "facilities": 158,
+      "reservations": 4985
     },
     "town-of-taylor": {
       "programs": 67,
-      "registrations": 4984,
+      "registrations": 4989,
       "memberships": 201,
       "passes": 0,
       "facilities": 25,
@@ -2193,12 +2215,12 @@
       "reservations": 0
     },
     "town-of-windham": {
-      "programs": 123,
-      "registrations": 5345,
+      "programs": 124,
+      "registrations": 5366,
       "memberships": 1403,
       "passes": 17,
       "facilities": 55,
-      "reservations": 4919
+      "reservations": 4929
     },
     "upson-county": {
       "programs": 0,
@@ -2208,13 +2230,21 @@
       "facilities": 2,
       "reservations": 0
     },
+    "village-of-jackson": {
+      "programs": 0,
+      "registrations": 0,
+      "memberships": 0,
+      "passes": 0,
+      "facilities": 0,
+      "reservations": 0
+    },
     "watertown": {
       "programs": 164,
-      "registrations": 10868,
-      "memberships": 2294,
+      "registrations": 10906,
+      "memberships": 2302,
       "passes": 0,
       "facilities": 133,
-      "reservations": 11125
+      "reservations": 11153
     },
     "woodmen-hills-metro-district": {
       "programs": 37,
@@ -2226,11 +2256,11 @@
     },
     "yerba-buena-gardens": {
       "programs": 50,
-      "registrations": 3071,
-      "memberships": 571,
+      "registrations": 3119,
+      "memberships": 583,
       "passes": 0,
       "facilities": 8,
-      "reservations": 1635
+      "reservations": 1659
     },
     "zzzarchivenorthern-door-sports-and-recreation": {
       "programs": 0,
@@ -2982,8 +3012,310 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 questions asked"
+        "count": 6,
+        "detail": "6 questions asked"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "grade_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "residency_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "prerequisites": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "registration_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_early_access_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "required_participant_info": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waivers_contracts": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "form_on_file_reuse": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "guests_allowed": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "skill_levels": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "addons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instructors": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instructor_certifications": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "memberships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "auto_renew_memberships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "passes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "benefit_rules": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "physical_access_devices": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "facility_rentals": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "rental_applications": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "reservation_buffers": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "security_deposits": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "rental_permits": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_reservation_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "store_credit": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "structured_refund_policies": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_pricing_tiers": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "tax_collection": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "cash_check_payments": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_email_domains": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "notification_subscriptions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "audience_segments": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "storefront_products": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "pos_desk_locations": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "cash_reconciliation": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_staff_roles": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "alternate_identities": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
+    "alameda": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": true,
+        "count": 18,
+        "detail": "18 GL accounts"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": true,
+        "count": 3,
+        "detail": "3 events"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": true,
+        "count": 10,
+        "detail": "10 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -3258,14 +3590,14 @@
         "detail": "5 instant-bookable sites"
       },
       "gl_accounting": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 18,
+        "detail": "18 GL accounts"
       },
       "seasons": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 4,
+        "detail": "4 seasons"
       },
       "competitions_leagues": {
         "adopted": false,
@@ -3273,9 +3605,9 @@
         "detail": "Not using"
       },
       "events": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 9,
+        "detail": "9 events"
       },
       "ticket_sales": {
         "adopted": false,
@@ -3284,8 +3616,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 69,
-        "detail": "69 questions asked"
+        "count": 92,
+        "detail": "92 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -3338,9 +3670,9 @@
         "detail": "Not using"
       },
       "skill_levels": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 10,
+        "detail": "10 sections with a skill level"
       },
       "addons": {
         "adopted": false,
@@ -3358,9 +3690,9 @@
         "detail": "Not using"
       },
       "memberships": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 3,
+        "detail": "3 membership plans"
       },
       "auto_renew_memberships": {
         "adopted": false,
@@ -3453,9 +3785,9 @@
         "detail": "Not using"
       },
       "storefront_products": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 3,
+        "detail": "3 products in the public store"
       },
       "pos_desk_locations": {
         "adopted": false,
@@ -3506,13 +3838,13 @@
     "apex-park-and-recreation-district": {
       "age_eligibility": {
         "adopted": true,
-        "count": 4637,
-        "detail": "4,637 sections with age rules"
+        "count": 4658,
+        "detail": "4,658 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 3740,
-        "detail": "3,740 sections with waitlist"
+        "count": 3758,
+        "detail": "3,758 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -3521,13 +3853,13 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 256896,
-        "detail": "256,896 emails sent"
+        "count": 256958,
+        "detail": "256,958 emails sent"
       },
       "payment_plans": {
         "adopted": true,
-        "count": 289,
-        "detail": "289 sections with plans"
+        "count": 294,
+        "detail": "294 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -3611,8 +3943,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 7188,
-        "detail": "7,188 registration windows"
+        "count": 7214,
+        "detail": "7,214 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -3621,8 +3953,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 108,
-        "detail": "108 sections requiring extra info"
+        "count": 111,
+        "detail": "111 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -3641,8 +3973,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 3088,
-        "detail": "3,088 sections with a skill level"
+        "count": 3102,
+        "detail": "3,102 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -3661,13 +3993,13 @@
       },
       "memberships": {
         "adopted": true,
-        "count": 74,
-        "detail": "74 membership plans"
+        "count": 75,
+        "detail": "75 membership plans"
       },
       "auto_renew_memberships": {
         "adopted": true,
-        "count": 34,
-        "detail": "34 auto-renewing plans"
+        "count": 35,
+        "detail": "35 auto-renewing plans"
       },
       "passes": {
         "adopted": true,
@@ -3686,8 +4018,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 8331,
-        "detail": "8,331 facility rentals"
+        "count": 8381,
+        "detail": "8,381 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -3701,13 +4033,13 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 227,
-        "detail": "227 deposits taken"
+        "count": 228,
+        "detail": "228 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
-        "count": 564,
-        "detail": "564 permits issued"
+        "count": 575,
+        "detail": "575 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -3716,8 +4048,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 11664,
-        "detail": "11,664 account credits issued"
+        "count": 11724,
+        "detail": "11,724 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -3726,8 +4058,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 5230,
-        "detail": "5,230 sections with member pricing"
+        "count": 5252,
+        "detail": "5,252 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -3736,8 +4068,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 10004,
-        "detail": "10,004 cash/check payments"
+        "count": 10014,
+        "detail": "10,014 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -3766,8 +4098,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 4056,
-        "detail": "4,056 cash-out reports"
+        "count": 4077,
+        "detail": "4,077 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -3776,8 +4108,8 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 16288,
-        "detail": "16,288 alternate IDs"
+        "count": 16309,
+        "detail": "16,309 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
@@ -3791,8 +4123,8 @@
       },
       "payment_plan_autopay": {
         "adopted": true,
-        "count": 12,
-        "detail": "12 sections require auto-pay"
+        "count": 17,
+        "detail": "17 sections require auto-pay"
       },
       "marketing_email": {
         "adopted": true,
@@ -6027,8 +6359,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 87,
-        "detail": "87 registration windows"
+        "count": 91,
+        "detail": "91 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -6057,8 +6389,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 15,
-        "detail": "15 sections with a skill level"
+        "count": 17,
+        "detail": "17 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -6526,13 +6858,13 @@
     "chicorec": {
       "age_eligibility": {
         "adopted": true,
-        "count": 1521,
-        "detail": "1,521 sections with age rules"
+        "count": 1525,
+        "detail": "1,525 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 1287,
-        "detail": "1,287 sections with waitlist"
+        "count": 1291,
+        "detail": "1,291 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -6556,8 +6888,8 @@
       },
       "scholarships": {
         "adopted": true,
-        "count": 6,
-        "detail": "6 scholarship programs"
+        "count": 7,
+        "detail": "7 scholarship programs"
       },
       "gift_cards": {
         "adopted": false,
@@ -6601,13 +6933,13 @@
       },
       "ticket_sales": {
         "adopted": true,
-        "count": 621,
-        "detail": "621 tickets sold"
+        "count": 624,
+        "detail": "624 tickets sold"
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 106,
-        "detail": "106 questions asked"
+        "count": 107,
+        "detail": "107 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -6631,8 +6963,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 1919,
-        "detail": "1,919 registration windows"
+        "count": 1923,
+        "detail": "1,923 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -6641,8 +6973,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 305,
-        "detail": "305 sections requiring extra info"
+        "count": 310,
+        "detail": "310 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -6651,8 +6983,8 @@
       },
       "form_on_file_reuse": {
         "adopted": true,
-        "count": 982,
-        "detail": "982 forms reused from file"
+        "count": 986,
+        "detail": "986 forms reused from file"
       },
       "guests_allowed": {
         "adopted": false,
@@ -6661,8 +6993,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 775,
-        "detail": "775 sections with a skill level"
+        "count": 779,
+        "detail": "779 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -6706,8 +7038,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1712,
-        "detail": "1,712 facility rentals"
+        "count": 1724,
+        "detail": "1,724 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -6721,8 +7053,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 1051,
-        "detail": "1,051 deposits taken"
+        "count": 1052,
+        "detail": "1,052 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
@@ -6736,8 +7068,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1591,
-        "detail": "1,591 account credits issued"
+        "count": 1593,
+        "detail": "1,593 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -6756,8 +7088,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1423,
-        "detail": "1,423 cash/check payments"
+        "count": 1424,
+        "detail": "1,424 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -6771,8 +7103,8 @@
       },
       "audience_segments": {
         "adopted": true,
-        "count": 20,
-        "detail": "20 audience segments"
+        "count": 21,
+        "detail": "21 audience segments"
       },
       "storefront_products": {
         "adopted": false,
@@ -6801,8 +7133,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 29,
-        "detail": "29 household notes"
+        "count": 31,
+        "detail": "31 household notes"
       },
       "calendar_sync": {
         "adopted": true,
@@ -7612,8 +7944,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 501,
-        "detail": "501 facility rentals"
+        "count": 505,
+        "detail": "505 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -7627,8 +7959,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 210,
-        "detail": "210 deposits taken"
+        "count": 211,
+        "detail": "211 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -7662,8 +7994,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 117,
-        "detail": "117 cash/check payments"
+        "count": 119,
+        "detail": "119 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -7914,8 +8246,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 11736,
-        "detail": "11,736 facility rentals"
+        "count": 11764,
+        "detail": "11,764 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -8216,13 +8548,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 415,
-        "detail": "415 facility rentals"
+        "count": 416,
+        "detail": "416 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 73,
-        "detail": "73 rental applications"
+        "count": 74,
+        "detail": "74 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -8266,8 +8598,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 64,
-        "detail": "64 cash/check payments"
+        "count": 65,
+        "detail": "65 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -8296,8 +8628,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 84,
-        "detail": "84 cash-out reports"
+        "count": 87,
+        "detail": "87 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -8338,13 +8670,13 @@
     "city-of-bloomington": {
       "age_eligibility": {
         "adopted": true,
-        "count": 82,
-        "detail": "82 sections with age rules"
+        "count": 96,
+        "detail": "96 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 93,
-        "detail": "93 sections with waitlist"
+        "count": 107,
+        "detail": "107 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -8418,8 +8750,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 29,
-        "detail": "29 questions asked"
+        "count": 30,
+        "detail": "30 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -8443,8 +8775,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 151,
-        "detail": "151 registration windows"
+        "count": 165,
+        "detail": "165 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -8473,8 +8805,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 188,
-        "detail": "188 sections with a skill level"
+        "count": 202,
+        "detail": "202 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -8645,8 +8977,8 @@
       },
       "waitlist": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 sections with waitlist"
+        "count": 13,
+        "detail": "13 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -8685,8 +9017,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 9,
-        "detail": "9 forms"
+        "count": 10,
+        "detail": "10 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -8720,8 +9052,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 26,
-        "detail": "26 questions asked"
+        "count": 28,
+        "detail": "28 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -8745,8 +9077,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 419,
-        "detail": "419 registration windows"
+        "count": 424,
+        "detail": "424 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -8755,8 +9087,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 10,
-        "detail": "10 sections requiring extra info"
+        "count": 13,
+        "detail": "13 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -8785,8 +9117,8 @@
       },
       "instructors": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 instructors"
+        "count": 12,
+        "detail": "12 instructors"
       },
       "instructor_certifications": {
         "adopted": false,
@@ -8850,8 +9182,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 356,
-        "detail": "356 account credits issued"
+        "count": 358,
+        "detail": "358 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -9122,8 +9454,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 947,
-        "detail": "947 facility rentals"
+        "count": 949,
+        "detail": "949 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -9324,8 +9656,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 49,
-        "detail": "49 questions asked"
+        "count": 51,
+        "detail": "51 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -9349,8 +9681,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 362,
-        "detail": "362 registration windows"
+        "count": 363,
+        "detail": "363 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -9379,8 +9711,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 315,
-        "detail": "315 sections with a skill level"
+        "count": 314,
+        "detail": "314 sections with a skill level"
       },
       "addons": {
         "adopted": false,
@@ -9424,8 +9756,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1051,
-        "detail": "1,051 facility rentals"
+        "count": 1057,
+        "detail": "1,057 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -9439,8 +9771,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 114,
-        "detail": "114 deposits taken"
+        "count": 116,
+        "detail": "116 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -9469,13 +9801,13 @@
       },
       "tax_collection": {
         "adopted": true,
-        "count": 55,
-        "detail": "55 taxed products/sites"
+        "count": 54,
+        "detail": "54 taxed products/sites"
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 2832,
-        "detail": "2,832 cash/check payments"
+        "count": 2837,
+        "detail": "2,837 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -9504,8 +9836,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 335,
-        "detail": "335 cash-out reports"
+        "count": 336,
+        "detail": "336 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -9519,8 +9851,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 540,
-        "detail": "540 household notes"
+        "count": 547,
+        "detail": "547 household notes"
       },
       "calendar_sync": {
         "adopted": true,
@@ -10557,13 +10889,13 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 152,
-        "detail": "152 registration windows"
+        "count": 155,
+        "detail": "155 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 8,
-        "detail": "8 member early-access windows"
+        "count": 9,
+        "detail": "9 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
@@ -10834,8 +11166,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 53,
-        "detail": "53 questions asked"
+        "count": 54,
+        "detail": "54 questions asked"
       },
       "ai_routines": {
         "adopted": true,
@@ -10859,8 +11191,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 62,
-        "detail": "62 registration windows"
+        "count": 64,
+        "detail": "64 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -10934,8 +11266,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 76,
-        "detail": "76 facility rentals"
+        "count": 78,
+        "detail": "78 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -10984,8 +11316,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 334,
-        "detail": "334 cash/check payments"
+        "count": 339,
+        "detail": "339 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -11373,8 +11705,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 251,
-        "detail": "251 emails sent"
+        "count": 632,
+        "detail": "632 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -11438,8 +11770,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 266,
-        "detail": "266 questions asked"
+        "count": 271,
+        "detail": "271 questions asked"
       },
       "ai_routines": {
         "adopted": true,
@@ -11538,13 +11870,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1689,
-        "detail": "1,689 facility rentals"
+        "count": 1704,
+        "detail": "1,704 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 83,
-        "detail": "83 rental applications"
+        "count": 86,
+        "detail": "86 rental applications"
       },
       "reservation_buffers": {
         "adopted": true,
@@ -11553,8 +11885,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 289,
-        "detail": "289 deposits taken"
+        "count": 291,
+        "detail": "291 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
@@ -11588,8 +11920,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 74,
-        "detail": "74 cash/check payments"
+        "count": 79,
+        "detail": "79 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -11648,8 +11980,8 @@
       },
       "marketing_email": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 marketing emails sent"
+        "count": 4,
+        "detail": "4 marketing emails sent"
       },
       "automated_waitlist": {
         "adopted": false,
@@ -12142,13 +12474,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 802,
-        "detail": "802 facility rentals"
+        "count": 803,
+        "detail": "803 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 426,
-        "detail": "426 rental applications"
+        "count": 427,
+        "detail": "427 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -12157,8 +12489,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 406,
-        "detail": "406 deposits taken"
+        "count": 407,
+        "detail": "407 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -12192,8 +12524,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 16752,
-        "detail": "16,752 cash/check payments"
+        "count": 16757,
+        "detail": "16,757 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -12444,8 +12776,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 320,
-        "detail": "320 facility rentals"
+        "count": 331,
+        "detail": "331 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -12459,8 +12791,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 deposits taken"
+        "count": 15,
+        "detail": "15 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -12494,8 +12826,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 15618,
-        "detail": "15,618 cash/check payments"
+        "count": 15670,
+        "detail": "15,670 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -12524,8 +12856,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 809,
-        "detail": "809 cash-out reports"
+        "count": 812,
+        "detail": "812 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -12746,13 +13078,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 158,
-        "detail": "158 facility rentals"
+        "count": 162,
+        "detail": "162 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 39,
-        "detail": "39 rental applications"
+        "count": 40,
+        "detail": "40 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -12761,13 +13093,13 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 403,
-        "detail": "403 deposits taken"
+        "count": 407,
+        "detail": "407 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 permits issued"
+        "count": 3,
+        "detail": "3 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -12796,8 +13128,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 155,
-        "detail": "155 cash/check payments"
+        "count": 171,
+        "detail": "171 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -13517,8 +13849,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 13,
-        "detail": "13 forms"
+        "count": 14,
+        "detail": "14 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -13577,8 +13909,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 57,
-        "detail": "57 registration windows"
+        "count": 66,
+        "detail": "66 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -13587,8 +13919,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 7,
-        "detail": "7 sections requiring extra info"
+        "count": 10,
+        "detail": "10 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -13702,8 +14034,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 4781,
-        "detail": "4,781 cash/check payments"
+        "count": 4822,
+        "detail": "4,822 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -13732,8 +14064,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 395,
-        "detail": "395 cash-out reports"
+        "count": 409,
+        "detail": "409 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -14588,8 +14920,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 100,
-        "detail": "100 account credits issued"
+        "count": 103,
+        "detail": "103 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -14608,8 +14940,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1483,
-        "detail": "1,483 cash/check payments"
+        "count": 1523,
+        "detail": "1,523 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -14860,8 +15192,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 369,
-        "detail": "369 facility rentals"
+        "count": 371,
+        "detail": "371 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -15212,8 +15544,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 3179,
-        "detail": "3,179 cash/check payments"
+        "count": 3201,
+        "detail": "3,201 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -15586,8 +15918,8 @@
     "city-of-menifee": {
       "age_eligibility": {
         "adopted": true,
-        "count": 678,
-        "detail": "678 sections with age rules"
+        "count": 679,
+        "detail": "679 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -15601,8 +15933,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 51730,
-        "detail": "51,730 emails sent"
+        "count": 51731,
+        "detail": "51,731 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -15711,8 +16043,8 @@
       },
       "form_on_file_reuse": {
         "adopted": true,
-        "count": 2119,
-        "detail": "2,119 forms reused from file"
+        "count": 2122,
+        "detail": "2,122 forms reused from file"
       },
       "guests_allowed": {
         "adopted": false,
@@ -15721,8 +16053,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 504,
-        "detail": "504 sections with a skill level"
+        "count": 505,
+        "detail": "505 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -15766,8 +16098,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1163,
-        "detail": "1,163 facility rentals"
+        "count": 1165,
+        "detail": "1,165 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -15781,8 +16113,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 1080,
-        "detail": "1,080 deposits taken"
+        "count": 1081,
+        "detail": "1,081 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -15796,8 +16128,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1499,
-        "detail": "1,499 account credits issued"
+        "count": 1507,
+        "detail": "1,507 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -15816,8 +16148,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1167,
-        "detail": "1,167 cash/check payments"
+        "count": 1168,
+        "detail": "1,168 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -16068,8 +16400,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1983,
-        "detail": "1,983 facility rentals"
+        "count": 1991,
+        "detail": "1,991 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -16370,8 +16702,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 3923,
-        "detail": "3,923 facility rentals"
+        "count": 3942,
+        "detail": "3,942 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -16385,8 +16717,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 2031,
-        "detail": "2,031 deposits taken"
+        "count": 2041,
+        "detail": "2,041 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -16400,8 +16732,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1323,
-        "detail": "1,323 account credits issued"
+        "count": 1345,
+        "detail": "1,345 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -16420,8 +16752,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 24010,
-        "detail": "24,010 cash/check payments"
+        "count": 24051,
+        "detail": "24,051 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -16672,8 +17004,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 16320,
-        "detail": "16,320 facility rentals"
+        "count": 16392,
+        "detail": "16,392 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -17628,8 +17960,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 258,
-        "detail": "258 cash/check payments"
+        "count": 263,
+        "detail": "263 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -17700,13 +18032,13 @@
     "city-of-niagara-falls": {
       "age_eligibility": {
         "adopted": true,
-        "count": 191,
-        "detail": "191 sections with age rules"
+        "count": 193,
+        "detail": "193 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 660,
-        "detail": "660 sections with waitlist"
+        "count": 661,
+        "detail": "661 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -17725,8 +18057,8 @@
       },
       "discount_codes": {
         "adopted": true,
-        "count": 43,
-        "detail": "43 promo codes"
+        "count": 47,
+        "detail": "47 promo codes"
       },
       "scholarships": {
         "adopted": true,
@@ -17750,8 +18082,8 @@
       },
       "instant_booking": {
         "adopted": true,
-        "count": 79,
-        "detail": "79 instant-bookable sites"
+        "count": 80,
+        "detail": "80 instant-bookable sites"
       },
       "gl_accounting": {
         "adopted": true,
@@ -17760,8 +18092,8 @@
       },
       "seasons": {
         "adopted": true,
-        "count": 21,
-        "detail": "21 seasons"
+        "count": 22,
+        "detail": "22 seasons"
       },
       "competitions_leagues": {
         "adopted": true,
@@ -17780,8 +18112,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 595,
-        "detail": "595 questions asked"
+        "count": 600,
+        "detail": "600 questions asked"
       },
       "ai_routines": {
         "adopted": true,
@@ -17805,18 +18137,18 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 1195,
-        "detail": "1,195 registration windows"
+        "count": 1198,
+        "detail": "1,198 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 669,
-        "detail": "669 member early-access windows"
+        "count": 670,
+        "detail": "670 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 23,
-        "detail": "23 sections requiring extra info"
+        "count": 25,
+        "detail": "25 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -17835,13 +18167,13 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 810,
-        "detail": "810 sections with a skill level"
+        "count": 812,
+        "detail": "812 sections with a skill level"
       },
       "addons": {
         "adopted": true,
-        "count": 201,
-        "detail": "201 add-on products"
+        "count": 229,
+        "detail": "229 add-on products"
       },
       "instructors": {
         "adopted": true,
@@ -17880,8 +18212,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1663,
-        "detail": "1,663 facility rentals"
+        "count": 1666,
+        "detail": "1,666 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -17890,13 +18222,13 @@
       },
       "reservation_buffers": {
         "adopted": true,
-        "count": 22,
-        "detail": "22 sites with a buffer"
+        "count": 23,
+        "detail": "23 sites with a buffer"
       },
       "security_deposits": {
         "adopted": true,
-        "count": 692,
-        "detail": "692 deposits taken"
+        "count": 693,
+        "detail": "693 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
@@ -17905,13 +18237,13 @@
       },
       "group_reservation_windows": {
         "adopted": true,
-        "count": 116,
-        "detail": "116 member booking windows"
+        "count": 117,
+        "detail": "117 member booking windows"
       },
       "store_credit": {
         "adopted": true,
-        "count": 973,
-        "detail": "973 account credits issued"
+        "count": 975,
+        "detail": "975 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -17975,8 +18307,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 56,
-        "detail": "56 household notes"
+        "count": 58,
+        "detail": "58 household notes"
       },
       "calendar_sync": {
         "adopted": true,
@@ -18182,8 +18514,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1545,
-        "detail": "1,545 facility rentals"
+        "count": 1549,
+        "detail": "1,549 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -18197,8 +18529,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 480,
-        "detail": "480 deposits taken"
+        "count": 481,
+        "detail": "481 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -18212,8 +18544,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 665,
-        "detail": "665 account credits issued"
+        "count": 677,
+        "detail": "677 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -18232,8 +18564,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 9238,
-        "detail": "9,238 cash/check payments"
+        "count": 9242,
+        "detail": "9,242 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -19285,18 +19617,18 @@
       },
       "ticket_sales": {
         "adopted": true,
-        "count": 123,
-        "detail": "123 tickets sold"
+        "count": 124,
+        "detail": "124 tickets sold"
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 664,
-        "detail": "664 questions asked"
+        "count": 701,
+        "detail": "701 questions asked"
       },
       "ai_routines": {
         "adopted": true,
-        "count": 48,
-        "detail": "48 routines set up"
+        "count": 49,
+        "detail": "49 routines set up"
       },
       "grade_eligibility": {
         "adopted": true,
@@ -19315,13 +19647,13 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 347,
-        "detail": "347 registration windows"
+        "count": 349,
+        "detail": "349 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 291,
-        "detail": "291 member early-access windows"
+        "count": 293,
+        "detail": "293 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
@@ -19420,8 +19752,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 452,
-        "detail": "452 account credits issued"
+        "count": 453,
+        "detail": "453 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -19440,8 +19772,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 325,
-        "detail": "325 cash/check payments"
+        "count": 326,
+        "detail": "326 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -19814,13 +20146,13 @@
     "city-of-piedmont": {
       "age_eligibility": {
         "adopted": true,
-        "count": 540,
-        "detail": "540 sections with age rules"
+        "count": 539,
+        "detail": "539 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 620,
-        "detail": "620 sections with waitlist"
+        "count": 619,
+        "detail": "619 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -19829,8 +20161,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 43953,
-        "detail": "43,953 emails sent"
+        "count": 47074,
+        "detail": "47,074 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -19929,8 +20261,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 221,
-        "detail": "221 sections requiring extra info"
+        "count": 220,
+        "detail": "220 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -19949,8 +20281,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 534,
-        "detail": "534 sections with a skill level"
+        "count": 533,
+        "detail": "533 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -19994,8 +20326,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 156,
-        "detail": "156 facility rentals"
+        "count": 157,
+        "detail": "157 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -20009,8 +20341,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 155,
-        "detail": "155 deposits taken"
+        "count": 156,
+        "detail": "156 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
@@ -20024,8 +20356,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1392,
-        "detail": "1,392 account credits issued"
+        "count": 1418,
+        "detail": "1,418 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -20034,8 +20366,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 630,
-        "detail": "630 sections with member pricing"
+        "count": 629,
+        "detail": "629 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -20104,8 +20436,8 @@
       },
       "marketing_email": {
         "adopted": true,
-        "count": 26,
-        "detail": "26 marketing emails sent"
+        "count": 27,
+        "detail": "27 marketing emails sent"
       },
       "automated_waitlist": {
         "adopted": false,
@@ -21127,8 +21459,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 1035,
-        "detail": "1,035 registration windows"
+        "count": 1036,
+        "detail": "1,036 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -21202,8 +21534,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 990,
-        "detail": "990 facility rentals"
+        "count": 996,
+        "detail": "996 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -21222,8 +21554,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 470,
-        "detail": "470 permits issued"
+        "count": 475,
+        "detail": "475 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -21252,8 +21584,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1610,
-        "detail": "1,610 cash/check payments"
+        "count": 1623,
+        "detail": "1,623 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -21626,13 +21958,13 @@
     "city-of-torrance": {
       "age_eligibility": {
         "adopted": true,
-        "count": 3544,
-        "detail": "3,544 sections with age rules"
+        "count": 3546,
+        "detail": "3,546 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 4574,
-        "detail": "4,574 sections with waitlist"
+        "count": 4575,
+        "detail": "4,575 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -21706,8 +22038,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 359,
-        "detail": "359 questions asked"
+        "count": 389,
+        "detail": "389 questions asked"
       },
       "ai_routines": {
         "adopted": true,
@@ -21731,13 +22063,13 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 10695,
-        "detail": "10,695 registration windows"
+        "count": 10710,
+        "detail": "10,710 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 6480,
-        "detail": "6,480 member early-access windows"
+        "count": 6489,
+        "detail": "6,489 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
@@ -21761,8 +22093,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 3337,
-        "detail": "3,337 sections with a skill level"
+        "count": 3338,
+        "detail": "3,338 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -21806,8 +22138,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 3848,
-        "detail": "3,848 facility rentals"
+        "count": 3865,
+        "detail": "3,865 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -21821,8 +22153,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 304,
-        "detail": "304 deposits taken"
+        "count": 308,
+        "detail": "308 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -21836,8 +22168,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 13438,
-        "detail": "13,438 account credits issued"
+        "count": 13502,
+        "detail": "13,502 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -21846,8 +22178,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 2108,
-        "detail": "2,108 sections with member pricing"
+        "count": 2109,
+        "detail": "2,109 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -21856,8 +22188,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 2300,
-        "detail": "2,300 cash/check payments"
+        "count": 2303,
+        "detail": "2,303 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -21901,8 +22233,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 1861,
-        "detail": "1,861 household notes"
+        "count": 1871,
+        "detail": "1,871 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -22108,8 +22440,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 225,
-        "detail": "225 facility rentals"
+        "count": 226,
+        "detail": "226 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -22158,8 +22490,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 7292,
-        "detail": "7,292 cash/check payments"
+        "count": 7340,
+        "detail": "7,340 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -22188,8 +22520,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 437,
-        "detail": "437 cash-out reports"
+        "count": 441,
+        "detail": "441 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -22198,13 +22530,13 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 754,
-        "detail": "754 alternate IDs"
+        "count": 757,
+        "detail": "757 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 593,
-        "detail": "593 household notes"
+        "count": 599,
+        "detail": "599 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -22834,13 +23166,13 @@
     "city-of-west-haven": {
       "age_eligibility": {
         "adopted": true,
-        "count": 315,
-        "detail": "315 sections with age rules"
+        "count": 316,
+        "detail": "316 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 67,
-        "detail": "67 sections with waitlist"
+        "count": 68,
+        "detail": "68 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -22939,13 +23271,13 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 376,
-        "detail": "376 registration windows"
+        "count": 377,
+        "detail": "377 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 311,
-        "detail": "311 member early-access windows"
+        "count": 312,
+        "detail": "312 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
@@ -23014,8 +23346,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 266,
-        "detail": "266 facility rentals"
+        "count": 269,
+        "detail": "269 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -23034,8 +23366,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 29,
-        "detail": "29 permits issued"
+        "count": 30,
+        "detail": "30 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -23044,8 +23376,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 177,
-        "detail": "177 account credits issued"
+        "count": 181,
+        "detail": "181 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -23054,8 +23386,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 218,
-        "detail": "218 sections with member pricing"
+        "count": 219,
+        "detail": "219 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -23109,8 +23441,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 household notes"
+        "count": 6,
+        "detail": "6 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -23136,13 +23468,13 @@
     "city-of-west-linn": {
       "age_eligibility": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 sections with age rules"
+        "count": 8,
+        "detail": "8 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 sections with waitlist"
+        "count": 8,
+        "detail": "8 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -23235,14 +23567,14 @@
         "detail": "Not using"
       },
       "prerequisites": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 prerequisites set up"
       },
       "registration_windows": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 registration windows"
+        "count": 12,
+        "detail": "12 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -23271,8 +23603,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 sections with a skill level"
+        "count": 8,
+        "detail": "8 sections with a skill level"
       },
       "addons": {
         "adopted": false,
@@ -23356,8 +23688,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 sections with member pricing"
+        "count": 9,
+        "detail": "9 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -23453,8 +23785,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 15709,
-        "detail": "15,709 emails sent"
+        "count": 15736,
+        "detail": "15,736 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -23483,8 +23815,8 @@
       },
       "custom_forms": {
         "adopted": true,
-        "count": 62,
-        "detail": "62 forms"
+        "count": 63,
+        "detail": "63 forms"
       },
       "instant_booking": {
         "adopted": true,
@@ -23513,8 +23845,8 @@
       },
       "ticket_sales": {
         "adopted": true,
-        "count": 84,
-        "detail": "84 tickets sold"
+        "count": 88,
+        "detail": "88 tickets sold"
       },
       "ai_assistant": {
         "adopted": true,
@@ -23618,13 +23950,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 356,
-        "detail": "356 facility rentals"
+        "count": 364,
+        "detail": "364 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 160,
-        "detail": "160 rental applications"
+        "count": 163,
+        "detail": "163 rental applications"
       },
       "reservation_buffers": {
         "adopted": true,
@@ -23633,8 +23965,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 283,
-        "detail": "283 deposits taken"
+        "count": 284,
+        "detail": "284 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
@@ -23648,8 +23980,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 436,
-        "detail": "436 account credits issued"
+        "count": 439,
+        "detail": "439 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -23668,8 +24000,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1018,
-        "detail": "1,018 cash/check payments"
+        "count": 1020,
+        "detail": "1,020 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -23698,8 +24030,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 934,
-        "detail": "934 cash-out reports"
+        "count": 938,
+        "detail": "938 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -23708,8 +24040,8 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 1267,
-        "detail": "1,267 alternate IDs"
+        "count": 1268,
+        "detail": "1,268 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
@@ -24231,9 +24563,9 @@
         "detail": "Not using"
       },
       "reservation_buffers": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 3,
+        "detail": "3 sites with a buffer"
       },
       "security_deposits": {
         "adopted": false,
@@ -25265,8 +25597,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 10076,
-        "detail": "10,076 emails sent"
+        "count": 10078,
+        "detail": "10,078 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -25325,13 +25657,13 @@
       },
       "ticket_sales": {
         "adopted": true,
-        "count": 79,
-        "detail": "79 tickets sold"
+        "count": 85,
+        "detail": "85 tickets sold"
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 270,
-        "detail": "270 questions asked"
+        "count": 272,
+        "detail": "272 questions asked"
       },
       "ai_routines": {
         "adopted": true,
@@ -25340,8 +25672,8 @@
       },
       "grade_eligibility": {
         "adopted": true,
-        "count": 47,
-        "detail": "47 sections with grade rules"
+        "count": 48,
+        "detail": "48 sections with grade rules"
       },
       "residency_eligibility": {
         "adopted": false,
@@ -25355,8 +25687,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 301,
-        "detail": "301 registration windows"
+        "count": 302,
+        "detail": "302 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -25365,8 +25697,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 32,
-        "detail": "32 sections requiring extra info"
+        "count": 33,
+        "detail": "33 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -25375,8 +25707,8 @@
       },
       "form_on_file_reuse": {
         "adopted": true,
-        "count": 90,
-        "detail": "90 forms reused from file"
+        "count": 91,
+        "detail": "91 forms reused from file"
       },
       "guests_allowed": {
         "adopted": false,
@@ -25385,8 +25717,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 144,
-        "detail": "144 sections with a skill level"
+        "count": 145,
+        "detail": "145 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -25430,8 +25762,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 966,
-        "detail": "966 facility rentals"
+        "count": 976,
+        "detail": "976 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -25445,13 +25777,13 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 498,
-        "detail": "498 deposits taken"
+        "count": 508,
+        "detail": "508 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
-        "count": 143,
-        "detail": "143 permits issued"
+        "count": 145,
+        "detail": "145 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -25460,8 +25792,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 79,
-        "detail": "79 account credits issued"
+        "count": 84,
+        "detail": "84 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -25480,8 +25812,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 1659,
-        "detail": "1,659 cash/check payments"
+        "count": 1710,
+        "detail": "1,710 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -25510,8 +25842,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 273,
-        "detail": "273 cash-out reports"
+        "count": 283,
+        "detail": "283 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -25520,13 +25852,13 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 2261,
-        "detail": "2,261 alternate IDs"
+        "count": 2278,
+        "detail": "2,278 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 79,
-        "detail": "79 household notes"
+        "count": 80,
+        "detail": "80 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -25571,9 +25903,9 @@
         "detail": "993 emails sent"
       },
       "payment_plans": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 sections with plans"
       },
       "discount_codes": {
         "adopted": true,
@@ -25732,13 +26064,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 9557,
-        "detail": "9,557 facility rentals"
+        "count": 9849,
+        "detail": "9,849 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 128,
-        "detail": "128 rental applications"
+        "count": 131,
+        "detail": "131 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -25747,8 +26079,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 248,
-        "detail": "248 deposits taken"
+        "count": 249,
+        "detail": "249 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -25762,8 +26094,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 419,
-        "detail": "419 account credits issued"
+        "count": 421,
+        "detail": "421 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -25782,8 +26114,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 491,
-        "detail": "491 cash/check payments"
+        "count": 503,
+        "detail": "503 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -25812,8 +26144,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 347,
-        "detail": "347 cash-out reports"
+        "count": 354,
+        "detail": "354 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -26034,8 +26366,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1732,
-        "detail": "1,732 facility rentals"
+        "count": 1735,
+        "detail": "1,735 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -26064,8 +26396,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1013,
-        "detail": "1,013 account credits issued"
+        "count": 1014,
+        "detail": "1,014 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -26084,8 +26416,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 2699,
-        "detail": "2,699 cash/check payments"
+        "count": 2704,
+        "detail": "2,704 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -26166,8 +26498,8 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 208,
-        "detail": "208 SMS sent"
+        "count": 209,
+        "detail": "209 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
@@ -26236,8 +26568,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 9,
-        "detail": "9 questions asked"
+        "count": 10,
+        "detail": "10 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -26301,8 +26633,8 @@
       },
       "instructors": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 instructors"
+        "count": 16,
+        "detail": "16 instructors"
       },
       "instructor_certifications": {
         "adopted": false,
@@ -26336,8 +26668,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 238,
-        "detail": "238 facility rentals"
+        "count": 253,
+        "detail": "253 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -26356,8 +26688,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 29,
-        "detail": "29 permits issued"
+        "count": 31,
+        "detail": "31 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -26386,8 +26718,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 9,
-        "detail": "9 cash/check payments"
+        "count": 10,
+        "detail": "10 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -26940,8 +27272,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 3052,
-        "detail": "3,052 facility rentals"
+        "count": 3056,
+        "detail": "3,056 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -27242,8 +27574,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 5890,
-        "detail": "5,890 facility rentals"
+        "count": 5908,
+        "detail": "5,908 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -27272,8 +27604,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 1489,
-        "detail": "1,489 account credits issued"
+        "count": 1493,
+        "detail": "1,493 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -27408,19 +27740,19 @@
         "detail": "Not using"
       },
       "custom_forms": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 forms"
       },
       "instant_booking": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 instant-bookable sites"
       },
       "gl_accounting": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 GL accounts"
       },
       "seasons": {
         "adopted": false,
@@ -27433,9 +27765,9 @@
         "detail": "Not using"
       },
       "events": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 events"
       },
       "ticket_sales": {
         "adopted": false,
@@ -27444,8 +27776,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 80,
-        "detail": "80 questions asked"
+        "count": 85,
+        "detail": "85 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -27503,9 +27835,9 @@
         "detail": "Not using"
       },
       "addons": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 13,
+        "detail": "13 add-on products"
       },
       "instructors": {
         "adopted": false,
@@ -27518,9 +27850,9 @@
         "detail": "Not using"
       },
       "memberships": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 1,
+        "detail": "1 membership plans"
       },
       "auto_renew_memberships": {
         "adopted": false,
@@ -27543,9 +27875,9 @@
         "detail": "Not using"
       },
       "facility_rentals": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -27553,9 +27885,9 @@
         "detail": "Not using"
       },
       "reservation_buffers": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 2,
+        "detail": "2 sites with a buffer"
       },
       "security_deposits": {
         "adopted": false,
@@ -27568,9 +27900,9 @@
         "detail": "Not using"
       },
       "group_reservation_windows": {
-        "adopted": false,
-        "count": 0,
-        "detail": "Not using"
+        "adopted": true,
+        "count": 3,
+        "detail": "3 member booking windows"
       },
       "store_credit": {
         "adopted": false,
@@ -27846,8 +28178,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 100,
-        "detail": "100 facility rentals"
+        "count": 101,
+        "detail": "101 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -29780,13 +30112,13 @@
     "jurupa-area-recreation-and-park-district": {
       "age_eligibility": {
         "adopted": true,
-        "count": 907,
-        "detail": "907 sections with age rules"
+        "count": 920,
+        "detail": "920 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 833,
-        "detail": "833 sections with waitlist"
+        "count": 846,
+        "detail": "846 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -29795,8 +30127,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 18295,
-        "detail": "18,295 emails sent"
+        "count": 18319,
+        "detail": "18,319 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -29855,8 +30187,8 @@
       },
       "ticket_sales": {
         "adopted": true,
-        "count": 6272,
-        "detail": "6,272 tickets sold"
+        "count": 6276,
+        "detail": "6,276 tickets sold"
       },
       "ai_assistant": {
         "adopted": false,
@@ -29885,18 +30217,18 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 1436,
-        "detail": "1,436 registration windows"
+        "count": 1454,
+        "detail": "1,454 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 452,
-        "detail": "452 member early-access windows"
+        "count": 454,
+        "detail": "454 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 13,
-        "detail": "13 sections requiring extra info"
+        "count": 29,
+        "detail": "29 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -29915,8 +30247,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 558,
-        "detail": "558 sections with a skill level"
+        "count": 574,
+        "detail": "574 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -29960,28 +30292,28 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 570,
-        "detail": "570 facility rentals"
+        "count": 573,
+        "detail": "573 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 167,
-        "detail": "167 rental applications"
+        "count": 171,
+        "detail": "171 rental applications"
       },
       "reservation_buffers": {
         "adopted": true,
-        "count": 1,
-        "detail": "1 sites with a buffer"
+        "count": 2,
+        "detail": "2 sites with a buffer"
       },
       "security_deposits": {
         "adopted": true,
-        "count": 799,
-        "detail": "799 deposits taken"
+        "count": 807,
+        "detail": "807 deposits taken"
       },
       "rental_permits": {
         "adopted": true,
-        "count": 60,
-        "detail": "60 permits issued"
+        "count": 61,
+        "detail": "61 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -29990,8 +30322,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 437,
-        "detail": "437 account credits issued"
+        "count": 439,
+        "detail": "439 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -30000,8 +30332,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 858,
-        "detail": "858 sections with member pricing"
+        "count": 871,
+        "detail": "871 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -30010,8 +30342,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 451,
-        "detail": "451 cash/check payments"
+        "count": 452,
+        "detail": "452 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -30050,8 +30382,8 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 422,
-        "detail": "422 alternate IDs"
+        "count": 425,
+        "detail": "425 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
@@ -30866,8 +31198,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 2632,
-        "detail": "2,632 facility rentals"
+        "count": 2646,
+        "detail": "2,646 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -31607,8 +31939,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 emails sent"
+        "count": 13,
+        "detail": "13 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -31672,8 +32004,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 66,
-        "detail": "66 questions asked"
+        "count": 68,
+        "detail": "68 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -32800,18 +33132,18 @@
     "needham": {
       "age_eligibility": {
         "adopted": true,
-        "count": 114,
-        "detail": "114 sections with age rules"
+        "count": 115,
+        "detail": "115 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 141,
-        "detail": "141 sections with waitlist"
+        "count": 142,
+        "detail": "142 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 SMS sent"
+        "count": 6,
+        "detail": "6 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
@@ -32855,8 +33187,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 8,
-        "detail": "8 GL accounts"
+        "count": 9,
+        "detail": "9 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -32905,18 +33237,18 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 165,
-        "detail": "165 registration windows"
+        "count": 166,
+        "detail": "166 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 157,
-        "detail": "157 member early-access windows"
+        "count": 158,
+        "detail": "158 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 141,
-        "detail": "141 sections requiring extra info"
+        "count": 142,
+        "detail": "142 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -32925,8 +33257,8 @@
       },
       "form_on_file_reuse": {
         "adopted": true,
-        "count": 141,
-        "detail": "141 forms reused from file"
+        "count": 142,
+        "detail": "142 forms reused from file"
       },
       "guests_allowed": {
         "adopted": false,
@@ -33584,8 +33916,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1736,
-        "detail": "1,736 facility rentals"
+        "count": 1742,
+        "detail": "1,742 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -33761,8 +34093,8 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 14,
-        "detail": "14 GL accounts"
+        "count": 15,
+        "detail": "15 GL accounts"
       },
       "seasons": {
         "adopted": true,
@@ -33811,8 +34143,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 68,
-        "detail": "68 registration windows"
+        "count": 69,
+        "detail": "69 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -33861,13 +34193,13 @@
       },
       "memberships": {
         "adopted": true,
-        "count": 11,
-        "detail": "11 membership plans"
+        "count": 13,
+        "detail": "13 membership plans"
       },
       "auto_renew_memberships": {
         "adopted": true,
-        "count": 1,
-        "detail": "1 auto-renewing plans"
+        "count": 2,
+        "detail": "2 auto-renewing plans"
       },
       "passes": {
         "adopted": true,
@@ -33886,8 +34218,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 371,
-        "detail": "371 facility rentals"
+        "count": 373,
+        "detail": "373 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -33981,8 +34313,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 household notes"
+        "count": 4,
+        "detail": "4 household notes"
       },
       "calendar_sync": {
         "adopted": true,
@@ -35099,8 +35431,8 @@
       },
       "rental_applications": {
         "adopted": true,
-        "count": 15,
-        "detail": "15 rental applications"
+        "count": 16,
+        "detail": "16 rental applications"
       },
       "reservation_buffers": {
         "adopted": true,
@@ -35144,8 +35476,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 52,
-        "detail": "52 cash/check payments"
+        "count": 60,
+        "detail": "60 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -35174,8 +35506,8 @@
       },
       "cash_reconciliation": {
         "adopted": true,
-        "count": 38,
-        "detail": "38 cash-out reports"
+        "count": 40,
+        "detail": "40 cash-out reports"
       },
       "custom_staff_roles": {
         "adopted": true,
@@ -35698,8 +36030,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 465,
-        "detail": "465 facility rentals"
+        "count": 467,
+        "detail": "467 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -35820,8 +36152,8 @@
     "prescott-valley": {
       "age_eligibility": {
         "adopted": true,
-        "count": 391,
-        "detail": "391 sections with age rules"
+        "count": 392,
+        "detail": "392 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -35925,8 +36257,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 623,
-        "detail": "623 registration windows"
+        "count": 638,
+        "detail": "638 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -35955,8 +36287,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 420,
-        "detail": "420 sections with a skill level"
+        "count": 419,
+        "detail": "419 sections with a skill level"
       },
       "addons": {
         "adopted": false,
@@ -36000,13 +36332,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1391,
-        "detail": "1,391 facility rentals"
+        "count": 1396,
+        "detail": "1,396 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 64,
-        "detail": "64 rental applications"
+        "count": 65,
+        "detail": "65 rental applications"
       },
       "reservation_buffers": {
         "adopted": true,
@@ -36015,8 +36347,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 140,
-        "detail": "140 deposits taken"
+        "count": 143,
+        "detail": "143 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -36030,8 +36362,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 659,
-        "detail": "659 account credits issued"
+        "count": 661,
+        "detail": "661 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -36307,8 +36639,8 @@
       },
       "rental_applications": {
         "adopted": true,
-        "count": 153,
-        "detail": "153 rental applications"
+        "count": 156,
+        "detail": "156 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -36604,8 +36936,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 139,
-        "detail": "139 facility rentals"
+        "count": 140,
+        "detail": "140 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -36619,8 +36951,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 152,
-        "detail": "152 deposits taken"
+        "count": 153,
+        "detail": "153 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -39020,8 +39352,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1464,
-        "detail": "1,464 facility rentals"
+        "count": 1465,
+        "detail": "1,465 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -39322,8 +39654,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1053,
-        "detail": "1,053 facility rentals"
+        "count": 1058,
+        "detail": "1,058 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -39444,8 +39776,8 @@
     "san-francisco-rec-park": {
       "age_eligibility": {
         "adopted": true,
-        "count": 278,
-        "detail": "278 sections with age rules"
+        "count": 280,
+        "detail": "280 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -39549,8 +39881,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 14577,
-        "detail": "14,577 registration windows"
+        "count": 14615,
+        "detail": "14,615 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -39579,8 +39911,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 929,
-        "detail": "929 sections with a skill level"
+        "count": 947,
+        "detail": "947 sections with a skill level"
       },
       "addons": {
         "adopted": false,
@@ -39624,8 +39956,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 423950,
-        "detail": "423,950 facility rentals"
+        "count": 425010,
+        "detail": "425,010 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -39654,8 +39986,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 22284,
-        "detail": "22,284 account credits issued"
+        "count": 22297,
+        "detail": "22,297 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -39926,8 +40258,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 4766,
-        "detail": "4,766 facility rentals"
+        "count": 4768,
+        "detail": "4,768 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -40530,8 +40862,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 352,
-        "detail": "352 facility rentals"
+        "count": 353,
+        "detail": "353 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -41628,8 +41960,8 @@
       },
       "events": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 events"
+        "count": 4,
+        "detail": "4 events"
       },
       "ticket_sales": {
         "adopted": true,
@@ -41638,8 +41970,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 31,
-        "detail": "31 questions asked"
+        "count": 32,
+        "detail": "32 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -41738,8 +42070,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 135,
-        "detail": "135 facility rentals"
+        "count": 136,
+        "detail": "136 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -41860,13 +42192,13 @@
     "the-ranch": {
       "age_eligibility": {
         "adopted": true,
-        "count": 509,
-        "detail": "509 sections with age rules"
+        "count": 512,
+        "detail": "512 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 540,
-        "detail": "540 sections with waitlist"
+        "count": 543,
+        "detail": "543 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -41875,8 +42207,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 33556,
-        "detail": "33,556 emails sent"
+        "count": 33557,
+        "detail": "33,557 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -41915,13 +42247,13 @@
       },
       "gl_accounting": {
         "adopted": true,
-        "count": 33,
-        "detail": "33 GL accounts"
+        "count": 34,
+        "detail": "34 GL accounts"
       },
       "seasons": {
         "adopted": true,
-        "count": 5,
-        "detail": "5 seasons"
+        "count": 6,
+        "detail": "6 seasons"
       },
       "competitions_leagues": {
         "adopted": false,
@@ -41940,8 +42272,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 4,
-        "detail": "4 questions asked"
+        "count": 8,
+        "detail": "8 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -41965,18 +42297,18 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 674,
-        "detail": "674 registration windows"
+        "count": 677,
+        "detail": "677 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 206,
-        "detail": "206 member early-access windows"
+        "count": 207,
+        "detail": "207 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 169,
-        "detail": "169 sections requiring extra info"
+        "count": 172,
+        "detail": "172 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -42040,8 +42372,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 3454,
-        "detail": "3,454 facility rentals"
+        "count": 3468,
+        "detail": "3,468 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -42070,8 +42402,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 415,
-        "detail": "415 account credits issued"
+        "count": 417,
+        "detail": "417 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -42080,8 +42412,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 575,
-        "detail": "575 sections with member pricing"
+        "count": 578,
+        "detail": "578 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -42135,8 +42467,8 @@
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 37,
-        "detail": "37 household notes"
+        "count": 38,
+        "detail": "38 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -42464,13 +42796,13 @@
     "town-of-clarkstown": {
       "age_eligibility": {
         "adopted": true,
-        "count": 174,
-        "detail": "174 sections with age rules"
+        "count": 175,
+        "detail": "175 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 202,
-        "detail": "202 sections with waitlist"
+        "count": 206,
+        "detail": "206 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
@@ -42544,18 +42876,18 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 135,
-        "detail": "135 questions asked"
+        "count": 153,
+        "detail": "153 questions asked"
       },
       "ai_routines": {
         "adopted": true,
-        "count": 2,
-        "detail": "2 routines set up"
+        "count": 3,
+        "detail": "3 routines set up"
       },
       "grade_eligibility": {
         "adopted": true,
-        "count": 71,
-        "detail": "71 sections with grade rules"
+        "count": 74,
+        "detail": "74 sections with grade rules"
       },
       "residency_eligibility": {
         "adopted": false,
@@ -42574,13 +42906,13 @@
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 319,
-        "detail": "319 member early-access windows"
+        "count": 324,
+        "detail": "324 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 120,
-        "detail": "120 sections requiring extra info"
+        "count": 124,
+        "detail": "124 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -42599,8 +42931,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 207,
-        "detail": "207 sections with a skill level"
+        "count": 211,
+        "detail": "211 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -42644,8 +42976,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 41,
-        "detail": "41 facility rentals"
+        "count": 44,
+        "detail": "44 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -42674,8 +43006,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 93,
-        "detail": "93 account credits issued"
+        "count": 98,
+        "detail": "98 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -42694,8 +43026,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 29,
-        "detail": "29 cash/check payments"
+        "count": 30,
+        "detail": "30 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -42734,13 +43066,13 @@
       },
       "alternate_identities": {
         "adopted": true,
-        "count": 5673,
-        "detail": "5,673 alternate IDs"
+        "count": 5674,
+        "detail": "5,674 alternate IDs"
       },
       "crm_household_notes": {
         "adopted": true,
-        "count": 71,
-        "detail": "71 household notes"
+        "count": 73,
+        "detail": "73 household notes"
       },
       "calendar_sync": {
         "adopted": false,
@@ -42766,13 +43098,13 @@
     "town-of-clarksville": {
       "age_eligibility": {
         "adopted": true,
-        "count": 85,
-        "detail": "85 sections with age rules"
+        "count": 87,
+        "detail": "87 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 74,
-        "detail": "74 sections with waitlist"
+        "count": 75,
+        "detail": "75 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": false,
@@ -42871,8 +43203,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 186,
-        "detail": "186 registration windows"
+        "count": 188,
+        "detail": "188 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
@@ -42946,8 +43278,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 432,
-        "detail": "432 facility rentals"
+        "count": 434,
+        "detail": "434 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -42976,8 +43308,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 104,
-        "detail": "104 account credits issued"
+        "count": 105,
+        "detail": "105 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -42996,8 +43328,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 8615,
-        "detail": "8,615 cash/check payments"
+        "count": 8616,
+        "detail": "8,616 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -43248,8 +43580,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 15917,
-        "detail": "15,917 facility rentals"
+        "count": 15946,
+        "detail": "15,946 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -43450,8 +43782,8 @@
       },
       "ai_assistant": {
         "adopted": true,
-        "count": 28,
-        "detail": "28 questions asked"
+        "count": 29,
+        "detail": "29 questions asked"
       },
       "ai_routines": {
         "adopted": false,
@@ -43550,8 +43882,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 411,
-        "detail": "411 facility rentals"
+        "count": 413,
+        "detail": "413 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -43570,8 +43902,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 124,
-        "detail": "124 permits issued"
+        "count": 126,
+        "detail": "126 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -43580,8 +43912,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 257,
-        "detail": "257 account credits issued"
+        "count": 269,
+        "detail": "269 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -43600,8 +43932,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 186,
-        "detail": "186 cash/check payments"
+        "count": 188,
+        "detail": "188 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -43672,8 +44004,8 @@
     "town-of-reading": {
       "age_eligibility": {
         "adopted": true,
-        "count": 294,
-        "detail": "294 sections with age rules"
+        "count": 295,
+        "detail": "295 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
@@ -43777,13 +44109,13 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 235,
-        "detail": "235 registration windows"
+        "count": 239,
+        "detail": "239 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 194,
-        "detail": "194 member early-access windows"
+        "count": 197,
+        "detail": "197 member early-access windows"
       },
       "required_participant_info": {
         "adopted": false,
@@ -43852,8 +44184,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 25,
-        "detail": "25 facility rentals"
+        "count": 27,
+        "detail": "27 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -43882,8 +44214,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 117,
-        "detail": "117 account credits issued"
+        "count": 119,
+        "detail": "119 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -43902,8 +44234,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 89,
-        "detail": "89 cash/check payments"
+        "count": 90,
+        "detail": "90 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -44154,8 +44486,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 247,
-        "detail": "247 facility rentals"
+        "count": 250,
+        "detail": "250 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -44184,8 +44516,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 440,
-        "detail": "440 account credits issued"
+        "count": 441,
+        "detail": "441 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -44456,8 +44788,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 445,
-        "detail": "445 facility rentals"
+        "count": 446,
+        "detail": "446 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -44471,8 +44803,8 @@
       },
       "security_deposits": {
         "adopted": true,
-        "count": 271,
-        "detail": "271 deposits taken"
+        "count": 272,
+        "detail": "272 deposits taken"
       },
       "rental_permits": {
         "adopted": false,
@@ -44506,8 +44838,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 6128,
-        "detail": "6,128 cash/check payments"
+        "count": 6131,
+        "detail": "6,131 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -45182,23 +45514,23 @@
     "town-of-windham": {
       "age_eligibility": {
         "adopted": true,
-        "count": 246,
-        "detail": "246 sections with age rules"
+        "count": 250,
+        "detail": "250 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 194,
-        "detail": "194 sections with waitlist"
+        "count": 198,
+        "detail": "198 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 3105,
-        "detail": "3,105 SMS sent"
+        "count": 3108,
+        "detail": "3,108 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 33483,
-        "detail": "33,483 emails sent"
+        "count": 33491,
+        "detail": "33,491 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -45247,8 +45579,8 @@
       },
       "competitions_leagues": {
         "adopted": true,
-        "count": 3,
-        "detail": "3 leagues/competitions"
+        "count": 4,
+        "detail": "4 leagues/competitions"
       },
       "events": {
         "adopted": true,
@@ -45287,18 +45619,18 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 778,
-        "detail": "778 registration windows"
+        "count": 786,
+        "detail": "786 registration windows"
       },
       "group_early_access_windows": {
         "adopted": true,
-        "count": 662,
-        "detail": "662 member early-access windows"
+        "count": 665,
+        "detail": "665 member early-access windows"
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 37,
-        "detail": "37 sections requiring extra info"
+        "count": 41,
+        "detail": "41 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -45307,8 +45639,8 @@
       },
       "form_on_file_reuse": {
         "adopted": true,
-        "count": 305,
-        "detail": "305 forms reused from file"
+        "count": 308,
+        "detail": "308 forms reused from file"
       },
       "guests_allowed": {
         "adopted": false,
@@ -45317,8 +45649,8 @@
       },
       "skill_levels": {
         "adopted": true,
-        "count": 119,
-        "detail": "119 sections with a skill level"
+        "count": 121,
+        "detail": "121 sections with a skill level"
       },
       "addons": {
         "adopted": true,
@@ -45362,8 +45694,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 942,
-        "detail": "942 facility rentals"
+        "count": 945,
+        "detail": "945 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -45382,8 +45714,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 113,
-        "detail": "113 permits issued"
+        "count": 114,
+        "detail": "114 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -45402,8 +45734,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 150,
-        "detail": "150 sections with member pricing"
+        "count": 151,
+        "detail": "151 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -45412,8 +45744,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 4414,
-        "detail": "4,414 cash/check payments"
+        "count": 4415,
+        "detail": "4,415 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -45783,6 +46115,308 @@
         "detail": "Not using"
       }
     },
+    "village-of-jackson": {
+      "age_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "sms_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "email_messaging": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plans": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "discount_codes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "scholarships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gift_cards": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_booking_questions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_forms": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instant_booking": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "gl_accounting": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "seasons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "competitions_leagues": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "events": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ticket_sales": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_assistant": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "ai_routines": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "grade_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "residency_eligibility": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "prerequisites": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "registration_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_early_access_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "required_participant_info": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "waivers_contracts": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "form_on_file_reuse": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "guests_allowed": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "skill_levels": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "addons": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instructors": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "instructor_certifications": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "memberships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "auto_renew_memberships": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "passes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "benefit_rules": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "physical_access_devices": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "facility_rentals": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "rental_applications": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "reservation_buffers": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "security_deposits": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "rental_permits": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_reservation_windows": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "store_credit": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "structured_refund_policies": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "group_pricing_tiers": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "tax_collection": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "cash_check_payments": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_email_domains": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "notification_subscriptions": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "audience_segments": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "storefront_products": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "pos_desk_locations": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "cash_reconciliation": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "custom_staff_roles": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "alternate_identities": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "crm_household_notes": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "calendar_sync": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "payment_plan_autopay": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "marketing_email": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      },
+      "automated_waitlist": {
+        "adopted": false,
+        "count": 0,
+        "detail": "Not using"
+      }
+    },
     "watertown": {
       "age_eligibility": {
         "adopted": true,
@@ -45796,13 +46430,13 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 3379,
-        "detail": "3,379 SMS sent"
+        "count": 3390,
+        "detail": "3,390 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 5751,
-        "detail": "5,751 emails sent"
+        "count": 5762,
+        "detail": "5,762 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -45966,13 +46600,13 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 2592,
-        "detail": "2,592 facility rentals"
+        "count": 2622,
+        "detail": "2,622 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
-        "count": 937,
-        "detail": "937 rental applications"
+        "count": 938,
+        "detail": "938 rental applications"
       },
       "reservation_buffers": {
         "adopted": false,
@@ -45986,8 +46620,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 1871,
-        "detail": "1,871 permits issued"
+        "count": 1900,
+        "detail": "1,900 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -45996,8 +46630,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 790,
-        "detail": "790 account credits issued"
+        "count": 798,
+        "detail": "798 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": true,
@@ -46016,8 +46650,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 226,
-        "detail": "226 cash/check payments"
+        "count": 230,
+        "detail": "230 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -46390,23 +47024,23 @@
     "yerba-buena-gardens": {
       "age_eligibility": {
         "adopted": true,
-        "count": 161,
-        "detail": "161 sections with age rules"
+        "count": 163,
+        "detail": "163 sections with age rules"
       },
       "waitlist": {
         "adopted": true,
-        "count": 138,
-        "detail": "138 sections with waitlist"
+        "count": 140,
+        "detail": "140 sections with waitlist"
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 48,
-        "detail": "48 SMS sent"
+        "count": 54,
+        "detail": "54 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 487,
-        "detail": "487 emails sent"
+        "count": 488,
+        "detail": "488 emails sent"
       },
       "payment_plans": {
         "adopted": false,
@@ -46495,8 +47129,8 @@
       },
       "registration_windows": {
         "adopted": true,
-        "count": 240,
-        "detail": "240 registration windows"
+        "count": 241,
+        "detail": "241 registration windows"
       },
       "group_early_access_windows": {
         "adopted": false,
@@ -46505,8 +47139,8 @@
       },
       "required_participant_info": {
         "adopted": true,
-        "count": 153,
-        "detail": "153 sections requiring extra info"
+        "count": 155,
+        "detail": "155 sections requiring extra info"
       },
       "waivers_contracts": {
         "adopted": true,
@@ -46530,13 +47164,13 @@
       },
       "addons": {
         "adopted": true,
-        "count": 118,
-        "detail": "118 add-on products"
+        "count": 120,
+        "detail": "120 add-on products"
       },
       "instructors": {
         "adopted": true,
-        "count": 22,
-        "detail": "22 instructors"
+        "count": 24,
+        "detail": "24 instructors"
       },
       "instructor_certifications": {
         "adopted": false,
@@ -46600,8 +47234,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 172,
-        "detail": "172 account credits issued"
+        "count": 183,
+        "detail": "183 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -46610,8 +47244,8 @@
       },
       "group_pricing_tiers": {
         "adopted": true,
-        "count": 158,
-        "detail": "158 sections with member pricing"
+        "count": 160,
+        "detail": "160 sections with member pricing"
       },
       "tax_collection": {
         "adopted": false,
@@ -47294,7 +47928,7 @@
       }
     }
   },
-  "notes": "60 of 61 catalog features measured, re-baked 2026-09-14 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 147 organizations are live on rec.us.",
+  "notes": "60 of 61 catalog features measured, re-baked 2026-09-15 from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. 73 of 149 organizations are live on rec.us.",
   "measuredFeatures": [
     "age_eligibility",
     "waitlist",
@@ -49543,6 +50177,288 @@
         "notification_subscriptions": 25,
         "audience_segments": 59,
         "storefront_products": 55,
+        "pos_desk_locations": 58,
+        "cash_reconciliation": 37,
+        "custom_staff_roles": 62,
+        "alternate_identities": 25,
+        "crm_household_notes": 70,
+        "calendar_sync": 20,
+        "payment_plan_autopay": 11,
+        "marketing_email": 42,
+        "automated_waitlist": 2
+      }
+    },
+    {
+      "date": "2026-09-15",
+      "setKey": "60:14h8gt2",
+      "measured": 60,
+      "scores": {
+        "aardvark-city": 3,
+        "alameda": 5,
+        "allegheny-county": 20,
+        "apex-park-and-recreation-district": 87,
+        "barrie": 30,
+        "barton-springs": 18,
+        "bellflower": 3,
+        "boston-bcyf": 38,
+        "braintree": 27,
+        "brookline-recreation": 13,
+        "carmichael-district": 7,
+        "central-point-recreation": 47,
+        "chicago-park-district-golf": 7,
+        "chicorec": 70,
+        "city-of-aspen": 18,
+        "city-of-ball-ground": 5,
+        "city-of-battle-ground": 23,
+        "city-of-belmont": 10,
+        "city-of-belton": 63,
+        "city-of-bloomington": 55,
+        "city-of-boerne": 60,
+        "city-of-brisbane": 23,
+        "city-of-buffalo": 62,
+        "city-of-calabasas": 3,
+        "city-of-cedar-rapids": 22,
+        "city-of-duarte": 33,
+        "city-of-easton": 42,
+        "city-of-euclid": 63,
+        "city-of-goodyear": 43,
+        "city-of-hermosa-beach": 72,
+        "city-of-indianapolis": 3,
+        "city-of-jeffersonville": 63,
+        "city-of-joplin": 52,
+        "city-of-lakeland": 52,
+        "city-of-las-vegas": 18,
+        "city-of-league-city": 18,
+        "city-of-lewisburg": 57,
+        "city-of-lockhart": 13,
+        "city-of-lodi": 0,
+        "city-of-madeira-beach": 42,
+        "city-of-madison": 57,
+        "city-of-malibu": 55,
+        "city-of-medford": 22,
+        "city-of-menifee": 58,
+        "city-of-miamisburg": 12,
+        "city-of-midland": 55,
+        "city-of-milford": 13,
+        "city-of-mountain-view": 12,
+        "city-of-nashville": 20,
+        "city-of-natchez": 47,
+        "city-of-niagara-falls": 97,
+        "city-of-norman": 82,
+        "city-of-oakland": 0,
+        "city-of-orinda": 0,
+        "city-of-palm-springs": 13,
+        "city-of-pawnee": 92,
+        "city-of-pflugerville": 0,
+        "city-of-piedmont": 63,
+        "city-of-pleasant-hill": 0,
+        "city-of-san-francisco": 7,
+        "city-of-santa-cruz": 0,
+        "city-of-smyrna": 78,
+        "city-of-stanwood": 10,
+        "city-of-torrance": 72,
+        "city-of-tullahoma": 57,
+        "city-of-university-park": 12,
+        "city-of-watsonville": 27,
+        "city-of-west-haven": 65,
+        "city-of-west-linn": 25,
+        "city-of-west-sacramento": 80,
+        "clark-county": 0,
+        "coab-recreation": 7,
+        "concord-township": 0,
+        "conference": 28,
+        "d4cprs": 2,
+        "douglas-county-nv": 73,
+        "el-segundo-recreation": 68,
+        "emeryville": 72,
+        "essex-junction": 60,
+        "fairfax-county": 72,
+        "folsom": 27,
+        "foster-city": 22,
+        "glenview-park-district": 22,
+        "golden-gate-village": 10,
+        "hammond-area-recreation-district": 17,
+        "haverford-township": 53,
+        "indy-parks--recreation": 38,
+        "iv2pp-off": 18,
+        "iv2pp-on": 25,
+        "jasons-sanbox": 0,
+        "jurupa-area-recreation-and-park-district": 73,
+        "laguna-beach": 2,
+        "lake-county": 28,
+        "lincoln": 28,
+        "littleton": 55,
+        "maple-grove": 3,
+        "marin-county-parks": 23,
+        "mashantucket-pequot-tribal-nation": 35,
+        "mesa": 8,
+        "mission-oaks-rpd": 18,
+        "needham": 43,
+        "nnerpc": 3,
+        "norris": 18,
+        "northern-door-sports-and-recreation": 58,
+        "north-logan": 42,
+        "orangevale-recreation--park-district": 0,
+        "oro-valley": 32,
+        "paradise-recreation-and-park-district": 62,
+        "pittsburg": 13,
+        "pleasant-hill": 52,
+        "prescott-valley": 58,
+        "pueblo-county": 57,
+        "putnam-county": 42,
+        "rec-demo-org": 10,
+        "rec-east-bay": 0,
+        "rec-mountain": 18,
+        "RecSF": 32,
+        "rec-staging": 5,
+        "rec-university": 47,
+        "redwood-city": 5,
+        "rocklin": 28,
+        "sacramento-county": 52,
+        "san-francisco-rec-park": 38,
+        "santacruzcounty": 43,
+        "scotts-valley": 30,
+        "sebastopol": 43,
+        "suffolk-parks-and-recreation": 30,
+        "sunrise-pickleball-club": 20,
+        "sunrise-rpd": 15,
+        "the-dance-palace": 38,
+        "the-ranch": 57,
+        "torranceca": 5,
+        "town-of-clarkstown": 63,
+        "town-of-clarksville": 67,
+        "town-of-corte-madera": 13,
+        "town-of-danvers": 72,
+        "town-of-reading": 43,
+        "town-of-shrewsbury": 63,
+        "town-of-taylor": 50,
+        "town-of-wellesley": 2,
+        "town-of-wellesley-old": 7,
+        "town-of-windham": 80,
+        "upson-county": 7,
+        "village-of-jackson": 0,
+        "watertown": 72,
+        "woodmen-hills-metro-district": 47,
+        "yerba-buena-gardens": 57,
+        "zzzarchivenorthern-door-sports-and-recreation": 0,
+        "zzzyerba-buena-gardens": 3
+      },
+      "orgs": 149,
+      "liveOrgs": 73,
+      "featureLive": {
+        "age_eligibility": 62,
+        "waitlist": 60,
+        "sms_messaging": 18,
+        "email_messaging": 66,
+        "payment_plans": 29,
+        "discount_codes": 33,
+        "scholarships": 14,
+        "gift_cards": 8,
+        "custom_booking_questions": 24,
+        "custom_forms": 58,
+        "instant_booking": 63,
+        "gl_accounting": 61,
+        "seasons": 66,
+        "competitions_leagues": 18,
+        "events": 24,
+        "ticket_sales": 15,
+        "ai_assistant": 47,
+        "ai_routines": 10,
+        "grade_eligibility": 37,
+        "residency_eligibility": 43,
+        "prerequisites": 16,
+        "registration_windows": 63,
+        "group_early_access_windows": 44,
+        "required_participant_info": 43,
+        "waivers_contracts": 70,
+        "form_on_file_reuse": 43,
+        "guests_allowed": 5,
+        "skill_levels": 64,
+        "addons": 34,
+        "instructors": 51,
+        "instructor_certifications": 11,
+        "memberships": 43,
+        "auto_renew_memberships": 10,
+        "passes": 32,
+        "benefit_rules": 38,
+        "physical_access_devices": 1,
+        "facility_rentals": 72,
+        "rental_applications": 45,
+        "reservation_buffers": 20,
+        "security_deposits": 44,
+        "rental_permits": 17,
+        "group_reservation_windows": 71,
+        "store_credit": 60,
+        "structured_refund_policies": 8,
+        "group_pricing_tiers": 40,
+        "tax_collection": 11,
+        "cash_check_payments": 54,
+        "custom_email_domains": 8,
+        "notification_subscriptions": 22,
+        "audience_segments": 46,
+        "storefront_products": 34,
+        "pos_desk_locations": 42,
+        "cash_reconciliation": 30,
+        "custom_staff_roles": 45,
+        "alternate_identities": 23,
+        "crm_household_notes": 55,
+        "calendar_sync": 18,
+        "payment_plan_autopay": 8,
+        "marketing_email": 34,
+        "automated_waitlist": 0
+      },
+      "featureAll": {
+        "age_eligibility": 86,
+        "waitlist": 82,
+        "sms_messaging": 21,
+        "email_messaging": 81,
+        "payment_plans": 39,
+        "discount_codes": 38,
+        "scholarships": 19,
+        "gift_cards": 11,
+        "custom_booking_questions": 29,
+        "custom_forms": 82,
+        "instant_booking": 107,
+        "gl_accounting": 103,
+        "seasons": 95,
+        "competitions_leagues": 24,
+        "events": 41,
+        "ticket_sales": 23,
+        "ai_assistant": 68,
+        "ai_routines": 17,
+        "grade_eligibility": 44,
+        "residency_eligibility": 63,
+        "prerequisites": 22,
+        "registration_windows": 96,
+        "group_early_access_windows": 55,
+        "required_participant_info": 52,
+        "waivers_contracts": 97,
+        "form_on_file_reuse": 51,
+        "guests_allowed": 8,
+        "skill_levels": 97,
+        "addons": 47,
+        "instructors": 64,
+        "instructor_certifications": 15,
+        "memberships": 64,
+        "auto_renew_memberships": 16,
+        "passes": 48,
+        "benefit_rules": 53,
+        "physical_access_devices": 2,
+        "facility_rentals": 112,
+        "rental_applications": 62,
+        "reservation_buffers": 31,
+        "security_deposits": 59,
+        "rental_permits": 24,
+        "group_reservation_windows": 118,
+        "store_credit": 77,
+        "structured_refund_policies": 13,
+        "group_pricing_tiers": 53,
+        "tax_collection": 20,
+        "cash_check_payments": 65,
+        "custom_email_domains": 9,
+        "notification_subscriptions": 25,
+        "audience_segments": 59,
+        "storefront_products": 56,
         "pos_desk_locations": 58,
         "cash_reconciliation": 37,
         "custom_staff_roles": 62,
