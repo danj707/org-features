@@ -408,7 +408,7 @@
 <script>
 (function () {
   const e = React.createElement;
-  const { useState, useEffect, useMemo } = React;
+  const { useState, useEffect, useMemo, useRef } = React;
   const fmt = (n) => n == null ? "—" : Number(n).toLocaleString("en-US");
   const days = (iso) => iso ? Math.round((Date.now() - new Date(iso)) / 864e5) : null;
 
@@ -1523,6 +1523,23 @@
   // follow the order above rather than staying pinned to a stage name.
   const GANTT_STAGE_COLORS = { "Sales Hand Off": "#6366f1", "Partnership Kick Off": "#8b5cf6", "Discovery": "#06b6d4", "Configuration": "#0ea5e9", "Launch Marketing and Operations": "#10b981", "Go-Live Support": "#f59e0b", "Launched": "#475569", "Delayed": "#7f1d1d" };
   const LOE_WEIGHT = { "Very Large": 4, "Large": 3, "Medium": 2, "Small": 1 };
+  /* Implementation segments, banded off SOW Hours on the Airtable service
+     record. Airtable stores whole hours, so the bands are stated inclusive:
+     the spec's exclusive bounds (>0 and <19, >18 and <23, …) describe the
+     same integers with no gap between bands. */
+  const SEGMENTS = [
+    { key: "SMB",        abbr: "SMB",  lo: 1,  hi: 18,       hours: "1–18h",  color: "#38bdf8" },
+    { key: "Mid-Market", abbr: "MM",   lo: 19, hi: 22,       hours: "19–22h", color: "#22d3ee" },
+    { key: "Enterprise", abbr: "ENT",  lo: 23, hi: 37,       hours: "23–37h", color: "#34d399" },
+    { key: "Strategic",  abbr: "STR",  lo: 38, hi: 60,       hours: "38–60h", color: "#fbbf24" },
+    { key: "Strategic+", abbr: "STR+", lo: 61, hi: Infinity, hours: "61h+",   color: "#f87171" },
+  ];
+  /* Launches with SOW Hours unset land here rather than falling out of the
+     matrix — a capacity view that silently drops work is worse than one that
+     admits it does not know the size. The column only appears when some
+     visible launch is actually unsized. */
+  const UNSIZED = { key: "Unsized", abbr: "—", hours: "no SOW Hours set", color: "#64748b" };
+  const segmentOf = (h) => (typeof h === "number" && h > 0 ? SEGMENTS.find(s => h >= s.lo && h <= s.hi) || UNSIZED : UNSIZED);
   const KNOWN_OWNER_COLORS = { "Michael Kehoe": "#f97316", "Maddie Pellman": "#ec4899", "Lindsay Keare": "#8b5cf6", "Dan Jenner": "#06b6d4", "Lionel Nyange": "#10b981", "Ankur Lal": "#e11d48", "Teddy Noll": "#a3e635" };
   const OWNER_PALETTE = ["#fbbf24", "#38bdf8", "#c084fc", "#34d399", "#fb7185", "#a78bfa"];
   const pd = (d) => new Date(d + "T00:00:00");
@@ -1573,6 +1590,20 @@
     const [sortBy, setSortBy] = useState("regLaunch");
     const [hoveredId, setHoveredId] = useState(null);
     const [tooltip, setTooltip] = useState(null);
+    /* The segment matrix below the chart scrolls with it. Both scrollers hold
+       the same LABEL_W + TIMELINE_W geometry, so scrollLeft maps 1:1 and the
+       months stay aligned. The lock stops the echo: setting scrollLeft fires
+       the other one's onScroll, which would set this one straight back. */
+    const ganttScrollRef = useRef(null);
+    const matrixScrollRef = useRef(null);
+    const scrollLock = useRef(false);
+    const linkScroll = (otherRef) => (ev) => {
+      const other = otherRef.current;
+      if (!other || scrollLock.current) return;
+      scrollLock.current = true;
+      other.scrollLeft = ev.currentTarget.scrollLeft;
+      window.requestAnimationFrame(() => { scrollLock.current = false; });
+    };
 
     // Owners, categories, statuses derive from the data so new hires and new
     // Airtable options show up without a code change.
@@ -1641,13 +1672,31 @@
         }).filter(b => b.count);
         const unassigned = active.filter(s => !s.owner);
         if (unassigned.length) breakdown.push({ owner: "Unassigned", count: unassigned.length, acv: unassigned.reduce((t, s) => t + (s.acv || 0), 0) });
-        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown });
+        /* owner -> segment key -> count, over the SAME `active` set the header
+           counts, so every month's matrix sums to the count printed above it. */
+        const segGrid = {};
+        active.forEach(s => {
+          const o = s.owner || "Unassigned";
+          const k = segmentOf(s.sowHours).key;
+          if (!segGrid[o]) segGrid[o] = {};
+          segGrid[o][k] = (segGrid[o][k] || 0) + 1;
+        });
+        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown, segGrid });
         cur = nextMonth;
       } }
     const maxActive = Math.max(...months.map(m => m.activeCount), 1);
 
+    // Rows of the segment matrix: owners with at least one visible launch.
+    const matrixOwners = [...new Set(rows.map(s => s.owner || "Unassigned"))].sort();
+    const segCols = rows.some(s => segmentOf(s.sowHours) === UNSIZED) ? [...SEGMENTS, UNSIZED] : SEGMENTS;
+    const MATRIX_H = 38 + matrixOwners.length * 14;
+
     const ROW_H = 36, LABEL_W = 350, HEADER_H = 80, OWNER_ROW_H = 170;
-    const TIMELINE_W = Math.max(months.length * 160, 800);
+    /* Month width is shared by the gantt and the segment matrix below it, so
+       the two scrollers stay aligned. It is set by the matrix, which is the
+       denser of the two: a month there holds an owner name plus one column
+       per segment, and at the old 160px the names truncated to "M…". */
+    const TIMELINE_W = Math.max(months.length * 230, 800);
     const upper = { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" };
 
     // Quarterly revenue + QTD stats work off regLaunch across ALL services.
@@ -1732,7 +1781,7 @@
 
       // Gantt
       e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
-        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
+        e("div", { ref: ganttScrollRef, onScroll: linkScroll(matrixScrollRef), style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
           e("div", { style: { minWidth: LABEL_W + TIMELINE_W } },
 
             // Header row: months with launch counts + ACV
@@ -1818,6 +1867,60 @@
           }),
           e("div", { style: { marginLeft: "auto", color: "#64748b" } }, "◆ = Reg. Launch Date"),
           data.length > rows.length ? e("div", { style: { color: "#64748b" } }, (data.length - rows.length) + " service(s) hidden — no start date in Airtable") : null)),
+
+      /* ── Capacity by segment ─────────────────────────────────────────────
+         One column per month, aligned to and scroll-linked with the gantt.
+         Each month holds a mini-table: a row per owner, a column per
+         implementation segment, and the count of launches that owner has in
+         flight that month at that size. "In flight" is the same predicate the
+         gantt uses — any day of the month between Start and End — so a
+         month's cells sum to the active count printed in the gantt header. */
+      e("div", { style: { marginTop: 24 } },
+        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" } },
+          "Capacity by Segment",
+          e("span", { style: { fontSize: 11, fontWeight: 400, color: "#64748b", textTransform: "none", letterSpacing: 0 } },
+            "launches in flight per owner each month, by implementation size · scrolls with the gantt above")),
+        // Legend: what each segment assumes about SOW Hours.
+        e("div", { style: { display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 8, fontSize: 11.5, color: "#94a3b8", alignItems: "center" } },
+          segCols.map(s =>
+            e("span", { key: s.key, style: { display: "inline-flex", alignItems: "center", gap: 5 } },
+              e("i", { style: { width: 9, height: 9, borderRadius: 2, background: s.color, display: "inline-block" } }),
+              e("b", { style: { color: "#cbd5e1", fontWeight: 700 } }, s.abbr),
+              e("span", { style: { color: "#64748b" } }, s.hours)))),
+        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "hidden" } },
+          matrixOwners.length === 0
+            ? e("div", { style: { padding: "18px 16px", textAlign: "center", color: "#64748b", fontSize: 12.5 } }, "No services match the current filters.")
+            : e("div", { ref: matrixScrollRef, onScroll: linkScroll(ganttScrollRef), style: { overflowX: "auto" } },
+                e("div", { style: { minWidth: LABEL_W + TIMELINE_W, display: "flex" } },
+                  // Frozen label column — same width as the gantt's, so the
+                  // month grids start at the same x in both scrollers.
+                  e("div", { style: { position: "sticky", left: 0, zIndex: 5, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: MATRIX_H, borderRight: "1px solid #334155", background: "#162032", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
+                    e("span", { style: upper }, "Owner × Segment"),
+                    e("span", { style: { fontSize: 10.5, color: "#475569", marginTop: 3 } }, matrixOwners.length + " owner" + (matrixOwners.length !== 1 ? "s" : "") + " · " + rows.length + " launches")),
+                  e("div", { style: { position: "relative", width: TIMELINE_W, height: MATRIX_H, flexShrink: 0 } },
+                    months.map((m, i) =>
+                      e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", overflow: "hidden", padding: "6px 6px 4px 8px", boxSizing: "border-box" } },
+                        e("div", { style: { fontSize: 9, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, whiteSpace: "nowrap" } }, m.label),
+                        e("table", { style: { width: "100%", borderCollapse: "collapse", tableLayout: "fixed" } },
+                          e("thead", null, e("tr", null,
+                            e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "left", paddingBottom: 2, borderBottom: "1px solid #1e293b", background: "transparent", position: "static", overflow: "hidden" } }, ""),
+                            segCols.map(s =>
+                              e("th", { key: s.key, title: s.key + " · " + s.hours, style: { fontSize: 8, color: s.color, fontWeight: 700, textAlign: "center", paddingBottom: 2, borderBottom: "1px solid #1e293b", background: "transparent", position: "static", width: 22 } }, s.abbr)))),
+                          e("tbody", null,
+                            matrixOwners.map((o, ri) =>
+                              e("tr", { key: o, style: { background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+                                e("td", { style: { padding: "2px 3px 1px 0", border: "none", textAlign: "left", overflow: "hidden" } },
+                                  e("div", { style: { display: "flex", alignItems: "center", gap: 3, overflow: "hidden" } },
+                                    e("div", { style: { width: 4, height: 4, borderRadius: "50%", background: ownerColor[o] || "#94a3b8", flexShrink: 0 } }),
+                                    e("span", { style: { fontSize: 9.5, color: "#cbd5e1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 } },
+                                      o === "Unassigned" ? "Unassigned" : o.split(" ")[0]))),
+                                segCols.map(s => {
+                                  const n = (m.segGrid[o] || {})[s.key] || 0;
+                                  return e("td", { key: s.key, title: n ? o + " · " + s.key + " · " + n + " in " + m.label : null,
+                                    style: { fontSize: 10, fontWeight: n ? 700 : 400, color: n ? s.color : "#293548", textAlign: "center", padding: "2px 0 1px", border: "none", lineHeight: 1.2 } }, n || "·");
+                                }))))))))))),
+        e("div", { style: { fontSize: 11.5, color: "#64748b", marginTop: 6 } },
+          "A launch counts in a month when any day of that month falls between its Start and End date, so long launches count in every month they span. Segment comes from SOW Hours on the service record.")),
 
       // Quarterly revenue by owner
       e("div", { style: { marginTop: 24 } },

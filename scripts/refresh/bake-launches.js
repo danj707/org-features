@@ -41,6 +41,10 @@ function normalizeRecord(fields) {
     loe: fields["LOE"] || null,
     status: fields["Launch Status"] || null,
     acv: typeof fields["Gross ACV"] === "number" ? fields["Gross ACV"] : 0,
+    // Drives the implementation-segment matrix (SMB … Strategic+). Null when
+    // unset in Airtable, which the dashboard shows as Unsized rather than
+    // silently dropping the launch out of the capacity view.
+    sowHours: typeof fields["SOW Hours"] === "number" ? fields["SOW Hours"] : null,
   };
 }
 

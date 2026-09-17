@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T22:02:49.000Z",
+  "generatedAt": "2026-09-17T13:15:04.000Z",
   "source": "Airtable Services table (base apph3ijsChF7vzVFU, all stages) \u2014 launch pipeline",
   "services": [
     {
@@ -15,7 +15,8 @@
       "end": "2024-06-28",
       "loe": "Large",
       "status": "On Track",
-      "acv": 120000
+      "acv": 120000,
+      "sowHours": 60
     },
     {
       "id": "807940809409",
@@ -30,7 +31,8 @@
       "end": "2025-05-16",
       "loe": "Large",
       "status": "On Track",
-      "acv": 48000
+      "acv": 48000,
+      "sowHours": 38
     },
     {
       "id": "500232455545",
@@ -45,7 +47,8 @@
       "end": "2026-04-21",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 69500
+      "acv": 69500,
+      "sowHours": 18
     },
     {
       "id": "500201953697",
@@ -60,7 +63,8 @@
       "end": "2025-06-30",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 60000
+      "acv": 60000,
+      "sowHours": 23
     },
     {
       "id": "500034217851",
@@ -75,7 +79,8 @@
       "end": "2026-03-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 28000
+      "acv": 28000,
+      "sowHours": 23
     },
     {
       "id": "455786688099",
@@ -90,7 +95,8 @@
       "end": "2025-11-01",
       "loe": null,
       "status": "On Track",
-      "acv": 3960
+      "acv": 3960,
+      "sowHours": 9
     },
     {
       "id": "455786688027",
@@ -105,7 +111,8 @@
       "end": "2025-12-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 11500
+      "acv": 11500,
+      "sowHours": 9
     },
     {
       "id": "448259007105",
@@ -120,7 +127,8 @@
       "end": "2025-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 42575
+      "acv": 42575,
+      "sowHours": null
     },
     {
       "id": "448236539047",
@@ -128,14 +136,15 @@
       "company": null,
       "owner": "Dan Jenner",
       "ownerEmail": "dan@rec.us",
-      "category": "Module Expansion",
+      "category": "Rip and Replace",
       "stage": "Launched",
       "regLaunch": "2025-08-08",
       "start": "2025-07-16",
       "end": "2025-11-01",
       "loe": "Small",
       "status": "Delayed",
-      "acv": 20780
+      "acv": 20780,
+      "sowHours": 9
     },
     {
       "id": "448259006632",
@@ -150,7 +159,8 @@
       "end": "2025-12-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 35450
+      "acv": 35450,
+      "sowHours": 18
     },
     {
       "id": "448259007887",
@@ -161,11 +171,12 @@
       "category": "Pilot",
       "stage": "Launched",
       "regLaunch": "2025-09-01",
-      "start": "2025-08-04",
+      "start": "2025-03-20",
       "end": "2025-09-30",
       "loe": "Small",
       "status": "On Track",
-      "acv": 4856
+      "acv": 4856,
+      "sowHours": 9
     },
     {
       "id": "454501592409",
@@ -180,7 +191,8 @@
       "end": "2026-02-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 32750
+      "acv": 32750,
+      "sowHours": 12
     },
     {
       "id": "448259005563",
@@ -195,7 +207,8 @@
       "end": "2026-02-28",
       "loe": "Small",
       "status": "Delayed",
-      "acv": 0
+      "acv": 0,
+      "sowHours": 9
     },
     {
       "id": "449005981276",
@@ -210,7 +223,8 @@
       "end": null,
       "loe": "Medium",
       "status": "On Track",
-      "acv": 75000
+      "acv": 75000,
+      "sowHours": 23
     },
     {
       "id": "449004599915",
@@ -225,7 +239,8 @@
       "end": "2025-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 99950
+      "acv": 99950,
+      "sowHours": 23
     },
     {
       "id": "449005982749",
@@ -240,7 +255,8 @@
       "end": "2025-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 18955
+      "acv": 18955,
+      "sowHours": null
     },
     {
       "id": "460908462640",
@@ -255,7 +271,8 @@
       "end": "2026-01-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 10750
+      "acv": 10750,
+      "sowHours": 9
     },
     {
       "id": "449004600904",
@@ -270,7 +287,8 @@
       "end": "2025-11-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 32905
+      "acv": 32905,
+      "sowHours": null
     },
     {
       "id": "451382031520",
@@ -285,7 +303,8 @@
       "end": null,
       "loe": "Small",
       "status": "On Track",
-      "acv": 37655
+      "acv": 37655,
+      "sowHours": 12
     },
     {
       "id": "449004600704",
@@ -300,7 +319,8 @@
       "end": null,
       "loe": "Small",
       "status": "On Track",
-      "acv": 8200
+      "acv": 8200,
+      "sowHours": 9
     },
     {
       "id": "452748314264",
@@ -315,7 +335,8 @@
       "end": null,
       "loe": "Small",
       "status": "On Track",
-      "acv": 13000
+      "acv": 13000,
+      "sowHours": 9
     },
     {
       "id": "463201716823",
@@ -330,7 +351,8 @@
       "end": "2026-02-01",
       "loe": "Large",
       "status": "On Track",
-      "acv": 95400
+      "acv": 95400,
+      "sowHours": 9
     },
     {
       "id": "470847064917",
@@ -345,7 +367,8 @@
       "end": null,
       "loe": "Medium",
       "status": "On Track",
-      "acv": 57832
+      "acv": 57832,
+      "sowHours": 30
     },
     {
       "id": "463715061361",
@@ -360,7 +383,8 @@
       "end": null,
       "loe": "Medium",
       "status": "On Track",
-      "acv": 46675
+      "acv": 46675,
+      "sowHours": 18
     },
     {
       "id": "468051481090",
@@ -375,7 +399,8 @@
       "end": "2026-02-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 28500
+      "acv": 28500,
+      "sowHours": 9
     },
     {
       "id": "486116522664",
@@ -390,7 +415,8 @@
       "end": "2026-02-01",
       "loe": "Large",
       "status": "On Track",
-      "acv": 100000
+      "acv": 100000,
+      "sowHours": 9
     },
     {
       "id": "449005981757",
@@ -405,7 +431,8 @@
       "end": "2025-12-01",
       "loe": "Large",
       "status": "On Track",
-      "acv": 95400
+      "acv": 95400,
+      "sowHours": 23
     },
     {
       "id": "463864678529",
@@ -420,7 +447,8 @@
       "end": "2026-03-31",
       "loe": "Small",
       "status": "On Track",
-      "acv": 22750
+      "acv": 22750,
+      "sowHours": 23
     },
     {
       "id": "512158805621",
@@ -435,7 +463,8 @@
       "end": "2026-03-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 10950
+      "acv": 10950,
+      "sowHours": 9
     },
     {
       "id": "449004601149",
@@ -450,7 +479,8 @@
       "end": null,
       "loe": "Medium",
       "status": "On Track",
-      "acv": 89000
+      "acv": 89000,
+      "sowHours": 18
     },
     {
       "id": "449005983001",
@@ -465,7 +495,8 @@
       "end": "2026-03-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 34087
+      "acv": 34087,
+      "sowHours": 23
     },
     {
       "id": "461479714562",
@@ -480,7 +511,8 @@
       "end": null,
       "loe": "Small",
       "status": "On Track",
-      "acv": 19000
+      "acv": 19000,
+      "sowHours": 12
     },
     {
       "id": "490037074744",
@@ -495,7 +527,8 @@
       "end": "2026-03-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 22125
+      "acv": 22125,
+      "sowHours": 18
     },
     {
       "id": "449004600928",
@@ -510,7 +543,8 @@
       "end": "2026-07-31",
       "loe": "Very Large",
       "status": "On Track",
-      "acv": 494600
+      "acv": 494600,
+      "sowHours": 120
     },
     {
       "id": "500798879046",
@@ -525,7 +559,8 @@
       "end": "2026-02-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 15490
+      "acv": 15490,
+      "sowHours": 9
     },
     {
       "id": "496777515559",
@@ -540,7 +575,8 @@
       "end": "2026-02-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 19500
+      "acv": 19500,
+      "sowHours": 9
     },
     {
       "id": "505503515142",
@@ -555,7 +591,8 @@
       "end": "2026-05-26",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 68000
+      "acv": 68000,
+      "sowHours": 18
     },
     {
       "id": "449004601009",
@@ -570,7 +607,8 @@
       "end": "2026-05-15",
       "loe": "Large",
       "status": "On Track",
-      "acv": 122000
+      "acv": 122000,
+      "sowHours": null
     },
     {
       "id": "448259007602",
@@ -585,7 +623,8 @@
       "end": "2026-05-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 20000
+      "acv": 20000,
+      "sowHours": 9
     },
     {
       "id": "500798878818",
@@ -600,7 +639,8 @@
       "end": "2026-04-30",
       "loe": "Small",
       "status": "On Track",
-      "acv": 9650
+      "acv": 9650,
+      "sowHours": 9
     },
     {
       "id": "517947060787",
@@ -615,7 +655,24 @@
       "end": "2026-04-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 10000
+      "acv": 10000,
+      "sowHours": 9
+    },
+    {
+      "id": "851439999688",
+      "name": "North Logan Library",
+      "company": null,
+      "owner": "Maddie Pellman",
+      "ownerEmail": "maddie@rec.us",
+      "category": null,
+      "stage": "Launched",
+      "regLaunch": "2026-03-26",
+      "start": "2026-01-30",
+      "end": "2027-04-30",
+      "loe": null,
+      "status": null,
+      "acv": 0,
+      "sowHours": null
     },
     {
       "id": "515417269905",
@@ -630,7 +687,8 @@
       "end": "2026-05-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 19750
+      "acv": 19750,
+      "sowHours": 20
     },
     {
       "id": "454486173366",
@@ -645,7 +703,8 @@
       "end": "2026-04-01",
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 0
+      "acv": 0,
+      "sowHours": 9
     },
     {
       "id": "466125554958",
@@ -660,7 +719,8 @@
       "end": "2026-05-29",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 84000
+      "acv": 84000,
+      "sowHours": 23
     },
     {
       "id": "757738343120",
@@ -675,7 +735,8 @@
       "end": "2026-05-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 0
+      "acv": 0,
+      "sowHours": 9
     },
     {
       "id": "449004601109",
@@ -690,7 +751,8 @@
       "end": "2026-06-10",
       "loe": "Large",
       "status": "On Track",
-      "acv": 177000
+      "acv": 177000,
+      "sowHours": 38
     },
     {
       "id": "757162175202",
@@ -705,7 +767,8 @@
       "end": "2026-06-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 15000
+      "acv": 15000,
+      "sowHours": 9
     },
     {
       "id": "449004600854",
@@ -720,7 +783,8 @@
       "end": null,
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 0
+      "acv": 0,
+      "sowHours": 9
     },
     {
       "id": "519780516128",
@@ -735,7 +799,8 @@
       "end": "2026-06-05",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 19900
+      "acv": 19900,
+      "sowHours": 12
     },
     {
       "id": "522121728875",
@@ -750,7 +815,8 @@
       "end": "2026-07-07",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 44287
+      "acv": 44287,
+      "sowHours": 18
     },
     {
       "id": "512608800032",
@@ -765,7 +831,8 @@
       "end": "2026-07-31",
       "loe": "Large",
       "status": "On Track",
-      "acv": 100000
+      "acv": 100000,
+      "sowHours": 23
     },
     {
       "id": "519780516621",
@@ -774,13 +841,14 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Rip and Replace",
-      "stage": "Go-Live Support",
+      "stage": "Launched",
       "regLaunch": "2026-07-01",
       "start": "2026-01-13",
       "end": "2026-07-22",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 33150
+      "acv": 33150,
+      "sowHours": 12
     },
     {
       "id": "500798993497",
@@ -789,13 +857,14 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Rip and Replace",
-      "stage": "Go-Live Support",
+      "stage": "Launched",
       "regLaunch": "2026-07-09",
       "start": "2026-02-04",
-      "end": "2026-06-01",
+      "end": "2026-07-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 34320
+      "acv": 34320,
+      "sowHours": 18
     },
     {
       "id": "534269550680",
@@ -804,13 +873,14 @@
       "owner": "Dan Jenner",
       "ownerEmail": "dan@rec.us",
       "category": "Rip and Replace",
-      "stage": "Go-Live Support",
+      "stage": "Launched",
       "regLaunch": "2026-07-11",
       "start": "2026-03-11",
       "end": "2026-09-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 35750
+      "acv": 35750,
+      "sowHours": 12
     },
     {
       "id": "765268532924",
@@ -819,13 +889,14 @@
       "owner": "",
       "ownerEmail": null,
       "category": "Rip and Replace",
-      "stage": "Sales Hand Off",
+      "stage": "Delayed",
       "regLaunch": "2026-07-22",
       "start": "2026-05-11",
       "end": "2026-08-31",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 60480
+      "acv": 60480,
+      "sowHours": 18
     },
     {
       "id": "518150124359",
@@ -840,7 +911,8 @@
       "end": "2026-08-14",
       "loe": "Small",
       "status": "Delayed",
-      "acv": 21250
+      "acv": 21250,
+      "sowHours": 12
     },
     {
       "id": "769005013713",
@@ -855,7 +927,8 @@
       "end": "2026-09-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 10000
+      "acv": 10000,
+      "sowHours": 6
     },
     {
       "id": "500799054479",
@@ -864,13 +937,30 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Go-Live Support",
+      "stage": "Launched",
       "regLaunch": "2026-08-03",
       "start": "2026-04-13",
       "end": "2026-09-03",
       "loe": "Large",
       "status": "On Track",
-      "acv": 101500
+      "acv": 101500,
+      "sowHours": 23
+    },
+    {
+      "id": "833678542545",
+      "name": "Dance Palace",
+      "company": null,
+      "owner": "Ankur Lal",
+      "ownerEmail": "ankur@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Launched",
+      "regLaunch": "2026-08-10",
+      "start": "2026-08-03",
+      "end": "2026-08-21",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 10630,
+      "sowHours": 9
     },
     {
       "id": "760879906518",
@@ -879,13 +969,46 @@
       "owner": "Dan Jenner",
       "ownerEmail": "dan@rec.us",
       "category": "Rip and Replace",
-      "stage": "Go-Live Support",
+      "stage": "Launched",
       "regLaunch": "2026-08-10",
       "start": "2026-04-13",
       "end": "2026-08-15",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 91000
+      "acv": 91000,
+      "sowHours": 12
+    },
+    {
+      "id": "833679240907",
+      "name": "Northern Door - Rip and Replace",
+      "company": null,
+      "owner": "Ankur Lal",
+      "ownerEmail": "ankur@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Launched",
+      "regLaunch": "2026-08-10",
+      "start": "2026-08-03",
+      "end": "2026-08-21",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 6650,
+      "sowHours": 9
+    },
+    {
+      "id": "767165290173",
+      "name": "Yerba Buena Gardens",
+      "company": null,
+      "owner": "Ankur Lal",
+      "ownerEmail": "ankur@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Go-Live Support",
+      "regLaunch": "2026-08-10",
+      "start": "2026-07-13",
+      "end": "2026-09-30",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 80000,
+      "sowHours": 12
     },
     {
       "id": "525419332194",
@@ -894,13 +1017,14 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Rip and Replace",
-      "stage": "Launch Marketing and Operations",
+      "stage": "Go-Live Support",
       "regLaunch": "2026-08-11",
       "start": "2026-03-02",
       "end": "2026-09-15",
       "loe": "Large",
       "status": "On Track",
-      "acv": 114175
+      "acv": 114175,
+      "sowHours": 38
     },
     {
       "id": "770193553134",
@@ -909,13 +1033,14 @@
       "owner": "Dan Jenner",
       "ownerEmail": "dan@rec.us",
       "category": "Rip and Replace",
-      "stage": "Launch Marketing and Operations",
+      "stage": "Launched",
       "regLaunch": "2026-08-15",
       "start": "2026-04-29",
       "end": "2026-09-30",
       "loe": "Large",
       "status": "On Track",
-      "acv": 152500
+      "acv": 152500,
+      "sowHours": 23
     },
     {
       "id": "527404141605",
@@ -924,13 +1049,14 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Launch Marketing and Operations",
+      "stage": "Launched",
       "regLaunch": "2026-08-17",
       "start": "2026-02-23",
       "end": "2026-09-17",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 161500
+      "acv": 161500,
+      "sowHours": 23
     },
     {
       "id": "507540114708",
@@ -939,13 +1065,14 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Configuration",
+      "stage": "Launched",
       "regLaunch": "2026-09-01",
       "start": "2026-04-01",
       "end": "2026-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 22750
+      "acv": 22750,
+      "sowHours": 18
     },
     {
       "id": "513829773071",
@@ -954,28 +1081,14 @@
       "owner": "Dan Jenner",
       "ownerEmail": "dan@rec.us",
       "category": "Rip and Replace",
-      "stage": "Launch Marketing and Operations",
+      "stage": "Launched",
       "regLaunch": "2026-09-01",
       "start": "2025-12-22",
       "end": "2026-10-01",
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 34000
-    },
-    {
-      "id": "755465383618",
-      "name": "Needham, MA Rip & Replace",
-      "company": null,
-      "owner": "Dan Jenner",
-      "ownerEmail": "dan@rec.us",
-      "category": "Rip and Replace",
-      "stage": "Configuration",
-      "regLaunch": "2026-09-01",
-      "start": "2026-06-10",
-      "end": "2026-12-01",
-      "loe": "Medium",
-      "status": "On Track",
-      "acv": 64000
+      "acv": 34000,
+      "sowHours": 23
     },
     {
       "id": "460233617276",
@@ -990,22 +1103,8 @@
       "end": null,
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 37000
-    },
-    {
-      "id": "765267809991",
-      "name": "Palm Springs Courts Pilot",
-      "company": null,
-      "owner": "Lionel Nyange",
-      "ownerEmail": "lionel@rec.us",
-      "category": "Pilot",
-      "stage": "Configuration",
-      "regLaunch": "2026-09-01",
-      "start": "2026-05-18",
-      "end": "2026-10-01",
-      "loe": "Small",
-      "status": "Delayed",
-      "acv": 10500
+      "acv": 37000,
+      "sowHours": 18
     },
     {
       "id": "534249713745",
@@ -1014,13 +1113,14 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Launch Marketing and Operations",
+      "stage": "Launched",
       "regLaunch": "2026-09-01",
       "start": "2026-03-18",
       "end": "2026-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 34225
+      "acv": 34225,
+      "sowHours": 23
     },
     {
       "id": "527601362510",
@@ -1035,7 +1135,24 @@
       "end": "2026-10-01",
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 27375
+      "acv": 27375,
+      "sowHours": 9
+    },
+    {
+      "id": "755465383618",
+      "name": "Needham, MA Rip & Replace",
+      "company": null,
+      "owner": "Dan Jenner",
+      "ownerEmail": "dan@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Go-Live Support",
+      "regLaunch": "2026-09-02",
+      "start": "2026-06-10",
+      "end": "2026-10-02",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 64000,
+      "sowHours": 18
     },
     {
       "id": "451945270354",
@@ -1050,22 +1167,24 @@
       "end": "2026-09-21",
       "loe": "Medium",
       "status": "Delayed",
-      "acv": 34750
+      "acv": 34750,
+      "sowHours": 30
     },
     {
-      "id": "767165290173",
-      "name": "Yerba Buena Gardens",
+      "id": "765267809991",
+      "name": "Palm Springs Courts Pilot",
       "company": null,
-      "owner": "Ankur Lal",
-      "ownerEmail": "ankur@rec.us",
-      "category": "Rip and Replace",
+      "owner": "Lionel Nyange",
+      "ownerEmail": "lionel@rec.us",
+      "category": "Pilot",
       "stage": "Configuration",
-      "regLaunch": "2026-09-08",
-      "start": "2026-07-13",
-      "end": "2026-09-30",
-      "loe": "Medium",
-      "status": "On Track",
-      "acv": 80000
+      "regLaunch": "2026-09-21",
+      "start": "2026-05-18",
+      "end": "2026-10-01",
+      "loe": "Small",
+      "status": "Delayed",
+      "acv": 10500,
+      "sowHours": 12
     },
     {
       "id": "803479245535",
@@ -1080,7 +1199,8 @@
       "end": "2026-10-16",
       "loe": "Small",
       "status": "On Track",
-      "acv": 13500
+      "acv": 13500,
+      "sowHours": null
     },
     {
       "id": "765267810002",
@@ -1089,13 +1209,14 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Pilot",
-      "stage": "Discovery",
+      "stage": "Configuration",
       "regLaunch": "2026-10-01",
       "start": "2026-05-18",
       "end": "2026-10-19",
       "loe": "Small",
       "status": "On Track",
-      "acv": 13500
+      "acv": 13500,
+      "sowHours": 9
     },
     {
       "id": "543294378017",
@@ -1110,7 +1231,8 @@
       "end": "2026-10-23",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 42000
+      "acv": 42000,
+      "sowHours": 18
     },
     {
       "id": "817264468705",
@@ -1119,13 +1241,30 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Module Expansion",
-      "stage": "Sales Hand Off",
+      "stage": "Discovery",
       "regLaunch": "2026-10-01",
       "start": "2026-08-24",
       "end": "2026-10-23",
       "loe": "Small",
       "status": "On Track",
-      "acv": 25000
+      "acv": 80000,
+      "sowHours": 9
+    },
+    {
+      "id": "847682440911",
+      "name": "Larkspur Courts Pilot",
+      "company": null,
+      "owner": "Lionel Nyange",
+      "ownerEmail": "lionel@rec.us",
+      "category": "Pilot",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2026-10-12",
+      "start": "2026-09-14",
+      "end": "2026-10-23",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 7720,
+      "sowHours": 9
     },
     {
       "id": "507540294072",
@@ -1134,13 +1273,14 @@
       "owner": "Maddie Pellman",
       "ownerEmail": "maddie@rec.us",
       "category": "Rip and Replace",
-      "stage": "Discovery",
+      "stage": "Configuration",
       "regLaunch": "2026-10-15",
       "start": "2026-07-01",
       "end": "2026-11-04",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 35665
+      "acv": 35665,
+      "sowHours": 12
     },
     {
       "id": "813938660064",
@@ -1149,13 +1289,30 @@
       "owner": "Teddy Noll",
       "ownerEmail": "teddy@rec.us",
       "category": "Rip and Replace",
-      "stage": "Sales Hand Off",
-      "regLaunch": "2026-10-16",
-      "start": "2026-09-01",
+      "stage": "Configuration",
+      "regLaunch": "2026-10-19",
+      "start": "2026-08-28",
       "end": "2026-11-06",
       "loe": "Small",
       "status": "On Track",
-      "acv": 26700
+      "acv": 26700,
+      "sowHours": 18
+    },
+    {
+      "id": "847679563463",
+      "name": "South Bay Tennis Center Rip and Replace",
+      "company": null,
+      "owner": "Lindsay Keare",
+      "ownerEmail": "lindsay@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2026-10-28",
+      "start": "2026-09-21",
+      "end": "2026-11-09",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 112000,
+      "sowHours": 9
     },
     {
       "id": "760468296409",
@@ -1164,13 +1321,14 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Partnership Kick Off",
+      "stage": "Discovery",
       "regLaunch": "2026-10-30",
       "start": "2026-08-24",
       "end": "2026-12-31",
       "loe": "Large",
       "status": "On Track",
-      "acv": 297000
+      "acv": 297000,
+      "sowHours": 23
     },
     {
       "id": "782033880814",
@@ -1185,7 +1343,24 @@
       "end": "2027-01-31",
       "loe": "Large",
       "status": "On Track",
-      "acv": 286642
+      "acv": 286642,
+      "sowHours": 38
+    },
+    {
+      "id": "840788289224",
+      "name": "Suwannee County, FL",
+      "company": null,
+      "owner": "Loris Lamarque",
+      "ownerEmail": "loris@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Discovery",
+      "regLaunch": "2026-11-04",
+      "start": "2026-09-14",
+      "end": "2026-11-20",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 21000,
+      "sowHours": 9
     },
     {
       "id": "782103228102",
@@ -1194,13 +1369,30 @@
       "owner": "Teddy Noll",
       "ownerEmail": "teddy@rec.us",
       "category": "Rip and Replace",
-      "stage": "Sales Hand Off",
+      "stage": "Discovery",
       "regLaunch": "2026-12-01",
       "start": "2026-09-02",
       "end": "2027-01-08",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 49000
+      "acv": 49000,
+      "sowHours": 9
+    },
+    {
+      "id": "840092511953",
+      "name": "Volusia County, FL",
+      "company": null,
+      "owner": "Teddy Noll",
+      "ownerEmail": "teddy@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Partnership Kick Off",
+      "regLaunch": "2026-12-02",
+      "start": "2026-09-30",
+      "end": "2026-12-18",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 53475,
+      "sowHours": 9
     },
     {
       "id": "805165683441",
@@ -1209,13 +1401,30 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Discovery",
+      "stage": "Configuration",
       "regLaunch": "2026-12-07",
-      "start": "2027-01-07",
-      "end": "2027-01-07",
+      "start": "2026-07-09",
+      "end": "2026-12-30",
       "loe": "Small",
       "status": "On Track",
-      "acv": 32650
+      "acv": 32650,
+      "sowHours": 18
+    },
+    {
+      "id": "844477963987",
+      "name": "Jackson, WI Rip and Replace",
+      "company": null,
+      "owner": "Teddy Noll",
+      "ownerEmail": "teddy@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Partnership Kick Off",
+      "regLaunch": "2026-12-15",
+      "start": "2026-10-05",
+      "end": "2027-01-08",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 35000,
+      "sowHours": 12
     },
     {
       "id": "765268928233",
@@ -1230,7 +1439,8 @@
       "end": "2027-04-30",
       "loe": "Very Large",
       "status": "On Track",
-      "acv": 540000
+      "acv": 540000,
+      "sowHours": 100
     },
     {
       "id": "756547997409",
@@ -1245,7 +1455,8 @@
       "end": "2027-03-31",
       "loe": "Very Large",
       "status": "On Track",
-      "acv": 260750
+      "acv": 260750,
+      "sowHours": 90
     },
     {
       "id": "768873714405",
@@ -1260,7 +1471,8 @@
       "end": "2026-12-01",
       "loe": "Small",
       "status": "On Track",
-      "acv": 10000
+      "acv": 10000,
+      "sowHours": 9
     },
     {
       "id": "757737734880",
@@ -1275,7 +1487,8 @@
       "end": "2026-10-01",
       "loe": "Medium",
       "status": "On Track",
-      "acv": 45000
+      "acv": 45000,
+      "sowHours": 12
     },
     {
       "id": "498851880375",
@@ -1288,9 +1501,10 @@
       "regLaunch": "2027-01-01",
       "start": "2025-11-11",
       "end": "2027-01-29",
-      "loe": "Large",
+      "loe": "Medium",
       "status": "On Track",
-      "acv": 63000
+      "acv": 63000,
+      "sowHours": 18
     },
     {
       "id": "543231577348",
@@ -1305,7 +1519,40 @@
       "end": "2027-02-15",
       "loe": "Large",
       "status": "On Track",
-      "acv": 213757
+      "acv": 213757,
+      "sowHours": 38
+    },
+    {
+      "id": "845289799388",
+      "name": "Schaumburg, IL Rip and Replace",
+      "company": null,
+      "owner": "Dan Jenner",
+      "ownerEmail": "dan@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-01-04",
+      "start": "2026-09-21",
+      "end": "2027-04-30",
+      "loe": "Very Large",
+      "status": "On Track",
+      "acv": 864756,
+      "sowHours": 80
+    },
+    {
+      "id": "831063918308",
+      "name": "Pflugerville Rip and Replace - Facilities and Programming",
+      "company": null,
+      "owner": "Maddie Pellman",
+      "ownerEmail": "maddie@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Partnership Kick Off",
+      "regLaunch": "2027-01-11",
+      "start": "2026-08-24",
+      "end": "2027-03-19",
+      "loe": "Large",
+      "status": "On Track",
+      "acv": 300000,
+      "sowHours": 38
     },
     {
       "id": "449004600881",
@@ -1314,13 +1561,14 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Partnership Kick Off",
+      "stage": "Discovery",
       "regLaunch": "2027-01-18",
       "start": "2026-08-03",
       "end": "2027-02-26",
       "loe": "Large",
       "status": "Delayed",
-      "acv": 81000
+      "acv": 81000,
+      "sowHours": 23
     },
     {
       "id": "816882208449",
@@ -1335,7 +1583,72 @@
       "end": "2027-02-28",
       "loe": "Small",
       "status": "On Track",
-      "acv": 34020
+      "acv": 34020,
+      "sowHours": 12
+    },
+    {
+      "id": "851439971011",
+      "name": "Miamisburg, OH Rip & Replace",
+      "company": null,
+      "owner": "Dan Jenner",
+      "ownerEmail": "dan@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Partnership Kick Off",
+      "regLaunch": "2027-02-01",
+      "start": "2026-10-12",
+      "end": "2027-03-01",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 78625,
+      "sowHours": null
+    },
+    {
+      "id": "831952943845",
+      "name": "Panama City, FL Rip and Replace",
+      "company": null,
+      "owner": "Teddy Noll",
+      "ownerEmail": "teddy@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Partnership Kick Off",
+      "regLaunch": "2027-02-01",
+      "start": "2026-09-16",
+      "end": "2027-02-26",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 33000,
+      "sowHours": 9
+    },
+    {
+      "id": "850566725333",
+      "name": "South Fayette Township, PA",
+      "company": null,
+      "owner": "Maddie Pellman",
+      "ownerEmail": "maddie@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-02-08",
+      "start": "2026-10-12",
+      "end": "2027-03-08",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 29750,
+      "sowHours": null
+    },
+    {
+      "id": "844476527328",
+      "name": "Avalon, CA",
+      "company": null,
+      "owner": "Michael Kehoe",
+      "ownerEmail": "mike@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-02-15",
+      "start": "2026-11-16",
+      "end": "2027-03-15",
+      "loe": "Small",
+      "status": "On Track",
+      "acv": 28800,
+      "sowHours": 9
     },
     {
       "id": "765263271611",
@@ -1344,13 +1657,30 @@
       "owner": "Lionel Nyange",
       "ownerEmail": "lionel@rec.us",
       "category": "Rip and Replace",
-      "stage": "Sales Hand Off",
+      "stage": "Partnership Kick Off",
       "regLaunch": "2027-02-17",
       "start": "2026-09-01",
       "end": "2027-04-21",
       "loe": "Large",
       "status": "On Track",
-      "acv": 297000
+      "acv": 297000,
+      "sowHours": 23
+    },
+    {
+      "id": "845464419016",
+      "name": "Oceanside, CA Rip and Replace",
+      "company": null,
+      "owner": "Lionel Nyange",
+      "ownerEmail": "lionel@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-03-15",
+      "start": "2026-10-19",
+      "end": "2027-04-15",
+      "loe": "Medium",
+      "status": "On Track",
+      "acv": 176400,
+      "sowHours": 23
     },
     {
       "id": "754982687418",
@@ -1365,7 +1695,56 @@
       "end": "2027-04-23",
       "loe": "Small",
       "status": "On Track",
-      "acv": 19000
+      "acv": 19000,
+      "sowHours": 12
+    },
+    {
+      "id": "844519163603",
+      "name": "Oro Valley Rip and Replace",
+      "company": null,
+      "owner": "Lionel Nyange",
+      "ownerEmail": "lionel@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-04-01",
+      "start": "2026-10-12",
+      "end": "2027-04-30",
+      "loe": "Very Large",
+      "status": "On Track",
+      "acv": 191957,
+      "sowHours": 50
+    },
+    {
+      "id": "847679540965",
+      "name": "Reno, NV Rip and Replace",
+      "company": null,
+      "owner": "Maddie Pellman",
+      "ownerEmail": "maddie@rec.us",
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-04-19",
+      "start": "2026-10-19",
+      "end": "2027-05-19",
+      "loe": "Large",
+      "status": "On Track",
+      "acv": 364499,
+      "sowHours": 38
+    },
+    {
+      "id": "844474361555",
+      "name": "Irvine, CA Rip and Replace",
+      "company": null,
+      "owner": "",
+      "ownerEmail": null,
+      "category": "Rip and Replace",
+      "stage": "Sales Hand Off",
+      "regLaunch": "2027-06-01",
+      "start": "2027-01-18",
+      "end": "2027-08-31",
+      "loe": "Very Large",
+      "status": "On Track",
+      "acv": 683000,
+      "sowHours": 90
     },
     {
       "id": "455304384125",
@@ -1380,7 +1759,8 @@
       "end": null,
       "loe": "Large",
       "status": "Delayed",
-      "acv": 0
+      "acv": 0,
+      "sowHours": 38
     },
     {
       "id": "509204798219",
@@ -1395,7 +1775,8 @@
       "end": null,
       "loe": "Small",
       "status": "At Risk",
-      "acv": 5550
+      "acv": 5550,
+      "sowHours": 9
     },
     {
       "id": "826957918908",
@@ -1410,7 +1791,8 @@
       "end": null,
       "loe": "Medium",
       "status": "On Track",
-      "acv": 0
+      "acv": 0,
+      "sowHours": null
     }
   ]
 }
