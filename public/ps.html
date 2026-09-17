@@ -408,7 +408,7 @@
 <script>
 (function () {
   const e = React.createElement;
-  const { useState, useEffect, useMemo, useRef } = React;
+  const { useState, useEffect, useMemo } = React;
   const fmt = (n) => n == null ? "—" : Number(n).toLocaleString("en-US");
   const days = (iso) => iso ? Math.round((Date.now() - new Date(iso)) / 864e5) : null;
 
@@ -1578,6 +1578,61 @@
       }, options.map(o => e("option", { key: o, value: o }, o))));
   }
 
+  /* Launches in flight per owner, per period, split by implementation size.
+     One row per owner; each period contributes one column per segment plus a
+     Σ total. A launch counts in every period its Start–End range touches, so
+     the quarterly view is a DISTINCT count of launches active in that quarter,
+     not the sum of its three months — a launch spanning all three is one
+     launch, not three. */
+  function CapacityGrid({ periods, owners, cols, ownerColor, unit }) {
+    const NAME_W = 156, CELL_W = 30, TOT_W = 38;
+    const th = (extra) => ({ padding: "6px 4px", fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.04em", background: "#162032", position: "static", borderBottom: "1px solid #334155", textAlign: "center", ...extra });
+    const num = (extra) => ({ padding: "5px 4px", fontSize: 11.5, textAlign: "center", border: "none", borderBottom: "1px solid #1e293b", fontVariantNumeric: "tabular-nums", ...extra });
+    const sticky = { position: "sticky", left: 0, zIndex: 3 };
+    /* Without an explicit width a fixed-layout table shrinks to its container,
+       which at 22 months crushed every column into a few pixels. Stating the
+       natural width makes the wrapper scroll instead. */
+    const TABLE_W = NAME_W + periods.length * (cols.length * CELL_W + TOT_W);
+    const colTotal = (p, o) => cols.reduce((t, c) => t + ((p.grid[o] || {})[c.key] || 0), 0);
+    const periodSum = (p, key) => owners.reduce((t, o) => t + ((p.grid[o] || {})[key] || 0), 0);
+    return e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "auto" } },
+      e("table", { style: { borderCollapse: "collapse", tableLayout: "fixed", width: TABLE_W, minWidth: TABLE_W } },
+        e("thead", null,
+          e("tr", null,
+            e("th", { rowSpan: 2, style: { ...th({ textAlign: "left", width: NAME_W, minWidth: NAME_W, paddingLeft: 14, borderRight: "1px solid #334155" }), ...sticky, zIndex: 4 } }, "Owner"),
+            periods.map(p =>
+              e("th", { key: p.key, colSpan: cols.length + 1, style: th({ borderRight: "1px solid #334155", color: p.current ? "#38bdf8" : "#94a3b8", background: p.current ? "rgba(56,189,248,0.07)" : "#162032" }) }, p.key))),
+          e("tr", null,
+            periods.map(p => e(React.Fragment, { key: p.key },
+              cols.map(c => e("th", { key: c.key, title: c.key + " · " + c.hours, style: th({ width: CELL_W, color: c.color, fontSize: 9 }) }, c.abbr)),
+              e("th", { key: "t", style: th({ width: TOT_W, color: "#cbd5e1", borderRight: "1px solid #334155" }) }, "Σ"))))),
+        e("tbody", null,
+          owners.map((o, ri) =>
+            e("tr", { key: o, style: { background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
+              e("td", { style: { ...num({ textAlign: "left", paddingLeft: 14, borderRight: "1px solid #334155" }), ...sticky, background: ri % 2 === 0 ? "#1e293b" : "#212c3f" } },
+                e("span", { style: { display: "inline-flex", alignItems: "center", gap: 6 } },
+                  e("span", { style: { width: 6, height: 6, borderRadius: "50%", background: ownerColor[o] || "#94a3b8", flexShrink: 0 } }),
+                  e("span", { style: { color: "#cbd5e1", fontWeight: 500, fontSize: 12 } }, o))),
+              periods.map(p => {
+                const tot = colTotal(p, o);
+                return e(React.Fragment, { key: p.key },
+                  cols.map(c => {
+                    const n = (p.grid[o] || {})[c.key] || 0;
+                    return e("td", { key: c.key, title: n ? o + " · " + c.key + " · " + n + " in " + p.key : null,
+                      style: num({ color: n ? c.color : "#2c3a4f", fontWeight: n ? 700 : 400 }) }, n || "·");
+                  }),
+                  e("td", { key: "t", style: num({ color: tot ? "#f8fafc" : "#2c3a4f", fontWeight: 700, borderRight: "1px solid #334155", background: p.current ? "rgba(56,189,248,0.05)" : "rgba(255,255,255,0.03)" }) }, tot || "·"));
+              }))),
+          e("tr", { style: { background: "rgba(255,255,255,0.05)", borderTop: "1px solid #334155" } },
+            e("td", { style: { ...num({ textAlign: "left", paddingLeft: 14, borderRight: "1px solid #334155", fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "none" }), ...sticky, background: "#232f42" } }, "All owners"),
+            periods.map(p => e(React.Fragment, { key: p.key },
+              cols.map(c => {
+                const n = periodSum(p, c.key);
+                return e("td", { key: c.key, style: num({ color: n ? c.color : "#2c3a4f", fontWeight: 700, borderBottom: "none" }) }, n || "·");
+              }),
+              e("td", { key: "t", style: num({ color: "#f8fafc", fontWeight: 800, borderRight: "1px solid #334155", borderBottom: "none", background: p.current ? "rgba(56,189,248,0.06)" : "rgba(255,255,255,0.04)" }) }, p.total || "·")))))));
+  }
+
   function LaunchGantt({ snap, onRefresh, refreshing, refreshErr }) {
     const services = snap.services || [];
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1590,20 +1645,8 @@
     const [sortBy, setSortBy] = useState("regLaunch");
     const [hoveredId, setHoveredId] = useState(null);
     const [tooltip, setTooltip] = useState(null);
-    /* The segment matrix below the chart scrolls with it. Both scrollers hold
-       the same LABEL_W + TIMELINE_W geometry, so scrollLeft maps 1:1 and the
-       months stay aligned. The lock stops the echo: setting scrollLeft fires
-       the other one's onScroll, which would set this one straight back. */
-    const ganttScrollRef = useRef(null);
-    const matrixScrollRef = useRef(null);
-    const scrollLock = useRef(false);
-    const linkScroll = (otherRef) => (ev) => {
-      const other = otherRef.current;
-      if (!other || scrollLock.current) return;
-      scrollLock.current = true;
-      other.scrollLeft = ev.currentTarget.scrollLeft;
-      window.requestAnimationFrame(() => { scrollLock.current = false; });
-    };
+    // Launch Gantt | Launch Table. Filters and sort above the tabs apply to both.
+    const [tab, setTab] = useState("gantt");
 
     // Owners, categories, statuses derive from the data so new hires and new
     // Airtable options show up without a code change.
@@ -1672,31 +1715,51 @@
         }).filter(b => b.count);
         const unassigned = active.filter(s => !s.owner);
         if (unassigned.length) breakdown.push({ owner: "Unassigned", count: unassigned.length, acv: unassigned.reduce((t, s) => t + (s.acv || 0), 0) });
-        /* owner -> segment key -> count, over the SAME `active` set the header
-           counts, so every month's matrix sums to the count printed above it. */
-        const segGrid = {};
-        active.forEach(s => {
-          const o = s.owner || "Unassigned";
-          const k = segmentOf(s.sowHours).key;
-          if (!segGrid[o]) segGrid[o] = {};
-          segGrid[o][k] = (segGrid[o][k] || 0) + 1;
-        });
-        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown, segGrid });
+        months.push({ label, left, width, activeCount: active.length, activeACV: active.reduce((t, s) => t + (s.acv || 0), 0), breakdown });
         cur = nextMonth;
       } }
     const maxActive = Math.max(...months.map(m => m.activeCount), 1);
 
-    // Rows of the segment matrix: owners with at least one visible launch.
+    // Rows of the Launch Table: owners with at least one visible launch.
     const matrixOwners = [...new Set(rows.map(s => s.owner || "Unassigned"))].sort();
     const segCols = rows.some(s => segmentOf(s.sowHours) === UNSIZED) ? [...SEGMENTS, UNSIZED] : SEGMENTS;
-    const MATRIX_H = 38 + matrixOwners.length * 14;
+
+    /* Launch Table periods. Each period counts the launches in flight during
+       it — any overlap of the launch's Start–End with the period — so the
+       quarterly grid is its own distinct count rather than a sum of months. */
+    const buildPeriods = (spans) => spans.map(sp => {
+      const act = rows.filter(s => {
+        const st = pd(s.start), en = s.end ? pd(s.end) : maxDate;
+        return st <= sp.end && en >= sp.start;
+      });
+      const grid = {};
+      act.forEach(s => {
+        const o = s.owner || "Unassigned", k = segmentOf(s.sowHours).key;
+        if (!grid[o]) grid[o] = {};
+        grid[o][k] = (grid[o][k] || 0) + 1;
+      });
+      return { key: sp.key, current: sp.current, grid, total: act.length };
+    });
+    const monthSpans = [], quarterSpans = [];
+    { let cur = new Date(minDate);
+      while (cur < maxDate) {
+        const nxt = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+        monthSpans.push({ key: cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" }), start: new Date(cur), end: new Date(nxt - 1),
+          current: cur.getFullYear() === today.getFullYear() && cur.getMonth() === today.getMonth() });
+        cur = nxt;
+      } }
+    { let cur = new Date(minDate.getFullYear(), Math.floor(minDate.getMonth() / 3) * 3, 1);
+      while (cur < maxDate) {
+        const nxt = new Date(cur.getFullYear(), cur.getMonth() + 3, 1);
+        quarterSpans.push({ key: cur.getFullYear() + " Q" + (Math.floor(cur.getMonth() / 3) + 1), start: new Date(cur), end: new Date(nxt - 1),
+          current: today >= cur && today < nxt });
+        cur = nxt;
+      } }
+    const quarterPeriods = buildPeriods(quarterSpans);
+    const monthPeriods = buildPeriods(monthSpans);
 
     const ROW_H = 36, LABEL_W = 350, HEADER_H = 80, OWNER_ROW_H = 170;
-    /* Month width is shared by the gantt and the segment matrix below it, so
-       the two scrollers stay aligned. It is set by the matrix, which is the
-       denser of the two: a month there holds an owner name plus one column
-       per segment, and at the old 160px the names truncated to "M…". */
-    const TIMELINE_W = Math.max(months.length * 230, 800);
+    const TIMELINE_W = Math.max(months.length * 160, 800);
     const upper = { fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" };
 
     // Quarterly revenue + QTD stats work off regLaunch across ALL services.
@@ -1771,6 +1834,39 @@
                 key: v, onClick: () => setSortBy(v),
                 style: { background: sortBy === v ? "#334155" : "transparent", border: "1px solid", borderColor: sortBy === v ? "#475569" : "#1e293b", borderRadius: 6, color: sortBy === v ? "#e2e8f0" : "#64748b", padding: "3px 10px", fontSize: 12, cursor: "pointer", fontWeight: sortBy === v ? 600 : 400 } }, l))))),
 
+      // Tabs — filters and sort above apply to both views.
+      e("div", { style: { display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid #334155" } },
+        [["gantt", "Launch Gantt"], ["table", "Launch Table"]].map(([k, l]) =>
+          e("button", { key: k, onClick: () => setTab(k),
+            style: { background: "transparent", border: "none", borderBottom: "2px solid " + (tab === k ? "#38bdf8" : "transparent"), color: tab === k ? "#f8fafc" : "#64748b", padding: "8px 16px", fontSize: 13, fontWeight: tab === k ? 700 : 500, cursor: "pointer", marginBottom: -1 } }, l))),
+
+      tab === "table" ? e(React.Fragment, null,
+        e("div", { style: { display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 14, fontSize: 11.5, color: "#94a3b8", alignItems: "center" } },
+          segCols.map(s =>
+            e("span", { key: s.key, style: { display: "inline-flex", alignItems: "center", gap: 5 } },
+              e("i", { style: { width: 9, height: 9, borderRadius: 2, background: s.color, display: "inline-block" } }),
+              e("b", { style: { color: "#cbd5e1", fontWeight: 700 } }, s.abbr),
+              e("span", { style: { color: "#64748b" } }, s.hours))),
+          e("span", { style: { color: "#475569" } }, "Σ = all segments")),
+
+        e("div", { style: { marginBottom: 8, fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" } },
+          "Launches by Quarter",
+          e("span", { style: { fontSize: 11, fontWeight: 400, color: "#64748b", textTransform: "none", letterSpacing: 0 } },
+            "launches in flight per owner each quarter, by implementation size")),
+        e(CapacityGrid, { periods: quarterPeriods, owners: matrixOwners, cols: segCols, ownerColor }),
+
+        e("div", { style: { margin: "24px 0 8px", fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" } },
+          "Launches by Month",
+          e("span", { style: { fontSize: 11, fontWeight: 400, color: "#64748b", textTransform: "none", letterSpacing: 0 } },
+            "the same counts at month grain — scroll right for later months")),
+        e(CapacityGrid, { periods: monthPeriods, owners: matrixOwners, cols: segCols, ownerColor }),
+
+        e("div", { style: { fontSize: 11.5, color: "#64748b", marginTop: 10, lineHeight: 1.5 } },
+          "A launch counts in every period its Start–End range touches, so a long implementation occupies its owner in each month it spans. ",
+          "Quarters are counted the same way against the whole quarter, which means a quarter is not the sum of its three months — a launch running all quarter is one launch there, three in the monthly view. ",
+          "Segment comes from SOW Hours on the service record; the filters above apply.")) : null,
+
+      tab !== "gantt" ? null : e(React.Fragment, null,
       // Stage legend (only stages present in the visible rows)
       e("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 } },
         GANTT_STAGE_ORDER.filter(s => rows.some(r => r.stage === s)).map(s =>
@@ -1781,7 +1877,7 @@
 
       // Gantt
       e("div", { style: { background: "#1e293b", borderRadius: 12, overflow: "hidden", border: "1px solid #334155" } },
-        e("div", { ref: ganttScrollRef, onScroll: linkScroll(matrixScrollRef), style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
+        e("div", { style: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 150px)" } },
           e("div", { style: { minWidth: LABEL_W + TIMELINE_W } },
 
             // Header row: months with launch counts + ACV
@@ -1868,60 +1964,6 @@
           e("div", { style: { marginLeft: "auto", color: "#64748b" } }, "◆ = Reg. Launch Date"),
           data.length > rows.length ? e("div", { style: { color: "#64748b" } }, (data.length - rows.length) + " service(s) hidden — no start date in Airtable") : null)),
 
-      /* ── Capacity by segment ─────────────────────────────────────────────
-         One column per month, aligned to and scroll-linked with the gantt.
-         Each month holds a mini-table: a row per owner, a column per
-         implementation segment, and the count of launches that owner has in
-         flight that month at that size. "In flight" is the same predicate the
-         gantt uses — any day of the month between Start and End — so a
-         month's cells sum to the active count printed in the gantt header. */
-      e("div", { style: { marginTop: 24 } },
-        e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" } },
-          "Capacity by Segment",
-          e("span", { style: { fontSize: 11, fontWeight: 400, color: "#64748b", textTransform: "none", letterSpacing: 0 } },
-            "launches in flight per owner each month, by implementation size · scrolls with the gantt above")),
-        // Legend: what each segment assumes about SOW Hours.
-        e("div", { style: { display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 8, fontSize: 11.5, color: "#94a3b8", alignItems: "center" } },
-          segCols.map(s =>
-            e("span", { key: s.key, style: { display: "inline-flex", alignItems: "center", gap: 5 } },
-              e("i", { style: { width: 9, height: 9, borderRadius: 2, background: s.color, display: "inline-block" } }),
-              e("b", { style: { color: "#cbd5e1", fontWeight: 700 } }, s.abbr),
-              e("span", { style: { color: "#64748b" } }, s.hours)))),
-        e("div", { style: { background: "#1e293b", borderRadius: 12, border: "1px solid #334155", overflow: "hidden" } },
-          matrixOwners.length === 0
-            ? e("div", { style: { padding: "18px 16px", textAlign: "center", color: "#64748b", fontSize: 12.5 } }, "No services match the current filters.")
-            : e("div", { ref: matrixScrollRef, onScroll: linkScroll(ganttScrollRef), style: { overflowX: "auto" } },
-                e("div", { style: { minWidth: LABEL_W + TIMELINE_W, display: "flex" } },
-                  // Frozen label column — same width as the gantt's, so the
-                  // month grids start at the same x in both scrollers.
-                  e("div", { style: { position: "sticky", left: 0, zIndex: 5, width: LABEL_W, minWidth: LABEL_W, flexShrink: 0, height: MATRIX_H, borderRight: "1px solid #334155", background: "#162032", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingLeft: 16, paddingBottom: 10 } },
-                    e("span", { style: upper }, "Owner × Segment"),
-                    e("span", { style: { fontSize: 10.5, color: "#475569", marginTop: 3 } }, matrixOwners.length + " owner" + (matrixOwners.length !== 1 ? "s" : "") + " · " + rows.length + " launches")),
-                  e("div", { style: { position: "relative", width: TIMELINE_W, height: MATRIX_H, flexShrink: 0 } },
-                    months.map((m, i) =>
-                      e("div", { key: i, style: { position: "absolute", left: (m.left / 100) * TIMELINE_W, width: (m.width / 100) * TIMELINE_W, height: "100%", borderRight: "1px solid #334155", overflow: "hidden", padding: "6px 6px 4px 8px", boxSizing: "border-box" } },
-                        e("div", { style: { fontSize: 9, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, whiteSpace: "nowrap" } }, m.label),
-                        e("table", { style: { width: "100%", borderCollapse: "collapse", tableLayout: "fixed" } },
-                          e("thead", null, e("tr", null,
-                            e("th", { style: { fontSize: 8, color: "#475569", fontWeight: 600, textAlign: "left", paddingBottom: 2, borderBottom: "1px solid #1e293b", background: "transparent", position: "static", overflow: "hidden" } }, ""),
-                            segCols.map(s =>
-                              e("th", { key: s.key, title: s.key + " · " + s.hours, style: { fontSize: 8, color: s.color, fontWeight: 700, textAlign: "center", paddingBottom: 2, borderBottom: "1px solid #1e293b", background: "transparent", position: "static", width: 22 } }, s.abbr)))),
-                          e("tbody", null,
-                            matrixOwners.map((o, ri) =>
-                              e("tr", { key: o, style: { background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" } },
-                                e("td", { style: { padding: "2px 3px 1px 0", border: "none", textAlign: "left", overflow: "hidden" } },
-                                  e("div", { style: { display: "flex", alignItems: "center", gap: 3, overflow: "hidden" } },
-                                    e("div", { style: { width: 4, height: 4, borderRadius: "50%", background: ownerColor[o] || "#94a3b8", flexShrink: 0 } }),
-                                    e("span", { style: { fontSize: 9.5, color: "#cbd5e1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 } },
-                                      o === "Unassigned" ? "Unassigned" : o.split(" ")[0]))),
-                                segCols.map(s => {
-                                  const n = (m.segGrid[o] || {})[s.key] || 0;
-                                  return e("td", { key: s.key, title: n ? o + " · " + s.key + " · " + n + " in " + m.label : null,
-                                    style: { fontSize: 10, fontWeight: n ? 700 : 400, color: n ? s.color : "#293548", textAlign: "center", padding: "2px 0 1px", border: "none", lineHeight: 1.2 } }, n || "·");
-                                }))))))))))),
-        e("div", { style: { fontSize: 11.5, color: "#64748b", marginTop: 6 } },
-          "A launch counts in a month when any day of that month falls between its Start and End date, so long launches count in every month they span. Segment comes from SOW Hours on the service record.")),
-
       // Quarterly revenue by owner
       e("div", { style: { marginTop: 24 } },
         e("div", { style: { fontSize: 13, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 } }, "Revenue by Owner · By Quarter"),
@@ -1996,7 +2038,7 @@
                   e("td", { style: { ...tdCell("right"), color: "#e2e8f0", fontWeight: 600, fontVariantNumeric: "tabular-nums" } }, data.length),
                   e("td", { style: { ...tdCell("right"), fontSize: 13, fontWeight: 700, color: "#f8fafc" } }, fmtACV(stageTotalACV)),
                   e("td", { style: { ...tdCell("right"), color: "#94a3b8", fontWeight: 600, fontVariantNumeric: "tabular-nums" } }, stageTotalACV ? "100%" : "—")))),
-            stageRollup.length === 0 ? e("div", { style: { padding: "18px 16px", textAlign: "center", color: "#64748b", fontSize: 12.5 } }, "No services match the current filters.") : null))),
+            stageRollup.length === 0 ? e("div", { style: { padding: "18px 16px", textAlign: "center", color: "#64748b", fontSize: 12.5 } }, "No services match the current filters.") : null)))),
 
       // Tooltip
       tooltip ? e("div", { style: { position: "fixed", left: Math.min(tooltip.x + 12, window.innerWidth - 260), top: Math.max(8, tooltip.y - 160), background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: "12px 14px", zIndex: 100, width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", pointerEvents: "none" } },
