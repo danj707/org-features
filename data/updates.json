@@ -3,6 +3,17 @@
   "updates": [
     {
       "date": "2026-09-17",
+      "title": "CX Reporting has two tabs, and the capacity view is readable",
+      "body": "Yesterday's capacity grid tried to fit a whole owner-by-segment table inside each month column of the gantt. It was correct and unreadable - 8px type, names truncated to a letter. It moves to its own tab and becomes two ordinary tables instead.",
+      "items": [
+        "Launch Gantt keeps everything that was on the page before: the chart, revenue by owner, quarter-to-date and ACV by stage. The chart's month columns are back to their original width.",
+        "Launch Table holds the same counts as flat grids - one row per owner, one column per segment per period, plus a total column. Launches by Quarter first, Launches by Month below it.",
+        "The quarterly grid is its own count, not a sum of months: a launch running all quarter is one launch there and three in the monthly view. Both are right; they answer different questions.",
+        "Filters and sort sit above the tabs and apply to both."
+      ]
+    },
+    {
+      "date": "2026-09-17",
       "title": "Who is carrying what, month by month",
       "body": "The launch gantt showed when work happens but never how much of it lands on one person at once. A new Capacity by Segment table sits under the chart, one column per month, scroll-linked to the gantt so the months stay lined up. Each month holds a grid of owner by implementation size, counting the launches that person has in flight.",
       "items": [
