@@ -48,6 +48,16 @@ by stage.
   table is baked (all stages) so revenue math can count completed launches;
   the gantt itself defaults to upcoming work — **Launched and Delayed
   stages are hidden unless toggled on** via the Include pills.
+  Below the chart, **Capacity by Segment** repeats the gantt's month columns
+  (same `TIMELINE_W`, scroll-linked in both directions) and fills each month
+  with an owner × implementation-size grid: the count of launches that owner
+  has in flight that month, where "in flight" is the same any-day-between-
+  Start-and-End predicate the gantt header uses — so a month's cells sum to
+  the active count printed above it. Size bands come from **SOW Hours** on
+  the service record (SMB 1–18, Mid-Market 19–22, Enterprise 23–37,
+  Strategic 38–60, Strategic+ 61+); services with SOW Hours unset fall into
+  an **Unsized** column that only appears when some visible launch needs it,
+  so nothing drops silently out of the capacity view.
   Data lives in `data/launches-data.json`, baked by
   `scripts/refresh/bake-launches.js` (Airtable REST, `AIRTABLE_API_KEY`).
   Freshness has three layers, all needing only the Railway env var:
