@@ -384,6 +384,9 @@
   .fchart-rangelab { font-size: 11px; font-weight: 700; color: var(--muted);
                      text-transform: uppercase; letter-spacing: .4px; margin-right: 2px; }
   .fchart-range[disabled] { opacity: .4; cursor: not-allowed; }
+  /* Quiet, and it wraps rather than pushing the search box off the row —
+     it is an explanation, not another control. */
+  .fchart-rangenote { font-size: 11.5px; color: var(--muted); }
   .fchart-q { margin-left: auto; min-width: 190px; padding: 5px 10px; font-size: 12.5px;
               border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink-2); }
   .fchart-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
@@ -1682,6 +1685,31 @@
       enabled: !r.days || ofChartWindow(history, r.days).length < n,
     }));
   }
+  /* AND IT SAYS WHY, ON SCREEN. Dan, on the greyed row: "how come this isn't
+     clickable?" — which is the disabled control answering nothing, for the
+     second time in this repo family.
+
+     THE EXPLANATION WAS ALREADY THERE AND UNREACHABLE. Each gated button
+     carries a `title` saying how much history the bake has. A disabled button
+     DOES still fire mouseover in Chrome (measured — the first theory here was
+     that it does not, and that was wrong), so the tooltip works; nobody
+     hovers a greyed-out button to find out why it is grey. The chart's
+     footnote states the same fact and sits six hundred pixels below the
+     thing it explains.
+
+     So the reason goes NEXT TO THE BUTTONS, and only while it is true: once
+     the bake has more than a year of history nothing is gated, this returns
+     null and the note disappears on its own. A permanent note is noise, and
+     noise is what the next reader learns to skip. */
+  function ofChartRangeNote(history, ranges) {
+    const gated = (ranges || []).filter(r => !r.enabled);
+    if (!gated.length) return null;
+    const n = (history || []).length;
+    return n + " day" + (n === 1 ? "" : "s") + " of history so far \u2014 "
+      + (gated.length === 1 ? gated[0].label + " unlocks" : "longer ranges unlock")
+      + " as the bake fills in";
+  }
+
   /* ONE DERIVATION, WINDOWED. The trend is re-taken over the sliced history
      through `ofFeatureTrend` — the same function the table's Trend column
      reads — rather than recomputed here, so the delta on a pill is the delta
@@ -1832,6 +1860,7 @@
     const [range, setRange] = React.useState("all");
     const [cq, setCq] = React.useState("");
     const ranges = ofChartRangeOptions(history);
+    const rangeNote = ofChartRangeNote(history, ranges);
     /* AN UNAVAILABLE RANGE RESOLVES TO ALL rather than emptying the chart —
        which ranges are offered depends on how much history exists, so one
        that was pickable yesterday is not a state to get stranded in. */
@@ -1916,6 +1945,9 @@
                     + "this becomes pickable once there is more than " + r.label + " of it",
                 onClick: () => setRange(r.id),
               }, r.label)),
+              rangeNote ? e("span", { className: "fchart-rangenote",
+                                      "data-of-chart-rangenote": ranges.filter(r => !r.enabled).length },
+                            rangeNote) : null,
               /* FINDING ONE FEATURE AMONG SIXTY. Dan: "a search box for the
                  adoption graph would be helpful, for example 'automated
                  waitlists', I had to read through the entire list."
