@@ -541,6 +541,89 @@ const CASES = [
              + " → " + after[moved[0]] + ")" : ""));
       }, before, first);
     } },
+  /* THE SEARCH FINDS A FEATURE WITHOUT SCROLLING SIXTY CHIPS, and it does not
+     pull anything off the chart while you type.
+
+     Dan: "a search box for the adoption graph would be helpful, for example
+     'automated waitlists', I had to read through the entire list of features
+     to find it." So the discriminating term is his: "automated waitlist" must
+     narrow the pills to the one feature, WITHOUT unplotting the five lines
+     already drawn — a series vanishing mid-keystroke is the opposite of
+     looking something up, and a pill list that dropped the selected features
+     would leave no way to switch them off again. Both halves are asserted,
+     because a search wired to the chart instead of the list renders a
+     perfectly plausible narrower chart. */
+  { name: "org features · the chart search finds one feature without unplotting the rest",
+    path: "/ps/feature", needs: '[data-rc-fq="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-line]");
+      const before = await pg.evaluate(() =>
+        [...document.querySelectorAll("[data-of-chart-line]")].map(l => l.getAttribute("data-of-chart-line")));
+      await pg.type("[data-of-chart-q]", "automated waitlist");
+      await pg.waitForFunction(() => document.querySelector("[data-of-chart-qnote]"));
+      await pg.evaluate((before2) => {
+        const pills = [...document.querySelectorAll("[data-of-chart-pill]")]
+          .map(b => b.getAttribute("data-of-chart-pill"));
+        const after = [...document.querySelectorAll("[data-of-chart-line]")]
+          .map(l => l.getAttribute("data-of-chart-line"));
+        // the term finds it, and does not leave the whole catalogue listed
+        const found = pills.includes("automated_waitlist");
+        // every line that was drawn is still drawn, and still has a pill
+        const dropped = before2.filter(k => !after.includes(k));
+        const orphan = before2.filter(k => !pills.includes(k));
+        const note = document.querySelector("[data-of-chart-qnote]");
+        const matched = note ? Number(note.getAttribute("data-of-chart-qnote")) : -1;
+        const good = found && matched > 0 && matched < 10
+                     && !dropped.length && !orphan.length;
+        document.body.setAttribute("data-rc-fq", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fq-seen",
+          "automated_waitlist " + (found ? "found" : "NOT FOUND") + " \u00b7 " + matched
+          + " matched \u00b7 " + pills.length + " pill(s) listed \u00b7 "
+          + dropped.length + " line(s) unplotted by typing \u00b7 "
+          + orphan.length + " plotted line(s) left with no pill");
+      }, before);
+    } },
+  /* THE RANGE PRESETS, AND THE ONES THE HISTORY CANNOT FILL SAY SO.
+
+     Dan asked for "last 30, last 3 months, 6 months" rather than a date
+     range. With the bake only recording since 2026-09-07 every preset is
+     still the whole series, so they render DISABLED rather than absent —
+     hiding a control he asked for makes "was this built?" unanswerable, and
+     all five drawing the same chart would make it look broken. This asserts
+     the shape that follows from the data rather than a fixed list: All is
+     always pickable, and a preset is enabled iff it would actually cut the
+     series. */
+  { name: "org features · the range presets offer only what the history can fill",
+    path: "/ps/feature", needs: '[data-rc-frange="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-rangeopt]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const hist = ((d && d.history) || []).filter(h => h && h.liveOrgs > 0);
+        const span = hist.length > 1
+          ? Math.round((Date.parse(hist[hist.length - 1].date) - Date.parse(hist[0].date)) / 86400000) + 1
+          : hist.length;
+        const btns = [...document.querySelectorAll("[data-of-chart-rangeopt]")];
+        const on = btns.filter(b => b.getAttribute("data-of-chart-rangeon") === "1")
+                       .map(b => b.getAttribute("data-of-chart-rangeopt"));
+        const days = { "30d": 30, "3m": 91, "6m": 182, "12m": 365 };
+        // enabled iff the preset is shorter than the span the feed actually holds
+        const wrong = btns.filter(b => {
+          const id = b.getAttribute("data-of-chart-rangeopt");
+          const en = b.getAttribute("data-of-chart-rangeon") === "1";
+          return id === "all" ? !en : en !== (days[id] < span);
+        });
+        // a disabled preset must also be unclickable, not merely grey
+        const clickable = btns.filter(b => b.getAttribute("data-of-chart-rangeon") === "0" && !b.disabled);
+        const good = btns.length === 5 && on.includes("all") && !wrong.length && !clickable.length;
+        document.body.setAttribute("data-rc-frange", good ? "1" : "0");
+        document.body.setAttribute("data-rc-frange-seen",
+          btns.length + " preset(s) \u00b7 history spans " + span + " day(s) \u00b7 enabled: "
+          + (on.join(",") || "none") + " \u00b7 " + wrong.length + " wrongly gated"
+          + (wrong.length ? " (e.g. " + wrong[0].getAttribute("data-of-chart-rangeopt") + ")" : "")
+          + " \u00b7 " + clickable.length + " grey but still clickable");
+      });
+    } },
   /* EVERY LINE IS NAMED ON THE CHART, AND TWO FEATURES AT THE SAME SHARE DO
      NOT STACK THEIR LABELS.
 

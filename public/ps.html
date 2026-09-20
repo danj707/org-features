@@ -190,6 +190,13 @@
      carries its series colour, the feature's name and its current share, so
      identity never rests on the colour alone (three of the six series colours
      sit below 3:1 on this white card). */
+  .fchart-ranges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+                   padding: 12px 16px 0; }
+  .fchart-rangelab { font-size: 11px; font-weight: 700; color: var(--muted);
+                     text-transform: uppercase; letter-spacing: .4px; margin-right: 2px; }
+  .fchart-range[disabled] { opacity: .4; cursor: not-allowed; }
+  .fchart-q { margin-left: auto; min-width: 190px; padding: 5px 10px; font-size: 12.5px;
+              border: 1px solid var(--line); border-radius: 999px; background: #fff; color: #334155; }
   .fchart-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
                   padding: 12px 16px 10px; border-bottom: 1px solid var(--line); }
   .fchart-pill { gap: 6px; }
@@ -1344,14 +1351,104 @@
   const OF_CHART_MAX = OF_SERIES_COLORS.length;
   const OF_CHART_OPEN = 5;
 
+  /* ── HOW FAR BACK ─────────────────────────────────────────────────────
+     Dan: "any way we can change the time range here? Don't need a date
+     range, just a last 30, last 3 months, 6 months, etc."
+
+     Presets rather than two date fields, because every question anyone asks
+     of this chart is "recently" or "over the year" — a From/To pair makes the
+     reader compose a window before they can look at anything, and the page
+     already has a date-free story to tell. */
+  const OF_CHART_RANGES = [
+    { id: "30d", label: "30 days", days: 30 },
+    { id: "3m", label: "3 months", days: 91 },
+    { id: "6m", label: "6 months", days: 182 },
+    { id: "12m", label: "12 months", days: 365 },
+    { id: "all", label: "All", days: null },
+  ];
+  /* THE CUTOFF IS COMPUTED IN UTC FROM THE PARTS, and that is deliberate
+     rather than a violation of this file's own never-parse-a-bare-ISO rule.
+     That rule exists because `new Date("2026-09-07")` is parsed as UTC
+     midnight and then READ BACK in local time, which lands a day early west
+     of UTC. Date.UTC on explicit parts, read back with getUTC*, never touches
+     the local zone in either direction, so it is the one safe way to do date
+     ARITHMETIC — and there is no way to subtract 91 days from a string. */
+  function ofChartCutoff(iso, days) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+    if (!m || !days) return null;
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]) - (days - 1) * 86400000);
+    const pad = n => (n < 10 ? "0" : "") + n;
+    return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
+  }
+  /* MEASURED BACK FROM THE LAST BAKE, not from today's clock. The bake can
+     miss a morning — it missed three in September — and counting back from
+     "now" would then quietly drop the newest points out of a 30-day window on
+     the days it matters most. ISO dates compare correctly as strings. */
+  function ofChartWindow(history, days) {
+    const h = history || [];
+    if (!days || !h.length) return h;
+    const cut = ofChartCutoff(h[h.length - 1].date, days);
+    return cut ? h.filter(x => x && x.date >= cut) : h;
+  }
+  /* ONLY THE RANGES THAT CHANGE SOMETHING ARE OFFERED, because a row of
+     buttons that all draw the same chart is a control that looks broken. The
+     bake has recorded history since 2026-09-07, so today every preset is the
+     whole series and only All can be picked — they enable themselves as the
+     history grows past each one, with no code change and nothing to remember.
+
+     THEY ARE SHOWN DISABLED RATHER THAN HIDDEN, which is the narrow exception
+     to this project's absent-not-greyed rule and is the same call Dan made on
+     the Musco button one project over: hiding a control he asked for makes
+     "was this built?" unanswerable, and a disabled button that says why it is
+     disabled answers it. */
+  function ofChartRangeOptions(history) {
+    const n = (history || []).length;
+    return OF_CHART_RANGES.map(r => Object.assign({}, r, {
+      enabled: !r.days || ofChartWindow(history, r.days).length < n,
+    }));
+  }
+  /* ONE DERIVATION, WINDOWED. The trend is re-taken over the sliced history
+     through `ofFeatureTrend` — the same function the table's Trend column
+     reads — rather than recomputed here, so the delta on a pill is the delta
+     over the window on screen and the two surfaces still cannot disagree
+     about how a series is built. The table keeps passing the full history;
+     only the chart narrows its input. */
+  function ofChartRows(rows, hist) {
+    return (rows || []).map(r => Object.assign({}, r, { trend: ofFeatureTrend(hist, r.key) }));
+  }
+
+  /* THREE BANDS, AND THE MIDDLE ONE IS NEW. Dan: "if a feature is too new
+     then just put a dot where it started on the timeline."
+
+     A feature with ONE measurement in the window used to be dropped from this
+     chart entirely — `ofFeatureTrend` returns ready:false for it and the
+     filter here was `r.trend.ready` — so the features most worth noticing,
+     the ones that have just appeared, were the ones it hid. They are plotted
+     now as a single dot at the date they start, which is the honest mark: a
+     line between one point and nothing is a claim about a direction nobody
+     has measured yet.
+
+     Movers first, then the new arrivals, then the flat — because a feature
+     appearing IS change, and ranking it below a line that has not moved in a
+     month buries the thing this chart is for. A feature with NO measurement
+     in the window is not offered at all; there is nothing to draw. */
+  function ofChartBand(t) {
+    if (!t || !t.points.length) return 3;               // nothing in this window
+    if (t.ready && t.delta !== 0) return 0;             // moved
+    if (!t.ready) return 1;                             // too new to say
+    return 2;                                           // measured, flat
+  }
   function ofChartOrder(rows) {
-    return (rows || []).filter(r => r && r.trend && r.trend.ready).slice().sort((a, b) => {
-      const da = Math.abs(a.trend.delta), db = Math.abs(b.trend.delta);
-      if (db !== da) return db - da;
-      const pa = a.pct == null ? -1 : a.pct, pb = b.pct == null ? -1 : b.pct;
-      if (pb !== pa) return pb - pa;
-      return String(a.name).localeCompare(String(b.name));
-    });
+    return (rows || []).filter(r => r && r.trend && r.trend.points.length)
+      .slice().sort((a, b) => {
+        const ba = ofChartBand(a.trend), bb = ofChartBand(b.trend);
+        if (ba !== bb) return ba - bb;
+        const da = Math.abs(a.trend.delta || 0), db = Math.abs(b.trend.delta || 0);
+        if (db !== da) return db - da;
+        const pa = a.pct == null ? -1 : a.pct, pb = b.pct == null ? -1 : b.pct;
+        if (pb !== pa) return pb - pa;
+        return String(a.name).localeCompare(String(b.name));
+      });
   }
   function ofChartDefault(rows) {
     return ofChartOrder(rows).slice(0, OF_CHART_OPEN).map(r => r.key);
@@ -1385,9 +1482,13 @@
     (rows || []).forEach(r => { if (r && r.key) byKey[r.key] = r; });
     return (slots || []).map((k, i) => {
       const r = k ? byKey[k] : null;
-      if (!r || !r.trend || !r.trend.ready) return null;
+      /* ONE POINT IS ENOUGH TO PLOT — it draws a dot rather than a line.
+         `ofFeatureTrend` still sets `last` for a single point, so the mark and
+         its label have a value without anything being inferred. */
+      if (!r || !r.trend || !r.trend.points.length) return null;
       return { key: r.key, name: r.name, color: OF_SERIES_COLORS[i % OF_SERIES_COLORS.length],
-               points: r.trend.points, last: r.trend.last, delta: r.trend.delta };
+               points: r.trend.points, last: r.trend.last, delta: r.trend.delta,
+               ready: r.trend.ready };
     }).filter(Boolean);
   }
   /* THE X DOMAIN IS THE UNION OF THE DATES THE SELECTED SERIES ACTUALLY
@@ -1452,14 +1553,23 @@
   const OF_CHART_BOX = { w: 960, h: 264, l: 38, r: 190, t: 14, b: 30 };
   const OF_CHART_NAME_MAX = 20;
 
-  function FeatureAdoptionChart({ rows }) {
-    const plottable = ofChartOrder(rows);
-    const [slots, setSlots] = React.useState(() => ofChartDefault(rows));
+  function FeatureAdoptionChart({ rows, history }) {
+    const [range, setRange] = React.useState("all");
+    const [cq, setCq] = React.useState("");
+    const ranges = ofChartRangeOptions(history);
+    /* AN UNAVAILABLE RANGE RESOLVES TO ALL rather than emptying the chart —
+       which ranges are offered depends on how much history exists, so one
+       that was pickable yesterday is not a state to get stranded in. */
+    const pick = ranges.find(r => r.id === range && r.enabled) || ranges[ranges.length - 1];
+    const hist = ofChartWindow(history, pick.days);
+    const wrows = ofChartRows(rows, hist);
+    const plottable = ofChartOrder(wrows);
+    const [slots, setSlots] = React.useState(() => ofChartDefault(ofChartRows(rows, history)));
     const [showAll, setShowAll] = React.useState(false);
     const [hoverIdx, setHoverIdx] = React.useState(null);
     const svgRef = React.useRef(null);
 
-    const series = ofChartSeries(rows, slots);
+    const series = ofChartSeries(wrows, slots);
     const dates = ofChartDates(series);
     const B = OF_CHART_BOX;
     const pw = B.w - B.l - B.r, ph = B.h - B.t - B.b;
@@ -1470,7 +1580,21 @@
 
     const full = ofChartCount(slots) >= OF_CHART_MAX;
     const PILLS_SHOWN = 14;
-    const pills = showAll ? plottable : plottable.slice(0, PILLS_SHOWN);
+    /* THE SEARCH NARROWS THE LIST, NEVER THE CHART. Typing must not pull a
+       plotted line off the axis — the reader is looking for something to ADD,
+       and a series vanishing mid-keystroke is the opposite of that. So a
+       selected feature is always listed whatever the search says, or its own
+       pill would be the thing that disappeared and there would be no way to
+       switch it off.
+
+       A SEARCH SHOWS EVERY MATCH. The 14-pill cap exists so sixty chips do
+       not bury the chart; once somebody has typed a term, the whole point is
+       to see what matched, so the cap lifts. */
+    const matched = cq ? plottable.filter(r => ofFeatureMatch(r, cq)) : plottable;
+    const picked = new Set(slots.filter(Boolean));
+    const pills = cq
+      ? plottable.filter(r => picked.has(r.key) || matched.indexOf(r) >= 0)
+      : (showAll ? plottable : plottable.slice(0, PILLS_SHOWN));
     const colorOf = k => { const i = slots.indexOf(k); return i < 0 ? null : OF_SERIES_COLORS[i]; };
 
     /* THE READER AIMS AT A DATE, NOT AT A 2px LINE — the hairline snaps to the
@@ -1503,6 +1627,35 @@
             "No feature has two comparable measurements yet. The nightly bake adds a point "
             + "every morning, so this fills in from tomorrow.")
         : e(React.Fragment, null,
+            e("div", { className: "fchart-ranges", "data-of-chart-range": pick.id },
+              e("span", { className: "fchart-rangelab" }, "Range"),
+              ranges.map(r => e("button", {
+                key: r.id,
+                className: "qvchip fchart-range" + (r.id === pick.id ? " on" : ""),
+                "data-of-chart-rangeopt": r.id,
+                "data-of-chart-rangeon": r.enabled ? "1" : "0",
+                disabled: !r.enabled,
+                title: r.enabled
+                  ? (r.days ? "The last " + r.days + " days of bakes" : "Every measurement on record")
+                  : "The bake has " + (history || []).length + " day(s) of history so far — "
+                    + "this becomes pickable once there is more than " + r.label + " of it",
+                onClick: () => setRange(r.id),
+              }, r.label)),
+              /* FINDING ONE FEATURE AMONG SIXTY. Dan: "a search box for the
+                 adoption graph would be helpful, for example 'automated
+                 waitlists', I had to read through the entire list."
+
+                 IT IS THE TABLE'S OWN MATCHER, `ofFeatureMatch` — name, key,
+                 category, category label and description, terms ANDed — so a
+                 term that finds a row below finds its pill up here, and the
+                 two cannot start disagreeing about what "waitlist" matches. */
+              e("input", { type: "text", className: "fchart-q", value: cq,
+                "data-of-chart-q": cq,
+                placeholder: "Find a feature\u2026",
+                onChange: ev => setCq(ev.target.value) }),
+              cq ? e("button", { className: "qvchip fchart-qclear", "data-of-chart-qclear": 1,
+                                 onClick: () => setCq("") }, "Clear") : null),
+
             e("div", { className: "fchart-pills", "data-of-chart-sel": slots.filter(Boolean).join(",") },
               pills.map(r => {
                 const col = colorOf(r.key);
@@ -1527,13 +1680,32 @@
                   r.name,
                   e("span", { className: "qvn" },
                     r.pct + "%",
-                    r.trend.delta ? (r.trend.delta > 0 ? " ▲" : " ▼") + Math.abs(r.trend.delta) : ""));
+                    /* NO ARROW WHERE THERE IS NO SECOND POINT. A delta of zero
+                       and a delta nobody has measured are different facts, and
+                       a flat marker for the second is the load-versus-empty
+                       mistake this codebase keeps logging. */
+                    !r.trend.ready ? " · new"
+                      : r.trend.delta ? (r.trend.delta > 0 ? " ▲" : " ▼") + Math.abs(r.trend.delta)
+                      : ""));
               }),
-              plottable.length > PILLS_SHOWN
+              !cq && plottable.length > PILLS_SHOWN
                 ? e("button", { className: "qvchip fchart-more", "data-of-chart-more": showAll ? "less" : "more",
                                 onClick: () => setShowAll(v => !v) },
                     showAll ? "Show fewer" : "+" + (plottable.length - PILLS_SHOWN) + " more")
                 : null),
+
+            /* WHAT THE SEARCH DID, stated. A pill row that silently went
+               from sixty chips to one looks like a broken control, and the
+               table below already states its own count for the same reason. */
+            cq ? e("div", { className: "qvnote", "data-of-chart-qnote": matched.length },
+              e("b", null, "Find \u201c" + cq + "\u201d"), " \u00b7 ",
+              matched.length + " of " + plottable.length + " plottable feature"
+              + (plottable.length === 1 ? "" : "s"),
+              " \u00b7 matched on name, key, category and description",
+              picked.size ? " \u00b7 the " + picked.size + " on the chart stay listed" : "",
+              " \u00b7 ",
+              e("a", { href: "#", onClick: ev => { ev.preventDefault(); setCq(""); } },
+                "clear")) : null,
 
             series.length === 0
               ? e("div", { className: "qvnote", "data-of-chart-empty": "noselection" },
@@ -1569,6 +1741,12 @@
 
                     series.map(s => {
                       const pts = s.points.filter(p => idxOf[p.date] != null);
+                      /* A LINE NEEDS TWO POINTS. One measurement gets the dot
+                         below and nothing else — a segment drawn from a single
+                         point renders as an invisible one-vertex polyline, or
+                         invites somebody to "fix" it into a flat line
+                         asserting a direction nobody has measured. */
+                      if (pts.length < 2) return null;
                       return e("polyline", {
                         key: s.key, "data-of-chart-line": s.key,
                         "data-of-chart-pts": pts.length,
@@ -1580,8 +1758,14 @@
                        finish at the same share still read as two. */
                     series.map(s => {
                       const last = s.points[s.points.length - 1];
+                      const lone = s.points.length === 1;
+                      /* WHERE IT STARTED, for a feature too new to draw a
+                         line. A touch larger than an end dot so it reads as
+                         the mark it is rather than as a line whose stroke
+                         went missing. */
                       return e("circle", { key: s.key, cx: xAt(idxOf[last.date]), cy: yAt(last.v),
-                                           r: 4, fill: s.color, stroke: "#fff", strokeWidth: 2 });
+                                           r: lone ? 5 : 4, fill: s.color, stroke: "#fff", strokeWidth: 2,
+                                           "data-of-chart-dot": lone ? s.key : null });
                     }),
                     hoverIdx != null
                       ? series.map(s => {
@@ -1621,6 +1805,7 @@
                as though it covers all of history. */
             e("div", { className: "qvnote", "data-of-chart-note": dates.length },
               e("b", null, "Opens on the features that have moved most"), " · ",
+              pick.days ? "last " + pick.label + " · " : "",
               dates.length + " daily measurement" + (dates.length === 1 ? "" : "s"),
               dates.length ? " from " + ofChartDateLabel(dates[0]) + " to "
                              + ofChartDateLabel(dates[dates.length - 1]) : "",
@@ -2999,7 +3184,7 @@
         /* ABOVE THE TABLE IT PLOTS, and below the Moving card it expands —
            the chart's pills and the table's rows are the same population, so
            a reader who spots a line climbing scrolls straight to the row. */
-        e(FeatureAdoptionChart, { rows: fall }),
+        e(FeatureAdoptionChart, { rows: fall, history: dv.history }),
 
         e("div", { className: "panel" },
           e("h2", null, "Feature adoption across the fleet",
