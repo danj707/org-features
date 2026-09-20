@@ -110,11 +110,14 @@
 --                       same type on a different channel (45 rows).
 --   automated_waitlist  DELIBERATELY NOT waitlist. That metric counts any
 --                       waitlist_config at all and reaches 82% of live orgs;
---                       the split is 32,220 'manual' sections against SIXTEEN
---                       'automated' ones, at 2 orgs, NEITHER of them live. So
---                       this reads 0% of the live fleet — which is the honest
---                       answer about a feature nobody has switched on yet,
---                       not a broken filter.
+--                       the split, measured 2026-09-20, is 36,515 'manual'
+--                       sections across 99 orgs against 136 'automated' ones
+--                       across three, of which ONE is live. It read 0% of the
+--                       live fleet until 2026-09-17, when Apex switched it on
+--                       across 118 sections — so the number this separation
+--                       exists to expose has started moving. Do not pin the
+--                       count anywhere that can fail: a spec did, and it
+--                       blocked three nightly bakes.
 --   calendar_sync       THE ONLY ORG-SCOPED SIGNAL IS saved_filter_view.
 --                       `oauth_connection` has NO organization_id, and
 --                       resolving it through organization_association gives

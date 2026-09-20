@@ -163,7 +163,7 @@ counted, inside a broader metric whose high number hides it.
 | SMS | yes, `sms_messaging` — 25% live | — |
 | CRM | yes, `crm_household_notes` — 75% live | — |
 | **Marketing email** | **no** | `email_messaging` is 90% and is 9,993 `transaction` deliveries against 699 `marketing` ones. Marketing email alone is **47%** of live orgs. |
-| **Automated waitlists** | **no** | `waitlist` is 82% and is 32,220 `manual` sections against **sixteen** `automated` ones, at two orgs, **neither live**. Automated alone is **0%**. |
+| **Automated waitlists** | **no** | `waitlist` is 82% and is 36,515 `manual` sections against **136** `automated` ones, at three orgs, **one live**. Automated alone was 0% of the live fleet until 2026-09-17, when Apex switched it on across 118 sections. |
 
 Both are built now. The generalisation is worth more than the two entries:
 **a metric that is true and near-universal is the best hiding place there is**,

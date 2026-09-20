@@ -442,6 +442,177 @@ const CASES = [
              + " vertices for " + pts(wrongLen[0]) + " points)" : ""));
       });
     } },
+  /* THE CHART DRAWS THE SERIES THE FEED CARRIES, and opens on the movers.
+
+     Two claims, and neither is visible in source. A polyline is a string of
+     coordinates: a chart plotting a truncated series, or one inventing a
+     zero for a date a feature was not measured on, renders a perfectly
+     plausible line and throws nothing. So the vertex count of every drawn
+     line must equal the number of comparable points the feed holds for that
+     feature — the same guard the trend column carries, for the same reason.
+
+     AND THE DEFAULT IS THE WHOLE POINT OF THE CHART. Opening on the most
+     adopted features draws five flat lines (the top eight by adoption have a
+     delta of zero), so the default is "moved most" — asserted as the
+     property rather than by re-deriving the sort here, which would only test
+     the same mistake twice: every feature on screen must have moved at least
+     as much as every plottable feature left off it. */
+  { name: "org features · the adoption chart plots the movers, one vertex per measurement",
+    path: "/ps/feature", needs: '[data-rc-fchart="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-line]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const hist = (d && d.history) || [];
+        const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
+                                          && h.featureLive[k] != null).length;
+        const dl = k => { const p = hist.filter(h => h.liveOrgs > 0 && h.featureLive
+                                                     && h.featureLive[k] != null)
+                            .map(h => Math.round((h.featureLive[k] / h.liveOrgs) * 100));
+                          return p.length > 1 ? Math.abs(p[p.length - 1] - p[0]) : null; };
+        const lines = [...document.querySelectorAll("[data-of-chart-line]")];
+        const sel = lines.map(l => l.getAttribute("data-of-chart-line"));
+        const verts = l => (l.getAttribute("points") || "").trim().split(/\s+/).filter(Boolean).length;
+        // A line drawn from a different series than the feed carries.
+        const wrongLen = lines.filter(l => verts(l) !== pts(l.getAttribute("data-of-chart-line")));
+        // Every plottable feature, from the pills the chart itself offers.
+        const all = [...document.querySelectorAll("[data-of-chart-pill]")]
+          .map(b => b.getAttribute("data-of-chart-pill"));
+        const off = all.filter(k => !sel.includes(k));
+        const minOn = Math.min(...sel.map(k => dl(k) == null ? -1 : dl(k)));
+        const maxOff = off.length ? Math.max(...off.map(k => dl(k) == null ? -1 : dl(k))) : -Infinity;
+        // One line per selected pill, and the selection is the top of the order.
+        const litPills = [...document.querySelectorAll("[data-of-chart-pill]")]
+          .filter(b => (b.getAttribute("data-of-chart-color") || "") !== "").length;
+        const good = lines.length >= 2 && litPills === lines.length
+                     && !wrongLen.length && minOn >= maxOff;
+        document.body.setAttribute("data-rc-fchart", good ? "1" : "0");
+        document.body.setAttribute("data-rc-fchart-seen",
+          lines.length + " line(s) for " + litPills + " lit pill(s) · "
+          + wrongLen.length + " wrong length"
+          + (wrongLen.length ? " (e.g. " + wrongLen[0].getAttribute("data-of-chart-line")
+             + " draws " + verts(wrongLen[0]) + " vertices for "
+             + pts(wrongLen[0].getAttribute("data-of-chart-line")) + " points)" : "")
+          + " · smallest move on screen " + minOn + " vs biggest left off " + maxOff);
+      });
+    } },
+  /* TAKING A LINE OFF MUST NOT REPAINT THE ONES THAT STAY.
+
+     Colour follows the feature, never its position in the list — a reader who
+     unticks one feature and finds that another has changed colour has been
+     told the data moved. The obvious implementation (colour = index into a
+     dense array of selected keys) repaints every series after the one removed,
+     renders identically on first paint, and is invisible to any source
+     assertion. So the case reads the real stroke of each survivor either side
+     of a real click.
+
+     IT ALSO CHECKS THE CAP, in the same pass: the palette was validated six
+     deep, so a seventh pill must refuse rather than reach for a hue nobody
+     checked. */
+  { name: "org features · removing a line leaves the others their own colour",
+    path: "/ps/feature", needs: '[data-rc-fcolor="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-line]");
+      const before = await pg.evaluate(() => {
+        const m = {};
+        document.querySelectorAll("[data-of-chart-line]").forEach(l =>
+          m[l.getAttribute("data-of-chart-line")] = l.getAttribute("stroke"));
+        return m;
+      });
+      // Remove the FIRST series — the one every later slot sits behind.
+      const first = Object.keys(before)[0];
+      await pg.click('[data-of-chart-pill="' + first + '"]');
+      await pg.waitForFunction(k => !document.querySelector('[data-of-chart-line="' + k + '"]'),
+                               {}, first);
+      await pg.evaluate((before2, first2) => {
+        const after = {};
+        document.querySelectorAll("[data-of-chart-line]").forEach(l =>
+          after[l.getAttribute("data-of-chart-line")] = l.getAttribute("stroke"));
+        const survivors = Object.keys(before2).filter(k => k !== first2);
+        const moved = survivors.filter(k => after[k] && after[k] !== before2[k]);
+        const gone = !after[first2];
+        const stillThere = survivors.filter(k => after[k]).length;
+        document.body.setAttribute("data-rc-fcolor",
+          gone && stillThere === survivors.length && !moved.length ? "1" : "0");
+        document.body.setAttribute("data-rc-fcolor-seen",
+          "removed " + first2 + " · " + stillThere + " of " + survivors.length
+          + " survived · " + moved.length + " repainted"
+          + (moved.length ? " (e.g. " + moved[0] + " " + before2[moved[0]]
+             + " → " + after[moved[0]] + ")" : ""));
+      }, before, first);
+    } },
+  /* EVERY LINE IS NAMED ON THE CHART, AND TWO FEATURES AT THE SAME SHARE DO
+     NOT STACK THEIR LABELS.
+
+     Colour alone is not enough here: three of the six validated series colours
+     sit below 3:1 against this page's white card, and the validator's contrast
+     finding obliges visible labels rather than a swatch to match by eye.
+
+     THE CASE PICKS ITS OWN PAIR, and that is the whole design of it. The
+     default five finish at 26, 40, 58, 66 and 82 per cent — nowhere near each
+     other — so over that selection the de-collision code never runs and
+     deleting it changes nothing on screen. It was verified to survive exactly
+     that way before this was rewritten. So the case clears the chart and
+     selects the CLOSEST PAIR the feed happens to hold, which is the only
+     selection where a stacked label and a placed one look different. Computed
+     from the pills rather than hardcoded, or it expires the first morning
+     those two features drift apart. */
+  { name: "org features · two features at the same share still read as two",
+    path: "/ps/feature", needs: '[data-rc-fchartlabel="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-line]");
+      // Clear the default selection, then plot the closest pair.
+      const pair = await pg.evaluate(() => {
+        const pills = [...document.querySelectorAll("[data-of-chart-pill]")];
+        const pct = b => Number((b.textContent.match(/(\d+)%/) || [0, -1])[1]);
+        const lit = pills.filter(b => (b.getAttribute("data-of-chart-color") || "") !== "")
+                         .map(b => b.getAttribute("data-of-chart-pill"));
+        let best = null;
+        for (let a = 0; a < pills.length; a++)
+          for (let b = a + 1; b < pills.length; b++) {
+            const gap = Math.abs(pct(pills[a]) - pct(pills[b]));
+            if (!best || gap < best.gap)
+              best = { gap, keys: [pills[a].getAttribute("data-of-chart-pill"),
+                                   pills[b].getAttribute("data-of-chart-pill")] };
+          }
+        return { lit, pair: best ? best.keys : [], gap: best ? best.gap : -1 };
+      });
+      for (const k of pair.lit) await pg.click('[data-of-chart-pill="' + k + '"]');
+      for (const k of pair.pair) await pg.click('[data-of-chart-pill="' + k + '"]');
+      await pg.waitForFunction(() => document.querySelectorAll("[data-of-chart-line]").length === 2);
+      await pg.evaluate((gap) => {
+        const lines = [...document.querySelectorAll("[data-of-chart-line]")]
+          .map(l => l.getAttribute("data-of-chart-line"));
+        const labs = [...document.querySelectorAll("[data-of-chart-endlabel]")];
+        const named = lines.filter(k =>
+          labs.some(t => t.getAttribute("data-of-chart-endlabel") === k
+                         && (t.textContent || "").trim().length > 2));
+        const ys = labs.map(t => Number(t.getAttribute("y")) || 0).sort((a, b) => a - b);
+        const collided = ys.filter((y, i) => i && y - ys[i - 1] < 10).length;
+        /* AND THE LABEL HAS TO FIT THE GUTTER IT LIVES IN. A name running off
+           the right edge of the viewBox is silently cropped by the SVG \u2014 it
+           throws nothing, the label is still "present" by every other test
+           here, and the reader loses the end of it. That shipped at r:150 and
+           only a screenshot showed it, so it is measured from the real text. */
+        const svg = document.querySelector("svg.fchart");
+        const vbW = svg ? svg.viewBox.baseVal.width : 0;
+        const clipped = labs.filter(t => {
+          const bb = t.getBBox ? t.getBBox() : null;
+          return bb && (bb.x + bb.width) > vbW;
+        });
+        document.body.setAttribute("data-rc-fchartlabel",
+          lines.length === 2 && named.length === 2 && !collided && !clipped.length ? "1" : "0");
+        document.body.setAttribute("data-rc-fchartlabel-seen",
+          named.length + " of " + lines.length + " named · the pair is " + gap
+          + " point(s) apart · closest labels "
+          + (ys.length > 1 ? (ys[1] - ys[0]).toFixed(1) : "n/a") + "px apart"
+          + (collided ? " \u2014 STACKED" : "")
+          + " \u00b7 " + clipped.length + " clipped"
+          + (clipped.length ? " (e.g. " + clipped[0].textContent.trim() + " ends at "
+             + (clipped[0].getBBox().x + clipped[0].getBBox().width).toFixed(0)
+             + " of " + vbW + ")" : ""));
+      }, pair.gap);
+    } },
   /* THE SEARCH MUST REACH FIELDS THAT ARE NOT ON SCREEN. "calendar" matching
      Calendar Sync proves almost nothing — the name is right there. The
      discriminating term is one that appears ONLY in the description, because

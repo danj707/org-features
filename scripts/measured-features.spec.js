@@ -460,8 +460,9 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   ok(/45 rows|channel is filtered/i.test(byKey.marketing_email.adoption_definition),
      "...and why the channel has to be filtered as well");
 
-  // 3. AUTOMATED WAITLISTS ARE NOT WAITLISTS. 32,220 manual sections against
-  //    SIXTEEN automated ones, at two orgs, neither of them live.
+  // 3. AUTOMATED WAITLISTS ARE NOT WAITLISTS. Measured 2026-09-20: 36,515
+  //    'manual' sections across 99 orgs against 136 'automated' ones across
+  //    three, of which ONE is live — Apex, at 118 of those 136.
   ok(/waitlist_config ->> 'type' = 'automated'/.test(code),
      "automated waitlists key on the type, not on the config existing");
   ok(/section WHERE deleted_at IS NULL AND waitlist_config IS NOT NULL/.test(code),
@@ -469,12 +470,46 @@ const TRAPPED = ["skill_levels", "custom_staff_roles", "storefront_products",
   const aw = usedBy("automated_waitlist").filter(s2 => live.has(s2)).length;
   const wl = usedBy("waitlist").filter(s2 => live.has(s2)).length;
   ok(aw < wl, `automated waitlists reach fewer live orgs than waitlists — ${aw} against ${wl}`);
-  /* ZERO LIVE ORGS IS AN ANSWER, NOT A BROKEN FILTER, and it is the reading
-     the combined 82% hides. The guard is that the metric still finds the two
-     PRE-LAUNCH orgs that have configured it — a filter matching nothing at
-     all anywhere would be the broken case. */
-  eq(aw, 0, "no LIVE organization has an automated waitlist yet — that is the honest answer the combined waitlist figure hides");
+  /* A STRICT SUBSET, ORG BY ORG. This is the durable form of the claim this
+     block used to make as `eq(aw, 0)` — "no LIVE organization has an
+     automated waitlist yet" — and that assertion is why the nightly bake
+     failed on the 17th, 18th and 19th of September 2026.
+
+     IT WAS A MEASUREMENT OF THE WORLD WEARING A SPEC'S CLOTHES. Nothing in
+     this repository can hold it true: it came out of production and it stayed
+     true only until an organization switched the feature on. On 2026-09-17
+     Apex did, across 118 sections, and became the first live adopter. The
+     metric was right, the query was right, the snapshot it produced was
+     right — and the spec failed the run, so the push never happened and the
+     dashboard served 16 September for three days while announcing that it
+     refreshes daily. A GUARD WITH ZERO HEADROOM FAILS ON SUCCESS, and what
+     tripped it is the adoption this page exists to notice.
+
+     What replaces it cannot expire, because it is true by construction:
+     `waitlist_config ->> 'type' = 'automated'` implies `waitlist_config IS
+     NOT NULL`, so every automated org is a waitlist org whatever any of them
+     does next. It fails only if the two metrics stop being parent and child
+     — which is the thing actually worth catching, and is what a filter that
+     had started matching the wrong rows would look like. Same shape as the
+     payment-plan subset check above.
+
+     (Second instance in this repo. The trend render case expired the same way
+     on 2026-09-12, by sourcing its negative half from live data. When an
+     assertion's truth is a fact about the fleet rather than about the code,
+     write the invariant instead — and if the number is worth keeping, keep
+     it in the comment, where it dates itself.) */
+  {
+    const parent = new Set(usedBy("waitlist"));
+    const stray = usedBy("automated_waitlist").filter(s2 => !parent.has(s2));
+    eq(stray.length, 0,
+       "every organization with an automated waitlist also shows as having a waitlist at all"
+       + (stray.length ? " - " + stray.join(", ") : ""));
+  }
+  /* NOT MATCHING NOTHING — the half of the old assertion that was always a
+     real guard, and the one its comment claimed was doing the work. A filter
+     keyed on a value that no longer existed would read 0% everywhere and look
+     exactly like a feature nobody has switched on. */
   ok(usedBy("automated_waitlist").length >= 2,
-     "...while the metric does find the pre-launch organizations that configured it, so it is not simply matching nothing");
+     "...while the metric does find the organizations that configured it, so it is not simply matching nothing");
 }
 

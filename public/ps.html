@@ -186,6 +186,32 @@
   .qvchip.on { background: var(--brand); border-color: var(--brand); color: #fff; }
   .qvn { font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
   .qvchip.on .qvn { color: rgba(255,255,255,.8); }
+  /* The adoption chart. The pill row IS the legend — each selected pill
+     carries its series colour, the feature's name and its current share, so
+     identity never rests on the colour alone (three of the six series colours
+     sit below 3:1 on this white card). */
+  .fchart-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+                  padding: 12px 16px 10px; border-bottom: 1px solid var(--line); }
+  .fchart-pill { gap: 6px; }
+  .fchart-pill.locked { opacity: .45; cursor: not-allowed; }
+  .fchart-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+  .fchart-more { color: var(--brand-2); }
+  .fchart-wrap { position: relative; padding: 10px 16px 2px; }
+  .fchart { display: block; width: 100%; height: auto; }
+  .fchart-ax { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  /* Text wears text tokens, never the series colour — the line and its end dot
+     carry identity, the label stays readable ink. */
+  .fchart-end { font-size: 11.5px; fill: var(--ink); font-weight: 600; }
+  .fchart-endv { fill: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .fchart-tip { position: absolute; top: 14px; transform: translateX(-50%); pointer-events: none;
+                background: #fff; border: 1px solid var(--line); border-radius: 8px;
+                box-shadow: 0 4px 14px rgba(16,24,40,.10); padding: 7px 10px; font-size: 12px;
+                min-width: 130px; z-index: 5; }
+  .fchart-tipd { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+  /* Values lead, names follow. */
+  .fchart-tipr { display: flex; align-items: center; gap: 6px; white-space: nowrap; line-height: 1.55; }
+  .fchart-tipr b { font-variant-numeric: tabular-nums; min-width: 30px; }
+  .fchart-tipr span:last-child { color: var(--muted); }
   .qvnote { font-size: 12px; color: var(--muted); padding: 8px 16px;
             background: #fbfcfe; border-bottom: 1px solid var(--line); }
   .qvnote b { color: var(--ink); }
@@ -1280,6 +1306,326 @@
     peers.sort((a, b) => b - a);
     return { rank: peers.filter(v => v > mine).length + 1, of: peers.length,
              median: peers[Math.floor((peers.length - 1) / 2)] };
+  }
+
+  /* ── ADOPTION OVER TIME ───────────────────────────────────────────────
+     Dan: "I want a fill rate chart similar to this one from our reporting
+     project. what lets me track the adoption rate of rec features."
+
+     The table below this answers "where has each feature got to". This
+     answers "which way is it going", which is the question a table of
+     percentages cannot be read for — the Moving card above already counts
+     the features whose share has changed, and this is that card's contents
+     drawn out.
+
+     IT READS `ofFeatureTrend` AND DERIVES NOTHING. That helper is already
+     the one definition of a feature's adoption series, and it is what the
+     sparkline in the table's Trend column plots — so a line here and the
+     dot on its own row cannot disagree about the same feature. Two
+     derivations of one series is how a chart comes to contradict the table
+     it sits above.
+
+     DEFAULTS TO THE MOVERS, and that is measured rather than preferred.
+     On 2026-09-16, of the 60 tracked features, exactly TEN had moved at all
+     over the ten days of history; the top eight by adoption are all flat.
+     Opening on "most adopted" therefore draws five ruler-straight lines and
+     teaches nothing, while opening on "moved most" draws ai_assistant
+     climbing 59→66. One ordering does both: by movement, then by adoption,
+     then by name — so a fleet where nothing has moved yet still opens on
+     its biggest features rather than on an empty chart. */
+  const OF_SERIES_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"];
+  /* SIX, BECAUSE SIX IS WHAT WAS VALIDATED. These are the first six slots of
+     the categorical order, checked as a set against this page's white card:
+     worst adjacent colour-vision ΔE 9.1, worst normal-vision ΔE 19.6, both
+     above their floors. A seventh series would be a hue nobody checked, so
+     the pills refuse rather than inventing one — and three of the six sit
+     below 3:1 contrast on white, which is why every line is labelled at its
+     end and every pill carries its name. Colour is never the only channel. */
+  const OF_CHART_MAX = OF_SERIES_COLORS.length;
+  const OF_CHART_OPEN = 5;
+
+  function ofChartOrder(rows) {
+    return (rows || []).filter(r => r && r.trend && r.trend.ready).slice().sort((a, b) => {
+      const da = Math.abs(a.trend.delta), db = Math.abs(b.trend.delta);
+      if (db !== da) return db - da;
+      const pa = a.pct == null ? -1 : a.pct, pb = b.pct == null ? -1 : b.pct;
+      if (pb !== pa) return pb - pa;
+      return String(a.name).localeCompare(String(b.name));
+    });
+  }
+  function ofChartDefault(rows) {
+    return ofChartOrder(rows).slice(0, OF_CHART_OPEN).map(r => r.key);
+  }
+
+  /* COLOUR FOLLOWS THE FEATURE, NOT ITS RANK. The slot list is positional and
+     a removed feature leaves a HOLE rather than closing the gap, so taking
+     one line off the chart cannot repaint the ones that stay — a reader who
+     unticks Payment Plans must not find that SMS has silently become orange.
+     That is the whole reason this is not `sel.indexOf(key)` over a dense
+     array, which is the obvious implementation and repaints on every
+     removal. */
+  function ofChartToggle(slots, key) {
+    const next = (slots || []).slice();
+    const at = next.indexOf(key);
+    if (at >= 0) {
+      next[at] = null;
+      while (next.length && next[next.length - 1] == null) next.pop();
+      return next;
+    }
+    const hole = next.indexOf(null);
+    if (hole >= 0) { next[hole] = key; return next; }
+    if (next.length >= OF_CHART_MAX) return next;   // full: refuse, never cycle
+    next.push(key);
+    return next;
+  }
+  function ofChartCount(slots) { return (slots || []).filter(Boolean).length; }
+
+  function ofChartSeries(rows, slots) {
+    const byKey = {};
+    (rows || []).forEach(r => { if (r && r.key) byKey[r.key] = r; });
+    return (slots || []).map((k, i) => {
+      const r = k ? byKey[k] : null;
+      if (!r || !r.trend || !r.trend.ready) return null;
+      return { key: r.key, name: r.name, color: OF_SERIES_COLORS[i % OF_SERIES_COLORS.length],
+               points: r.trend.points, last: r.trend.last, delta: r.trend.delta };
+    }).filter(Boolean);
+  }
+  /* THE X DOMAIN IS THE UNION OF THE DATES THE SELECTED SERIES ACTUALLY
+     CARRY — never a generated range. A feature first measured on the 11th has
+     six points against everything else's ten, and it must START on the 11th
+     rather than being given four zeroes to sit on; the repo has already
+     shipped that bug once and the guard against it is that a line's vertex
+     count equals its point count. */
+  function ofChartDates(series) {
+    const seen = {};
+    (series || []).forEach(s => (s.points || []).forEach(p => { seen[p.date] = 1; }));
+    return Object.keys(seen).sort();
+  }
+  /* Label about eight of them, whatever the history has grown to — the axis
+     gains a date every morning and an unthinned axis collides with itself
+     inside a fortnight. Always the last one, so "where it ends" is readable. */
+  function ofChartTicks(dates, max) {
+    const n = (dates || []).length, cap = max || 10;
+    if (!n) return [];
+    if (n <= cap) return dates.map((_, i) => i);
+    const step = (n - 1) / (cap - 1), out = [];
+    for (let i = 0; i < cap; i++) out.push(Math.round(i * step));
+    return out.filter((v, i, a) => a.indexOf(v) === i);
+  }
+  function ofChartDateLabel(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+    if (!m) return String(iso || "");
+    /* FROM THE PARTS, never `new Date(iso)` — a bare ISO date is UTC midnight
+       and renders as the day before across the Americas, which would put every
+       point on this axis one day early. */
+    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return MON[Number(m[2]) - 1] + " " + Number(m[3]);
+  }
+  /* PUSH OVERLAPPING END LABELS APART rather than letting them collide. Two
+     features three points apart put their labels on top of each other and
+     both become unreadable; the line still ends where the data says, only the
+     text is nudged. */
+  function ofChartLabelY(ys, minGap, lo, hi) {
+    const gap = minGap || 13;
+    const order = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
+    let prev = -Infinity;
+    order.forEach(o => { o.y = Math.max(o.y, prev + gap); prev = o.y; });
+    const over = order.length ? order[order.length - 1].y - hi : 0;
+    if (over > 0) {
+      let p = Infinity;
+      for (let j = order.length - 1; j >= 0; j--) {
+        order[j].y = Math.min(order[j].y, p - gap);
+        p = order[j].y;
+      }
+      order.forEach(o => { o.y = Math.max(o.y, lo); });
+    }
+    const out = ys.slice();
+    order.forEach(o => { out[o.i] = o.y; });
+    return out;
+  }
+
+  /* THE RIGHT GUTTER IS SIZED TO THE LABELS THAT LIVE IN IT. At 150 the
+     longest name plus its percentage ran off the viewBox and "Store Credit /
+     Accoun… 82%" lost the per-cent sign — nothing throws, the SVG just crops
+     it, and only a screenshot shows it. The render case measures each
+     label's real getBBox against this width now. */
+  const OF_CHART_BOX = { w: 960, h: 264, l: 38, r: 190, t: 14, b: 30 };
+  const OF_CHART_NAME_MAX = 20;
+
+  function FeatureAdoptionChart({ rows }) {
+    const plottable = ofChartOrder(rows);
+    const [slots, setSlots] = React.useState(() => ofChartDefault(rows));
+    const [showAll, setShowAll] = React.useState(false);
+    const [hoverIdx, setHoverIdx] = React.useState(null);
+    const svgRef = React.useRef(null);
+
+    const series = ofChartSeries(rows, slots);
+    const dates = ofChartDates(series);
+    const B = OF_CHART_BOX;
+    const pw = B.w - B.l - B.r, ph = B.h - B.t - B.b;
+    const xAt = i => dates.length > 1 ? B.l + (i / (dates.length - 1)) * pw : B.l + pw / 2;
+    const yAt = v => B.t + ((100 - v) / 100) * ph;
+    const idxOf = {};
+    dates.forEach((d2, i) => { idxOf[d2] = i; });
+
+    const full = ofChartCount(slots) >= OF_CHART_MAX;
+    const PILLS_SHOWN = 14;
+    const pills = showAll ? plottable : plottable.slice(0, PILLS_SHOWN);
+    const colorOf = k => { const i = slots.indexOf(k); return i < 0 ? null : OF_SERIES_COLORS[i]; };
+
+    /* THE READER AIMS AT A DATE, NOT AT A 2px LINE — the hairline snaps to the
+       nearest bake and the readout lists every series at it, so a value never
+       has to be chased by landing the pointer on a stroke. */
+    const onMove = (ev) => {
+      const el = svgRef.current;
+      if (!el || dates.length < 2) return;
+      const box = el.getBoundingClientRect();
+      if (!box.width) return;
+      const x = ((ev.clientX - box.left) / box.width) * B.w;
+      const t = (x - B.l) / (pw || 1);
+      setHoverIdx(Math.max(0, Math.min(dates.length - 1, Math.round(t * (dates.length - 1)))));
+    };
+
+    const endYs = ofChartLabelY(series.map(s => yAt(s.last)), 13, B.t + 4, B.t + ph);
+
+    return e("div", { className: "panel", "data-of-chart": series.length,
+                      "data-of-chart-plottable": plottable.length },
+      e("h2", null, "Adoption over time",
+        e("span", { className: "hint" },
+          "share of the " + (rows && rows[0] ? rows[0].liveOrgs : 0)
+          + " live organizations using each feature · click a feature to add or remove its line")),
+
+      plottable.length === 0
+        /* NOT AN EMPTY AXIS. Two comparable bakes is the floor, and on the
+           morning after a catalog change most features are below it — an
+           empty grid with no explanation reads as a broken chart. */
+        ? e("div", { className: "qvnote", "data-of-chart-empty": "nohistory" },
+            "No feature has two comparable measurements yet. The nightly bake adds a point "
+            + "every morning, so this fills in from tomorrow.")
+        : e(React.Fragment, null,
+            e("div", { className: "fchart-pills", "data-of-chart-sel": slots.filter(Boolean).join(",") },
+              pills.map(r => {
+                const col = colorOf(r.key);
+                const on = !!col;
+                /* A pill that cannot be turned on says why, rather than
+                   looking broken when clicking it does nothing. */
+                const locked = !on && full;
+                return e("button", {
+                  key: r.key,
+                  className: "qvchip fchart-pill" + (on ? " on" : "") + (locked ? " locked" : ""),
+                  "data-of-chart-pill": r.key,
+                  "data-of-chart-color": col || "",
+                  disabled: locked,
+                  title: locked
+                    ? "Six lines is the most this chart will draw — take one off to add another"
+                    : r.name + " · " + r.pct + "% of live organizations · "
+                      + (r.trend.delta > 0 ? "+" : "") + r.trend.delta + " points since " + r.trend.from,
+                  style: on ? { background: col, borderColor: col, color: "#fff" } : null,
+                  onClick: () => setSlots(s => ofChartToggle(s, r.key)),
+                },
+                  e("span", { className: "fchart-dot", style: { background: on ? "#fff" : "#cbd5e1" } }),
+                  r.name,
+                  e("span", { className: "qvn" },
+                    r.pct + "%",
+                    r.trend.delta ? (r.trend.delta > 0 ? " ▲" : " ▼") + Math.abs(r.trend.delta) : ""));
+              }),
+              plottable.length > PILLS_SHOWN
+                ? e("button", { className: "qvchip fchart-more", "data-of-chart-more": showAll ? "less" : "more",
+                                onClick: () => setShowAll(v => !v) },
+                    showAll ? "Show fewer" : "+" + (plottable.length - PILLS_SHOWN) + " more")
+                : null),
+
+            series.length === 0
+              ? e("div", { className: "qvnote", "data-of-chart-empty": "noselection" },
+                  "No feature selected. Click one above to plot how its share of the live fleet has moved.")
+              : e("div", { className: "fchart-wrap" },
+                  e("svg", { className: "fchart", ref: svgRef, viewBox: "0 0 " + B.w + " " + B.h,
+                             preserveAspectRatio: "xMidYMid meet", role: "img",
+                             "aria-label": "Adoption over time for " + series.map(s => s.name).join(", "),
+                             onMouseMove: onMove, onMouseLeave: () => setHoverIdx(null) },
+                    /* 0-100 FIXED, and it does not rescale when a line is added
+                       or removed. A share of the fleet is meaningful against the
+                       whole fleet, the lines are only comparable with each other
+                       on a shared axis, and an axis that moved on every toggle
+                       would make picking a feature look like a change in the
+                       data. The cost is that a 3-point move is a gentle slope —
+                       so the movement is also written on the pill and in the
+                       readout, where it is exact. */
+                    [0, 25, 50, 75, 100].map(v =>
+                      e("g", { key: v },
+                        e("line", { x1: B.l, x2: B.l + pw, y1: yAt(v), y2: yAt(v),
+                                    stroke: "#eef2f7", strokeWidth: 1 }),
+                        e("text", { x: B.l - 8, y: yAt(v) + 3.5, textAnchor: "end",
+                                    className: "fchart-ax" }, v + "%"))),
+                    ofChartTicks(dates, 10).map(i =>
+                      e("text", { key: i, x: xAt(i), y: B.h - 10, textAnchor: "middle",
+                                  className: "fchart-ax" }, ofChartDateLabel(dates[i]))),
+
+                    hoverIdx != null
+                      ? e("line", { x1: xAt(hoverIdx), x2: xAt(hoverIdx), y1: B.t, y2: B.t + ph,
+                                    stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "3 3",
+                                    "data-of-chart-hair": dates[hoverIdx] })
+                      : null,
+
+                    series.map(s => {
+                      const pts = s.points.filter(p => idxOf[p.date] != null);
+                      return e("polyline", {
+                        key: s.key, "data-of-chart-line": s.key,
+                        "data-of-chart-pts": pts.length,
+                        points: pts.map(p => xAt(idxOf[p.date]) + "," + yAt(p.v)).join(" "),
+                        fill: "none", stroke: s.color, strokeWidth: 2,
+                        strokeLinecap: "round", strokeLinejoin: "round" });
+                    }),
+                    /* The end dot carries a surface ring, so two lines that
+                       finish at the same share still read as two. */
+                    series.map(s => {
+                      const last = s.points[s.points.length - 1];
+                      return e("circle", { key: s.key, cx: xAt(idxOf[last.date]), cy: yAt(last.v),
+                                           r: 4, fill: s.color, stroke: "#fff", strokeWidth: 2 });
+                    }),
+                    hoverIdx != null
+                      ? series.map(s => {
+                          const p = s.points.find(x => x.date === dates[hoverIdx]);
+                          return p ? e("circle", { key: s.key, cx: xAt(hoverIdx), cy: yAt(p.v),
+                                                   r: 3.5, fill: s.color, stroke: "#fff", strokeWidth: 2 }) : null;
+                        })
+                      : null,
+                    /* DIRECT LABELS, and they are not decoration: three of the
+                       six series colours sit below 3:1 on white, so the name
+                       has to be readable without matching a hue to a swatch. */
+                    series.map((s, i) =>
+                      e("text", { key: s.key, x: B.l + pw + 9, y: endYs[i] + 3.5,
+                                  className: "fchart-end", "data-of-chart-endlabel": s.key },
+                        s.name.length > OF_CHART_NAME_MAX
+                          ? s.name.slice(0, OF_CHART_NAME_MAX - 1) + "…" : s.name,
+                        e("tspan", { className: "fchart-endv" }, "  " + s.last + "%")))),
+
+                  hoverIdx != null
+                    ? e("div", { className: "fchart-tip", "data-of-chart-tip": dates[hoverIdx],
+                                 style: { left: ((xAt(hoverIdx) / B.w) * 100) + "%" } },
+                        e("div", { className: "fchart-tipd" }, ofChartDateLabel(dates[hoverIdx])),
+                        series.map(s => {
+                          const p = s.points.find(x => x.date === dates[hoverIdx]);
+                          /* A SERIES WITH NO POINT AT THIS DATE IS OMITTED, not
+                             shown as zero — it was not measured yet. */
+                          return p ? e("div", { key: s.key, className: "fchart-tipr" },
+                            e("span", { className: "fchart-dot", style: { background: s.color } }),
+                            e("b", null, p.v + "%"),
+                            e("span", null, s.name)) : null;
+                        }))
+                    : null),
+
+            /* WHAT THIS IS SHOWING AND SINCE WHEN, stated. The series starts at
+               the first bake that recorded it, which is far more recent than
+               the dashboard itself, and a chart whose window is unstated reads
+               as though it covers all of history. */
+            e("div", { className: "qvnote", "data-of-chart-note": dates.length },
+              e("b", null, "Opens on the features that have moved most"), " · ",
+              dates.length + " daily measurement" + (dates.length === 1 ? "" : "s"),
+              dates.length ? " from " + ofChartDateLabel(dates[0]) + " to "
+                             + ofChartDateLabel(dates[dates.length - 1]) : "",
+              " · ", plottable.length + " of " + (rows || []).length
+              + " features have enough history to plot")));
   }
 
   function Spark({ series }) {
@@ -2649,6 +2995,11 @@
             .filter(Boolean).join(" \u00b7 ") +
           ". An excluded organization leaves the denominator too, so these shares are not "
           + "comparable with a differently-scoped view.") : null,
+
+        /* ABOVE THE TABLE IT PLOTS, and below the Moving card it expands —
+           the chart's pills and the table's rows are the same population, so
+           a reader who spots a line climbing scrolls straight to the row. */
+        e(FeatureAdoptionChart, { rows: fall }),
 
         e("div", { className: "panel" },
           e("h2", null, "Feature adoption across the fleet",
