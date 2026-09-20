@@ -1238,3 +1238,290 @@ derivation into `ofDerive` moved the org sort out of the `Features` slice and
 broke an assertion that had nothing to do with ordering. It no longer slices a
 component — there is exactly one place in the file that sorts `d.orgs`, and
 matching it wherever it lives is the assertion.
+
+## A DARK MODE, AND 294 COLOURS THAT COULD NOT THEME (2026-09-20)
+
+Dan, with an arrow drawn at the bottom-left of the sidebar: *"and finally
+another item, toggle for dark/light mode here."*
+
+The toggle is two buttons in the sidebar foot. The work was everything under
+it.
+
+### THE PAGE WAS ALREADY PART DARK, AND THAT DECIDED THE PALETTE
+
+Measured before anything was written: **476 hex literals, 100 distinct**, and
+**182 of them are the CX capacity grid and launch pipeline** — which have
+always been slate cards on a slate grid. The sidebar has always been navy.
+
+So dark mode is not a look invented here. `--bg #0f172a` / `--card #1e293b`
+are **the values that region already used**, which is why the two places that
+looked anomalous on a white page stop being anomalous, and why that whole
+region needed no dark variants at all: it is already wearing them.
+
+That leaves **294 literals in scope** — 122 in the stylesheet, 172 in React
+inline styles.
+
+### AN INLINE STYLE CAN THEME. A HARDCODED VALUE CANNOT.
+
+The sibling project's rule reads *"a themeable property cannot live in an
+inline style"*, and taken literally it would have made this a rewrite: 172 of
+the 294 are `style={{ background: "#dcfce7" }}`, which no second stylesheet
+can ever reach.
+
+**The rule is about the VALUE, not the attribute.** `style={{ background:
+"var(--good-bg)" }}` resolves against the cascade at paint time and themes
+itself. So every one of those sites became a token reference in place, with no
+component moved and no class invented.
+
+**AND `var()` RESOLVES IN AN SVG PRESENTATION ATTRIBUTE TOO — measured, not
+assumed.** I was about to build a JS palette pair plus a React context to
+carry the theme down to the chart, on the belief that `stroke="var(--x)"`
+renders black. A four-line Puppeteer probe against this project's own
+Chromium says both forms work:
+
+| | computed fill |
+|---|---|
+| `<circle fill="var(--t)">` | `rgb(255, 0, 0)` |
+| `<circle style="fill:var(--t)">` | `rgb(255, 0, 0)` |
+
+So `OF_SERIES_COLORS` is `["var(--series-1)", …]` and the six dark steps live
+in the stylesheet beside the light ones. No JS palette, no context, no prop
+threading — and the line and its own legend pill read the same token, so they
+structurally cannot drift.
+
+### THE SERIES PALETTE IS RE-VALIDATED, NOT DARKENED
+
+The dark column is the data-viz reference palette's own dark steps, run
+through the validator **against this page's dark card rather than the
+validator's default surface** — contrast and band results only mean anything
+against the surface the chart actually renders on:
+
+```
+Palette (dark, surface #1e293b, categorical): 6 slots
+  [PASS] Lightness band      all 6 inside L 0.48–0.67
+  [PASS] Chroma floor        all 6 >= 0.1
+  [PASS] CVD separation      worst adjacent ΔE 8.4 (protan)
+  [PASS] Normal-vision floor worst adjacent ΔE 19.3
+  [WARN] Contrast vs surface #008300 at 2.96
+```
+
+The one WARN is legal **only** under the relief rule, and the relief already
+exists: every line carries a direct label at its right edge and every pill
+carries the feature's name. Colour is not the only channel here, which is why
+the chart's box reserves 190px on the right.
+
+**A finding worth recording: the DARK pills are better than the light ones.**
+White on each selected pill measures 3.07–4.95:1 in dark and **2.17–4.42 in
+light, where three slots fail 3:1 outright**. That is pre-existing light-mode
+behaviour and is deliberately NOT changed here — Dan asked for a theme, not a
+palette revision, and a light-mode colour change is a visible edit to a page
+people already read.
+
+### THE STAMP GOES ON BEFORE ANYTHING PAINTS
+
+Nine lines in `<head>`, before React loads. Applied from an effect instead,
+a dark-mode viewer gets a full-brightness white flash on every single load —
+which is worse than having no toggle.
+
+- **No stamp means "follow the OS".** The media query handles that case, so an
+  unpinned viewer needs no JavaScript at all to get the right mode.
+- **An unrecognised stored value is no choice, not a default to light.** A
+  corrupt or hand-edited key degrades to following the OS, which is what
+  somebody who never touched the toggle gets.
+- **It fails silently.** `localStorage` throws in a locked-down browser and a
+  colour preference is not worth a blank page.
+
+### THE TOGGLE HAS TO BEAT THE OS IN BOTH DIRECTIONS
+
+The dark values are declared **twice** — once under `@media
+(prefers-color-scheme: dark)` for the OS setting and once under
+`:root[data-theme="dark"]` for the stamp. The media block is written
+`:root:where(:not([data-theme="light"]))`: `:where()` gives it zero
+specificity so the stamp wins, and the `:not()` guard is what lets an explicit
+**Light** beat an OS-dark machine.
+
+**That second half is the one that actually breaks**, and it breaks silently
+in one direction only: without the guard, a viewer on a dark laptop clicks
+Light and nothing happens. It has its own render case for exactly that reason.
+
+### TWO BUTTONS, NOT ONE
+
+A single toggle has to be labelled either with the mode you are in or the mode
+you would get, and every reader guesses the other one. Both options are on
+screen with the live one filled — the same argument `.slicetab` already makes
+for filling the active tab rather than underlining it.
+
+It wears `--nav-ink` / `--nav-ink-strong`, **fixed in both modes**, because the
+sidebar is dark either way: a control on the nav reading `--ink` inverts while
+the surface under it does not. The same trap caught three sites during the
+sweep — the logo, the active nav item, and the "Signed in as" name had all been
+mapped to `--card` because they were `#fff`.
+
+**And text on a brand FILL is `--on-accent`, never `--card`.** `#fff` meant
+three different things in this file: a card surface, nav ink, and the label on
+a filled button. One blanket map turned all three into `var(--card)`, which in
+dark mode is slate — i.e. an invisible logo and an unreadable Save button.
+Caught by auditing every replacement rather than by the run being green.
+
+### THE SHARED PILL READ TOKENS NOBODY DECLARED — a hole in my own sweep
+
+`/feature-pills.js` is ONE heat ramp serving the themed CX shell and the
+light-only public dashboard, and it held **six hardcoded colours** the sweep
+could never see, because the sweep only scanned `ps.html`. In dark mode a
+"not measured" pill painted `#f8fafc` — a white chip on a slate card — and a
+measured **zero** painted `#fff` with `#cbd5e1` ink, which is near-white on
+white and was barely legible in LIGHT mode either.
+
+The ramp itself is translucent (`rgba(15,111,92,α)` over the card), so it
+themes for free — **except for its hue**, and that is the part worth keeping:
+on white, a deep teal at rising alpha reads as *more*; on a dark card the same
+hue reads as *less*, because it is closer to the ground than the card is. The
+dark step is a LIGHT teal so "more" is always further from the surface.
+
+Both readers now declare the seven tokens the file reads, and the spec asserts
+that in all three scopes — light shell, dark shell, public dashboard. An
+undeclared token paints **no background at all**, which on a metric pill is an
+invisible number rather than an obvious break, so it is a thing to assert
+rather than a thing to notice.
+
+*Generalise it: a sweep that scans one file is not a sweep. The shared file is
+exactly where the untokenised colour survives, because it belongs to neither
+page.*
+
+### TWO OF THE PILL'S THREE BRANCHES CANNOT BE REACHED IN A BROWSER
+
+The ramp has three branches — not measured, a real zero, and the wash — and
+the render case can only ever exercise two of them, which mutation testing is
+what showed:
+
+- **The first fixture took the two alphabetically-first orgs**, which are
+  pre-launch: every metric is a real zero, so `t` is never computed and the
+  WASH never renders. An inverted-ink mutation survived it. It picks the two
+  busiest orgs out of the snapshot now (SF and Apex) and requires more than
+  one distinct fill, so a run that exercised nothing fails rather than passes.
+- **The `v == null` branch is unreachable at all: the snapshot carries ZERO
+  null cells across all 960.** A browser mutation setting `--pill-null-bg` to
+  a light value SURVIVES, and no fixture change fixes that — it is a fact
+  about the fleet, not a hole in the case.
+
+So that claim is made where it can be computed: the spec asserts every dark
+pill background is actually dark and every light one light, from the token
+values. Same for the ramp's DIRECTION — carrying the light teal into dark
+mode inverts the scale silently while every pill still renders and every
+label keeps its contrast, so the browser cannot see it; the spec composites
+the wash at both ends of the alpha range and requires it to move AWAY from
+the card as the value rises.
+
+*Generalise it: when a branch cannot be reached by the real data, assert it
+where the values live rather than pretending a render case covers it.*
+
+### AND I DISCARDED MY OWN UNCOMMITTED WORK WITH `git checkout`
+
+Mid-way through mutation testing the pill, a loop restored `public/ps.html`
+with `git checkout` between mutations — and the dark-mode work on that file
+was **uncommitted**, so the whole thing went. Recovered from a copy taken
+twenty minutes earlier.
+
+The sibling project's notes carry this rule verbatim (*"a mutation runner must
+restore from the bytes it saved, never from git"*) and I broke it anyway, in
+the ad-hoc loop rather than in the runner — which is exactly where that note
+says it happens. The two halves of the remedy: **commit before mutating**, and
+restore from a saved copy. Both were applied after the fact; the second
+mutation round ran against `/tmp/safe_ps.html`.
+
+**The tell that something was wrong was in the measurement, not in an error.**
+Two unrelated mutations both reported *"1 distinct fill"* — every pill the same
+colour, which is what `rgba(,0.63)` computes to when its token has gone. A
+mutation whose failure message does not describe the mutation is worth
+reading twice.
+
+### THE INK SWITCH KEEPS ITS THRESHOLD, and the measurement says why
+
+The label flips from soft to strong ink at `t > 0.6`, and composited against
+the real wash that leaves a contrast dip right at the crossover. Measured
+across the whole ramp at six candidate thresholds:
+
+| switch at | worst ratio, either mode | where |
+|---|---|---|
+| 0.60 (shipped) | **1.90:1** | light, t=0.60 |
+| 0.70 | 2.10:1 | light, t=0.70 |
+| 0.80 | 2.32:1 | light, t=0.80 |
+
+**Every one of those worst cases is in LIGHT mode** — dark's own worst is
+**2.83:1** at the same threshold, i.e. the new mode is better than the one
+that has been shipping. So the threshold stays where it is: moving it would
+change a page people read daily, to fix a dip that predates this work and is
+worse on the side I am not touching. Recorded rather than quietly adjusted.
+
+### Guards
+
+`scripts/theme.spec.js` (**50 assertions, in CI**). The load-bearing one is the
+**sweep**: no hex may survive anywhere in `ps.html` outside the token
+declarations and the already-dark CX region, each named individually with its
+reason. A regex-shaped exemption quietly widens into "any block I did not want
+to fix".
+
+The second is **parity**: a token declared in `:root` and forgotten in the dark
+scope keeps its LIGHT value on a dark page, and that is invisible at every call
+site because the token looks correctly used. Both scopes must declare the same
+names, and the two dark sites must agree on every value — or OS-dark and
+toggled-dark are two different products.
+
+Mutation-tested **fifteen ways, all failing by an assertion that names the
+defect**: a stray hex in an inline style, a token dropped from dark, the two
+dark sites disagreeing, the `:not()` guard removed, the head stamp removed, the
+head stamp moved below React, the storage key drifting, the OS beating a pin,
+`themeStamp` defaulting to light, the toggle unmounted, the switch reading the
+page's ink, `--nav-ink` flipping between modes, the dark series palette one slot
+short, `OF_SERIES_COLORS` back to hex, and a typo'd token name.
+
+**Three of my own mutations were imprecise and were fixed rather than
+accepted.** Two removed a token from only ONE dark scope, so they were caught
+by the sites-agree assertion instead of the parity assertion they were written
+for — *a mutation caught by the wrong assertion has not shown that assertion
+works*. The third was a no-op against a line I had since edited, and the
+runner's own "did the file actually change" check is what said so.
+
+**AND MY OWN VACUITY CHECK WAS THE WRONG SHAPE.** It asserted the allowed
+regions were under 95% of the file's literals — which **failed on correct
+code**, because on a fully tokenised page almost every surviving literal IS in
+an allowed region. That is the goal, not a symptom. It bounds the regions by
+SPAN now (they are ~5% of the file) and plants a stray in the page body,
+requiring the sweep to find it.
+
+**Six `ci-check-render.js` cases, because no source assertion can see any of
+this.** A stylesheet full of tokens reads exactly as plausibly whether or not
+the dark scope ever wins, and `data-theme="dark"` on `<html>` is an attribute,
+not a dark page — the sibling project shipped a `wx-night` class that named a
+night sky and painted none of it. Every case reads **computed** values:
+
+- a stored Dark paints a dark card on a darker page **with light ink on it** —
+  all three, or a card that stayed white inside a dark page passes the first;
+- clicking Dark repaints without a reload;
+- the choice survives a reload **with the stamp already on `<html>` at the
+  moment `<body>` appears and the React root still empty** — both halves, or
+  "it was dark" passes on a sample taken after React;
+- an unpinned viewer follows an emulated dark OS **with no stamp written**;
+- a pinned Light beats a dark OS;
+- the chart's line strokes differ between the modes **and are both real
+  colours** — a token that failed to resolve computes to black in both, which
+  would otherwise pass an "it changed" test by accident.
+
+`ci-check-render.js` gained a **`pre(page)` hook** for these: the theme decides
+the FIRST PAINT, so state set from `act` is set after the page it governs has
+already been drawn, and the case would be testing a repaint rather than a load.
+
+### NOT DONE
+
+- **The three other pages are light only** — `dashboard.html` (the public
+  all-orgs view), `login.html` and `reset.html`. They carry 30 hex literals
+  between them and no sidebar to put a control in. The public dashboard is the
+  one worth doing next if anyone asks; it would want its own stamp script,
+  since it does not load the PS app.
+- **No way back to "follow my OS" once you have chosen.** The default is the OS
+  setting, and the first click pins. Adding a third state is a segmented
+  control with three buttons and nothing else; nobody has asked.
+- **Light mode is byte-for-byte unchanged**, including the three selected-pill
+  colours that fail 3:1 and a `--faint` that measures 2.56:1 on white. Both are
+  pre-existing and both are fixable; neither is what Dan asked for, and a
+  silent colour change to a page people read daily is not a drive-by.
