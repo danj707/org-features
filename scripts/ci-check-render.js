@@ -777,6 +777,35 @@ const CASES = [
   { name: "updates", path: "/ps/updates", needs: ".panel" },
   { name: "the public dashboard", path: "/", needs: ".panel" },
 
+  /* THE GREYED RANGE ROW EXPLAINS ITSELF, WHERE THE BUTTONS ARE. Dan asked
+     why the presets were not clickable — the reason was in each button's
+     `title` and in the chart's own footnote, and neither reached him.
+
+     THE CASE KEYS ON POSITION, not on the text existing: the footnote below
+     the chart already says the same thing, and has since the chart shipped,
+     so "a line mentions the history length" passes on the build that
+     prompted the question. What is new is that it sits INSIDE the range row,
+     beside the controls it explains. */
+  { name: "org features · the greyed ranges say why, next to the buttons",
+    path: "/ps/feature", needs: '[data-rc-rangenote="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector(".fchart-ranges");
+      await pg.evaluate(() => {
+        const row = document.querySelector(".fchart-ranges");
+        const note = row && row.querySelector(".fchart-rangenote");
+        const gated = [...document.querySelectorAll(".fchart-range[disabled]")];
+        const txt = note ? note.textContent : "";
+        /* All three: something IS gated (or the note is correctly absent and
+           this case is testing nothing), the note is a DESCENDANT of the row
+           rather than anywhere on the page, and it names a day count. */
+        const ok = gated.length > 0 && !!note && /\d+ days? of history/.test(txt);
+        document.body.setAttribute("data-rc-rangenote", ok ? "1" : "0");
+        document.body.setAttribute("data-rc-rangenote-seen",
+          gated.length + " gated preset(s) · note in the row: " + (!!note)
+          + " · " + JSON.stringify(txt.slice(0, 70)));
+      });
+    } },
+
   /* ── THE THEME ─────────────────────────────────────────────────────────
      NO SOURCE ASSERTION CAN SEE ANY OF THIS. A stylesheet full of tokens
      reads exactly as plausibly whether or not the dark scope ever wins, and

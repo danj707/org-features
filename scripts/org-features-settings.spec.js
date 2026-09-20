@@ -107,7 +107,7 @@ const H = (() => {
       " ofChartToggle, ofChartCount, ofChartSeries, ofChartDates, ofChartTicks," +
       " ofChartDateLabel, ofChartLabelY, FeatureAdoptionChart," +
       " OF_CHART_RANGES, ofChartCutoff, ofChartWindow, ofChartRangeOptions," +
-      " ofChartRows, ofChartBand };")(EL);
+      " ofChartRangeNote, ofChartRows, ofChartBand };")(EL);
   } catch (err) {
     LIFT_ERR = err;
     return { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
@@ -130,7 +130,8 @@ const H = (() => {
              ofChartTicks: () => [], ofChartDateLabel: x => String(x),
              ofChartLabelY: ys => ys, FeatureAdoptionChart: () => null,
              OF_CHART_RANGES: [], ofChartCutoff: () => null, ofChartWindow: h => h,
-             ofChartRangeOptions: () => [], ofChartRows: r => r, ofChartBand: () => 0 };
+             ofChartRangeOptions: () => [], ofChartRangeNote: () => null,
+             ofChartRows: r => r, ofChartBand: () => 0 };
   }
 })();
 ok(!LIFT_ERR, "the module-scope org-features helpers lift and evaluate"
@@ -757,6 +758,35 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(H.OF_CHART_RANGES.some(r => r.days === 30) && H.OF_CHART_RANGES.some(r => r.days === 91)
        && H.OF_CHART_RANGES.some(r => r.days === 182) && H.OF_CHART_RANGES.some(r => !r.days),
        "the presets Dan named are offered — 30 days, 3 months, 6 months, and All");
+
+    /* AND THE GREYED ROW SAYS WHY, ON SCREEN. Dan, looking at it: "how come
+       this isn't clickable?" — the disabled control answering nothing. The
+       reason was already in each button's `title` and in the footnote six
+       hundred pixels below; a disabled button does still fire mouseover in
+       Chrome, so the tooltip worked, but nobody hovers a greyed-out button
+       to find out why it is grey.
+
+       THE NOTE IS CONDITIONAL, and that is the half worth guarding: once the
+       bake has more than a year of history nothing is gated and the note has
+       to disappear on its own. A note that stays forever is noise, and noise
+       is what a reader learns to skip past. */
+    const noteOf = (h) => H.ofChartRangeNote(h, H.ofChartRangeOptions(h));
+    ok(noteOf(shortHist), "a gated row carries a reason on screen");
+    ok(/\b2 days\b/.test(String(noteOf(shortHist))),
+       "...and it names how much history there is, which is the fact that answers the question"
+       + " — got " + JSON.stringify(noteOf(shortHist)));
+    eq(noteOf([mk("2026-09-20", 40)]).indexOf("1 day of history") >= 0, true,
+       "one day is singular, because a stray plural is what makes a generated line read as generated");
+    /* A HISTORY LONGER THAN EVERY PRESET GATES NOTHING, so there is nothing
+       to explain. `hy` is 366 days, which still leaves 12 months pickable —
+       so the no-note case needs a history longer than the longest preset. */
+    const twoYears = [mk("2024-09-20", 10), mk("2026-09-20", 41)];
+    eq(H.ofChartRangeOptions(twoYears).every(r => r.enabled), true,
+       "with two years of history every preset does real work");
+    eq(noteOf(twoYears), null, "...so the note is gone — it explains a gate, and there is no gate");
+    /* AN EMPTY HISTORY IS THE OTHER END: everything but All is gated, and the
+       note must still be a sentence rather than "0 days of history so far". */
+    ok(noteOf([]), "an empty history still explains itself rather than showing a silent grey row");
 
     /* THE TREND IS RE-TAKEN OVER THE WINDOW, through the same helper the
        table's Trend column reads, so a pill's delta is the delta over the

@@ -1525,3 +1525,79 @@ already been drawn, and the case would be testing a repaint rather than a load.
   colours that fail 3:1 and a `--faint` that measures 2.56:1 on white. Both are
   pre-existing and both are fixable; neither is what Dan asked for, and a
   silent colour change to a page people read daily is not a drive-by.
+
+## THE GREYED RANGES SAID WHY, WHERE NOBODY WOULD LOOK (2026-09-20)
+
+Dan, with the range row on screen and four of five presets greyed: *"how come
+this isn't clickable?"*
+
+**THE GATING IS CORRECT AND THE EXPLANATION WAS UNREACHABLE.** The bake has
+eleven days of history, so a 3-month window shows the same eleven days as
+All — `ofChartRangeOptions` refuses a preset that would cut nothing, because a
+row of buttons that all draw the same chart is a control that looks broken.
+That part is working as designed.
+
+What failed is that nothing said so **where the question gets asked**. The
+reason existed twice over:
+
+- each gated button carries a `title` naming the history length, and
+- the chart's own footnote says *"11 daily measurements from Sep 7 to Sep 20"*.
+
+**MY FIRST DIAGNOSIS WAS WRONG AND I CHECKED BEFORE ACTING ON IT.** I assumed
+a `disabled` button cannot fire a tooltip — the usual reason a disabled
+control's `title` goes unread. Measured in this project's own Chromium, a
+disabled button still receives `pointerover`, `mouseover` and `mousemove`
+(only `click` is withheld), so the tooltip works fine. The real reason is
+duller and harder to fix by reading code: **nobody hovers a greyed-out button
+to find out why it is grey.** And the footnote that says the same thing sits
+six hundred pixels below the control it explains.
+
+So the reason moved next to the buttons:
+
+```
+RANGE  [30 days] [3 months] [6 months] [12 months] (All)
+       11 days of history so far — longer ranges unlock as the bake fills in
+```
+
+- **IT IS CONDITIONAL, and that is the half worth guarding.** `ofChartRangeNote`
+  returns null once nothing is gated, so the line disappears on its own when
+  the bake passes a year — no code change and nothing to remember. A note that
+  stays forever is noise, and noise is what a reader learns to skip.
+- **It names the day count**, which is the fact that answers the question.
+  "Longer ranges will unlock" explains nothing.
+- **Singular at one day.** A stray plural is what makes a generated line read
+  as generated.
+
+**WHY NOT JUST MAKE THEM CLICKABLE**, which is the other reading of the
+question: clicking *3 months* on eleven days of data draws exactly the chart
+that is already on screen. That is the same complaint arriving by a different
+door — *"clicking 3 months does nothing"* — and it is worse, because a control
+that silently no-ops teaches the reader to distrust the whole row. The gate
+stays; only the silence was the bug. Dan's call if he would rather have the
+no-op.
+
+**Hiding them was the other option and is the one this project already
+rejected**, for the reason the code comment gives: a control that silently is
+not there makes *"was this built?"* unanswerable — the same call Dan made on
+the Musco button one project over.
+
+### Guards
+
+`org-features-settings.spec.js` 1,432 → **1,438 assertions**, lifting and
+running `ofChartRangeNote` against a two-day history, a one-day history (the
+plural), a **two-year** history (the no-gate case — note that `hy`, at 366
+days, still leaves 12 months pickable, so the no-note case needs a history
+longer than the longest preset) and an empty one.
+
+Plus `org features · the greyed ranges say why, next to the buttons`, which
+**keys on POSITION rather than on the text existing**: the footnote below the
+chart has said the same thing since the chart shipped, so "a line mentions the
+history length" passes on the build that prompted the question. What is new is
+that it is a descendant of the range row.
+
+Mutation-tested three ways, and **the split between the two layers is the
+interesting part**: the note removed from the row is caught by the render case
+alone (the helper still returns the string), the note shown unconditionally by
+the spec alone (in a browser against the real snapshot something is always
+gated, so no render case can reach that state), and the day count dropped by
+both.
