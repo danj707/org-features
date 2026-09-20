@@ -320,6 +320,28 @@ const out = {
   notes: `${ADOPTION_KEYS.length} of ${old.features.length} catalog features measured, re-baked ${new Date().toISOString().slice(0, 10)} from the production read replica via scripts/refresh/fleet-query.sql. Metric definitions and their traps are documented in that file. Sandbox organizations are excluded; unlaunched organizations are included and flagged. ${live} of ${orgs.length} organizations are live on rec.us.`,
   measuredFeatures: ADOPTION_KEYS,
   history,
+  /* ── CARRIED THROUGH UNTOUCHED ────────────────────────────────────────
+     `backfill` is the reconstructed half of the series (see
+     scripts/refresh/backfill-history.js). It is written once, by that
+     script, and this one must neither extend it nor trim it — so it is
+     copied forward rather than rebuilt.
+
+     THIS LINE IS THE WHOLE REASON IT SURVIVES. `out` is assembled from
+     scratch every morning, so a key that is not named here is DELETED by
+     the next bake, silently, in a commit whose diff looks like a routine
+     refresh. That would have happened the first morning after the backfill
+     landed. Two guards catch it: backfill.spec.js asserts both keys are
+     copied from `old`, and that the bake never appends to `backfill` —
+     these points are reconstructions and a measured point must not join
+     them.
+
+     HISTORY_MAX DOES NOT APPLY, and must not be extended to it. The trim
+     above bounds the growing series; `backfill` is a fixed 231 points that
+     stop where the measured one starts, and running the trim over both
+     would eat the reconstruction from the front the moment the two
+     together pass 120. */
+  backfill: old.backfill,
+  backfillMeta: old.backfillMeta,
 };
 
 fs.writeFileSync(dataFile, JSON.stringify(out, null, 2) + "\n");

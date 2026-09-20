@@ -1,0 +1,18 @@
+{
+  "note": "Adoption reconstructed from the production database for 2026-09-07 - the day the nightly bake recorded its FIRST measured point, independently. Diffing the two is the only evidence that the reconstruction is right rather than merely plausible; scripts/backfill.spec.js runs that diff in CI with no database access. Regenerate with the --verify query in scripts/refresh/backfill-history.js.",
+  "date": "2026-09-07",
+  "liveOrgs": 73,
+  "featureLive": {
+    "addons": 34, "ai_routines": 10, "alternate_identities": 23, "audience_segments": 46,
+    "benefit_rules": 38, "cash_check_payments": 54, "cash_reconciliation": 30,
+    "competitions_leagues": 18, "crm_household_notes": 55, "custom_booking_questions": 24,
+    "custom_forms": 58, "discount_codes": 32, "email_messaging": 66, "events": 24,
+    "gift_cards": 8, "gl_accounting": 61, "group_early_access_windows": 44,
+    "group_reservation_windows": 69, "instructor_certifications": 11, "instructors": 51,
+    "marketing_email": 33, "memberships": 43, "notification_subscriptions": 22,
+    "passes": 32, "physical_access_devices": 1, "pos_desk_locations": 41,
+    "prerequisites": 16, "registration_windows": 63, "rental_applications": 45,
+    "scholarships": 14, "seasons": 66, "security_deposits": 44, "sms_messaging": 17,
+    "store_credit": 58, "structured_refund_policies": 8, "waivers_contracts": 70
+  }
+}

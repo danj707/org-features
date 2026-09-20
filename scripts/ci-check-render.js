@@ -195,7 +195,8 @@ const CASES = [
            named for. The invariant is the RELATIONSHIP — a line may exist iff
            there are at least two points scored over the CURRENT feature set. */
         const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
-        const hist = (d && d.history) || [];
+        const hist = ((d && d.backfill) || []).concat((d && d.history) || [])
+          .sort((a, b) => String(a.date).localeCompare(String(b.date)));
         const newest = hist.length ? hist[hist.length - 1].setKey : null;
         const comparable = hist.filter(h => h.setKey === newest).length;
         const cells = [...document.querySelectorAll("[data-of-trend]")].slice(0, 40);
@@ -413,7 +414,16 @@ const CASES = [
       await pg.waitForSelector("[data-feat-frow]");
       await pg.evaluate(async () => {
         const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
-        const hist = (d && d.history) || [];
+        /* THE SERIES IS BOTH HALVES, recomputed here rather than borrowed
+           from the page. `backfill` is the reconstructed history and
+           `history` is what the nightly bake has measured since; the chart
+           draws them as one, so a case that expected only the measured half
+           would read 11 vertices on a line that legitimately draws 242. The
+           merge is re-derived independently — calling the page's own
+           ofSeriesHistory would make this agree with itself and test
+           nothing. */
+        const hist = ((d && d.backfill) || []).concat((d && d.history) || [])
+          .sort((a, b) => String(a.date).localeCompare(String(b.date)));
         const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
                                           && h.featureLive[k] != null).length;
         const row = k => document.querySelector('[data-feat-frow="' + k + '"]');
@@ -463,11 +473,21 @@ const CASES = [
       await pg.waitForSelector("[data-of-chart-line]");
       await pg.evaluate(async () => {
         const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
-        const hist = (d && d.history) || [];
+        const hist = ((d && d.backfill) || []).concat((d && d.history) || [])
+          .sort((a, b) => String(a.date).localeCompare(String(b.date)));
         const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
                                           && h.featureLive[k] != null).length;
+        /* "MOVED MOST" IS MEASURED OVER THE WINDOW EVERY FEATURE HAS, which
+           after the backfill is the first MEASURED bake onward — 36 features
+           reach back to January and 24 start there, and ranking each over its
+           own span makes eight months of drift beat three weeks of real
+           movement. Re-derived here rather than borrowed from the page: the
+           point is to check the page's ordering against an independent one,
+           and calling ofChartRankDelta would only make it agree with itself. */
+        const rankFrom = (hist.find(h => h && !h.backfill) || {}).date || null;
         const dl = k => { const p = hist.filter(h => h.liveOrgs > 0 && h.featureLive
-                                                     && h.featureLive[k] != null)
+                                                     && h.featureLive[k] != null
+                                                     && (!rankFrom || h.date >= rankFrom))
                             .map(h => Math.round((h.featureLive[k] / h.liveOrgs) * 100));
                           return p.length > 1 ? Math.abs(p[p.length - 1] - p[0]) : null; };
         const lines = [...document.querySelectorAll("[data-of-chart-line]")];
@@ -553,6 +573,53 @@ const CASES = [
      would leave no way to switch them off again. Both halves are asserted,
      because a search wired to the chart instead of the list renders a
      perfectly plausible narrower chart. */
+  /* THE CHART SAYS WHICH HALF OF EACH LINE WAS MEASURED.
+     36 of the 60 features reach back to January because their predicate is a
+     timestamped event; the other 24 read a setting the database keeps no
+     history of and start at the first bake. Two lines on one axis, one eight
+     months long and one three weeks, is a picture that invites the reader to
+     compare their slopes — so the split has to be ON SCREEN.
+
+     NO SOURCE ASSERTION CAN SEE THIS. The markup renders identically whether
+     the note is computed from the real split or hardcoded, and a pill's
+     attribute is only worth anything if it agrees with the series actually
+     drawn. So this compares the marked pills against the feed's own
+     backfillMeta, and requires BOTH kinds to be present — a build where
+     everything or nothing is reconstructed would pass a mere presence check
+     while proving nothing. */
+  { name: "org features · the chart says which lines are reconstructed and which are measured",
+    path: "/ps/feature", needs: '[data-rc-bfprov="1"]',
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-pill]");
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
+        const declared = new Set((((d || {}).backfillMeta || {}).features) || []);
+        const pills = [...document.querySelectorAll("[data-of-chart-pill]")];
+        const marked = pills.filter(b => b.getAttribute("data-of-chart-bf") === "1")
+          .map(b => b.getAttribute("data-of-chart-pill"));
+        const plain = pills.filter(b => b.getAttribute("data-of-chart-bf") === "0")
+          .map(b => b.getAttribute("data-of-chart-pill"));
+        // The marking has to AGREE with the feed, not merely exist.
+        const wrong = marked.filter(k => !declared.has(k))
+          .concat(plain.filter(k => declared.has(k)));
+        const note = document.querySelector("[data-of-chart-prov]");
+        const txt = note ? (note.getAttribute("data-of-chart-prov") || "") : "";
+        /* The footnote counts only the lines on the chart, so it must name a
+           number no larger than the lines drawn and mention both halves. */
+        const lines = document.querySelectorAll("[data-of-chart-line]").length;
+        const m = /^(\d+) reconstructed .* (\d+) measured/.exec(txt);
+        const counted = m ? Number(m[1]) + Number(m[2]) : -1;
+        const good = marked.length > 0 && plain.length > 0 && wrong.length === 0
+                     && !!note && counted === lines;
+        document.body.setAttribute("data-rc-bfprov", good ? "1" : "0");
+        document.body.setAttribute("data-rc-bfprov-seen",
+          marked.length + " reconstructed pill(s), " + plain.length + " measured-only, "
+          + wrong.length + " disagreeing with the feed"
+          + (wrong.length ? " (e.g. " + wrong[0] + ")" : "")
+          + " \u00b7 footnote " + (note ? "\"" + txt + "\" covering " + counted : "ABSENT")
+          + " of " + lines + " line(s)");
+      });
+    } },
   { name: "org features · the chart search finds one feature without unplotting the rest",
     path: "/ps/feature", needs: '[data-rc-fq="1"]',
     act: async (pg) => {
@@ -599,7 +666,8 @@ const CASES = [
       await pg.waitForSelector("[data-of-chart-rangeopt]");
       await pg.evaluate(async () => {
         const d = await fetch("/api/data").then(r => r.json()).catch(() => null);
-        const hist = ((d && d.history) || []).filter(h => h && h.liveOrgs > 0);
+        const hist = ((d && d.backfill) || []).concat((d && d.history) || [])
+          .sort((a, b) => String(a.date).localeCompare(String(b.date))).filter(h => h && h.liveOrgs > 0);
         const span = hist.length > 1
           ? Math.round((Date.parse(hist[hist.length - 1].date) - Date.parse(hist[0].date)) / 86400000) + 1
           : hist.length;
