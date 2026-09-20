@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T11:21:21.738Z",
+  "generatedAt": "2026-09-20T13:54:49.898Z",
   "source": "Rec production database (Rec-Prod-ReadReplica via Metabase), fleet-wide SQL snapshot",
   "status": "adoption-wave-1",
   "orgs": [
@@ -1189,11 +1189,11 @@
     },
     "apex-park-and-recreation-district": {
       "programs": 629,
-      "registrations": 100712,
+      "registrations": 100726,
       "memberships": 25103,
       "passes": 4965,
       "facilities": 334,
-      "reservations": 94473
+      "reservations": 94474
     },
     "barrie": {
       "programs": 0,
@@ -1246,7 +1246,7 @@
     "brookline-recreation": {
       "programs": 0,
       "registrations": 0,
-      "memberships": 23,
+      "memberships": 24,
       "passes": 0,
       "facilities": 18,
       "reservations": 0
@@ -1277,11 +1277,11 @@
     },
     "chicorec": {
       "programs": 190,
-      "registrations": 10956,
+      "registrations": 10957,
       "memberships": 1233,
       "passes": 8,
       "facilities": 148,
-      "reservations": 18530
+      "reservations": 18531
     },
     "city-of-aspen": {
       "programs": 3,
@@ -1349,11 +1349,11 @@
     },
     "city-of-buffalo": {
       "programs": 34,
-      "registrations": 1573,
+      "registrations": 1574,
       "memberships": 3139,
       "passes": 0,
       "facilities": 41,
-      "reservations": 2807
+      "reservations": 2808
     },
     "city-of-calabasas": {
       "programs": 1,
@@ -1414,7 +1414,7 @@
     "city-of-hermosa-beach": {
       "programs": 37,
       "registrations": 1286,
-      "memberships": 1733,
+      "memberships": 1734,
       "passes": 0,
       "facilities": 80,
       "reservations": 5603
@@ -1533,11 +1533,11 @@
     },
     "city-of-miamisburg": {
       "programs": 0,
-      "registrations": 1802,
+      "registrations": 1804,
       "memberships": 0,
       "passes": 0,
       "facilities": 15,
-      "reservations": 5321
+      "reservations": 5323
     },
     "city-of-midland": {
       "programs": 8,
@@ -1549,11 +1549,11 @@
     },
     "city-of-milford": {
       "programs": 0,
-      "registrations": 15599,
+      "registrations": 15597,
       "memberships": 1035,
       "passes": 0,
       "facilities": 33,
-      "reservations": 27206
+      "reservations": 27207
     },
     "city-of-mountain-view": {
       "programs": 24,
@@ -1669,11 +1669,11 @@
     },
     "city-of-smyrna": {
       "programs": 104,
-      "registrations": 18744,
+      "registrations": 18750,
       "memberships": 3972,
       "passes": 65,
       "facilities": 98,
-      "reservations": 7045
+      "reservations": 7046
     },
     "city-of-stanwood": {
       "programs": 0,
@@ -1685,8 +1685,8 @@
     },
     "city-of-torrance": {
       "programs": 673,
-      "registrations": 74871,
-      "memberships": 14460,
+      "registrations": 74872,
+      "memberships": 14461,
       "passes": 391,
       "facilities": 409,
       "reservations": 73931
@@ -1805,23 +1805,23 @@
     },
     "el-segundo-recreation": {
       "programs": 111,
-      "registrations": 11834,
-      "memberships": 5818,
-      "passes": 857,
+      "registrations": 11867,
+      "memberships": 5821,
+      "passes": 855,
       "facilities": 161,
-      "reservations": 31425
+      "reservations": 31477
     },
     "emeryville": {
       "programs": 136,
-      "registrations": 11160,
+      "registrations": 11161,
       "memberships": 3241,
       "passes": 1219,
       "facilities": 113,
-      "reservations": 16822
+      "reservations": 16823
     },
     "essex-junction": {
       "programs": 40,
-      "registrations": 3312,
+      "registrations": 3313,
       "memberships": 581,
       "passes": 0,
       "facilities": 19,
@@ -1837,11 +1837,11 @@
     },
     "folsom": {
       "programs": 39,
-      "registrations": 2535,
+      "registrations": 2536,
       "memberships": 544,
       "passes": 0,
       "facilities": 36,
-      "reservations": 4873
+      "reservations": 4874
     },
     "foster-city": {
       "programs": 4,
@@ -1997,8 +1997,8 @@
     },
     "needham": {
       "programs": 52,
-      "registrations": 784,
-      "memberships": 439,
+      "registrations": 789,
+      "memberships": 441,
       "passes": 0,
       "facilities": 93,
       "reservations": 800
@@ -2013,11 +2013,11 @@
     },
     "norris": {
       "programs": 0,
-      "registrations": 1014,
+      "registrations": 1022,
       "memberships": 144,
       "passes": 0,
       "facilities": 10,
-      "reservations": 6319
+      "reservations": 6327
     },
     "northern-door-sports-and-recreation": {
       "programs": 19,
@@ -2197,11 +2197,11 @@
     },
     "san-francisco-rec-park": {
       "programs": 229,
-      "registrations": 382365,
+      "registrations": 382369,
       "memberships": 0,
       "passes": 0,
       "facilities": 116,
-      "reservations": 565487
+      "reservations": 565491
     },
     "santacruzcounty": {
       "programs": 104,
@@ -2317,11 +2317,11 @@
     },
     "town-of-danvers": {
       "programs": 138,
-      "registrations": 8258,
+      "registrations": 8259,
       "memberships": 2153,
       "passes": 370,
       "facilities": 72,
-      "reservations": 9266
+      "reservations": 9267
     },
     "town-of-reading": {
       "programs": 128,
@@ -2405,7 +2405,7 @@
     },
     "watertown": {
       "programs": 164,
-      "registrations": 11054,
+      "registrations": 11055,
       "memberships": 2327,
       "passes": 0,
       "facilities": 133,
@@ -4183,8 +4183,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 8564,
-        "detail": "8,564 facility rentals"
+        "count": 8565,
+        "detail": "8,565 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -4203,8 +4203,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 614,
-        "detail": "614 permits issued"
+        "count": 615,
+        "detail": "615 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -4213,8 +4213,8 @@
       },
       "store_credit": {
         "adopted": true,
-        "count": 11974,
-        "detail": "11,974 account credits issued"
+        "count": 11975,
+        "detail": "11,975 account credits issued"
       },
       "structured_refund_policies": {
         "adopted": false,
@@ -4233,8 +4233,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 10131,
-        "detail": "10,131 cash/check payments"
+        "count": 10134,
+        "detail": "10,134 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": true,
@@ -7505,8 +7505,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1776,
-        "detail": "1,776 facility rentals"
+        "count": 1777,
+        "detail": "1,777 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -9669,8 +9669,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 7864,
-        "detail": "7,864 cash/check payments"
+        "count": 7872,
+        "detail": "7,872 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -10223,8 +10223,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1069,
-        "detail": "1,069 facility rentals"
+        "count": 1070,
+        "detail": "1,070 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -12474,8 +12474,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 1500,
-        "detail": "1,500 emails sent"
+        "count": 1501,
+        "detail": "1,501 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -14803,8 +14803,8 @@
       },
       "cash_check_payments": {
         "adopted": true,
-        "count": 5017,
-        "detail": "5,017 cash/check payments"
+        "count": 5019,
+        "detail": "5,019 cash/check payments"
       },
       "custom_email_domains": {
         "adopted": false,
@@ -17169,8 +17169,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 2009,
-        "detail": "2,009 facility rentals"
+        "count": 2011,
+        "detail": "2,011 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -17773,8 +17773,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 16543,
-        "detail": "16,543 facility rentals"
+        "count": 16541,
+        "detail": "16,541 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -20326,8 +20326,8 @@
       },
       "email_messaging": {
         "adopted": true,
-        "count": 838,
-        "detail": "838 emails sent"
+        "count": 840,
+        "detail": "840 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -22303,8 +22303,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1035,
-        "detail": "1,035 facility rentals"
+        "count": 1036,
+        "detail": "1,036 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -22323,8 +22323,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 506,
-        "detail": "506 permits issued"
+        "count": 507,
+        "detail": "507 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
@@ -23945,13 +23945,13 @@
       },
       "sms_messaging": {
         "adopted": true,
-        "count": 5320,
-        "detail": "5,320 SMS sent"
+        "count": 5355,
+        "detail": "5,355 SMS sent"
       },
       "email_messaging": {
         "adopted": true,
-        "count": 105198,
-        "detail": "105,198 emails sent"
+        "count": 105233,
+        "detail": "105,233 emails sent"
       },
       "payment_plans": {
         "adopted": true,
@@ -27437,8 +27437,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 10976,
-        "detail": "10,976 facility rentals"
+        "count": 11008,
+        "detail": "11,008 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -27739,8 +27739,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1744,
-        "detail": "1,744 facility rentals"
+        "count": 1745,
+        "detail": "1,745 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -28645,8 +28645,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 3074,
-        "detail": "3,074 facility rentals"
+        "count": 3075,
+        "detail": "3,075 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -35289,8 +35289,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 1815,
-        "detail": "1,815 facility rentals"
+        "count": 1823,
+        "detail": "1,823 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -42235,8 +42235,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 430189,
-        "detail": "430,189 facility rentals"
+        "count": 430247,
+        "detail": "430,247 facility rentals"
       },
       "rental_applications": {
         "adopted": false,
@@ -46765,8 +46765,8 @@
       },
       "facility_rentals": {
         "adopted": true,
-        "count": 420,
-        "detail": "420 facility rentals"
+        "count": 422,
+        "detail": "422 facility rentals"
       },
       "rental_applications": {
         "adopted": true,
@@ -46785,8 +46785,8 @@
       },
       "rental_permits": {
         "adopted": true,
-        "count": 133,
-        "detail": "133 permits issued"
+        "count": 135,
+        "detail": "135 permits issued"
       },
       "group_reservation_windows": {
         "adopted": true,
