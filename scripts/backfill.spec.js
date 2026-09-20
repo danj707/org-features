@@ -212,6 +212,33 @@ for (const x of meta.excluded || []) {
 eq((meta.excluded || []).length + (meta.features || []).length, measured.length,
   "the backfilled and excluded sets do not add up to the measured catalog");
 
+/* ── 4b. THE EMITTED QUERY MATCHES THE DATA THAT WAS WRITTEN ────────────
+   `--sql` is what a future regeneration runs, and the committed points are
+   what it produced. If the two drift — a metric added to fleet-query.sql, a
+   denylist edit, a window moved — then re-running the documented command
+   silently yields a different series from the one on the chart, and the only
+   symptom is a number that changed for no reason anybody can name.
+
+   THE FEATURE SET IS READ OUT OF THE EMITTED SQL, not restated here. */
+const emitted = bf.buildSql();
+const emittedKeys = [...emitted.matchAll(/SELECT '([a-z0-9_]+)'::text k/g)].map(m => m[1])
+  .concat([...emitted.matchAll(/UNION ALL\s+SELECT '([a-z0-9_]+)'/g)].map(m => m[1]));
+/* `__fleet__` IS THE DENOMINATOR ARM, not a feature — it computes how many
+   organizations were live on each date, which is what every share on the
+   chart is a share OF. It is asserted separately below. */
+const emittedSet = [...new Set(emittedKeys)].filter(k => k !== "__fleet__").sort();
+ok(emittedSet.length > 0, "no feature keys could be read out of the emitted SQL — the regex stopped matching");
+eq(emittedSet.join(","), (meta.features || []).slice().sort().join(","),
+  "the query the script emits covers a different feature set from the data that was written");
+ok(emitted.indexOf("DATE '" + meta.from + "'") >= 0,
+  "the emitted query does not start at the window the data claims (" + meta.from + ")");
+ok(emitted.indexOf("DATE '" + meta.to + "'") >= 0,
+  "the emitted query does not end at the window the data claims (" + meta.to + ")");
+/* AND IT STILL ASKS FOR THE DENOMINATOR. Without the __fleet__ arm the
+   reducer throws, but by then the query has already been run against
+   production — the cheap place to catch it is here. */
+ok(/__fleet__/.test(emitted), "the emitted query no longer computes the live denominator");
+
 /* ── 5. THE NIGHTLY BAKE MUST NOT EAT IT ───────────────────────────────── */
 /* `out` is assembled from scratch every morning, so a key not named there is
    deleted by the next refresh — silently, in a commit whose diff looks
