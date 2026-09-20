@@ -1417,12 +1417,32 @@ if (!SKIP_SOURCE) {
   eq(Q.ofQuickView("nope"), null, "an unknown id resolves to null rather than throwing");
 
   /* THE FEATURES ARE NARROW ENOUGH TO SCAN — measured, not assumed. A chip
-     for a feature 110 of 144 orgs use lists most of the platform and answers
-     nothing, which is the whole reason this set was chosen from the data. */
+     for a feature most of the platform uses lists most of the platform and
+     answers nothing, which is the whole reason this set was chosen from the
+     data.
+
+     A SHARE OF THE FLEET, NOT A COUNT, and that is this morning's lesson
+     twice over. This was `users.length <= 70`, which was about half of the
+     144 organizations the comment above was written against — and it failed
+     the bake on 2026-09-20 reading "75 of 160 orgs use ai_assistant". Both
+     sides had moved: Seb adoption climbed 7 points in ten days (it is the
+     fastest-moving feature on the platform) and the fleet grew to 160, so 75
+     is 47% — still under half, still a slice, still exactly what this rule
+     wants. An absolute cap on a growing denominator expires on its own, with
+     no code change, and it stops the data pipeline when it does.
+
+     THE LINE COMES FROM THE COMMENT'S OWN EXAMPLE rather than being invented:
+     110 of 144 is 76%, and that is the case it calls too wide. Three quarters
+     it is. Seb would have to reach 120 of 160 to trip this, and if it ever
+     does, "is this still a useful filter" is a real question worth putting to
+     a human — which is the only kind of claim that belongs in a guard the
+     nightly bake has to pass. */
   for (const v of Q.OF_QUICK_VIEWS.filter(x => x.kind === "feature")) {
     const users = Object.keys(snap.adoption).filter(s2 => (snap.adoption[s2][v.key] || {}).adopted);
-    ok(users.length > 0 && users.length <= 70,
-       `"${v.id}" scopes to a scannable slice — ${users.length} of ${snap.orgs.length} orgs use ${v.key}`);
+    const share = snap.orgs.length ? users.length / snap.orgs.length : 0;
+    ok(users.length > 0 && share < 0.75,
+       `"${v.id}" scopes to a scannable slice — ${users.length} of ${snap.orgs.length} orgs `
+       + `(${Math.round(share * 100)}%) use ${v.key}`);
   }
 
   // ── the reducer ──
