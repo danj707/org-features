@@ -105,7 +105,9 @@ const H = (() => {
       " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell," +
       " OF_SERIES_COLORS, OF_CHART_MAX, OF_CHART_OPEN, ofChartOrder, ofChartDefault," +
       " ofChartToggle, ofChartCount, ofChartSeries, ofChartDates, ofChartTicks," +
-      " ofChartDateLabel, ofChartLabelY, FeatureAdoptionChart };")(EL);
+      " ofChartDateLabel, ofChartLabelY, FeatureAdoptionChart," +
+      " OF_CHART_RANGES, ofChartCutoff, ofChartWindow, ofChartRangeOptions," +
+      " ofChartRows, ofChartBand };")(EL);
   } catch (err) {
     LIFT_ERR = err;
     return { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
@@ -126,7 +128,9 @@ const H = (() => {
              ofChartOrder: () => [], ofChartDefault: () => [], ofChartToggle: () => [],
              ofChartCount: () => 0, ofChartSeries: () => [], ofChartDates: () => [],
              ofChartTicks: () => [], ofChartDateLabel: x => String(x),
-             ofChartLabelY: ys => ys, FeatureAdoptionChart: () => null };
+             ofChartLabelY: ys => ys, FeatureAdoptionChart: () => null,
+             OF_CHART_RANGES: [], ofChartCutoff: () => null, ofChartWindow: h => h,
+             ofChartRangeOptions: () => [], ofChartRows: r => r, ofChartBand: () => 0 };
   }
 })();
 ok(!LIFT_ERR, "the module-scope org-features helpers lift and evaluate"
@@ -639,10 +643,22 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     crow("small", "Small", 10, [9, 10]),             // +1
     crow("fresh", "Fresh", 20, [20]),                // one point: not plottable
   ];
-  eq(H.ofChartOrder(crows).map(r => r.key).join(","), "mover,faller,small,flat_big",
-     "the chart orders by MOVEMENT first — opening on the most adopted draws flat lines, which is what the real feed does");
-  ok(!H.ofChartOrder(crows).some(r => r.key === "fresh"),
-     "...and a feature with one point is not offered at all, rather than offered and undrawable");
+  /* THREE BANDS: moved, then too new to say, then flat.
+
+     THE MIDDLE BAND IS A REVERSAL, and it is Dan's: "if a feature is too new
+     then just put a dot where it started on the timeline." A one-point
+     feature used to be filtered out of this chart altogether, which hid
+     exactly the features most worth noticing — the ones that have just
+     appeared. It is offered now, and it plots as a dot rather than a line,
+     because a line between one point and nothing asserts a direction nobody
+     has measured. It ranks ABOVE the flat features for the same reason a
+     mover does: a feature appearing is change. */
+  eq(H.ofChartOrder(crows).map(r => r.key).join(","), "mover,faller,small,fresh,flat_big",
+     "the chart orders by MOVEMENT first, then the new arrivals, then the flat — opening on the most adopted draws flat lines, which is what the real feed does");
+  eq(H.ofChartBand(crow("x", "X", 5, [3, 9]).trend), 0, "a feature that moved is in the first band");
+  eq(H.ofChartBand(crow("x", "X", 5, [9]).trend), 1, "...a feature with one measurement is in the second");
+  eq(H.ofChartBand(crow("x", "X", 5, [9, 9]).trend), 2, "...and a measured, flat one is in the third");
+  eq(H.ofChartBand({ points: [] }), 3, "a feature with nothing in the window is not plotted at all");
   /* A FALL IS A MOVE. A feature losing organizations is at least as worth
      seeing as one gaining them, so the order is on the ABSOLUTE delta. */
   ok(H.ofChartOrder(crows).indexOf(H.ofChartOrder(crows).find(r => r.key === "faller"))
@@ -673,7 +689,13 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
      "the axis is the union of the dates the selected series carry");
   eq(cser[0].points.length, 3, "...and the longer series keeps all of its points");
   eq(cser[1].points.length, 2, "...while the shorter one is NOT padded to match it");
-  eq(H.ofChartSeries(crows, ["fresh"]).length, 0, "a one-point feature draws no line even if selected");
+  {
+    const lone = H.ofChartSeries(crows, ["fresh"]);
+    eq(lone.length, 1, "a one-point feature IS plotted — as the dot Dan asked for, not dropped");
+    eq(lone[0].points.length, 1, "...from its single measurement");
+    eq(lone[0].ready, false, "...carrying that it has no trend, so the renderer knows to draw a dot rather than a line");
+    eq(lone[0].last, 20, "...and it still has a value to label, taken from that one point");
+  }
   eq(H.ofChartSeries(crows, ["nope"]).length, 0, "...and an unknown key is dropped rather than throwing");
 
   /* LABELS THAT WOULD LAND ON TOP OF EACH OTHER ARE PUSHED APART. Two
@@ -692,6 +714,59 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
      the 6th across the Americas, which would date every point one day early. */
   eq(H.ofChartDateLabel("2026-09-07"), "Sep 7", "a date label is built from the string's own parts");
   eq(H.ofChartDateLabel("2026-01-01"), "Jan 1", "...at the year boundary too");
+
+  /* ── the range control ────────────────────────────────────────────────
+     Dan: "Don't need a date range, just a last 30, last 3 months, 6 months." */
+  {
+    const mk = (d, n) => ({ date: d, liveOrgs: 100, featureLive: { a: n } });
+    /* Two points a year apart plus two recent ones, so a 30-day window and
+       an all-time one are different answers rather than the same one. */
+    const hy = [mk("2025-09-20", 10), mk("2026-06-20", 30), mk("2026-09-19", 40), mk("2026-09-20", 41)];
+    eq(H.ofChartWindow(hy, null).length, 4, "All is every measurement on record");
+    eq(H.ofChartWindow(hy, 30).map(x => x.date).join(","), "2026-09-19,2026-09-20",
+       "30 days keeps only the last 30 days of bakes");
+    eq(H.ofChartWindow(hy, 182).length, 3, "...and six months reaches back past the June point");
+    /* MEASURED BACK FROM THE LAST BAKE, NOT FROM THE CLOCK. The bake missed
+       three mornings in September; counting back from "now" would drop the
+       newest points out of a 30-day window on exactly the days that matters.
+       Pinned by using a history whose last date is fixed in the past — a
+       clock-based window would return nothing here. */
+    ok(H.ofChartWindow(hy, 30).length > 0,
+       "the window is measured from the last bake, so a stale history still plots");
+    eq(H.ofChartCutoff("2026-09-20", 30), "2026-08-22", "the cutoff is 30 days inclusive of the last bake");
+    eq(H.ofChartCutoff("2026-01-01", 30), "2025-12-03", "...and crosses a year boundary correctly");
+    eq(H.ofChartCutoff("2026-09-20", null), null, "All has no cutoff");
+
+    /* ONLY THE RANGES THAT CHANGE SOMETHING ARE OFFERED. A row of buttons
+       that all draw the same chart is a control that looks broken, so a
+       preset is enabled only once the history is longer than it. They light
+       up on their own as the bake accumulates days. */
+    const optOf = (h) => { const m = {}; H.ofChartRangeOptions(h).forEach(r => m[r.id] = r.enabled); return m; };
+    const shortHist = [mk("2026-09-19", 40), mk("2026-09-20", 41)];
+    eq(optOf(shortHist)["30d"], false, "with two days of history, 30 days would cut nothing and is refused");
+    eq(optOf(shortHist)["all"], true, "...while All is always offered");
+    eq(optOf(hy)["30d"], true, "with a year of history, 30 days does real work and is offered");
+    /* hy spans 2025-09-20 to 2026-09-20 — 366 days INCLUSIVE — so a 365-day
+       window really does cut its oldest point and 12 months is offered. The
+       refusal case is a history shorter than the preset, which is what the
+       two-day fixture above is for. */
+    eq(optOf(hy)["12m"], true, "...and 12 months too, because a 365-day window still cuts a 366-day series");
+    eq(optOf(shortHist)["12m"], false, "a preset longer than the whole history is refused, whichever preset it is");
+    eq(optOf([])["30d"], false, "an empty history offers no window to cut");
+    eq(optOf([])["all"], true, "...but All is still there, so the control is never an empty row");
+    ok(H.OF_CHART_RANGES.some(r => r.days === 30) && H.OF_CHART_RANGES.some(r => r.days === 91)
+       && H.OF_CHART_RANGES.some(r => r.days === 182) && H.OF_CHART_RANGES.some(r => !r.days),
+       "the presets Dan named are offered — 30 days, 3 months, 6 months, and All");
+
+    /* THE TREND IS RE-TAKEN OVER THE WINDOW, through the same helper the
+       table's Trend column reads, so a pill's delta is the delta over the
+       window on screen rather than over all of history. */
+    const wr = H.ofChartRows([{ key: "a", name: "A", pct: 41 }], H.ofChartWindow(hy, 30));
+    eq(wr[0].trend.points.length, 2, "a windowed row's trend is taken over the window");
+    eq(wr[0].trend.delta, 1, "...so the delta is the move inside it (40 to 41), not since last year");
+    eq(H.ofChartRows([{ key: "a", name: "A", pct: 41 }], hy)[0].trend.delta, 31,
+       "...while the full history still gives the full move, which is what the table shows");
+  }
   eq(H.ofFeatureTrend(null, "a").points.length, 0, "...and so does a missing history");
 
   // The shipped snapshot must actually carry the series, or the column is
