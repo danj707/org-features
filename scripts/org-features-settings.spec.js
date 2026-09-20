@@ -17,6 +17,23 @@
  * project over. And nothing ticked must read as "not measured", never as 0%:
  * an empty denominator is not an org that adopted nothing.
  */
+/* RE-EXEC UNDER A ZONE BEHIND UTC, because otherwise the date assertions in
+   here are decorative. A bare `YYYY-MM-DD` is UTC MIDNIGHT by spec, so
+   `new Date("2026-09-07")` renders as "Sep 6" west of UTC and as "Sep 7" in
+   UTC itself — and this sandbox and GitHub Actions both run UTC, where the
+   broken derivation and the correct one are indistinguishable. Verified:
+   swapping ofChartDateLabel for `new Date(iso).toLocaleDateString` passes all
+   1,347 assertions under TZ=UTC and fails two of them by name under this one
+   ("got Sep 6, want Sep 7").
+
+   THE SENTINEL IS AN EXPLICIT ENV FLAG, not a test of what TZ looks like — a
+   guard that guesses at the value it just set is how a spec forks forever. */
+if (!process.env.OF_SPEC_TZ) {
+  const r = require("child_process").spawnSync(process.execPath, [__filename, ...process.argv.slice(2)],
+    { stdio: "inherit", env: { ...process.env, TZ: "America/Los_Angeles", OF_SPEC_TZ: "1" } });
+  process.exit(r.status == null ? 1 : r.status);
+}
+
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -85,7 +102,10 @@ const H = (() => {
       " GRADE_RAMP, GRADE_BASIS, ofGrade, ofGradeColor, ofDerive, ofFleetUse, ofRank," +
       " FEATURE_GRADE_RAMP, FEATURE_GRADE_BASIS, ofFeatureGrade, ofFeatureGradeColor," +
       " ofFeatureTrend, ofFeatureRows, ofFeatureMatch, OF_SLICES," +
-      " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell };")(EL);
+      " TREND_MIN_POINTS, ofTrend, ofTrendLabel, ofTrendColor, Trendline, TrendCell," +
+      " OF_SERIES_COLORS, OF_CHART_MAX, OF_CHART_OPEN, ofChartOrder, ofChartDefault," +
+      " ofChartToggle, ofChartCount, ofChartSeries, ofChartDates, ofChartTicks," +
+      " ofChartDateLabel, ofChartLabelY, FeatureAdoptionChart };")(EL);
   } catch (err) {
     LIFT_ERR = err;
     return { CAT_SHORT: {}, catShort: x => x, ofRecAdminUrl: () => null,
@@ -101,7 +121,12 @@ const H = (() => {
              ofFeatureGradeColor: () => "", ofFeatureTrend: () => null,
              ofFeatureRows: () => [], ofFeatureMatch: () => true, OF_SLICES: [],
              TREND_MIN_POINTS: 0, ofTrend: () => null, ofTrendLabel: () => null,
-             ofTrendColor: () => "", Trendline: () => null, TrendCell: () => null };
+             ofTrendColor: () => "", Trendline: () => null, TrendCell: () => null,
+             OF_SERIES_COLORS: [], OF_CHART_MAX: 0, OF_CHART_OPEN: 0,
+             ofChartOrder: () => [], ofChartDefault: () => [], ofChartToggle: () => [],
+             ofChartCount: () => 0, ofChartSeries: () => [], ofChartDates: () => [],
+             ofChartTicks: () => [], ofChartDateLabel: x => String(x),
+             ofChartLabelY: ys => ys, FeatureAdoptionChart: () => null };
   }
 })();
 ok(!LIFT_ERR, "the module-scope org-features helpers lift and evaluate"
@@ -598,6 +623,75 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
      "a point that never measured the feature is dropped — there is no zero to plot, and drawing one invents a rise that never happened");
   ok(!tb.ready, "...so a feature measured for the first time today has no trend yet");
   eq(H.ofFeatureTrend(hist, "nope").points.length, 0, "an unknown key plots nothing rather than throwing");
+
+  // ── the adoption chart ────────────────────────────────────────────────
+  /* THE GEOMETRY AND THE SELECTION RULES, tested where the input is chosen
+     rather than off the feed. The browser case beside this proves the PAGE
+     wires them up over real data; these prove the rules themselves, including
+     the two cases production does not currently contain. */
+  const crow = (k, n, pct, pts) => ({ key: k, name: n, pct,
+    trend: { ready: pts.length > 1, points: pts.map((v, i) => ({ date: "2026-09-0" + (i + 1), v })),
+             first: pts[0], last: pts[pts.length - 1], delta: pts[pts.length - 1] - pts[0] } });
+  const crows = [
+    crow("flat_big", "Flat Big", 90, [90, 90]),      // most adopted, dead flat
+    crow("mover", "Mover", 40, [33, 40]),            // +7
+    crow("faller", "Faller", 50, [53, 50]),          // -3
+    crow("small", "Small", 10, [9, 10]),             // +1
+    crow("fresh", "Fresh", 20, [20]),                // one point: not plottable
+  ];
+  eq(H.ofChartOrder(crows).map(r => r.key).join(","), "mover,faller,small,flat_big",
+     "the chart orders by MOVEMENT first — opening on the most adopted draws flat lines, which is what the real feed does");
+  ok(!H.ofChartOrder(crows).some(r => r.key === "fresh"),
+     "...and a feature with one point is not offered at all, rather than offered and undrawable");
+  /* A FALL IS A MOVE. A feature losing organizations is at least as worth
+     seeing as one gaining them, so the order is on the ABSOLUTE delta. */
+  ok(H.ofChartOrder(crows).indexOf(H.ofChartOrder(crows).find(r => r.key === "faller"))
+     < H.ofChartOrder(crows).findIndex(r => r.key === "flat_big"),
+     "a feature going DOWN outranks a flat one — a fall is a move");
+
+  /* COLOUR FOLLOWS THE FEATURE, NOT ITS RANK. The removed slot stays a hole,
+     so nothing after it shifts colour. The dense-array implementation is the
+     obvious one and repaints every survivor. */
+  const s1 = ["a", "b", "c"];
+  const s2 = H.ofChartToggle(s1, "a");
+  eq(s2.indexOf("b"), 1, "removing the FIRST series leaves the second in its own slot");
+  eq(s2.indexOf("c"), 2, "...and the third in its own, so neither is repainted");
+  eq(H.ofChartToggle(s2, "d").indexOf("d"), 0, "...and the next feature added takes the freed slot rather than a new colour");
+  eq(H.ofChartCount(s2), 2, "a hole is not a series");
+  const full = ["a", "b", "c", "d", "e", "f"];
+  eq(H.ofChartToggle(full, "g").length, H.OF_CHART_MAX,
+     "a seventh series is REFUSED rather than cycling back onto a colour already on screen");
+  eq(H.OF_CHART_MAX, H.OF_SERIES_COLORS.length,
+     "...and the cap IS the number of validated colours, so the two cannot drift apart");
+  eq(H.OF_SERIES_COLORS.length, new Set(H.OF_SERIES_COLORS).size, "no colour is listed twice");
+
+  /* THE X DOMAIN IS THE UNION OF DATES ACTUALLY MEASURED, never a generated
+     range — a feature first measured halfway along starts halfway along. */
+  const cser = H.ofChartSeries(
+    [crow("x", "X", 50, [1, 2, 3]), crow("y", "Y", 50, [9, 9])], ["x", "y"]);
+  eq(H.ofChartDates(cser).join(","), "2026-09-01,2026-09-02,2026-09-03",
+     "the axis is the union of the dates the selected series carry");
+  eq(cser[0].points.length, 3, "...and the longer series keeps all of its points");
+  eq(cser[1].points.length, 2, "...while the shorter one is NOT padded to match it");
+  eq(H.ofChartSeries(crows, ["fresh"]).length, 0, "a one-point feature draws no line even if selected");
+  eq(H.ofChartSeries(crows, ["nope"]).length, 0, "...and an unknown key is dropped rather than throwing");
+
+  /* LABELS THAT WOULD LAND ON TOP OF EACH OTHER ARE PUSHED APART. Two
+     features at the same share is the case the browser case drives; here the
+     arithmetic is pinned exactly. */
+  const ly = H.ofChartLabelY([100, 100, 100], 13, 0, 400);
+  ok(ly[1] - ly[0] >= 13 && ly[2] - ly[1] >= 13,
+     "three labels at one y are separated by at least the minimum gap");
+  eq(H.ofChartLabelY([10, 200], 13, 0, 400).join(","), "10,200",
+     "...and labels that already clear it are left exactly where the data put them");
+
+  eq(H.ofChartTicks(["a","b","c"], 8).length, 3, "a short axis labels every date");
+  eq(H.ofChartTicks(new Array(40).fill(0).map((_, i) => i), 8).length, 8,
+     "...and a long one is thinned rather than colliding with itself");
+  /* FROM THE PARTS. `new Date("2026-09-07")` is UTC midnight and renders as
+     the 6th across the Americas, which would date every point one day early. */
+  eq(H.ofChartDateLabel("2026-09-07"), "Sep 7", "a date label is built from the string's own parts");
+  eq(H.ofChartDateLabel("2026-01-01"), "Jan 1", "...at the year boundary too");
   eq(H.ofFeatureTrend(null, "a").points.length, 0, "...and so does a missing history");
 
   // The shipped snapshot must actually carry the series, or the column is
