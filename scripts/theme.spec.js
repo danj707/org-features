@@ -329,6 +329,55 @@ ok(/OF_SERIES_COLORS = \["var\(--series-1\)"/.test(src),
        `${page} declares every token /feature-pills.js reads — an undeclared one paints nothing at all`);
   }
 
+  /* THE TWO RECESSIVE BRANCHES ARE ASSERTED HERE AND NOWHERE ELSE, because
+     a render case cannot reach one of them: the snapshot carries ZERO null
+     metric cells across all 960, so `v == null` never renders and a browser
+     mutation setting --pill-null-bg to a light value SURVIVES. That is a
+     fact about the fleet, not a hole in the case — so the claim is made
+     where it can be computed, against the token values themselves. */
+  const lum = (hex) => {
+    const h = String(hex || "").trim().replace("#", "");
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+    const v = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
+      .map(x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4));
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  };
+  for (const t of ["--pill-null-bg", "--pill-zero-bg"]) {
+    const dl = lum(D2[t]), ll = lum(L[t]);
+    ok(ll != null && ll > 0.5, `${t} is a light chip in light mode (${L[t]})`);
+    ok(dl != null && dl < 0.15,
+       `${t} is DARK in dark mode — a light chip on a slate card is the exact`
+       + ` regression the hardcoded ramp shipped (${D2[t]})`);
+  }
+
+  /* AND THE RAMP RUNS AWAY FROM THE SURFACE IN BOTH MODES. The wash is
+     translucent over the card, so "more" has to mean "further from the
+     card" — carrying the light hue into dark mode inverts that silently
+     while every pill still renders, and the browser case cannot see it
+     because the label's contrast against its own wash stays fine. */
+  const wash = (rgbTok, alpha, cardHex) => {
+    const rgb = String(rgbTok || "").split(",").map(Number);
+    const c = String(cardHex || "").replace("#", "");
+    if (rgb.length !== 3 || !/^[0-9a-fA-F]{6}$/.test(c)) return null;
+    const bg = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16));
+    const mix = rgb.map((x, i) => Math.round(x * alpha + bg[i] * (1 - alpha)));
+    return lum("#" + mix.map(v => v.toString(16).padStart(2, "0")).join(""));
+  };
+  for (const [name, set] of [["light", L], ["dark", D2]]) {
+    const card = lum(set["--card"]);
+    const lo = wash(set["--pill-heat-rgb"], 0.08, set["--card"]);   // t = 0
+    const hi = wash(set["--pill-heat-rgb"], 0.63, set["--card"]);   // t = 1
+    ok(lo != null && hi != null, `the ${name} heat wash composites`);
+    if (lo != null && hi != null) {
+      ok(Math.abs(hi - card) > Math.abs(lo - card),
+         `the ${name} heat ramp moves AWAY from the card as the value rises`
+         + ` — card ${card.toFixed(3)}, faint ${lo.toFixed(3)}, full ${hi.toFixed(3)}`);
+      ok(name === "light" ? hi < card : hi > card,
+         `a full ${name} pill is ${name === "light" ? "darker" : "lighter"} than the card,`
+         + " so 'more' always reads as further from the surface");
+    }
+  }
+
   /* THE RAMP'S HUE HAS TO MOVE WITH THE SURFACE. The wash is translucent over
      the card, so on white a deep teal at rising alpha reads as "more" and on
      a dark card the same hue reads as "less" — the scale inverts silently

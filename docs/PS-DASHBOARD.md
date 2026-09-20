@@ -1388,6 +1388,53 @@ rather than a thing to notice.
 exactly where the untokenised colour survives, because it belongs to neither
 page.*
 
+### TWO OF THE PILL'S THREE BRANCHES CANNOT BE REACHED IN A BROWSER
+
+The ramp has three branches — not measured, a real zero, and the wash — and
+the render case can only ever exercise two of them, which mutation testing is
+what showed:
+
+- **The first fixture took the two alphabetically-first orgs**, which are
+  pre-launch: every metric is a real zero, so `t` is never computed and the
+  WASH never renders. An inverted-ink mutation survived it. It picks the two
+  busiest orgs out of the snapshot now (SF and Apex) and requires more than
+  one distinct fill, so a run that exercised nothing fails rather than passes.
+- **The `v == null` branch is unreachable at all: the snapshot carries ZERO
+  null cells across all 960.** A browser mutation setting `--pill-null-bg` to
+  a light value SURVIVES, and no fixture change fixes that — it is a fact
+  about the fleet, not a hole in the case.
+
+So that claim is made where it can be computed: the spec asserts every dark
+pill background is actually dark and every light one light, from the token
+values. Same for the ramp's DIRECTION — carrying the light teal into dark
+mode inverts the scale silently while every pill still renders and every
+label keeps its contrast, so the browser cannot see it; the spec composites
+the wash at both ends of the alpha range and requires it to move AWAY from
+the card as the value rises.
+
+*Generalise it: when a branch cannot be reached by the real data, assert it
+where the values live rather than pretending a render case covers it.*
+
+### AND I DISCARDED MY OWN UNCOMMITTED WORK WITH `git checkout`
+
+Mid-way through mutation testing the pill, a loop restored `public/ps.html`
+with `git checkout` between mutations — and the dark-mode work on that file
+was **uncommitted**, so the whole thing went. Recovered from a copy taken
+twenty minutes earlier.
+
+The sibling project's notes carry this rule verbatim (*"a mutation runner must
+restore from the bytes it saved, never from git"*) and I broke it anyway, in
+the ad-hoc loop rather than in the runner — which is exactly where that note
+says it happens. The two halves of the remedy: **commit before mutating**, and
+restore from a saved copy. Both were applied after the fact; the second
+mutation round ran against `/tmp/safe_ps.html`.
+
+**The tell that something was wrong was in the measurement, not in an error.**
+Two unrelated mutations both reported *"1 distinct fill"* — every pill the same
+colour, which is what `rgba(,0.63)` computes to when its token has gone. A
+mutation whose failure message does not describe the mutation is worth
+reading twice.
+
 ### THE INK SWITCH KEEPS ITS THRESHOLD, and the measurement says why
 
 The label flips from soft to strong ink at `t > 0.6`, and composited against
