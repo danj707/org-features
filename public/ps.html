@@ -1349,7 +1349,9 @@
     })();
     return {
       hidden, excluded, byKey, label, allMeasured, shown, adoptedIn, scoreOf,
-      orgName, everyOrg, all, groups, setKey, history: d.history || [],
+      orgName, everyOrg, all, groups, setKey, history: ofSeriesHistory(d),
+      backfilled: ofBackfilledKeys(d),
+      backfillFrom: ((d.backfillMeta || {}).from) || null,
       trendOf: (slug) => ofTrend(d.history || [], slug, setKey),
       total: (d.features || []).length,
       notUsing: (s2) => shown.filter(k => !adoptedIn(s2, k)),
@@ -1400,6 +1402,43 @@
      flat line. One point is not a trend; a flat line is a claim that nothing
      changed, which is not the same fact as "we have only started measuring".
      Same absent-is-not-zero rule as everywhere else here. */
+  /* ── THE RECONSTRUCTED HALF OF THE SERIES ─────────────────────────────
+     The nightly bake accrues one point a morning and started on 2026-09-07,
+     so the chart had eleven days on it. `data.backfill` is the same shape
+     rebuilt from the production database back to 2026-01-19 — see
+     scripts/refresh/backfill-history.js for how, and for the two things that
+     bound it: a metric whose predicate reads an untimestamped column cannot
+     be reconstructed at all, and the live denominator is only real from the
+     day `organization.published_at` was populated.
+
+     THEY ARE ONE ARRAY FROM HERE ON, and that is safe rather than convenient.
+     A backfilled point carries ONLY the 36 reconstructable features, so
+     `ofFeatureTrend` — which skips any point missing the key it is asked for
+     — picks them up for those and leaves the other 24 starting at the bake,
+     with no filtering to write and none to forget. It carries no per-org
+     `scores` and no `setKey`, so `ofTrend` drops it twice over: a score over
+     36 features is not the same measurement as a score over 60, and the
+     per-organization series must not silently mix the two. */
+  function ofSeriesHistory(d) {
+    const back = (d && d.backfill) || [], live = (d && d.history) || [];
+    return back.concat(live).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  }
+  function ofBackfilledKeys(d) {
+    return new Set(((d && d.backfillMeta && d.backfillMeta.features) || []));
+  }
+  /* AND THE CHART SAYS WHICH HALF IT IS DRAWING. Two lines on one axis, one
+     reaching back eight months and one starting three weeks ago, is a picture
+     that invites the reader to compare their slopes — so the difference has
+     to be on screen rather than in a commit message. It returns null once
+     nothing is reconstructed, so a future where every feature is measured
+     from the start does not carry a permanent footnote about it. */
+  function ofChartProvenance(keys, backfilled, from) {
+    const all = (keys || []), bf = all.filter(k => backfilled && backfilled.has(k));
+    if (!bf.length || bf.length === all.length) return null;
+    return bf.length + " reconstructed from the database back to " + from
+      + ", " + (all.length - bf.length) + " measured from the first bake";
+  }
+
   const TREND_MIN_POINTS = 2;
   function ofTrend(history, slug, setKey) {
     const pts = (history || [])
@@ -1735,26 +1774,52 @@
      appearing IS change, and ranking it below a line that has not moved in a
      month buries the thing this chart is for. A feature with NO measurement
      in the window is not offered at all; there is nothing to draw. */
+  /* ── RANKING COMPARES LIKE WITH LIKE ──────────────────────────────────
+     "Moved most" has to be measured over a window every feature HAS, and
+     after the backfill they no longer share one: 36 features reach back to
+     January and 24 start at the first bake. Ranking on each series' own span
+     puts "+18 points over eight months" above "+3 points over three weeks"
+     and calls the first the bigger mover, which is not a comparison at all —
+     and the effect is not subtle. Measured on the real feed it pushed every
+     one of the 24 off the chart entirely: 14 pills, all reconstructed.
+
+     SO THE RANK IS TAKEN FROM THE FIRST MEASURED BAKE ONWARD, which every
+     feature has by construction — that is the day the nightly bake started
+     recording all of them. The LINE still draws its whole history; only the
+     ordering is scoped. With no backfill at all this is the entire series and
+     the ranking is exactly what it was. */
+  function ofChartRankFrom(history) {
+    const live = (history || []).filter(h => h && !h.backfill);
+    return live.length ? live[0].date : null;
+  }
+  function ofChartRankDelta(t, since) {
+    if (!t || !t.points) return null;
+    const pts = since ? t.points.filter(p => p.date >= since) : t.points;
+    if (pts.length < TREND_MIN_POINTS) return null;
+    return pts[pts.length - 1].v - pts[0].v;
+  }
+
   function ofChartBand(t) {
     if (!t || !t.points.length) return 3;               // nothing in this window
     if (t.ready && t.delta !== 0) return 0;             // moved
     if (!t.ready) return 1;                             // too new to say
     return 2;                                           // measured, flat
   }
-  function ofChartOrder(rows) {
+  function ofChartOrder(rows, since) {
     return (rows || []).filter(r => r && r.trend && r.trend.points.length)
       .slice().sort((a, b) => {
         const ba = ofChartBand(a.trend), bb = ofChartBand(b.trend);
         if (ba !== bb) return ba - bb;
-        const da = Math.abs(a.trend.delta || 0), db = Math.abs(b.trend.delta || 0);
+        const da = Math.abs(ofChartRankDelta(a.trend, since) || 0);
+        const db = Math.abs(ofChartRankDelta(b.trend, since) || 0);
         if (db !== da) return db - da;
         const pa = a.pct == null ? -1 : a.pct, pb = b.pct == null ? -1 : b.pct;
         if (pb !== pa) return pb - pa;
         return String(a.name).localeCompare(String(b.name));
       });
   }
-  function ofChartDefault(rows) {
-    return ofChartOrder(rows).slice(0, OF_CHART_OPEN).map(r => r.key);
+  function ofChartDefault(rows, since) {
+    return ofChartOrder(rows, since).slice(0, OF_CHART_OPEN).map(r => r.key);
   }
 
   /* COLOUR FOLLOWS THE FEATURE, NOT ITS RANK. The slot list is positional and
@@ -1856,7 +1921,7 @@
   const OF_CHART_BOX = { w: 960, h: 264, l: 38, r: 190, t: 14, b: 30 };
   const OF_CHART_NAME_MAX = 20;
 
-  function FeatureAdoptionChart({ rows, history }) {
+  function FeatureAdoptionChart({ rows, history, backfilled, backfillFrom }) {
     const [range, setRange] = React.useState("all");
     const [cq, setCq] = React.useState("");
     const ranges = ofChartRangeOptions(history);
@@ -1867,8 +1932,10 @@
     const pick = ranges.find(r => r.id === range && r.enabled) || ranges[ranges.length - 1];
     const hist = ofChartWindow(history, pick.days);
     const wrows = ofChartRows(rows, hist);
-    const plottable = ofChartOrder(wrows);
-    const [slots, setSlots] = React.useState(() => ofChartDefault(ofChartRows(rows, history)));
+    const rankFrom = ofChartRankFrom(history);
+    const plottable = ofChartOrder(wrows, rankFrom);
+    const [slots, setSlots] = React.useState(() =>
+      ofChartDefault(ofChartRows(rows, history), ofChartRankFrom(history)));
     const [showAll, setShowAll] = React.useState(false);
     const [hoverIdx, setHoverIdx] = React.useState(null);
     const svgRef = React.useRef(null);
@@ -1976,10 +2043,21 @@
                   "data-of-chart-pill": r.key,
                   "data-of-chart-color": col || "",
                   disabled: locked,
+                  /* A FEATURE THE BACKFILL COULD NOT REACH SAYS SO ON ITS OWN
+                     PILL. The footnote gives the totals; this is what answers
+                     "why is this line so much shorter" at the point of asking,
+                     and it names the cause rather than the symptom — the
+                     database keeps no record of when the setting changed, so
+                     there is nothing to reconstruct. */
+                  "data-of-chart-bf": backfilled && backfilled.has(r.key) ? "1" : "0",
                   title: locked
                     ? "Six lines is the most this chart will draw — take one off to add another"
                     : r.name + " · " + r.pct + "% of live organizations · "
-                      + (r.trend.delta > 0 ? "+" : "") + r.trend.delta + " points since " + r.trend.from,
+                      + (r.trend.delta > 0 ? "+" : "") + r.trend.delta + " points since " + r.trend.from
+                      + (backfilled && !backfilled.has(r.key)
+                          ? " · measured from the first bake only — this one reads a setting "
+                            + "the database keeps no history of, so it cannot be reconstructed"
+                          : ""),
                   style: on ? { background: col, borderColor: col, color: "var(--card)" } : null,
                   onClick: () => setSlots(s => ofChartToggle(s, r.key)),
                 },
@@ -2117,7 +2195,17 @@
               dates.length ? " from " + ofChartDateLabel(dates[0]) + " to "
                              + ofChartDateLabel(dates[dates.length - 1]) : "",
               " · ", plottable.length + " of " + (rows || []).length
-              + " features have enough history to plot")));
+              + " features have enough history to plot",
+              /* WHICH HALF OF THE LINE WAS MEASURED AND WHICH WAS REBUILT.
+                 Only about the series actually on the chart, not about the
+                 catalog — a reader comparing two slopes wants to know whether
+                 THESE two reach back equally far. */
+              (() => {
+                const prov = ofChartProvenance(series.map(s => s.key), backfilled, backfillFrom
+                  ? ofChartDateLabel(backfillFrom) : "the start");
+                return prov ? e(React.Fragment, null, " · ",
+                  e("span", { "data-of-chart-prov": prov }, prov)) : null;
+              })())));
   }
 
   function Spark({ series }) {
@@ -3491,7 +3579,8 @@
         /* ABOVE THE TABLE IT PLOTS, and below the Moving card it expands —
            the chart's pills and the table's rows are the same population, so
            a reader who spots a line climbing scrolls straight to the row. */
-        e(FeatureAdoptionChart, { rows: fall, history: dv.history }),
+        e(FeatureAdoptionChart, { rows: fall, history: dv.history,
+                                  backfilled: dv.backfilled, backfillFrom: dv.backfillFrom }),
 
         e("div", { className: "panel" },
           e("h2", null, "Feature adoption across the fleet",
