@@ -776,6 +776,275 @@ const CASES = [
   { name: "how this works", path: "/ps/how", needs: "svg" },
   { name: "updates", path: "/ps/updates", needs: ".panel" },
   { name: "the public dashboard", path: "/", needs: ".panel" },
+
+  /* ── THE THEME ─────────────────────────────────────────────────────────
+     NO SOURCE ASSERTION CAN SEE ANY OF THIS. A stylesheet full of tokens
+     reads exactly as plausibly whether or not the dark scope ever wins, and
+     `data-theme="dark"` on <html> is an attribute, not a dark page — the
+     sibling project shipped a `wx-night` class that named a night sky and
+     painted none of it. So these cases read the COMPUTED background of a
+     real card and the LUMINANCE of the ink on it, and compare the two modes
+     against each other rather than against a hex nobody would notice
+     drifting. */
+  { name: "theme · a stored Dark really paints dark",
+    path: "/ps/features", needs: '[data-rc-dark="1"]',
+    pre: async (pg) => pg.evaluateOnNewDocument(() => {
+      try { localStorage.setItem("psTheme", "dark"); } catch (e) {} }),
+    act: async (pg) => {
+      await pg.waitForSelector(".panel");
+      await pg.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = (c.match(/[\d.]+/g) || [255, 255, 255]).slice(0, 3).map(Number);
+          const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const panel = document.querySelector(".panel");
+        const h2 = panel.querySelector("h2") || panel;
+        const bg = lum(getComputedStyle(panel).backgroundColor);
+        const ink = lum(getComputedStyle(h2).color);
+        const page = lum(getComputedStyle(document.body).backgroundColor);
+        /* A DARK CARD ON A DARKER PAGE, WITH LIGHT INK ON IT. All three, or
+           a card that stayed white inside a dark page passes the first. */
+        document.body.setAttribute("data-rc-dark",
+          bg < 0.15 && page < 0.15 && ink > 0.4 ? "1" : "0");
+        document.body.setAttribute("data-rc-dark-seen",
+          `page lum ${page.toFixed(3)} · card ${bg.toFixed(3)} · ink ${ink.toFixed(3)}`);
+      });
+    } },
+
+  /* CLICKING IT REPAINTS, WITHOUT A RELOAD. The stamp is written by the head
+     script on load; the toggle has to write the same attribute live, or the
+     control appears to do nothing until you navigate. */
+  { name: "theme · clicking Dark repaints the page",
+    path: "/ps/features", needs: '[data-rc-flip="1"]',
+    pre: async (pg) => pg.evaluateOnNewDocument(() => {
+      try { localStorage.setItem("psTheme", "light"); } catch (e) {} }),
+    act: async (pg) => {
+      await pg.waitForSelector('.themebtn');
+      const read = () => pg.evaluate(() => getComputedStyle(document.querySelector(".panel")).backgroundColor);
+      const before = await read();
+      await pg.evaluate(() => [...document.querySelectorAll(".themebtn")]
+        .find(b => b.textContent.includes("Dark")).click());
+      await pg.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "dark",
+                               { timeout: 5000 });
+      const after = await read();
+      await pg.evaluate((b, a) => {
+        const lum = (c) => {
+          const [r, g, bl] = (c.match(/[\d.]+/g) || [255, 255, 255]).slice(0, 3).map(Number);
+          const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
+        };
+        document.body.setAttribute("data-rc-flip", lum(b) > 0.6 && lum(a) < 0.15 ? "1" : "0");
+        document.body.setAttribute("data-rc-flip-seen", `card ${b} -> ${a}`);
+      }, before, after);
+    } },
+
+  /* AND IT SURVIVES A RELOAD, STAMPED BEFORE THE FIRST PAINT. This is the
+     flash test: the attribute has to be on <html> from the head script, so
+     it is already there when React mounts rather than being applied by an
+     effect a frame later. Reading it inside an early document script is the
+     only way to tell those two apart from the outside. */
+  { name: "theme · the choice survives a reload, with no light flash",
+    path: "/ps/features", needs: '[data-rc-persist="1"]',
+    pre: async (pg) => pg.evaluateOnNewDocument(() => {
+      try { localStorage.setItem("psTheme", "dark"); } catch (e) {}
+      /* SAMPLED THE MOMENT <body> EXISTS, which is while <head> has just
+         finished parsing and long before the app script at the foot of the
+         document has run. `documentElement` is still null when this hook
+         itself runs, so an observer is the only way to catch that instant —
+         and it is the instant that matters: a stamp applied from a React
+         effect lands frames later, after a white first paint. */
+      const obs = new MutationObserver(() => {
+        if (!document.body || window.__themeAtStart !== undefined) return;
+        window.__themeAtStart = document.documentElement.getAttribute("data-theme");
+        window.__rootEmptyAtStart = !document.getElementById("root")
+          || !document.getElementById("root").childNodes.length;
+        obs.disconnect();
+      });
+      obs.observe(document, { childList: true, subtree: true });
+    }),
+    act: async (pg) => {
+      await pg.waitForSelector(".panel");
+      await pg.evaluate(() => {
+        /* BOTH HALVES. "It was dark" alone would pass if the sample simply
+           happened after React; requiring the root to have been EMPTY at the
+           same instant is what says the stamp beat the app. */
+        document.body.setAttribute("data-rc-persist",
+          window.__themeAtStart === "dark" && window.__rootEmptyAtStart === true ? "1" : "0");
+        document.body.setAttribute("data-rc-persist-seen",
+          "data-theme when <body> appeared: " + String(window.__themeAtStart)
+          + " · react had not rendered: " + String(window.__rootEmptyAtStart));
+      });
+    } },
+
+  /* AN UNPINNED VIEWER FOLLOWS THE OS, with no stored value and no script —
+     the media query alone. */
+  { name: "theme · unpinned follows the OS",
+    path: "/ps/features", needs: '[data-rc-os="1"]',
+    pre: async (pg) => {
+      await pg.evaluateOnNewDocument(() => { try { localStorage.removeItem("psTheme"); } catch (e) {} });
+      await pg.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
+    },
+    act: async (pg) => {
+      await pg.waitForSelector(".panel");
+      await pg.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = (c.match(/[\d.]+/g) || [255, 255, 255]).slice(0, 3).map(Number);
+          const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const bg = lum(getComputedStyle(document.querySelector(".panel")).backgroundColor);
+        const stamped = document.documentElement.getAttribute("data-theme");
+        /* NO STAMP AND STILL DARK is the whole claim — a stamp here would
+           mean the app wrote one, which is not what an unpinned viewer gets. */
+        document.body.setAttribute("data-rc-os", bg < 0.15 && !stamped ? "1" : "0");
+        document.body.setAttribute("data-rc-os-seen",
+          `card lum ${bg.toFixed(3)} · stamp ${String(stamped)}`);
+      });
+    } },
+
+  /* THE ONE THAT ACTUALLY BREAKS: a pinned Light on a dark machine. Without
+     the :not([data-theme="light"]) guard on the media query, the OS wins and
+     the toggle silently does nothing in that one direction — which reads as
+     the feature being broken rather than as a cascade bug. */
+  { name: "theme · a pinned Light beats a dark OS",
+    path: "/ps/features", needs: '[data-rc-pinlight="1"]',
+    pre: async (pg) => {
+      await pg.evaluateOnNewDocument(() => { try { localStorage.setItem("psTheme", "light"); } catch (e) {} });
+      await pg.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
+    },
+    act: async (pg) => {
+      await pg.waitForSelector(".panel");
+      await pg.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = (c.match(/[\d.]+/g) || [255, 255, 255]).slice(0, 3).map(Number);
+          const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const bg = lum(getComputedStyle(document.querySelector(".panel")).backgroundColor);
+        document.body.setAttribute("data-rc-pinlight", bg > 0.6 ? "1" : "0");
+        document.body.setAttribute("data-rc-pinlight-seen", `card lum ${bg.toFixed(3)} on a dark OS`);
+      });
+    } },
+
+  /* THE CHART THEMES WITH THE PAGE. Its lines are SVG, and an SVG
+     presentation attribute is the one place a token could have failed to
+     resolve — so this reads the COMPUTED stroke of a real line in each mode
+     and requires the two to differ. A line still painting its light step on
+     a dark card is the shape this catches. */
+  /* THE SHARED METRIC PILL, which is the one thing here that was actually
+     broken and that nothing could see. /feature-pills.js serves BOTH this
+     themed page and the light-only public dashboard, so its colours lived as
+     hardcoded hex — a "measured zero" pill painted #fff with #cbd5e1 ink,
+     i.e. a white chip on a slate card. It renders only inside the A/B compare
+     panel, which is why no existing case and no screenshot of the default
+     page ever showed it.
+
+     THE FLOOR IS THE LIGHT MODE'S OWN, NOT 3:1. A first draft required 3:1
+     of every pill and FAILED ON CORRECT CODE: the two recessive branches are
+     deliberately faint in both modes — a measured zero is 1.48:1 on white by
+     design, so the number recedes and the column reads as a comparison. A
+     blanket floor would have been an assertion about a decision nobody made
+     here. What dark must not do is be WORSE than the mode that ships today,
+     and it must not paint a light chip on a dark card — so the case measures
+     both modes on the same element and compares them. */
+  { name: "theme · the shared metric pill is no worse in dark",
+    path: "/ps/features", needs: '[data-rc-pill="1"]',
+    pre: async (pg) => pg.evaluateOnNewDocument(() => {
+      try { localStorage.setItem("psTheme", "dark"); } catch (e) {} }),
+    act: async (pg) => {
+      await pg.waitForSelector("select");
+      /* THE TWO BUSIEST ORGS, read from the snapshot rather than taken as the
+         first two options. The first two are alphabetical and pre-launch —
+         every metric is a real ZERO, so the ramp's `v === 0` branch returns
+         before `t` is ever computed and the WASH is never drawn. A first
+         draft did exactly that and an inverted ink mutation survived it:
+         a fixture where a wrong implementation cannot look wrong is not a
+         guard. */
+      await pg.evaluate(async () => {
+        const d = await fetch("/api/data").then(r => r.json());
+        const tot = (u) => Object.values(u || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+        const busiest = Object.entries(d.usage || {})
+          .map(([slug, u]) => ({ slug, n: tot(u) }))
+          .sort((a, b) => b.n - a.n).slice(0, 2);
+        const set = (el, slug) => {
+          Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value")
+            .set.call(el, slug);
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+        };
+        const sels = [...document.querySelectorAll("select")].slice(0, 2);
+        set(sels[0], busiest[0].slug); set(sels[1], busiest[1].slug);
+        window.__pillOrgs = busiest.map(b => b.slug + " (" + b.n + ")").join(" vs ");
+      });
+      await pg.waitForSelector(".cmprow .pill.mpill", { timeout: 15000 });
+      await pg.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = (c.match(/[\d.]+/g) || [255, 255, 255]).slice(0, 3).map(Number);
+          const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const ratio = (a, b) => {
+          const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+          return (x + 0.05) / (y + 0.05);
+        };
+        /* Read EVERY pill in the panel, not the first: the ramp has three
+           branches (not measured, a real zero, the wash) and a case that
+           sampled one would pass on the other two being white. */
+        const read = () => [...document.querySelectorAll(".cmprow .pill.mpill")].map(p => {
+          const st = getComputedStyle(p);
+          return { bg: st.backgroundColor, ink: st.color,
+                   l: lum(st.backgroundColor), r: ratio(st.color, st.backgroundColor) };
+        });
+        const dark = read();
+        document.documentElement.setAttribute("data-theme", "light");
+        const light = read();
+        document.documentElement.setAttribute("data-theme", "dark");
+
+        /* A LIGHT CHIP ON A DARK CARD is the regression this exists for, and
+           it is the one thing that needs no baseline to judge. */
+        const chips = dark.filter(x => x.l > 0.5);
+        /* AND NO BRANCH MAY BE WORSE THAN THE MODE THAT SHIPS TODAY. The
+           0.15 slack is for compositing rounding, not for a real drop. */
+        const worse = dark.map((d, i) => ({ d, l: light[i] }))
+          .filter(x => x.l && x.d.r < x.l.r - 0.15);
+        /* AND THE WASH MUST HAVE RENDERED. The recessive branches are flat
+           token colours; the ramp is the only one that produces a
+           translucent fill, so a run where every pill is the same colour as
+           its neighbours has exercised nothing. */
+        const distinct = new Set(dark.map(x => x.bg)).size;
+        document.body.setAttribute("data-rc-pill",
+          dark.length > 0 && distinct > 1 && !chips.length && !worse.length ? "1" : "0");
+        document.body.setAttribute("data-rc-pill-seen",
+          dark.length + " pill(s), " + distinct + " distinct fill(s) · "
+          + (window.__pillOrgs || "?") + " · " + chips.length + " light chip(s) · "
+          + worse.length + " worse than light"
+          + (chips.length ? " (chip bg " + chips[0].bg + ")" : "")
+          + (worse.length ? " (" + worse[0].d.r.toFixed(2) + ":1 dark vs "
+             + worse[0].l.r.toFixed(2) + ":1 light)" : ""));
+      });
+    } },
+
+  { name: "theme · the chart's series colours follow the theme",
+    path: "/ps/feature", needs: '[data-rc-series="1"]',
+    pre: async (pg) => pg.evaluateOnNewDocument(() => {
+      try { localStorage.setItem("psTheme", "dark"); } catch (e) {} }),
+    act: async (pg) => {
+      await pg.waitForSelector("[data-of-chart-line]");
+      await pg.evaluate(() => {
+        const l = document.querySelector("[data-of-chart-line]");
+        const dark = getComputedStyle(l).stroke;
+        document.documentElement.setAttribute("data-theme", "light");
+        const light = getComputedStyle(l).stroke;
+        document.documentElement.setAttribute("data-theme", "dark");
+        /* BOTH REAL AND DIFFERENT. A token that failed to resolve computes
+           to black in both, which would otherwise pass an "it changed" test
+           only by accident. */
+        const real = (c) => /^rgb/.test(c) && c !== "rgb(0, 0, 0)";
+        document.body.setAttribute("data-rc-series",
+          real(dark) && real(light) && dark !== light ? "1" : "0");
+        document.body.setAttribute("data-rc-series-seen", `line stroke light ${light} · dark ${dark}`);
+      });
+    } },
 ];
 
 for (const c of CASES) {
@@ -813,6 +1082,13 @@ const cases = only ? CASES.filter(c => c.name.includes(only)) : CASES;
     pg.on("console", m => { if (m.type() === "error") errs.push("console: " + m.text().split("\n")[0]); });
     await pg.setCookie({ name: cn, value: cv, domain: "127.0.0.1", path: "/" });
     try {
+      /* A `pre` HOOK, BECAUSE SOME STATE DECIDES THE FIRST PAINT. The theme
+         is stamped onto <html> by a script in the head, so a theme set from
+         `act` is set AFTER the page it decides has already been drawn — the
+         case would be testing a repaint rather than a load. Anything that
+         has to be true before navigation goes here: seeded localStorage, an
+         emulated OS preference. */
+      if (c.pre) await c.pre(pg);
       await pg.goto(`http://127.0.0.1:${PORT}${c.path}`, { waitUntil: "networkidle2", timeout: 45000 });
       if (c.act) await c.act(pg);
       if (c.needs) await pg.waitForSelector(c.needs, { timeout: 30000 });

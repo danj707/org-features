@@ -5,38 +5,227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rec · PS Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<!-- THE THEME STAMP GOES ON BEFORE ANYTHING PAINTS, and that is the whole
+     reason it is here rather than in the React app. Set from an effect and a
+     dark-mode viewer gets a full-brightness white flash on every load and
+     every route change, which is worse than having no toggle at all.
+
+     NO STAMP MEANS "FOLLOW THE OS" — the media query in the stylesheet
+     handles that case, so an unpinned viewer needs no JavaScript to get the
+     right mode. This script only writes a stamp when someone has actually
+     chosen, and it fails silently: localStorage throws in a locked-down
+     browser, and a theme preference is not worth a blank page. -->
+<script>
+  try {
+    var t = localStorage.getItem("psTheme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+</script>
 <script src="/vendor/react.production.min.js"></script>
 <script src="/vendor/react-dom.production.min.js"></script>
 <script src="/feature-pills.js"></script>
 <style>
+  /* ── THEME TOKENS ────────────────────────────────────────────────────────
+     Every themeable colour on this page is a token, declared once per mode.
+     Both modes are SELECTED, not computed: a dark theme derived by flipping
+     lightness produces muddy hues, and the categorical series steps below are
+     the validated dark column of the data-viz reference palette rather than
+     darkened copies of the light ones.
+
+     THE DARK SURFACES ARE THE ONES THIS PAGE ALREADY HAD. The sidebar has
+     always been navy and the CX capacity grid has always been slate on
+     slate — so dark mode is not a new look invented here, it
+     is the rest of the page catching up with the two regions that were
+     already dark. That is also why the capacity grid needs no dark variants:
+     it is already wearing them.
+
+     WHY TOKENS RATHER THAN A SECOND STYLESHEET: an inline `style={{...}}`
+     beats any stylesheet, and ~170 of this page's colour decisions are inline
+     React styles. A second stylesheet could never reach them. A token can —
+     `style={{ color: "var(--ink)" }}` resolves against the cascade at paint
+     time, so the same declaration themes itself.
+
+     The one place that CANNOT use a token is an SVG *presentation attribute*
+     (`stroke="…"`, `fill="…"`), which does not resolve var(). Those either
+     move into `style` or, where a render case reads the attribute, read from
+     the JS palette pair (see OF_SERIES_COLORS / OF_SERIES_COLORS_DARK). */
   :root {
-    --bg: #f4f6fa; --card: #ffffff; --ink: #1a2333; --muted: #64748b;
-    --line: #e2e8f0; --brand: #0f6f5c; --brand-2: #0d5c99;
+    color-scheme: light;
+    /* surfaces */
+    --bg: #f4f6fa; --card: #ffffff; --fill: #f8fafc; --fill-2: #f1f5f9;
+    --track: #eef2f7; --nav: #10233d;
+    /* The sidebar is dark in BOTH modes, so its ink is fixed. Reading
+       --card here would flip the logo to slate-on-navy. */
+    --nav-ink: #cbd5e1; --nav-ink-strong: #ffffff; --nav-warn: #fbbf24;
+    /* ink, darkest to lightest */
+    --ink: #1a2333; --ink-2: #334155; --muted: #64748b; --faint: #94a3b8;
+    --on-accent: #ffffff;
+    /* rules */
+    --line: #e2e8f0; --line-2: #cbd5e1;
+    /* brand */
+    --brand: #0f6f5c; --brand-hover: #0c5b4b; --brand-2: #0d5c99;
+    /* The masthead band. Its own tokens because a full-width fill and a
+       12px control want different steps of the same hue: on dark the
+       control has to lift off the surface while the band must not
+       become a neon stripe across the top of the page. */
+    --hdr-1: #0f6f5c; --hdr-2: #0d5c99;
+    --nav-accent: #6ee7b7;
+    /* status inks (kept under their original names — they are referenced by
+       .zero and by the ring meters) */
     --good: #16a34a; --warn: #d97706; --bad: #dc2626; --none: #cbd5e1;
-    --nav: #10233d;
+    /* semantic families: a tinted band, an ink that reads on it, an edge */
+    --good-bg: #dcfce7; --good-bg-2: #ecfdf5; --good-ink: #166534;
+    --good-ink-2: #15803d; --good-edge: #86efac;
+    --warn-bg: #fffbeb; --warn-bg-2: #fef3c7; --warn-ink: #b45309;
+    --warn-ink-2: #92400e; --warn-edge: #fcd34d; --warn-edge-2: #fde68a;
+    --bad-bg: #fee2e2; --bad-bg-2: #fef2f2; --bad-ink: #b91c1c; --bad-edge: #fca5a5;
+    --orange-bg: #ffedd5; --orange-bg-2: #fff7ed; --orange-ink: #c2410c;
+    --orange-ink-2: #9a3412; --orange-ink-3: #ea580c; --orange-edge: #fdba74;
+    --info-bg: #e0f2fe; --info-bg-2: #eef6ff; --info-ink: #075985; --info-edge: #93c5fd;
+    --aqua-bg: #cffafe; --aqua-ink: #155e75;
+    --pink-bg: #fce7f3; --pink-ink: #9d174d;
+    --violet-bg: #f5f3ff; --violet-edge: #c4b5fd;
+    --yellow-bg: #fef9c3; --yellow-ink: #a16207;
+    --neutral-bg: #e2e8f0; --neutral-ink: #475569;
+    --spark: #93c5fd; --spark-hot: #3b82f6;
+    /* The metric pill's heat ramp, read by /feature-pills.js — which is
+       shared with the light-only public dashboard, so both pages declare
+       these names. The wash is translucent over the card; only its HUE and
+       the two label inks are re-chosen per mode. */
+    --pill-null-bg: #f8fafc; --pill-null-ink: #94a3b8;
+    --pill-zero-bg: #ffffff; --pill-zero-ink: #cbd5e1;
+    --pill-heat-rgb: 15,111,92;
+    --pill-ink-strong: #ffffff; --pill-ink-soft: #0f3d33;
+    /* the six categorical series slots, light column */
+    --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a;
+    --series-4: #eda100; --series-5: #e87ba4; --series-6: #008300;
+  }
+  /* THE TOGGLE SCOPE AND THE OS SETTING, in that order. The `[data-theme]`
+     stamp must win both ways, so the media query is written with :where() —
+     zero specificity — and guarded against an explicit light stamp. Without
+     the guard a viewer on an OS-dark machine who picks LIGHT gets dark
+     anyway, which is the toggle silently not working. */
+  /* The dark column. Declared TWICE on purpose — the media query covers the
+     OS setting, the [data-theme] scope covers the toggle. :where() gives the
+     media block zero specificity and the :not() guard lets an explicit LIGHT
+     stamp beat OS-dark, so the toggle wins in both directions. Without that
+     guard a viewer on a dark machine who picks Light gets dark anyway, which
+     reads as the toggle being broken. */
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0f172a; --card: #1e293b; --fill: #18243a; --fill-2: #27344a;
+    --track: #2a3852; --nav: #0b1830;
+    --nav-ink: #cbd5e1; --nav-ink-strong: #ffffff; --nav-warn: #fbbf24;
+    --ink: #e6edf7; --ink-2: #c2cede; --muted: #93a3ba; --faint: #6b7c96;
+    --on-accent: #ffffff;
+    --line: #31405a; --line-2: #44556f;
+    --brand: #14a184; --brand-hover: #17b895; --brand-2: #4b9fe8;
+    --hdr-1: #0c4f43; --hdr-2: #0c3f66;
+    --nav-accent: #6ee7b7;
+    --good: #34d399; --warn: #fbbf24; --bad: #f87171; --none: #44556f;
+    --good-bg: #12351f; --good-bg-2: #0f2c22; --good-ink: #6ee7b7;
+    --good-ink-2: #34d399; --good-edge: #1c5b3a;
+    --warn-bg: #3a2c10; --warn-bg-2: #3f310f; --warn-ink: #fbbf24;
+    --warn-ink-2: #fcd34d; --warn-edge: #6b4f14; --warn-edge-2: #6b4f14;
+    --bad-bg: #3b1717; --bad-bg-2: #331414; --bad-ink: #f87171; --bad-edge: #6d2626;
+    --orange-bg: #3a2213; --orange-bg-2: #331d10; --orange-ink: #fb923c;
+    --orange-ink-2: #fdba74; --orange-ink-3: #fb923c; --orange-edge: #6b3a1c;
+    --info-bg: #122f45; --info-bg-2: #10283a; --info-ink: #7dd3fc; --info-edge: #2a5477;
+    --aqua-bg: #0f3542; --aqua-ink: #67e8f9;
+    --pink-bg: #3a1428; --pink-ink: #f9a8d4;
+    --violet-bg: #221f45; --violet-edge: #4b3fa0;
+    --yellow-bg: #3a3412; --yellow-ink: #facc15;
+    --neutral-bg: #2f3d54; --neutral-ink: #aab8cc;
+    --spark: #3b6ea8; --spark-hot: #60a5fa;
+    /* A LIGHT teal on dark, so "more" is always FURTHER from the surface.
+       Carrying the light hue over inverts the scale: the same deep teal that
+       reads as a full pill on white reads as an empty one on slate. */
+    --pill-null-bg: #18243a; --pill-null-ink: #6b7c96;
+    --pill-zero-bg: #1e293b; --pill-zero-ink: #44556f;
+    --pill-heat-rgb: 52,211,153;
+    --pill-ink-strong: #06231d; --pill-ink-soft: #c2cede;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+    --series-4: #c98500; --series-5: #d55181; --series-6: #008300;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f172a; --card: #1e293b; --fill: #18243a; --fill-2: #27344a;
+    --track: #2a3852; --nav: #0b1830;
+    --nav-ink: #cbd5e1; --nav-ink-strong: #ffffff; --nav-warn: #fbbf24;
+    --ink: #e6edf7; --ink-2: #c2cede; --muted: #93a3ba; --faint: #6b7c96;
+    --on-accent: #ffffff;
+    --line: #31405a; --line-2: #44556f;
+    --brand: #14a184; --brand-hover: #17b895; --brand-2: #4b9fe8;
+    --hdr-1: #0c4f43; --hdr-2: #0c3f66;
+    --nav-accent: #6ee7b7;
+    --good: #34d399; --warn: #fbbf24; --bad: #f87171; --none: #44556f;
+    --good-bg: #12351f; --good-bg-2: #0f2c22; --good-ink: #6ee7b7;
+    --good-ink-2: #34d399; --good-edge: #1c5b3a;
+    --warn-bg: #3a2c10; --warn-bg-2: #3f310f; --warn-ink: #fbbf24;
+    --warn-ink-2: #fcd34d; --warn-edge: #6b4f14; --warn-edge-2: #6b4f14;
+    --bad-bg: #3b1717; --bad-bg-2: #331414; --bad-ink: #f87171; --bad-edge: #6d2626;
+    --orange-bg: #3a2213; --orange-bg-2: #331d10; --orange-ink: #fb923c;
+    --orange-ink-2: #fdba74; --orange-ink-3: #fb923c; --orange-edge: #6b3a1c;
+    --info-bg: #122f45; --info-bg-2: #10283a; --info-ink: #7dd3fc; --info-edge: #2a5477;
+    --aqua-bg: #0f3542; --aqua-ink: #67e8f9;
+    --pink-bg: #3a1428; --pink-ink: #f9a8d4;
+    --violet-bg: #221f45; --violet-edge: #4b3fa0;
+    --yellow-bg: #3a3412; --yellow-ink: #facc15;
+    --neutral-bg: #2f3d54; --neutral-ink: #aab8cc;
+    --spark: #3b6ea8; --spark-hot: #60a5fa;
+    /* A LIGHT teal on dark, so "more" is always FURTHER from the surface.
+       Carrying the light hue over inverts the scale: the same deep teal that
+       reads as a full pill on white reads as an empty one on slate. */
+    --pill-null-bg: #18243a; --pill-null-ink: #6b7c96;
+    --pill-zero-bg: #1e293b; --pill-zero-ink: #44556f;
+    --pill-heat-rgb: 52,211,153;
+    --pill-ink-strong: #06231d; --pill-ink-soft: #c2cede;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+    --series-4: #c98500; --series-5: #d55181; --series-6: #008300;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--ink); }
   a { color: var(--brand-2); text-decoration: none; }
   .layout { display: flex; min-height: 100vh; }
-  nav.side { width: 216px; flex: none; background: var(--nav); color: #cbd5e1; padding: 18px 0; position: sticky; top: 0; height: 100vh; }
-  nav.side .logo { color: #fff; font-weight: 800; font-size: 16px; padding: 4px 18px 14px; letter-spacing: .3px;
+  nav.side { width: 216px; flex: none; background: var(--nav); color: var(--line-2); padding: 18px 0; position: sticky; top: 0; height: 100vh; }
+  nav.side .logo { color: var(--nav-ink-strong); font-weight: 800; font-size: 16px; padding: 4px 18px 14px; letter-spacing: .3px;
                    display: flex; align-items: center; gap: 8px; }
-  nav.side .logo span { color: #6ee7b7; }
+  nav.side .logo span { color: var(--nav-accent); }
   /* THE REAL REC MARK, not a redrawn one. This is the same asset the sibling
      rental-report project embeds in its admin header, extracted to a file
      here rather than inlined as a 4KB base64 string — it is cacheable and it
      keeps this block readable. A guessed logo and a guessed brand colour is
      how two of our own surfaces come to look like different products. */
   nav.side .logo img { height: 24px; width: 24px; border-radius: 5px; flex: none; display: block; }
-  nav.side .sec { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: #64748b; padding: 14px 18px 6px; }
-  nav.side a.item { display: block; padding: 9px 18px; color: #cbd5e1; font-size: 13.5px; font-weight: 600; border-left: 3px solid transparent; }
-  nav.side a.item:hover { background: rgba(255,255,255,.06); color: #fff; }
-  nav.side a.item.active { background: rgba(255,255,255,.08); color: #fff; border-left-color: #6ee7b7; }
+  nav.side .sec { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); padding: 14px 18px 6px; }
+  nav.side a.item { display: block; padding: 9px 18px; color: var(--line-2); font-size: 13.5px; font-weight: 600; border-left: 3px solid transparent; }
+  nav.side a.item:hover { background: rgba(255,255,255,.06); color: var(--nav-ink-strong); }
+  nav.side a.item.active { background: rgba(255,255,255,.08); color: var(--nav-ink-strong); border-left-color: var(--nav-accent); }
   nav.side a.item .cnt { float: right; background: rgba(255,255,255,.12); border-radius: 999px; font-size: 11px; padding: 1px 8px; }
-  nav.side .foot { position: absolute; bottom: 14px; left: 18px; right: 12px; font-size: 11px; color: #64748b; }
+  nav.side .foot { position: absolute; bottom: 14px; left: 18px; right: 12px; font-size: 11px; color: var(--muted); }
   main { flex: 1; min-width: 0; }
-  header.top { background: linear-gradient(135deg, #0f6f5c 0%, #0d5c99 100%); color: #fff; padding: 18px 24px; }
+  /* ── The theme switch, in the sidebar foot ──────────────────────────────
+     It lives on the nav, which is dark in BOTH modes, so it wears the nav's
+     own fixed ink rather than --ink/--card: reading a themed token here
+     would make the control invert while the surface under it did not. */
+  .themesw { display: inline-flex; gap: 2px; padding: 2px; margin-bottom: 9px;
+             background: rgba(255,255,255,.07); border-radius: 999px; }
+  .themebtn { display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+              border: 0; background: none; color: var(--nav-ink); font: inherit;
+              font-size: 11px; font-weight: 700; line-height: 1;
+              padding: 5px 10px; border-radius: 999px; }
+  .themebtn span { font-size: 11px; }
+  .themebtn:hover { color: var(--nav-ink-strong); }
+  /* THE LIVE ONE IS FILLED, not underlined or merely brighter — the page's
+     own .slicetab and .qvchip already make that argument, and two buttons
+     where neither is obviously "on" is the control reading as broken. */
+  .themebtn.on { background: rgba(255,255,255,.16); color: var(--nav-ink-strong); }
+  /* A KEYBOARD USER HAS TO SEE THE FOCUS. The default ring is a thin dark
+     outline, which is invisible on navy. */
+  .themebtn:focus-visible { outline: 2px solid var(--nav-accent); outline-offset: 1px; }
+  header.top { background: linear-gradient(135deg, var(--hdr-1) 0%, var(--hdr-2) 100%); color: var(--on-accent); padding: 18px 24px; }
   header.top h1 { font-size: 19px; margin: 0 0 2px; }
   header.top .sub { opacity: .85; font-size: 12.5px; }
   .wrap { max-width: 1240px; margin: 0 auto; padding: 18px 22px 60px; }
@@ -48,54 +237,54 @@
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 2px rgba(16,24,40,.04); overflow: hidden; margin-bottom: 20px; }
   .panel h2 { font-size: 15px; margin: 0; padding: 13px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .panel h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--line); background: #fbfcfe; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--fill); }
   .filters input[type=text] { flex: 1 1 220px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
-  .filters select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; background: #fff; color: var(--ink); }
+  .filters select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; background: var(--card); color: var(--ink); }
   .filters label.chk { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted); padding: 6px 4px; }
   .tablewrap { overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
   th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-  th { background: #f8fafc; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; cursor: pointer; user-select: none; z-index: 1; }
+  th { background: var(--fill); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; cursor: pointer; user-select: none; z-index: 1; }
   th.l, td.l { text-align: left; }
   td.name { text-align: left; font-weight: 600; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
   td.wraptxt { white-space: normal; min-width: 260px; max-width: 480px; }
-  .tablewrap tr:hover td { background: #f1f5f9; }
+  .tablewrap tr:hover td { background: var(--fill-2); }
   td.num { font-variant-numeric: tabular-nums; }
   .zero { color: var(--none); }
   .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 11.5px; }
-  .pill.p1 { background: #fee2e2; color: #b91c1c; }
-  .pill.p2 { background: #ffedd5; color: #c2410c; }
-  .pill.p3 { background: #fef9c3; color: #a16207; }
-  .pill.p4 { background: #e2e8f0; color: #475569; }
-  .pill.p0 { background: #f1f5f9; color: #94a3b8; }
-  .pill.status { background: #e0f2fe; color: #075985; }
-  .pill.neg { background: #fee2e2; color: #b91c1c; font-weight: 600; }
-  .pill.pos { background: #dcfce7; color: #166534; font-weight: 600; }
-  .pill.frdev { background: #fce7f3; color: #9d174d; }
-  .pill.frroad { background: #dcfce7; color: #166534; }
-  .pill.frreq { background: #cffafe; color: #155e75; }
+  .pill.p1 { background: var(--bad-bg); color: var(--bad-ink); }
+  .pill.p2 { background: var(--orange-bg); color: var(--orange-ink); }
+  .pill.p3 { background: var(--yellow-bg); color: var(--yellow-ink); }
+  .pill.p4 { background: var(--line); color: var(--neutral-ink); }
+  .pill.p0 { background: var(--fill-2); color: var(--faint); }
+  .pill.status { background: var(--info-bg); color: var(--info-ink); }
+  .pill.neg { background: var(--bad-bg); color: var(--bad-ink); font-weight: 600; }
+  .pill.pos { background: var(--good-bg); color: var(--good-ink); font-weight: 600; }
+  .pill.frdev { background: var(--pink-bg); color: var(--pink-ink); }
+  .pill.frroad { background: var(--good-bg); color: var(--good-ink); }
+  .pill.frreq { background: var(--aqua-bg); color: var(--aqua-ink); }
   /* The metric pills get their own modifier rather than widening .pill,
      which the bug-priority pills also use. Numeric cells need a floor width
      and tabular figures or a column of "7" next to "94,166" reads ragged. */
   .pill.mpill { min-width: 46px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11.5px; }
   .catlist { display: grid; gap: 6px; padding: 4px 0 2px; }
-  .chip { display: inline-block; background: #eef2f7; border: 1px solid var(--line); color: #334155; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px 1px 0; }
-  .scorebar { position: relative; display: inline-flex; align-items: center; width: 92px; height: 18px; border-radius: 999px; background: #eef2f7; overflow: hidden; vertical-align: middle; }
+  .chip { display: inline-block; background: var(--track); border: 1px solid var(--line); color: var(--ink-2); border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px 1px 0; }
+  .scorebar { position: relative; display: inline-flex; align-items: center; width: 92px; height: 18px; border-radius: 999px; background: var(--track); overflow: hidden; vertical-align: middle; }
   .scorebar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
   .scorebar > b { position: relative; width: 100%; text-align: center; font-size: 10.5px; font-weight: 700; }
   .spark { display: inline-flex; align-items: flex-end; gap: 2px; height: 22px; }
-  .spark i { width: 7px; background: #93c5fd; border-radius: 2px 2px 0 0; min-height: 2px; }
-  .spark i.hot { background: #3b82f6; }
+  .spark i { width: 7px; background: var(--spark); border-radius: 2px 2px 0 0; min-height: 2px; }
+  .spark i.hot { background: var(--spark-hot); }
   .note { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 13.5px; }
   .crumb { font-size: 13px; margin: 2px 0 10px; }
   .org-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 4px 0 14px; }
   .org-h h2 { font-size: 21px; margin: 0; }
   .org-h .links { font-size: 12.5px; }
-  .tag-sample { background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+  .tag-sample { background: var(--warn-bg-2); color: var(--warn-ink-2); border-radius: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
   .gantt { padding: 14px 16px; }
   .grow { display: grid; grid-template-columns: 190px 1fr; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 12px; }
-  .grow .nm { text-align: right; padding-right: 8px; color: #334155; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .gbar { position: relative; height: 16px; background: #f1f5f9; border-radius: 4px; }
+  .grow .nm { text-align: right; padding-right: 8px; color: var(--ink-2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gbar { position: relative; height: 16px; background: var(--fill-2); border-radius: 4px; }
   .gbar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; opacity: .85; }
   .legend { display: flex; gap: 14px; padding: 0 16px 12px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
@@ -116,7 +305,7 @@
   .ofs-sub { font-size: 12px; color: var(--muted); margin-top: 2px; max-width: 52ch; }
   .ofs-head button { background: none; border: 0; font-size: 15px; color: var(--muted); cursor: pointer;
                      line-height: 1; padding: 4px 6px; border-radius: 6px; }
-  .ofs-head button:hover { background: #f1f5f9; color: var(--ink); }
+  .ofs-head button:hover { background: var(--fill-2); color: var(--ink); }
   .ofs-body { padding: 14px 16px; overflow-y: auto; }
   /* NOT STICKY, and that was tried. Two sticky headers in one scroll box at
      top:0 only hand over when the second one reaches the top — and the org
@@ -126,7 +315,7 @@
   .ofs-secthead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
                   font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700;
                   color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
-  .ofs-secthead > span { text-transform: none; letter-spacing: 0; font-weight: 600; color: #334155; font-size: 12px; }
+  .ofs-secthead > span { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--ink-2); font-size: 12px; }
   .ofs-acts { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; }
   .ofs-note { font-size: 12px; color: var(--muted); margin: 7px 0 10px; max-width: 68ch; }
   .ofs-grp { margin-bottom: 12px; }
@@ -135,30 +324,30 @@
   .ofs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 2px 12px; }
   /* A label is the whole hit target, so the row highlights rather than only
      the 13px box, and long feature names wrap instead of being clipped. */
-  .ofs-chk { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; color: #334155;
+  .ofs-chk { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; color: var(--ink-2);
              padding: 4px 6px; border-radius: 6px; cursor: pointer; line-height: 1.35; }
-  .ofs-chk:hover { background: #f1f5f9; }
+  .ofs-chk:hover { background: var(--fill-2); }
   .ofs-chk input { margin: 2px 0 0; flex: none; accent-color: var(--brand); }
-  .ofs-chk.ofs-on { background: #fef3c7; color: #92400e; }
-  .ofs-chk.ofs-on:hover { background: #fde68a; }
+  .ofs-chk.ofs-on { background: var(--warn-bg-2); color: var(--warn-ink-2); }
+  .ofs-chk.ofs-on:hover { background: var(--warn-edge-2); }
   .ofs-gone { color: var(--muted); font-size: 11px; font-style: italic; }
   .ofs-search { width: 100%; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px;
-                font-size: 13px; margin: 8px 0 6px; color: var(--ink); background: #fff; }
+                font-size: 13px; margin: 8px 0 6px; color: var(--ink); background: var(--card); }
   /* The org list is the long one — 144 accounts — so it scrolls in its own
      box rather than pushing Save off the bottom of the sheet. */
   .ofs-scroll { max-height: 232px; overflow-y: auto; padding-right: 4px; }
   .ofs-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-              padding: 12px 16px; border-top: 1px solid var(--line); background: #fbfcfe;
+              padding: 12px 16px; border-top: 1px solid var(--line); background: var(--fill);
               border-radius: 0 0 14px 14px; }
   .ofs-footnote { font-size: 12px; color: var(--muted); max-width: 46ch; }
-  .ofs-foot button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  .ofs-foot button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--card);
                      color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; }
-  .ofs-foot button:hover { background: #f1f5f9; }
-  .ofs-foot button.ofs-save { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .ofs-foot button.ofs-save:hover { background: #0c5b4b; }
+  .ofs-foot button:hover { background: var(--fill-2); }
+  .ofs-foot button.ofs-save { background: var(--brand); border-color: var(--brand); color: var(--on-accent); }
+  .ofs-foot button.ofs-save:hover { background: var(--brand-hover); }
   /* A disabled Save says why in .ofs-footnote — greying it with no
      explanation is what invites "it didn't save". */
-  .ofs-foot button.ofs-save:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+  .ofs-foot button.ofs-save:disabled { background: var(--line); border-color: var(--line); color: var(--faint); cursor: not-allowed; }
   .ofs-meta { padding: 8px 16px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); }
   /* The "Data as of" line. It sits above the KPI cards and must read as a
      provenance note, not as another metric — hence no card chrome. */
@@ -166,11 +355,11 @@
           font-size: 12.5px; color: var(--muted); margin: 2px 0 14px; }
   .asof b { color: var(--ink); font-weight: 700; }
   .asof-age { color: var(--muted); }
-  .asof-stale { color: #b45309; font-weight: 700; }
-  .asof-stale a { color: #b45309; text-decoration: underline; }
+  .asof-stale { color: var(--warn-ink); font-weight: 700; }
+  .asof-stale a { color: var(--warn-ink); text-decoration: underline; }
   /* Pushed right and quiet: it is the same sentence every day, so it must
      not compete with the date, which is the part that changes. */
-  .asof-src { margin-left: auto; font-size: 11.5px; color: #94a3b8; }
+  .asof-src { margin-left: auto; font-size: 11.5px; color: var(--faint); }
   /* ── Org Features: the group table, the fingerprint, the drill-in ─────── */
   /* Twelve group columns plus name and adoption. The name column is capped so
      the group columns are not squeezed to nothing, and the table scrolls in
@@ -180,10 +369,10 @@
      than links: each one changes the table's state, it does not navigate. */
   .qv { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .qvchip { display: inline-flex; align-items: baseline; gap: 5px; cursor: pointer;
-            background: #fff; border: 1px solid var(--line); border-radius: 999px;
-            padding: 5px 11px; font-size: 12.5px; font-weight: 600; color: #334155; }
-  .qvchip:hover { background: #f1f5f9; }
-  .qvchip.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+            background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+            padding: 5px 11px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+  .qvchip:hover { background: var(--fill-2); }
+  .qvchip.on { background: var(--brand); border-color: var(--brand); color: var(--on-accent); }
   .qvn { font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
   .qvchip.on .qvn { color: rgba(255,255,255,.8); }
   /* The adoption chart. The pill row IS the legend — each selected pill
@@ -196,7 +385,7 @@
                      text-transform: uppercase; letter-spacing: .4px; margin-right: 2px; }
   .fchart-range[disabled] { opacity: .4; cursor: not-allowed; }
   .fchart-q { margin-left: auto; min-width: 190px; padding: 5px 10px; font-size: 12.5px;
-              border: 1px solid var(--line); border-radius: 999px; background: #fff; color: #334155; }
+              border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink-2); }
   .fchart-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
                   padding: 12px 16px 10px; border-bottom: 1px solid var(--line); }
   .fchart-pill { gap: 6px; }
@@ -211,7 +400,7 @@
   .fchart-end { font-size: 11.5px; fill: var(--ink); font-weight: 600; }
   .fchart-endv { fill: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
   .fchart-tip { position: absolute; top: 14px; transform: translateX(-50%); pointer-events: none;
-                background: #fff; border: 1px solid var(--line); border-radius: 8px;
+                background: var(--card); border: 1px solid var(--line); border-radius: 8px;
                 box-shadow: 0 4px 14px rgba(16,24,40,.10); padding: 7px 10px; font-size: 12px;
                 min-width: 130px; z-index: 5; }
   .fchart-tipd { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
@@ -220,13 +409,13 @@
   .fchart-tipr b { font-variant-numeric: tabular-nums; min-width: 30px; }
   .fchart-tipr span:last-child { color: var(--muted); }
   .qvnote { font-size: 12px; color: var(--muted); padding: 8px 16px;
-            background: #fbfcfe; border-bottom: 1px solid var(--line); }
+            background: var(--fill); border-bottom: 1px solid var(--line); }
   .qvnote b { color: var(--ink); }
   /* A/B comparison: a three-column grid, so both values line up against one
      label and the eye travels along a row to compare one thing. */
   .cmp { padding: 4px 16px 14px; }
   .cmprow { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 1fr; gap: 0 14px;
-            align-items: baseline; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+            align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--fill-2); }
   .cmprow:last-child { border-bottom: 0; }
   .cmphead { align-items: end; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
   .cmplab { font-size: 11.5px; color: var(--muted); font-weight: 600; }
@@ -234,9 +423,9 @@
   .cmpval { font-variant-numeric: tabular-nums; }
   .cmporg { font-size: 14px; }
   .cmpgaps { align-items: start; padding-top: 10px; }
-  .cmponly { font-size: 11.5px; color: #334155; line-height: 1.45; }
-  .cmponly b { color: #b45309; }
-  .cmponly.none { color: #166534; font-style: italic; }
+  .cmponly { font-size: 11.5px; color: var(--ink-2); line-height: 1.45; }
+  .cmponly b { color: var(--warn-ink); }
+  .cmponly.none { color: var(--good-ink); font-style: italic; }
   @media (max-width: 700px) { .cmprow { grid-template-columns: 1fr; gap: 2px; } }
 
   /* Ring meters. The ring is the plot; the figure sits beside it because a
@@ -267,10 +456,10 @@
      table, not with the cell, so they scroll out from under it — the rule has
      to be a shadow. */
   .stickywrap thead th { position: sticky; top: 0; z-index: 2;
-                         background: #f1f5f9; border-bottom: none;
+                         background: var(--fill-2); border-bottom: none;
                          box-shadow: inset 0 -1px 0 var(--line), 0 1px 0 var(--line); }
   .feattable th, .feattable td { padding: 7px 8px; }
-  .feattable th:hover { background: #eef2f7; color: var(--ink); }
+  .feattable th:hover { background: var(--track); color: var(--ink); }
   /* THE ORG CELL WRAPS. Every `td` in this app is `white-space: nowrap`, so a
      260px max-width on a cell that cannot wrap CLIPS NOTHING — it overflows,
      and the org's name, launch tag and admin link ran straight over the
@@ -306,7 +495,7 @@
   .trendcell { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; }
   .trendcell b { font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1; }
   .trendline { display: block; }
-  .trendnone { color: #cbd5e1; }
+  .trendnone { color: var(--line-2); }
   .feattable td.trend, .feattable th.trend { width: 76px; }
   .adminlink { font-size: 11px; font-weight: 600; color: var(--brand-2); white-space: nowrap; }
   .adminlink:hover { text-decoration: underline; }
@@ -322,11 +511,11 @@
      a single heavy edge. The inner rule is removed rather than lightened: a
      faint line still reads as a division. */
   .feattable tbody.orgband td { border-bottom: none; }
-  .feattable tbody.orgband tr.gap-row td { border-bottom: 2px solid #cbd5e1; padding-bottom: 15px; }
+  .feattable tbody.orgband tr.gap-row td { border-bottom: 2px solid var(--line-2); padding-bottom: 15px; }
   .feattable tbody.orgband tr:first-child td { padding-top: 14px; }
   /* Hovering EITHER row lights the whole band, or the summary and its own
      gaps highlight as two separate objects. */
-  .tablewrap tbody.orgband:hover td { background: #f1f5f9; }
+  .tablewrap tbody.orgband:hover td { background: var(--fill-2); }
   /* A RULE BETWEEN THE TWO HALVES OF A BAND. Dan: "How about a HR to separate
      out the org name section from the 'not using' area, it just all runs
      together."
@@ -338,7 +527,7 @@
      band's heavy 2px edge below. The divider has to be lighter than the band
      edge or the complaint comes straight back. */
   .gap-row td { padding-top: 9px; white-space: normal; text-align: left;
-                border-top: 1px dashed #e2e8f0; }
+                border-top: 1px dashed var(--line); }
 
   /* THE GAP STACK: one group per LINE, with the label in a fixed column.
      Dan: "The two rows of not using are just a mash up of words." They were —
@@ -350,17 +539,17 @@
   .gapstack { display: grid; grid-template-columns: 116px 46px minmax(0, 1fr);
               gap: 3px 12px; align-items: baseline; font-size: 11.5px;
               line-height: 1.5; max-width: 1080px; padding-left: 2px; }
-  .gapeyebrow { grid-column: 1 / -1; font-weight: 700; color: #b45309;
+  .gapeyebrow { grid-column: 1 / -1; font-weight: 700; color: var(--warn-ink);
                 text-transform: uppercase; font-size: 10px; letter-spacing: .5px;
                 margin-bottom: 1px; }
-  .gapeyebrow.ok { color: #166534; }
+  .gapeyebrow.ok { color: var(--good-ink); }
   .gapcat { font-weight: 700; color: var(--muted); text-transform: uppercase;
             font-size: 10px; letter-spacing: .4px; }
-  .gapratio { font-variant-numeric: tabular-nums; color: #94a3b8; font-weight: 700;
+  .gapratio { font-variant-numeric: tabular-nums; color: var(--faint); font-weight: 700;
               text-align: right; }
-  .gapnames { color: #334155; min-width: 0; }
-  .gapnames i { color: #94a3b8; font-style: normal; }
-  .gaptrim { grid-column: 2 / -1; color: #94a3b8; font-style: italic; }
+  .gapnames { color: var(--ink-2); min-width: 0; }
+  .gapnames i { color: var(--faint); font-style: normal; }
+  .gaptrim { grid-column: 2 / -1; color: var(--faint); font-style: italic; }
   @media (max-width: 760px) { .gapstack { grid-template-columns: 96px 40px minmax(0, 1fr); } }
   /* The drill-in's gap panel: grouped, so a reader sees WHERE the gaps are
      rather than one long alphabetical list. */
@@ -368,14 +557,14 @@
              gap: 12px; padding: 12px 16px; }
   .gapgrp { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .gaphead { display: flex; justify-content: space-between; align-items: baseline; gap: 6px;
-             background: #fffbeb; color: #92400e; font-size: 11px; font-weight: 700;
+             background: var(--warn-bg); color: var(--warn-ink-2); font-size: 11px; font-weight: 700;
              text-transform: uppercase; letter-spacing: .4px; padding: 5px 8px;
              border-bottom: 1px solid var(--line); }
   .gapn { font-variant-numeric: tabular-nums; letter-spacing: 0; }
-  .gapitem { font-size: 12.5px; color: #334155; padding: 4px 8px; border-bottom: 1px solid #f1f5f9; }
+  .gapitem { font-size: 12.5px; color: var(--ink-2); padding: 4px 8px; border-bottom: 1px solid var(--fill-2); }
   .gapitem:last-child { border-bottom: 0; }
   .gapclear { padding: 0 16px 12px; font-size: 12px; color: var(--muted); }
-  .gapclear b { color: #166534; }
+  .gapclear b { color: var(--good-ink); }
 
   /* Per-category: in use on the left with its measured figure, not in use on
      the right. Two columns rather than one list, because "what they have" and
@@ -384,18 +573,18 @@
   @media (max-width: 780px) { .catcols { grid-template-columns: 1fr; } }
   .catlab { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
             padding-bottom: 5px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
-  .catlab.on { color: #166534; }
-  .catlab.off { color: #b45309; }
+  .catlab.on { color: var(--good-ink); }
+  .catlab.off { color: var(--warn-ink); }
   .catrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-            font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
+            font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid var(--fill); }
   .catrow.off { display: block; }
-  .catrow.off .catname { color: #334155; }
-  .catname { font-weight: 600; color: #1a2333; }
+  .catrow.off .catname { color: var(--ink-2); }
+  .catname { font-weight: 600; color: var(--ink); }
   .catdetail { color: var(--muted); font-size: 11.5px; text-align: right;
                font-variant-numeric: tabular-nums; }
   .catdesc { font-size: 11px; color: var(--muted); font-weight: 400; line-height: 1.4;
              margin-top: 1px; max-width: 46ch; }
-  .catnone { font-size: 12px; color: #94a3b8; font-style: italic; padding: 4px 0; }
+  .catnone { font-size: 12px; color: var(--faint); font-style: italic; padding: 4px 0; }
 
   /* ── the per-feature page ─────────────────────────────────────────────
      The provenance block is deliberately readable prose at body size rather
@@ -404,13 +593,13 @@
      newest one. A definition behind a hover is a definition nobody reads. */
   .fabout { padding: 14px 16px; }
   .fdesc { margin: 0 0 8px; font-size: 14px; line-height: 1.5; color: var(--ink); }
-  .fwhy { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: #334155; }
+  .fwhy { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
   .fdef { margin-top: 10px; }
   .flab { font-size: 11px; color: var(--muted); text-transform: uppercase;
           letter-spacing: .4px; font-weight: 700; margin-bottom: 3px; }
-  .fdef > div:last-child { font-size: 12.5px; line-height: 1.55; color: #475569; }
-  .fsig { display: block; font-size: 11.5px; line-height: 1.5; color: #475569;
-          background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
+  .fdef > div:last-child { font-size: 12.5px; line-height: 1.55; color: var(--neutral-ink); }
+  .fsig { display: block; font-size: 11.5px; line-height: 1.5; color: var(--neutral-ink);
+          background: var(--fill); border: 1px solid var(--line); border-radius: 8px;
           padding: 8px 10px; white-space: pre-wrap; word-break: break-word; }
   /* The two slices of one dataset. A tab that only looks like a link is a
      tab nobody clicks, so the active one is filled rather than underlined —
@@ -421,18 +610,18 @@
               font-size: 13px; font-weight: 700; text-decoration: none; line-height: 1.25; }
   .slicetab i { display: block; font-style: normal; font-size: 11px; font-weight: 400;
                 color: var(--muted); margin-top: 1px; }
-  .slicetab:hover { background: #f1f5f9; text-decoration: none; }
-  .slicetab.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .slicetab:hover { background: var(--fill-2); text-decoration: none; }
+  .slicetab.on { background: var(--brand); border-color: var(--brand); color: var(--on-accent); }
   .slicetab.on i { color: rgba(255,255,255,.75); }
   .fnot { padding: 12px 16px; }
   /* A WRAPPED ROW OF NAMES, not a table. This list runs to 120 organizations
      on a feature nobody has adopted, and a 120-row table of one column is a
      scroll rather than a list you can read in one look. */
   .fnotwrap { display: flex; flex-wrap: wrap; gap: 5px; }
-  .fnotorg { display: inline-block; background: #f1f5f9; border: 1px solid var(--line);
-             border-radius: 999px; padding: 2px 9px; font-size: 12px; color: #334155;
+  .fnotorg { display: inline-block; background: var(--fill-2); border: 1px solid var(--line);
+             border-radius: 999px; padding: 2px 9px; font-size: 12px; color: var(--ink-2);
              text-decoration: none; }
-  .fnotorg:hover { background: #e2e8f0; text-decoration: none; }
+  .fnotorg:hover { background: var(--line); text-decoration: none; }
   @media (max-width: 860px) { nav.side { display: none; } }
 </style>
 </head>
@@ -602,12 +791,12 @@
      gets the grey outline rather than a red pill claiming nobody uses
      something nobody is counting. */
   const RATIO_BANDS = [
-    { min: 100, background: "#dcfce7", color: "#166534", borderColor: "#86efac" },
-    { min: 60,  background: "#ffedd5", color: "#9a3412", borderColor: "#fdba74" },
-    { min: 0,   background: "#fee2e2", color: "#b91c1c", borderColor: "#fca5a5" },
+    { min: 100, background: "var(--good-bg)", color: "var(--good-ink)", borderColor: "var(--good-edge)" },
+    { min: 60,  background: "var(--orange-bg)", color: "var(--orange-ink-2)", borderColor: "var(--orange-edge)" },
+    { min: 0,   background: "var(--bad-bg)", color: "var(--bad-ink)", borderColor: "var(--bad-edge)" },
   ];
   function ofRatioHeat(pct) {
-    if (pct == null) return { background: "#f8fafc", color: "#94a3b8", borderColor: "#e2e8f0" };
+    if (pct == null) return { background: "var(--fill)", color: "var(--faint)", borderColor: "var(--line)" };
     const b = RATIO_BANDS.find(x => pct >= x.min) || RATIO_BANDS[RATIO_BANDS.length - 1];
     return { background: b.background, color: b.color, borderColor: b.borderColor,
              fontWeight: 700 };
@@ -725,7 +914,7 @@
     return e("svg", { width: S2, height: S2, viewBox: "0 0 " + S2 + " " + S2,
                       className: "ring", role: "img",
                       "aria-label": label || ((p == null ? "not measured" : p + "%")) },
-      e("circle", { cx: S2 / 2, cy: S2 / 2, r: R, fill: "none", stroke: "#eef2f7", strokeWidth: W }),
+      e("circle", { cx: S2 / 2, cy: S2 / 2, r: R, fill: "none", stroke: "var(--track)", strokeWidth: W }),
       p == null ? null : e("circle", {
         cx: S2 / 2, cy: S2 / 2, r: R, fill: "none",
         stroke: color || "var(--brand)", strokeWidth: W, strokeLinecap: "round",
@@ -874,6 +1063,81 @@
         "slicetab" + (sl.page === page ? " on" : ""))));
   }
 
+  // ---------------- theme ----------------
+  /* THE PURE HALF IS SEPARATE FROM THE BROWSER HALF, so the rules can be run
+     by a spec rather than regexed. `themeStamp` and `themeEffective` take
+     what they need as arguments and touch nothing; only the three wrappers
+     under them reach for localStorage, matchMedia and the <html> element. */
+  const THEME_KEY = "psTheme";
+  /* AN UNRECOGNISED STORED VALUE IS NO CHOICE AT ALL, not a default to light.
+     Anything but the two names we write falls back to following the OS, so a
+     corrupted or hand-edited key degrades to the same behaviour as a viewer
+     who has never touched the toggle. */
+  function themeStamp(stored) { return stored === "light" || stored === "dark" ? stored : null; }
+  /* WHAT THE VIEWER IS ACTUALLY LOOKING AT — a pinned choice if there is one,
+     otherwise whatever the OS says. The control labels itself from THIS, not
+     from the stored value, or an unpinned viewer on a dark machine would see
+     a control claiming Light while the page is dark. */
+  function themeEffective(stored, osDark) { return themeStamp(stored) || (osDark ? "dark" : "light"); }
+
+  function themeStored() {
+    try { return themeStamp(localStorage.getItem(THEME_KEY)); } catch (_) { return null; }
+  }
+  function themeOsDark() {
+    try { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+    catch (_) { return false; }
+  }
+  /* WRITES THE STAMP THE SAME WAY THE <head> SCRIPT DOES. Two writers of one
+     attribute is how a toggle and a reload come to disagree about the theme,
+     so the shape is identical: the two names set it, anything else removes
+     it and hands the page back to the media query. */
+  function themeApply(t) {
+    const el = document.documentElement;
+    if (themeStamp(t)) el.setAttribute("data-theme", t); else el.removeAttribute("data-theme");
+  }
+
+  /* The OS listener only speaks while NOTHING is pinned. A viewer who chose
+     Light and then unlocks a dark laptop must stay light — that is what
+     choosing means — so the handler re-reads the stored value rather than
+     trusting a captured one. */
+  function useTheme() {
+    const [t, setT] = React.useState(() => themeEffective(themeStored(), themeOsDark()));
+    React.useEffect(() => {
+      let mq;
+      try { mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)"); } catch (_) {}
+      if (!mq) return;
+      const on = () => { if (!themeStored()) setT(themeOsDark() ? "dark" : "light"); };
+      if (mq.addEventListener) mq.addEventListener("change", on); else if (mq.addListener) mq.addListener(on);
+      return () => {
+        if (mq.removeEventListener) mq.removeEventListener("change", on);
+        else if (mq.removeListener) mq.removeListener(on);
+      };
+    }, []);
+    const set = (next) => {
+      try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+      themeApply(next);
+      setT(next);
+    };
+    return [t, set];
+  }
+
+  /* TWO BUTTONS, NOT ONE. A single button has to be labelled either with the
+     mode you are in or the mode you would get, and every reader guesses the
+     other one — the same argument .slicetab already makes for filling the
+     active tab rather than underlining it. Both options are on screen, the
+     live one is filled, and there is nothing to work out. */
+  function ThemeToggle() {
+    const [theme, setTheme] = useTheme();
+    const opt = (id, label, glyph) => e("button", {
+      key: id, type: "button", className: "themebtn" + (theme === id ? " on" : ""),
+      "aria-pressed": theme === id, title: "Switch to " + label.toLowerCase() + " mode",
+      onClick: () => setTheme(id),
+    }, e("span", { "aria-hidden": "true" }, glyph), label);
+    return e("div", { className: "themesw", role: "group", "aria-label": "Colour theme",
+                      "data-of-theme": theme },
+      opt("light", "Light", "\u2600"), opt("dark", "Dark", "\u263e"));
+  }
+
   function route() {
     const p = location.pathname;
     if (p.startsWith("/ps/bugs")) return { page: "bugs" };
@@ -912,7 +1176,7 @@
      measurement on a different scale; routing both through one function would
      couple two unrelated numbers, so that a grade ramp tuned to the feature
      fleet silently re-coloured a HubSpot figure. */
-  function scoreColor(p) { return p >= 70 ? "#16a34a" : p >= 40 ? "#d97706" : "#dc2626"; }
+  function scoreColor(p) { return p >= 70 ? "var(--good)" : p >= 40 ? "var(--warn)" : "var(--bad)"; }
 
   /* ---------------- the adoption GRADE ----------------
      Dan: "yeah the percentage is nice, but I want a letter grade, something
@@ -934,15 +1198,15 @@
      "C" reads as an absolute judgement against a 100% nobody reaches, so
      GRADE_BASIS travels with it. */
   const GRADE_RAMP = [
-    { min: 75, letter: "A", color: "#15803d", band: "#dcfce7",
+    { min: 75, letter: "A", color: "var(--good-ink-2)", band: "var(--good-bg)",
       says: "Getting nearly everything out of the platform" },
-    { min: 60, letter: "B", color: "#16a34a", band: "#ecfdf5",
+    { min: 60, letter: "B", color: "var(--good)", band: "var(--good-bg-2)",
       says: "Strong adoption, with room in a few areas" },
-    { min: 45, letter: "C", color: "#b45309", band: "#fffbeb",
+    { min: 45, letter: "C", color: "var(--warn-ink)", band: "var(--warn-bg)",
       says: "The core is in place; several areas are untouched" },
-    { min: 25, letter: "D", color: "#ea580c", band: "#fff7ed",
+    { min: 25, letter: "D", color: "var(--orange-ink-3)", band: "var(--orange-bg-2)",
       says: "Running on a fraction of what is available" },
-    { min: 0,  letter: "F", color: "#dc2626", band: "#fef2f2",
+    { min: 0,  letter: "F", color: "var(--bad)", band: "var(--bad-bg-2)",
       says: "Most of the platform is not configured yet" },
   ];
   const GRADE_BASIS = "Graded against what organizations on rec.us actually reach today, "
@@ -955,7 +1219,7 @@
     if (pct == null || typeof pct !== "number" || !isFinite(pct)) return null;
     return GRADE_RAMP.find(g => pct >= g.min) || GRADE_RAMP[GRADE_RAMP.length - 1];
   }
-  function ofGradeColor(pct) { const g = ofGrade(pct); return g ? g.color : "#94a3b8"; }
+  function ofGradeColor(pct) { const g = ofGrade(pct); return g ? g.color : "var(--faint)"; }
 
   /* ---------------- the FEATURE adoption grade ----------------
      Dan: "we also need a way to track feature adoption in general, like a
@@ -989,15 +1253,15 @@
      platform" is a sentence about an organization and nonsense about a
      feature, so every `says` here is about fleet penetration instead. */
   const FEATURE_GRADE_RAMP = [
-    { min: 80, letter: "A", color: "#15803d", band: "#dcfce7",
+    { min: 80, letter: "A", color: "var(--good-ink-2)", band: "var(--good-bg)",
       says: "Standard equipment — nearly every live organization has this" },
-    { min: 60, letter: "B", color: "#16a34a", band: "#ecfdf5",
+    { min: 60, letter: "B", color: "var(--good)", band: "var(--good-bg-2)",
       says: "Widely adopted, with a real tail left to convert" },
-    { min: 40, letter: "C", color: "#b45309", band: "#fffbeb",
+    { min: 40, letter: "C", color: "var(--warn-ink)", band: "var(--warn-bg)",
       says: "About half the fleet; the rest is addressable" },
-    { min: 20, letter: "D", color: "#ea580c", band: "#fff7ed",
+    { min: 20, letter: "D", color: "var(--orange-ink-3)", band: "var(--orange-bg-2)",
       says: "Early — a minority have turned it on" },
-    { min: 0,  letter: "F", color: "#dc2626", band: "#fef2f2",
+    { min: 0,  letter: "F", color: "var(--bad)", band: "var(--bad-bg-2)",
       says: "Barely adopted — new, niche, or not landing" },
   ];
   const FEATURE_GRADE_BASIS = "Graded against how far features actually spread on rec.us, "
@@ -1008,7 +1272,7 @@
     if (pct == null || typeof pct !== "number" || !isFinite(pct)) return null;
     return FEATURE_GRADE_RAMP.find(g => pct >= g.min) || FEATURE_GRADE_RAMP[FEATURE_GRADE_RAMP.length - 1];
   }
-  function ofFeatureGradeColor(pct) { const g = ofFeatureGrade(pct); return g ? g.color : "#94a3b8"; }
+  function ofFeatureGradeColor(pct) { const g = ofFeatureGrade(pct); return g ? g.color : "var(--faint)"; }
   /* The badge. `size` so one component serves a table cell, a KPI card and the
      printed report rather than three that drift apart. */
   /* ONE COMPONENT, TWO SCALES. How a grade is DRAWN is shared — a pill, the
@@ -1247,8 +1511,8 @@
   }
 
   function ofTrendColor(t) {
-    if (!t || !t.ready || t.delta == null) return "#94a3b8";
-    return t.delta > 0 ? "#16a34a" : t.delta < 0 ? "#dc2626" : "#94a3b8";
+    if (!t || !t.ready || t.delta == null) return "var(--faint)";
+    return t.delta > 0 ? "var(--good)" : t.delta < 0 ? "var(--bad)" : "var(--faint)";
   }
   /* The line. Scaled to the SERIES, not to 0-100 — an org moving 61 to 64
      over a month is a real move and would be a flat line against a full
@@ -1340,14 +1604,25 @@
      climbing 59→66. One ordering does both: by movement, then by adoption,
      then by name — so a fleet where nothing has moved yet still opens on
      its biggest features rather than on an empty chart. */
-  const OF_SERIES_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"];
-  /* SIX, BECAUSE SIX IS WHAT WAS VALIDATED. These are the first six slots of
-     the categorical order, checked as a set against this page's white card:
-     worst adjacent colour-vision ΔE 9.1, worst normal-vision ΔE 19.6, both
-     above their floors. A seventh series would be a hue nobody checked, so
-     the pills refuse rather than inventing one — and three of the six sit
-     below 3:1 contrast on white, which is why every line is labelled at its
-     end and every pill carries its name. Colour is never the only channel. */
+  /* THE SLOTS ARE TOKENS, NOT HEXES, so the chart themes itself. var()
+     resolves in an SVG presentation attribute as well as in a style object
+     — measured in this project's own Chromium, not assumed — so the line's
+     `stroke` and the pill's `background` can both be the same token and
+     there is no JS palette to keep in step with the stylesheet. */
+  const OF_SERIES_COLORS = ["var(--series-1)", "var(--series-2)", "var(--series-3)",
+                            "var(--series-4)", "var(--series-5)", "var(--series-6)"];
+  /* SIX, BECAUSE SIX IS WHAT WAS VALIDATED, in BOTH modes. The light column is
+     the first six slots of the categorical order against this page's white
+     card (worst adjacent colour-vision ΔE 9.1, worst normal-vision ΔE 19.6);
+     the dark column is the palette's own dark steps re-validated against this
+     page's own dark card (ΔE 8.4 / 19.3, every slot inside the dark
+     lightness band). BOTH RUNS PASS. A seventh series would be a hue nobody
+     checked in either mode, so the pills refuse rather than inventing one.
+
+     Three light slots sit below 3:1 on white and one dark slot (green, 2.96)
+     sits just below it on slate — which is why every line is labelled at its
+     end and every pill carries its name. That relief is the condition the
+     sub-3:1 slots are legal under; colour is never the only channel here. */
   const OF_CHART_MAX = OF_SERIES_COLORS.length;
   const OF_CHART_OPEN = 5;
 
@@ -1673,10 +1948,10 @@
                     ? "Six lines is the most this chart will draw — take one off to add another"
                     : r.name + " · " + r.pct + "% of live organizations · "
                       + (r.trend.delta > 0 ? "+" : "") + r.trend.delta + " points since " + r.trend.from,
-                  style: on ? { background: col, borderColor: col, color: "#fff" } : null,
+                  style: on ? { background: col, borderColor: col, color: "var(--card)" } : null,
                   onClick: () => setSlots(s => ofChartToggle(s, r.key)),
                 },
-                  e("span", { className: "fchart-dot", style: { background: on ? "#fff" : "#cbd5e1" } }),
+                  e("span", { className: "fchart-dot", style: { background: on ? "var(--card)" : "var(--line-2)" } }),
                   r.name,
                   e("span", { className: "qvn" },
                     r.pct + "%",
@@ -1726,7 +2001,7 @@
                     [0, 25, 50, 75, 100].map(v =>
                       e("g", { key: v },
                         e("line", { x1: B.l, x2: B.l + pw, y1: yAt(v), y2: yAt(v),
-                                    stroke: "#eef2f7", strokeWidth: 1 }),
+                                    stroke: "var(--track)", strokeWidth: 1 }),
                         e("text", { x: B.l - 8, y: yAt(v) + 3.5, textAnchor: "end",
                                     className: "fchart-ax" }, v + "%"))),
                     ofChartTicks(dates, 10).map(i =>
@@ -1735,7 +2010,7 @@
 
                     hoverIdx != null
                       ? e("line", { x1: xAt(hoverIdx), x2: xAt(hoverIdx), y1: B.t, y2: B.t + ph,
-                                    stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "3 3",
+                                    stroke: "var(--faint)", strokeWidth: 1, strokeDasharray: "3 3",
                                     "data-of-chart-hair": dates[hoverIdx] })
                       : null,
 
@@ -1764,14 +2039,14 @@
                          the mark it is rather than as a line whose stroke
                          went missing. */
                       return e("circle", { key: s.key, cx: xAt(idxOf[last.date]), cy: yAt(last.v),
-                                           r: lone ? 5 : 4, fill: s.color, stroke: "#fff", strokeWidth: 2,
+                                           r: lone ? 5 : 4, fill: s.color, stroke: "var(--card)", strokeWidth: 2,
                                            "data-of-chart-dot": lone ? s.key : null });
                     }),
                     hoverIdx != null
                       ? series.map(s => {
                           const p = s.points.find(x => x.date === dates[hoverIdx]);
                           return p ? e("circle", { key: s.key, cx: xAt(hoverIdx), cy: yAt(p.v),
-                                                   r: 3.5, fill: s.color, stroke: "#fff", strokeWidth: 2 }) : null;
+                                                   r: 3.5, fill: s.color, stroke: "var(--card)", strokeWidth: 2 }) : null;
                         })
                       : null,
                     /* DIRECT LABELS, and they are not decoration: three of the
@@ -1854,7 +2129,7 @@
     return e(React.Fragment, null,
       e("div", { className: "cards" },
         e("div", { className: "card" }, e("div", { className: "k" }, "Accounts"), e("div", { className: "v" }, accounts.length), e("div", { className: "d" }, launched + " launched")),
-        e("div", { className: "card" }, e("div", { className: "k" }, "Health-flagged"), e("div", { className: "v", style: { color: flagged ? "#dc2626" : undefined } }, flagged), e("div", { className: "d" }, "accounts with negative reasons")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Health-flagged"), e("div", { className: "v", style: { color: flagged ? "var(--bad)" : undefined } }, flagged), e("div", { className: "d" }, "accounts with negative reasons")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Open bugs (all)"), e("div", { className: "v" }, openBugs), e("div", { className: "d" }, data.bugs.filter(b => b.customers.length).length + " tagged to accounts")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Feature requests"), e("div", { className: "v" }, data.featureRequests.length), e("div", { className: "d" }, data.featureRequests.filter(r => r.status === "In Development").length + " in development"))),
       e("div", { className: "panel" },
@@ -1890,9 +2165,9 @@
               e("td", { className: "num" }, fmt(a.timesContacted)),
               e("td", { className: "num", title: a.lastContacted || "" }, a.lastContacted ? days(a.lastContacted) + "d ago" : "—")))))),
         e("div", { className: "legend" },
-          e("span", null, e("i", { style: { background: "#fce7f3" } }), "in development"),
-          e("span", null, e("i", { style: { background: "#dcfce7" } }), "on roadmap"),
-          e("span", null, e("i", { style: { background: "#cffafe" } }), "requested"),
+          e("span", null, e("i", { style: { background: "var(--pink-bg)" } }), "in development"),
+          e("span", null, e("i", { style: { background: "var(--good-bg)" } }), "on roadmap"),
+          e("span", null, e("i", { style: { background: "var(--aqua-bg)" } }), "requested"),
           e("span", null, "Reports/mo = customer reports attached to Linear issues (bugs + requests)"))));
   }
 
@@ -2004,7 +2279,7 @@
     return e(React.Fragment, null,
       e("div", { className: "cards" },
         e("div", { className: "card" }, e("div", { className: "k" }, "Open bugs"), e("div", { className: "v" }, bugs.length), e("div", { className: "d" }, "labeled Bug in Linear, not done/canceled")),
-        e("div", { className: "card" }, e("div", { className: "k" }, "Urgent"), e("div", { className: "v", style: { color: urgent ? "#dc2626" : undefined } }, urgent), e("div", { className: "d" }, bugs.filter(b => b.priority === "High").length + " high")),
+        e("div", { className: "card" }, e("div", { className: "k" }, "Urgent"), e("div", { className: "v", style: { color: urgent ? "var(--bad)" : undefined } }, urgent), e("div", { className: "d" }, bugs.filter(b => b.priority === "High").length + " high")),
         e("div", { className: "card" }, e("div", { className: "k" }, "New this week"), e("div", { className: "v" }, week), e("div", { className: "d" }, "created in last 7 days")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Tagged to accounts"), e("div", { className: "v" }, bugs.filter(b => b.customers.length).length), e("div", { className: "d" }, "have ≥1 Linear customer attached")),
         e("div", { className: "card" }, e("div", { className: "k" }, "Created WoW"), e("div", { className: "v", style: { paddingTop: 4 } }, e(Spark, { series: wow.map(w => ({ month: w.label, count: w.count })) })), e("div", { className: "d" }, "8-week trend"))),
@@ -2035,9 +2310,9 @@
             e("td", { className: "l" }, e("span", { className: "pill " + PRI_CLASS[b.priority] }, b.priority)),
             e("td", { className: "l" }, b.status),
             e("td", { className: "l" }, b.team),
-            e("td", { className: "num", style: b.ageDays > 90 ? { color: "#dc2626", fontWeight: 700 } : null }, b.ageDays + "d"),
+            e("td", { className: "num", style: b.ageDays > 90 ? { color: "var(--bad)", fontWeight: 700 } : null }, b.ageDays + "d"),
             e("td", { className: "l", style: { whiteSpace: "normal", maxWidth: 240 } }, b.customers.length ? b.customers.map((c, i) => e("span", { key: i, className: "chip" }, c)) : e("span", { className: "zero" }, "—")),
-            e("td", { className: "l", style: { color: "#64748b" } }, b.createdBy || "—")))))),
+            e("td", { className: "l", style: { color: "var(--muted)" } }, b.createdBy || "—")))))),
         filtered.length === 0 ? e("div", { className: "note" }, "No bugs match — good sign, or loosen the filters.") : null));
   }
 
@@ -2609,7 +2884,7 @@
         .catch(err => setLoadErr(String(err.message || err)));
     }, []);
 
-    if (loadErr) return e("div", { className: "note", style: { color: "#dc2626" } }, "Could not load remittance data: " + loadErr);
+    if (loadErr) return e("div", { className: "note", style: { color: "var(--bad)" } }, "Could not load remittance data: " + loadErr);
     if (!snap) return e("div", { className: "note" }, "Loading…");
 
     const period = snap.periods.find(p => p.end === end) || snap.periods[0];
@@ -2672,16 +2947,16 @@
           : e("a", {
               href: csvUrl(org, report),
               onClick: (ev) => { ev.preventDefault(); download(org, report); },
-              style: { fontWeight: 600, color: "#0d5c99" },
+              style: { fontWeight: 600, color: "var(--brand-2)" },
               title: "Download " + org.displayName + "'s " + report.label.toLowerCase() + " for " + period.label
             }, period.start + " → " + period.end),
-        busy[k] ? e("div", { style: { fontSize: 11.5, color: "#64748b" } }, "Building…") : null,
-        errs[k] ? e("div", { style: { fontSize: 11.5, color: "#dc2626" } }, errs[k]) : null);
+        busy[k] ? e("div", { style: { fontSize: 11.5, color: "var(--muted)" } }, "Building…") : null,
+        errs[k] ? e("div", { style: { fontSize: 11.5, color: "var(--bad)" } }, errs[k]) : null);
     }
 
     return e("div", null,
-      unconfigured.length ? e("div", { className: "panel", style: { borderColor: "#fcd34d", background: "#fffbeb" } },
-        e("div", { style: { padding: "12px 16px", fontSize: 13, color: "#78350f" } },
+      unconfigured.length ? e("div", { className: "panel", style: { borderColor: "var(--warn-edge)", background: "var(--warn-bg)" } },
+        e("div", { style: { padding: "12px 16px", fontSize: 13, color: "var(--warn-ink-2)" } },
           e("b", null, unconfigured.map(r => r.label).join(" and ") + (unconfigured.length > 1 ? " aren't" : " isn't") + " connected yet. "),
           "The shared Metabase card needs its public link enabled and its UUID set on this server. ",
           "Until then that column's dates aren't clickable.")) : null,
@@ -2725,7 +3000,7 @@
             e("tbody", null, orgs.map(o => e("tr", { key: o.id },
               e("td", { className: "name", title: o.name }, o.displayName),
               reports.map(r => reportCell(o, r))))))),
-        e("div", { style: { padding: "10px 16px", fontSize: 12, color: "#64748b", borderTop: "1px solid var(--line)" } },
+        e("div", { style: { padding: "10px 16px", fontSize: 12, color: "var(--muted)", borderTop: "1px solid var(--line)" } },
           orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule")));
   }
 
@@ -2764,17 +3039,17 @@
     if (!users) return e("div", { className: "note" }, "Loading…");
     return e("div", { className: "panel" },
       e("h2", null, "Users", e("span", { className: "hint" }, "admins can view everything and manage users; users can view dashboards")),
-      err ? e("div", { className: "note", style: { color: "#dc2626" } }, err) : null,
-      reset ? e("div", { style: { background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px", margin: "0 0 14px", fontSize: 13 } },
+      err ? e("div", { className: "note", style: { color: "var(--bad)" } }, err) : null,
+      reset ? e("div", { style: { background: "var(--good-bg-2)", border: "1px solid var(--good-edge)", borderRadius: 10, padding: "12px 14px", margin: "0 0 14px", fontSize: 13 } },
         e("div", { style: { marginBottom: 6 } }, e("b", null, "Reset link for " + reset.name),
           reset.emailSent ? " — emailed to " + reset.email + " ✓. Link below in case you'd rather send it yourself."
             : reset.emailError ? " — email failed (" + reset.emailError + "), send the link to them directly."
             : " — send it to them directly.",
           " It works once and expires in " + reset.minutes + " minutes; generating a new one replaces it."),
         e("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
-          e("code", { style: { flex: 1, background: "#fff", border: "1px solid #d1fae5", borderRadius: 7, padding: "6px 9px", fontSize: 11.5, overflowX: "auto", whiteSpace: "nowrap" } }, reset.url),
-          e("button", { onClick: copyReset, style: { background: reset.copied ? "#166534" : "#0f6f5c", color: "#fff", border: "none", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 } }, reset.copied ? "Copied ✓" : "Copy"),
-          e("button", { onClick: () => setReset(null), title: "Dismiss", style: { background: "transparent", color: "#64748b", border: "none", fontSize: 15, cursor: "pointer", flexShrink: 0 } }, "✕"))) : null,
+          e("code", { style: { flex: 1, background: "var(--card)", border: "1px solid var(--good-edge)", borderRadius: 7, padding: "6px 9px", fontSize: 11.5, overflowX: "auto", whiteSpace: "nowrap" } }, reset.url),
+          e("button", { onClick: copyReset, style: { background: reset.copied ? "var(--good-ink)" : "var(--brand)", color: "var(--card)", border: "none", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 } }, reset.copied ? "Copied ✓" : "Copy"),
+          e("button", { onClick: () => setReset(null), title: "Dismiss", style: { background: "transparent", color: "var(--muted)", border: "none", fontSize: 15, cursor: "pointer", flexShrink: 0 } }, "✕"))) : null,
       e("div", { className: "tablewrap" }, e("table", null,
         e("thead", null, e("tr", null, e("th", { className: "l" }, "Name"), e("th", { className: "l" }, "Email"), e("th", { className: "l" }, "Role"), e("th", { className: "l" }, "Status"), e("th", { className: "l" }, "Joined"), e("th", { className: "l" }, "Password"))),
         e("tbody", null, users.map(u => e("tr", { key: u.id },
@@ -2784,10 +3059,10 @@
             e("option", { value: "user" }, "user"), e("option", { value: "admin" }, "admin"))),
           e("td", { className: "l" }, e("label", { className: "chk" },
             e("input", { type: "checkbox", checked: u.active, disabled: u.id === me.id, onChange: ev => update(u.id, { active: ev.target.checked }) }), u.active ? "active" : "deactivated")),
-          e("td", { className: "l", style: { color: "#64748b" } }, (u.createdAt || "").slice(0, 10)),
+          e("td", { className: "l", style: { color: "var(--muted)" } }, (u.createdAt || "").slice(0, 10)),
           e("td", { className: "l" },
             e("button", { onClick: () => resetPw(u), disabled: !u.active, title: u.active ? "Generate a one-time reset link to send to " + u.name : "Reactivate the account first",
-              style: { background: u.active ? "#fff" : "#f8fafc", color: u.active ? "#0f6f5c" : "#94a3b8", border: "1px solid " + (u.active ? "#0f6f5c55" : "#e2e8f0"), borderRadius: 7, padding: "4px 10px", fontSize: 12, fontWeight: 600, cursor: u.active ? "pointer" : "default" } }, "Reset password"),
+              style: { background: u.active ? "var(--card)" : "var(--fill)", color: u.active ? "var(--brand)" : "var(--faint)", border: "1px solid " + (u.active ? "color-mix(in srgb, var(--brand) 33%, transparent)" : "var(--line)"), borderRadius: 7, padding: "4px 10px", fontSize: 12, fontWeight: 600, cursor: u.active ? "pointer" : "default" } }, "Reset password"),
             u.resetPending ? e("span", { className: "hint", title: "An unused reset link is outstanding for this user" }, " link pending") : null)))))));
   }
 
@@ -2951,7 +3226,7 @@
             e("b", { style: { color: ofGradeColor(r.score) } }, r.score + "%")));
 
     const launchTag = o => o.launched
-      ? e("span", { className: "chip", style: { background: "#dcfce7", borderColor: "#86efac", color: "#166534" } }, "live")
+      ? e("span", { className: "chip", style: { background: "var(--good-bg)", borderColor: "var(--good-edge)", color: "var(--good-ink)" } }, "live")
       : e("span", { className: "chip", title: "Not yet live on rec.us" }, "pre-launch");
 
     const orgOptions = all.map(o => e("option", { key: o.slug, value: o.slug }, orgName(o)));
@@ -2987,7 +3262,7 @@
            somebody was sent. It says why it is missing from the list rather
            than pretending not to exist. */
         excluded.has(o.slug) ? e("div", { className: "note", "data-feat-exclnote": 1,
-            style: { color: "#b45309", fontWeight: 600 } },
+            style: { color: "var(--warn-ink)", fontWeight: 600 } },
           "⚠ This organization is excluded in the settings, so it is not in the list or the fleet average.") : null,
 
         e("div", { className: "cards" },
@@ -3148,7 +3423,7 @@
           e("div", { className: "card ringcard", "data-feat-fcount": fall.length,
                      title: "Features this page is counting, after the settings" },
             e(Ring, { pct: allMeasured.length ? (shown.length / allMeasured.length) * 100 : null,
-                      color: "#0f6f5c", label: "Features tracked: " + fall.length }),
+                      color: "var(--brand)", label: "Features tracked: " + fall.length }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Features tracked"),
               e("div", { className: "v" }, fall.length),
@@ -3166,9 +3441,9 @@
                      title: "Features whose share of live organizations has moved since the first comparable bake" },
             e("div", { className: "k" }, "Moving"),
             e("div", { className: "v" },
-              e("span", { style: { color: "#15803d" } }, "\u25b2 " + up),
-              e("span", { style: { color: "#94a3b8", fontWeight: 400 } }, "  \u00b7  "),
-              e("span", { style: { color: up || down ? "#dc2626" : "#94a3b8" } }, "\u25bc " + down)),
+              e("span", { style: { color: "var(--good-ink-2)" } }, "\u25b2 " + up),
+              e("span", { style: { color: "var(--faint)", fontWeight: 400 } }, "  \u00b7  "),
+              e("span", { style: { color: up || down ? "var(--bad)" : "var(--faint)" } }, "\u25bc " + down)),
             e("div", { className: "d" }, trendable
               ? trendable + " of " + fall.length + " have enough history to say"
               : "no feature has two comparable measurements yet"))),
@@ -3314,18 +3589,18 @@
            from the list rather than pretending not to exist, because the
            link may be one somebody was sent. */
         hidden.has(featureKey) ? e("div", { className: "note", "data-feat-fhidden": 1,
-            style: { color: "#b45309", fontWeight: 600 } },
+            style: { color: "var(--warn-ink)", fontWeight: 600 } },
           "\u26a0 This feature is hidden in the settings, so it is not counted in any adoption score. "
           + "The figures below are unaffected \u2014 they are about this feature alone.") : null,
         measuredHere ? null : e("div", { className: "note", "data-feat-funmeasured": 1,
-            style: { color: "#b45309", fontWeight: 600 } },
+            style: { color: "var(--warn-ink)", fontWeight: 600 } },
           "\u26a0 This feature is in the catalog but is NOT measured, so nobody can be shown as using it. "
           + (f.not_measurable || "")),
 
         e("div", { className: "cards" },
           e("div", { className: "card ringcard", "data-feat-fusers": users.length,
                      title: "Organizations in this view that have this feature configured or in use" },
-            e(Ring, { pct: all.length ? (users.length / all.length) * 100 : null, color: "#0d5c99",
+            e(Ring, { pct: all.length ? (users.length / all.length) * 100 : null, color: "var(--brand-2)",
                       label: "Using it: " + users.length }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Using it"),
@@ -3338,7 +3613,7 @@
              wave away. */
           e("div", { className: "card ringcard", "data-feat-flive": liveUsing,
                      title: "Organizations live on rec.us that use it \u2014 the honest denominator" },
-            e(Ring, { pct: fleet.liveOrgs ? (liveUsing / fleet.liveOrgs) * 100 : null, color: "#0f6f5c",
+            e(Ring, { pct: fleet.liveOrgs ? (liveUsing / fleet.liveOrgs) * 100 : null, color: "var(--brand)",
                       label: "Live orgs using it: " + liveUsing }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Live on rec.us"),
@@ -3347,7 +3622,7 @@
                  drill-in that states it differently from the list it was
                  opened from is two surfaces disagreeing on one click. */
               e("div", { className: "v" }, liveUsing,
-                fleet.liveOrgs ? e("span", { style: { fontSize: 15, color: "#94a3b8", fontWeight: 600 } },
+                fleet.liveOrgs ? e("span", { style: { fontSize: 15, color: "var(--faint)", fontWeight: 600 } },
                   " \u00b7 " + livePct + "%") : null),
               fleet.liveOrgs ? e("div", { className: "gradeline" },
                 e(Grade, { pct: livePct, ramp: "feature", size: "lg", showSays: true })) : null,
@@ -3358,7 +3633,7 @@
                      + "bakes that measured it AND recorded a live-organization count." })))),
           e("div", { className: "card ringcard", "data-feat-preusing": preUsing,
                      title: "Organizations not yet live that have already configured it" },
-            e(Ring, { pct: preOrgs ? (preUsing / preOrgs) * 100 : null, color: "#6b7280",
+            e(Ring, { pct: preOrgs ? (preUsing / preOrgs) * 100 : null, color: "var(--faint)",
                       label: "Pre-launch orgs using it: " + preUsing }),
             e("div", { className: "ringtext" },
               e("div", { className: "k" }, "Pre-launch"),
@@ -3461,7 +3736,7 @@
         e("div", { className: "card ringcard", "data-feat-orgs": all.length,
                    title: "Organizations in this view, and how many are live on rec.us" },
           e(Ring, { pct: all.length ? (launched / all.length) * 100 : null,
-                    color: "#0d5c99", label: "Organizations: " + all.length }),
+                    color: "var(--brand-2)", label: "Organizations: " + all.length }),
           e("div", { className: "ringtext" },
             e("div", { className: "k" }, "Organizations"),
             e("div", { className: "v" }, all.length),
@@ -3482,7 +3757,7 @@
         e("div", { className: "card ringcard", "data-feat-shown": shown.length,
                    title: "How many of the measured features this page is counting" },
           e(Ring, { pct: allMeasured.length ? (shown.length / allMeasured.length) * 100 : null,
-                    color: "#0f6f5c", label: "Features tracked: " + shown.length + " of " + allMeasured.length }),
+                    color: "var(--brand)", label: "Features tracked: " + shown.length + " of " + allMeasured.length }),
           e("div", { className: "ringtext" },
             e("div", { className: "k" }, "Features tracked"),
             e("div", { className: "v" }, shown.length + " / " + allMeasured.length),
@@ -3502,7 +3777,7 @@
           .filter(Boolean).join(" \u00b7 ") +
         ". Adoption scores are taken over the " + shown.length + " tracked feature" + (shown.length === 1 ? "" : "s") +
         ", so they are not comparable with a differently-scoped view. Nothing is deleted \u2014 changing the settings brings it all back.") : null,
-      cfgErr ? e("div", { className: "note", style: { color: "#b45309" } },
+      cfgErr ? e("div", { className: "note", style: { color: "var(--warn-ink)" } },
         "\u26a0 Settings could not be loaded (" + cfgErr + "), so nothing is hidden. This is the full view.") : null,
 
       e("div", { className: "panel" },
@@ -3933,7 +4208,7 @@
 
         e("div", { className: "ofs-foot" },
           e("div", { className: "ofs-footnote", "data-feat-footnote": dirty ? "dirty" : "clean" },
-            saveErr ? e("span", { style: { color: "#b91c1c" } }, "Could not save: " + saveErr)
+            saveErr ? e("span", { style: { color: "var(--bad-ink)" } }, "Could not save: " + saveErr)
                     : dirty ? "Save applies this to everyone on the CX dashboard."
                             : "Nothing to save \u2014 tick or untick something first."),
           e("div", null,
@@ -3958,11 +4233,11 @@
     const box = (x, y, w, h, title, sub, fill, stroke) => e("g", { key: title },
       e("rect", { x, y, width: w, height: h, rx: 8, fill, stroke, strokeWidth: 1.5 }),
       e("text", { x: x + w / 2, y: y + (sub ? 22 : 26), textAnchor: "middle",
-                  fontSize: 12.5, fontWeight: 700, fill: "#0f172a" }, title),
+                  fontSize: 12.5, fontWeight: 700, fill: "var(--ink)" }, title),
       sub ? e("text", { x: x + w / 2, y: y + 39, textAnchor: "middle",
-                        fontSize: 10.5, fill: "#475569" }, sub) : null);
+                        fontSize: 10.5, fill: "var(--neutral-ink)" }, sub) : null);
     const arrow = (x1, y1, x2, y2, key) => e("line",
-      { key, x1, y1, x2, y2, stroke: "#94a3b8", strokeWidth: 1.5, markerEnd: "url(#ah)" });
+      { key, x1, y1, x2, y2, stroke: "var(--faint)", strokeWidth: 1.5, markerEnd: "url(#ah)" });
 
     return e("div", null,
       e("div", { className: "panel" },
@@ -3994,26 +4269,26 @@
                      role: "img", "aria-label": "Architecture: sources bake snapshots into the repo, Railway serves them, Postgres holds accounts" },
             e("defs", null, e("marker", { id: "ah", viewBox: "0 0 10 10", refX: 9, refY: 5,
               markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" },
-              e("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "#94a3b8" }))),
+              e("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "var(--faint)" }))),
 
-            e("text", { x: 12, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "SOURCES"),
-            box(12, 32, 150, 52, "rec prod replica", "via Metabase", "#eef6ff", "#93c5fd"),
-            box(12, 94, 150, 52, "Airtable", "services · requests", "#eef6ff", "#93c5fd"),
-            box(12, 156, 150, 52, "Linear · HubSpot", "bugs · accounts", "#eef6ff", "#93c5fd"),
+            e("text", { x: 12, y: 20, fontSize: 10.5, fontWeight: 700, fill: "var(--muted)" }, "SOURCES"),
+            box(12, 32, 150, 52, "rec prod replica", "via Metabase", "var(--info-bg-2)", "var(--spark)"),
+            box(12, 94, 150, 52, "Airtable", "services · requests", "var(--info-bg-2)", "var(--spark)"),
+            box(12, 156, 150, 52, "Linear · HubSpot", "bugs · accounts", "var(--info-bg-2)", "var(--spark)"),
 
-            e("text", { x: 232, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "BAKE"),
-            box(232, 32, 170, 176, "Scheduled Routine", "daily ~6am ET → commit", "#f5f3ff", "#c4b5fd"),
+            e("text", { x: 232, y: 20, fontSize: 10.5, fontWeight: 700, fill: "var(--muted)" }, "BAKE"),
+            box(232, 32, 170, 176, "Scheduled Routine", "daily ~6am ET → commit", "var(--violet-bg)", "var(--violet-edge)"),
 
-            e("text", { x: 472, y: 20, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "REPO"),
-            box(472, 32, 170, 176, "danj707/org-features", "3 snapshots committed", "#f0fdf4", "#86efac"),
+            e("text", { x: 472, y: 20, fontSize: 10.5, fontWeight: 700, fill: "var(--muted)" }, "REPO"),
+            box(472, 32, 170, 176, "danj707/org-features", "3 snapshots committed", "var(--good-bg-2)", "var(--good-edge)"),
 
-            e("text", { x: 12, y: 258, fontSize: 10.5, fontWeight: 700, fill: "#64748b" }, "RUNTIME"),
-            box(232, 270, 170, 68, "Railway", "org-features service", "#fff7ed", "#fdba74"),
-            box(472, 270, 170, 68, "Postgres", "schema: orgfeatures", "#fef2f2", "#fca5a5"),
-            box(682, 270, 166, 68, "Metabase", "live, per request", "#eef6ff", "#93c5fd"),
+            e("text", { x: 12, y: 258, fontSize: 10.5, fontWeight: 700, fill: "var(--muted)" }, "RUNTIME"),
+            box(232, 270, 170, 68, "Railway", "org-features service", "var(--orange-bg-2)", "var(--orange-edge)"),
+            box(472, 270, 170, 68, "Postgres", "schema: orgfeatures", "var(--bad-bg-2)", "var(--bad-edge)"),
+            box(682, 270, 166, 68, "Metabase", "live, per request", "var(--info-bg-2)", "var(--spark)"),
 
-            box(232, 372, 170, 62, "Org Features", "public dashboard", "#f8fafc", "#cbd5e1"),
-            box(472, 372, 170, 62, "CX Dashboard", "auth-gated", "#f8fafc", "#cbd5e1"),
+            box(232, 372, 170, 62, "Org Features", "public dashboard", "var(--fill)", "var(--line-2)"),
+            box(472, 372, 170, 62, "CX Dashboard", "auth-gated", "var(--fill)", "var(--line-2)"),
 
             arrow(162, 58, 232, 100, "a1"),
             arrow(162, 120, 232, 120, "a2"),
@@ -4025,11 +4300,11 @@
             arrow(300, 338, 300, 372, "a8"),
             arrow(340, 338, 520, 372, "a9"),
 
-            e("text", { x: 12, y: 300, fontSize: 10.5, fill: "#475569" }, "accounts +"),
-            e("text", { x: 12, y: 314, fontSize: 10.5, fill: "#475569" }, "snapshot"),
-            e("text", { x: 12, y: 328, fontSize: 10.5, fill: "#475569" }, "overrides"),
-            e("text", { x: 682, y: 356, fontSize: 10, fill: "#64748b" }, "Remittance only"),
-            e("text", { x: 472, y: 356, fontSize: 10, fill: "#64748b" }, "accounts live here"))),
+            e("text", { x: 12, y: 300, fontSize: 10.5, fill: "var(--neutral-ink)" }, "accounts +"),
+            e("text", { x: 12, y: 314, fontSize: 10.5, fill: "var(--neutral-ink)" }, "snapshot"),
+            e("text", { x: 12, y: 328, fontSize: 10.5, fill: "var(--neutral-ink)" }, "overrides"),
+            e("text", { x: 682, y: 356, fontSize: 10, fill: "var(--muted)" }, "Remittance only"),
+            e("text", { x: 472, y: 356, fontSize: 10, fill: "var(--muted)" }, "accounts live here"))),
         e("div", { className: "note", style: { marginTop: 10 } },
           "Deploys: pushing to main builds on Railway and waits for this repo's CI check " +
           "suites before releasing.")));
@@ -4112,8 +4387,13 @@
         item("/ps/how", "How This Works", r.page === "how"),
         item("/ps/updates", "Updates", r.page === "updates"),
         e("div", { className: "foot" },
-          e("div", null, "Signed in as ", e("b", { style: { color: "#cbd5e1" } }, me.name), " (" + me.role + ")"),
-          e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "#6ee7b7" } }, "Sign out"),
+          /* WHERE DAN POINTED. It sits above the identity line rather than
+             below the snapshot stamp because the stamp already ends in a
+             variable-height staleness shout — a control under that moves
+             down the sidebar on the days the bake is late. */
+          e(ThemeToggle, null),
+          e("div", null, "Signed in as ", e("b", { style: { color: "var(--nav-ink-strong)" } }, me.name), " (" + me.role + ")"),
+          e("a", { href: "#", onClick: (ev) => { ev.preventDefault(); signOut(); }, style: { color: "var(--nav-accent)" } }, "Sign out"),
           e("div", { style: { marginTop: 8 }, "data-snap-age": snapAgeDays(data.generatedAt) },
             // NAMED, because this is the PS/bugs snapshot and it renders at
             // the foot of every page including Org Features, which is baked
@@ -4126,7 +4406,7 @@
             // read as current. State the AGE, which is measured, and shout
             // when it is old enough to be misleading.
             snapStale(data.generatedAt)
-              ? e("div", { style: { color: "#fbbf24", fontWeight: 700, marginTop: 2 } },
+              ? e("div", { style: { color: "var(--nav-warn)", fontWeight: 700, marginTop: 2 } },
                   "\u26a0 " + snapAgeDays(data.generatedAt) + " days old — statuses may have moved on")
               : e("span", null, " \u00b7 " + snapAgeLabel(data.generatedAt))))),
       e("main", null,
