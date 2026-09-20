@@ -35,6 +35,7 @@ const mergeSrc = fs.readFileSync(path.join(__dirname, "refresh", "merge-snapshot
 const pageSrc = fs.readFileSync(path.join(ROOT, "public", "ps.html"), "utf8");
 
 /* ── 1. THE CLASSIFICATION ─────────────────────────────────────────────── */
+const meta0 = data.backfillMeta || {};
 const rows = parse().filter(r => !r.core);
 const okKeys = rows.filter(r => r.rw.ok).map(r => r.key);
 const noKeys = rows.filter(r => !r.rw.ok);
@@ -73,6 +74,28 @@ for (const r of noKeys) {
 for (const r of noKeys.filter(x => x.rw.untimestamped)) {
   ok(/no record of when it changed/.test(r.rw.why),
     "`" + r.key + "` is flagged untimestamped but its reason says otherwise");
+}
+
+/* THE DENYLIST HAS TO BE SEEN DOING WORK. Gutting it survived the first
+   mutation run: fewer exclusions still left the join-and-union four, so every
+   count assertion above stayed true while twenty features silently gained a
+   history the database cannot support — which is the one outcome this whole
+   exercise exists to prevent.
+
+   FOUR ARE NAMED, and they are the four the write-up rests on. `instant_booking`
+   is the measured proof (63 on the morning of 2026-09-07, reconstructs as 61,
+   because two organizations turned the flag off and nothing recorded when);
+   the other three are the same shape on a JSON config. A change that makes any
+   of them backfillable is a change somebody has to justify, not one that
+   slides through on a count. */
+const untimestamped = noKeys.filter(x => x.rw.untimestamped).map(x => x.key);
+ok(untimestamped.length >= 15,
+  "only " + untimestamped.length + " metrics are excluded as untimestamped — the denylist has been weakened");
+for (const k of ["instant_booking", "waitlist", "payment_plans", "auto_renew_memberships"]) {
+  ok(untimestamped.indexOf(k) >= 0,
+    "`" + k + "` reads a column with no record of when it changed and MUST NOT be backfilled");
+  ok(!(meta0.features || []).includes(k),
+    "`" + k + "` has backfilled history — its value today says nothing about any past date");
 }
 
 /* ── 2. THE ARITHMETIC ─────────────────────────────────────────────────── */
@@ -193,8 +216,14 @@ eq((meta.excluded || []).length + (meta.features || []).length, measured.length,
 /* `out` is assembled from scratch every morning, so a key not named there is
    deleted by the next refresh — silently, in a commit whose diff looks
    routine. That would have happened the first morning after this landed. */
-ok(/backfill:\s*old\.backfill/.test(mergeSrc),
-  "merge-snapshot does not carry `backfill` forward — the next bake deletes it");
+/* COPIED VERBATIM, and the message says both ways that can fail. An earlier
+   run mutated this into `(old.backfill || []).concat([point])` and was caught
+   here reading "the next bake deletes it" — true of one failure and not of
+   the one in front of it, and a mutation caught by a message that misdescribes
+   it has not shown the assertion works. */
+ok(/backfill:\s*old\.backfill\s*,/.test(mergeSrc),
+  "merge-snapshot does not copy `backfill` forward verbatim — the next bake would delete it, "
+  + "or rewrite it with measured points");
 ok(/backfillMeta:\s*old\.backfillMeta/.test(mergeSrc),
   "merge-snapshot does not carry `backfillMeta` forward — the next bake deletes it");
 /* NAMING THE MUTATION, not its neighbourhood. The first version of this

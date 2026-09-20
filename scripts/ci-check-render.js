@@ -477,8 +477,17 @@ const CASES = [
           .sort((a, b) => String(a.date).localeCompare(String(b.date)));
         const pts = k => hist.filter(h => h.liveOrgs > 0 && h.featureLive
                                           && h.featureLive[k] != null).length;
+        /* "MOVED MOST" IS MEASURED OVER THE WINDOW EVERY FEATURE HAS, which
+           after the backfill is the first MEASURED bake onward — 36 features
+           reach back to January and 24 start there, and ranking each over its
+           own span makes eight months of drift beat three weeks of real
+           movement. Re-derived here rather than borrowed from the page: the
+           point is to check the page's ordering against an independent one,
+           and calling ofChartRankDelta would only make it agree with itself. */
+        const rankFrom = (hist.find(h => h && !h.backfill) || {}).date || null;
         const dl = k => { const p = hist.filter(h => h.liveOrgs > 0 && h.featureLive
-                                                     && h.featureLive[k] != null)
+                                                     && h.featureLive[k] != null
+                                                     && (!rankFrom || h.date >= rankFrom))
                             .map(h => Math.round((h.featureLive[k] / h.liveOrgs) * 100));
                           return p.length > 1 ? Math.abs(p[p.length - 1] - p[0]) : null; };
         const lines = [...document.querySelectorAll("[data-of-chart-line]")];

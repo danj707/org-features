@@ -1601,3 +1601,210 @@ alone (the helper still returns the string), the note shown unconditionally by
 the spec alone (in a browser against the real snapshot something is always
 gated, so no render case can reach that state), and the day count dropped by
 both.
+
+## EIGHT MONTHS OF ADOPTION HISTORY, REBUILT FROM THE DATABASE (2026-09-20)
+
+Dan, on the greyed range presets: *"ahh so there's no historical data to refer
+back to? we can't infer that by looking directly in the db, and building a
+history"* — then, on the plan: *"works for me!"*
+
+We can, for **36 of the 60 features**, back to **2026-01-19**. The chart had
+eleven days on it; it has 242 points now.
+
+### merge-snapshot SAID IT COULD NOT BE DONE, AND IT WAS RIGHT ABOUT SNAPSHOTS
+
+Its own comment reads *"IT CANNOT BE BACKFILLED FROM GIT, and that is a
+measurement not a limitation"* — and that stays true. The only older bake in
+the repo measured **fourteen** features against today's sixty, so diffing
+across it publishes a definition change as org behaviour. That is a statement
+about the SNAPSHOTS.
+
+It is not a statement about the database underneath them. Every one of the 54
+tables the fleet query reads carries `created_at`, 35 also carry a soft-delete
+column, and the fleet query's own predicates are mostly tests that a row
+exists. *Generalise it: "this artifact cannot be reconstructed" and "the thing
+the artifact measured cannot be reconstructed" are different claims, and the
+first does not imply the second.*
+
+### 24 FEATURES ARE NOT A GAP TO CLOSE — that is the load-bearing decision
+
+**Twenty read a column that carries no record of when it changed** — a boolean
+(`is_instant_bookable`, `allow_guests`, `auto_renewal`), a JSON config
+(`waitlist_config`, `available_payment_plans`, `pricing_policy`), a mutable
+status. Reconstructing one reproduces **TODAY's answer at every past date**: a
+flat line wearing a trend's clothes, drawn beside a real one, inviting a reader
+to compare their slopes.
+
+**IT IS MEASURED, NOT ARGUED.** `instant_booking` was measured at **63** on the
+morning of 2026-09-07 and reconstructs as **61** — which is today's figure. Two
+organizations turned the flag off in between and nothing anywhere recorded it.
+
+The other four are written as a join or a union; this rewriter only handles
+single-table metrics, and **their exclusion reason says so in those words**
+rather than blaming the data. `age_eligibility`, `grade_eligibility` and
+`residency_eligibility` are all genuinely reconstructible and are the obvious
+next three if anyone wants them.
+
+### THE CLASSIFICATION IS DERIVED FROM fleet-query.sql, never listed
+
+A hand-kept second copy of sixty metric definitions is the drift this repo
+family keeps recording: it is only ever as current as the last person to edit
+it, and a metric that grew a predicate would keep backfilling under the old one
+on a chart nobody can check by eye. So `backfill-parse.js` reads the shipping
+query's own joins, and a metric it cannot mechanically rewrite **throws** rather
+than being quietly omitted. `backfill.spec.js` requires every measured feature
+to be on exactly one side, with no third state.
+
+### THE WINDOW STARTS WHERE THE DENOMINATOR BECOMES REAL
+
+A share of the live fleet needs to know which organizations were live that day,
+and the only column that can say is `organization.published_at`. **Its earliest
+value on the whole platform is 2026-01-19, shared by FORTY-TWO organizations**,
+with every value after it organic (one to six a day). Forty-two cities did not
+launch on one Monday — the column was populated in bulk.
+
+**A YEAR WAS TRIED FIRST AND IS WHAT FOUND THIS.** The reconstruction ran from
+2025-09-08 and drew a live fleet of **0 for four months** that then jumped to 42
+in a single day. The all-organizations series IS sound that far back
+(`created_at` is real), but the dashboard quotes the live share, and shipping a
+line whose denominator is wrong for its first four months is the failure this
+exercise exists to avoid.
+
+### PROVEN AGAINST A MEASUREMENT IT NEVER SAW
+
+The bake recorded 2026-09-07 from a different query before any of this existed.
+Reconstructing **that same day**:
+
+| | |
+|---|---|
+| live organizations | **73 measured, 73 reconstructed** |
+| features exact | **33 of 35 comparable** |
+| `email_messaging` | 65 vs 66 — the bake runs at 10:00 UTC, this counts the whole day; 09-08 onward measures 66 |
+| `group_reservation_windows` | 71 vs 69 — **hard deletes** |
+
+**THE SECOND ONE IS THE HONEST LIMIT OF THE WHOLE METHOD.** A hard-deleted row
+leaves nothing behind, so a reconstruction reads today's table and cannot know
+the organization ever had one. It is measurable here only because the bake
+happened to cover the same day: 71 live organizations have a site reservation
+window today and 71 had one on 2026-09-07, but only **69 of today's 71 had
+theirs by then** — so two of that day's are gone without trace and two others
+joined since. Two organizations, one feature of thirty-six, thirteen days.
+
+That day's reconstruction is committed as a fixture, and the diff re-runs in CI
+**with no database access**. The two differences are NAMED rather than absorbed
+into a tolerance — a tolerance would swallow the fourth one silently, and the
+fourth is the one worth hearing about.
+
+### IT WRITES `backfill`, NEVER `history` — three reasons, each sufficient
+
+`HISTORY_MAX` trims `history` to 120 and would have eaten the reconstruction
+from the front on the next bake; a reconstructed point and a measured one are
+different evidence and the page has to be able to say which it is drawing; and
+these points carry no per-org `scores`, because a score over 36 features is not
+the same measurement as one over 60.
+
+**AND THE NIGHTLY BAKE WOULD HAVE DELETED IT THE FIRST MORNING.**
+merge-snapshot assembles `out` from scratch, so a key not named there is gone —
+silently, in a commit whose diff looks like a routine refresh. Two assertions
+catch it: both keys are copied from `old`, and the bake never appends to
+`backfill`.
+
+### THE MERGE NEEDED NO FILTERING, AND THAT IS WHY IT IS SAFE
+
+A backfilled point carries **only** the 36 reconstructable features, so
+`ofFeatureTrend` — which already skips any point missing the key it is asked
+for — picks them up for those 36 and leaves the other 24 starting at the bake,
+with nothing to write and nothing to forget. `ofTrend`, the per-organization
+series, drops them twice over: no `scores` and no `setKey`.
+
+### THE BACKFILL BROKE THE CHART'S RANKING, and that was not obvious
+
+"Moved most" over each series' own span stops being a comparison once the two
+halves differ: **+18 points over eight months** outranks **+3 over three weeks**
+every time. Measured on the real feed it pushed **every one of the 24
+measured-only features off the chart** — 14 pills, all reconstructed.
+
+`ofChartRankFrom` scopes the ranking to the first MEASURED bake onward, which
+every feature has by construction. The LINE still draws its whole history; only
+the ordering is scoped, and with no backfill at all it is the entire series and
+the behaviour is exactly what it was.
+
+### THE CHART SAYS WHICH HALF IT IS DRAWING
+
+Two lines on one axis, one eight months long and one three weeks, invite the
+reader to compare slopes — so the split is on screen: a marker on each pill,
+and a footnote counting the two halves. **It returns null when every series or
+no series is reconstructed**, because the sentence is noise in both, and noise
+is what the next reader learns to skip.
+
+### Getting the data out, and why the query returns change points
+
+The raw intervals are 4,739 rows and the expanded grid is 365 days x 36
+features. Neither fits through a query tool with a userspace row cap, and a
+truncation at 2,000 rows would publish a backfill missing whichever features
+sort last. **Adoption is a STEP function**, so run-length encoding it is
+lossless and turns the whole year into 37 rows.
+
+**DAILY IS FORCED, not chosen.** The chart's x axis is ORDINAL —
+`xAt = i => l + (i / (dates.length - 1)) * pw` — so it spaces points evenly
+whatever their dates. Monthly points spliced in front of daily ones would draw
+eight months and eleven days at the same pitch: a chart that lies about time
+while every number on it is right.
+
+### Guards
+
+`scripts/backfill.spec.js` (**1,673 assertions, in CI**), which LIFTS AND RUNS
+the expander, the reducer, the ranking helpers and the page's own merge —
+every defect here is an off-by-one on a step function and a regex reads
+identically either way. **Mutation-tested fourteen ways, all fourteen caught by
+an assertion that NAMES the defect**: the reconstruction never reaching the
+chart, the merge unsorted, a count before the first change point carrying the
+first value backwards, a change point applying a day late, the reducer dividing
+by a missing denominator, a reconstructed point carrying scores, the
+untimestamped denylist gutted, the bake deleting the backfill, the bake
+appending a measured point to it, the ranking back on each series' own span,
+the rank window starting at the reconstruction, the pills unmarked, the note
+shown when everything is reconstructed, and an excluded feature given history.
+
+**TWO SURVIVED THE FIRST RUN and one was caught by the wrong message.**
+Gutting the denylist survived, because fewer exclusions still left the
+join-and-union four and every count assertion stayed true while twenty features
+silently gained a history the database cannot support — four are named
+explicitly now. The bake-appends mutation was caught reading *"the next bake
+deletes it"*, which is true of a different failure; *a mutation caught by a
+message that misdescribes it has not shown the assertion works*, so the message
+covers both. And the data-file mutation was simply BAD: a string replace found
+`"discount_codes"` in `adoption` rather than in a backfill point.
+
+**One render case, mutation-tested in a browser two ways** — the pills unmarked
+and the footnote dropped — each failing exactly the case that names it while
+the other three chart cases keep passing. It compares the marked pills against
+the feed's own `backfillMeta` and **requires both kinds present**, since a build
+where everything or nothing is reconstructed would pass a presence check while
+proving nothing.
+
+**FOUR PRE-EXISTING RENDER CASES READ `d.history` ALONE** and would have
+measured 11 vertices on a line that legitimately draws 242. A fifth encoded the
+old ranking and failed with *"smallest move on screen 3 vs biggest left off
+34"*. All five recompute the merge and the rank window **independently** rather
+than calling the page's helpers, which would only make them agree with
+themselves.
+
+**AND I EDITED THE WRONG OCCURRENCE FIRST.** The chart case and the trend-column
+case contain a byte-identical `const hist = (d && d.history) || [];`, and a
+replace-first patched the one I was not looking at — the failure message did not
+move, which is the tell. *"The second occurrence" is not a way to pick a call
+site*, recorded once already in the sibling project and re-learned here.
+
+### NOT DONE
+
+- **The three join-and-union eligibility metrics.** `age_eligibility`,
+  `grade_eligibility` and `residency_eligibility` are all reconstructible; each
+  needs one more shape in the rewriter, and 36 of 60 was the line worth drawing
+  today.
+- **Nothing runs this on a schedule, deliberately.** The window is fixed and
+  ends where the measured series begins, so it is a one-time artifact; re-running
+  it only makes sense if the classification changes or the four above are added.
+- **`published_at` still cannot date a launch before 2026-01-19.** If a truer
+  launch date exists anywhere outside this database, the window could reach
+  further back — nothing on `organization` carries one.
