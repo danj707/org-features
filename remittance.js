@@ -575,6 +575,116 @@ const REMITTANCE_FEES = {
 
 function feesFor(orgId) { return REMITTANCE_FEES[orgId] || null; }
 
+/* ── which remittance template an org is on ───────────────────────────────── */
+
+/**
+ * WHAT EACH ORG'S REMITTANCE CONTAINS, read off their own most recent sheet.
+ *
+ * This is deliberately NOT the same fact as `REMITTANCE_FEES`. That map is what
+ * this report can COMPUTE; this one is what finance's sheet actually HAS. They
+ * agree for every org that has a button, and where they differ the difference
+ * is the point: an org listed here with `tickets` and absent from the fee map
+ * is one whose remittance we cannot generate yet, and the pill on its row is
+ * the reason its button is a dash.
+ *
+ * Every remittance has the NORMAL block — credit card variable + fixed, cash,
+ * cheque, "Total Rec Fee" — so that is implied rather than listed. Only the
+ * additions are stored:
+ *
+ *   tech     "Technology Fees": a percentage of TOTAL SALES across every tender
+ *            (account credit and scholarships included), taken off BELOW Total
+ *            Rec Fee. Computed.
+ *   tickets  "Ticket & Events Module": max(rate x retail value, minimum per
+ *            ticket). NOT computed — the report cannot express it yet.
+ *   minimum  "Transaction minimum": the card fee becomes max(rate x amount,
+ *            minimum) PER PAYMENT rather than rate + fixed. Different
+ *            arithmetic for the base block itself, so not computed.
+ *
+ * TICKETS AND EVENTS ARE ONE MODULE, not two. The block is titled "Ticket &
+ * Events Module" and carries a single "Net Ticket Service Fees" line; none of
+ * the 59 sheets read prices them apart, so one pill rather than two that would
+ * always appear together.
+ *
+ * AN ORG THAT IS NOT IN THIS MAP HAS NO SHEET ON FILE, which is not the same as
+ * being on the normal template — most of the fleet has never had a remittance.
+ * Those rows get no pills rather than a "normal" they were never verified for.
+ */
+const REMITTANCE_TEMPLATES = {
+  "aeba47d0-c97f-49cb-a0e9-93c5af3a68fa": [],                                  // Apex Park and Recreation District
+  "b715f06b-920a-4562-ae7f-7df1477626c2": [],                                  // Battle Ground
+  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": ["tech"],                            // Belton
+  "71bf9bc4-cd62-482a-aee5-5d790cdba811": ["tickets"],                         // Boerne
+  "5aef2fa7-2999-45ed-afc7-0b884196e426": [],                                  // Buffalo
+  "521bbba9-a5ed-4efe-b296-354f9b3dffcb": [],                                  // Carmichael RPD
+  "449ce3cc-b071-4c6e-b474-d6591d32f617": [],                                  // Central Point
+  "de370d91-868b-4f7b-bf23-3694749661a5": [],                                  // Chico Recreation District
+  "14e26ada-ac6c-48ec-ad75-0590daaa4d71": [],                                  // City of Madison, IN
+  "83006fa1-fdaf-4f47-a4e1-a184e15f3527": [],                                  // City of West Haven, CT
+  "5dee565a-6012-4b4f-a325-0aea81674364": [],                                  // Clarkstown
+  "460566d3-3a51-4387-a7a0-0b010923e40d": [],                                  // Clarksville, IN
+  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": ["tech"],                            // Danvers, MA
+  "0312ebc8-40de-4fc8-a737-8afa26334e13": [],                                  // Douglas County, NV
+  "f4338fa8-009b-49eb-9a2b-16ca4688694a": ["tech"],                            // Easton
+  "8ae77057-6bce-4c20-b0f2-366ed5fa14dd": [],                                  // El Segundo
+  "6bc65b55-27e4-4447-9c07-22c98c8dd99b": ["minimum"],                         // Emeryville
+  "2e622a3e-80e1-4911-b722-81929ca27056": [],                                  // Essex Junction
+  "2a118b52-99af-42f3-9727-d9b46b8d31e4": ["tech"],                            // Euclid
+  "8890d2c8-329a-48a9-972b-872435bd5fa6": [],                                  // Hermosa Beach
+  "37478841-ab2a-48ce-8176-9197b719edd4": ["minimum"],                         // Jeffersonville
+  "ac04aa52-d629-435f-84af-0fc95e152e7b": [],                                  // Joplin
+  "1f1b6f1d-d0c4-4912-b4a2-077d1786ab20": [],                                  // Jurupa Area Recreation & Park District
+  "ef946698-1e71-4159-b814-f89df3d2e7d4": [],                                  // Lake County, CA
+  "f2f03a2b-82b8-4cd6-be40-ae94aea6480b": [],                                  // Lakeland
+  "ff965a2b-7746-4de9-8b41-402927cb5879": [],                                  // Lewisburg
+  "992ee322-4927-4558-827d-7f8768580b85": [],                                  // Littleton
+  "baa12a2d-b31b-4900-85a1-e6f634f0a3ce": ["tickets"],                         // Madeira Beach
+  "844620a6-c3d2-4a70-ac3e-1c6e5b76a49f": [],                                  // Malibu
+  "c193567f-9503-4635-a134-f72b5db556b6": [],                                  // Mashantucket Pequot Tribal Nation
+  "bc94a100-8adb-4303-90cb-7c4714c22751": [],                                  // Menifee
+  "8a8a4fb1-c184-4196-a878-75c775ce6252": [],                                  // Midland
+  "f64a9263-0fe8-4f90-8015-67b23c546e14": [],                                  // Natchez, MS
+  "9e6de746-5935-4c47-855d-0f50b02bfe7e": [],                                  // Needham
+  "a976a11a-5303-4785-838a-1b281ca77678": [],                                  // Niagara Falls
+  "574923bd-9e7b-43e0-9e5f-7ce256189cbf": ["tickets"],                         // Norman, OK
+  "70ea2e35-d1c7-4214-8074-3a598aa991f9": ["tickets"],                         // Northern Door Sports and Recreation
+  "f395300e-2edf-42f3-ba24-bebbceb1fa33": [],                                  // Paradise RPD
+  "5aa9686e-f5f7-49af-bf2d-3be6f6257013": [],                                  // Piedmont
+  "52efcded-a5e8-4dbf-8a45-100f70170de0": [],                                  // Pleasant Hill, MO
+  "9acfb33a-4114-4f0f-be3c-2eb0a3930550": ["tech", "tickets"],                 // Prescott Valley
+  "5b5a3779-da76-4b83-9229-17de9c525dc0": [],                                  // Pueblo County
+  "fe152712-f0bf-41df-892f-5edad45d9168": [],                                  // Putnam County, FL
+  "8f24ee66-e9a6-40a4-afbb-27efe8ef64d5": [],                                  // Reading
+  "90cab301-360d-4c01-9a88-0a67ecd6a9d2": [],                                  // Sacramento County
+  "17380e28-7e02-4b52-82c5-fab18557fd7a": [],                                  // San Francisco Rec & Park
+  "2dcbb832-c8b3-44c6-a729-703ee275d996": ["minimum"],                         // Sebastopol Community Cultural Center
+  "0a9c47af-b4c3-4601-ab0f-d2f401bb787a": ["tickets"],                         // Shrewsbury, MA
+  "efc0724c-8f32-481a-bab3-fc19c724f3a7": ["tickets"],                         // Smyrna
+  "ee3c6fb6-ddc6-479f-bf26-f112ea714e09": ["minimum"],                         // Taylor
+  "35861ae4-e71e-44e9-a574-9c5d6e691612": ["tech", "tickets"],                 // The Dance Palace
+  "2d147f38-068c-409e-890d-a8acc88d8079": [],                                  // The Ranch
+  "4246b144-a4e2-4bf1-bb7f-a89f47d71973": [],                                  // Torrance
+  "bc7afe82-0054-4bed-b77d-787a79a9018e": [],                                  // Tullahoma
+  "d781690b-c5a0-43c5-8443-9ae43899528c": ["tech"],                            // Watertown, MA
+  "7d22bf62-060a-4881-9821-9dea6a0538d6": ["tickets"],                         // West Sacramento
+  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": ["tech"],                            // Windham, ME
+  "b026a7c3-1e7e-48e1-9f0a-b2f7154b117d": ["tickets"],                         // Yerba Buena Gardens
+};
+
+const TEMPLATE_META = {
+  normal:  { label: "normal",  title: "Card variable + fixed fee per payment, plus cash and cheque rates" },
+  tech:    { label: "tech",    title: "Technology fee — a percentage of total sales across every tender" },
+  tickets: { label: "tickets", title: "Ticket & Events module — max(rate x retail, minimum per ticket). Not computed yet" },
+  minimum: { label: "min",     title: "Per-transaction minimum — max(rate x amount, minimum) per payment. Not computed yet" },
+};
+
+// Null, never ["normal"], for an org with no sheet on file: "we have never seen
+// this org's remittance" and "this org is on the plain template" are different
+// facts, and the second is a claim the row cannot support.
+function templatesFor(orgId) {
+  const extra = REMITTANCE_TEMPLATES[orgId];
+  return extra ? ["normal"].concat(extra) : null;
+}
+
 /* ── emailing a remittance ────────────────────────────────────────────────── */
 
 // WHO GETS IT IS A PLACEHOLDER, and deliberately a visible one. Finance
@@ -881,9 +991,15 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       // The workbook needs a fee schedule, so the button is offered per org
       // rather than fleet-wide. Only whether one EXISTS travels to the browser
       // — the rates themselves are nobody's business outside this server.
+      // `templates` is what that org's SHEET contains; `remittance` is whether
+      // this report can build it. Where they disagree the pills are the reason
+      // the button is a dash, so both travel.
+      templateMeta: TEMPLATE_META,
       orgs: loadOrgs().map(o => {
         const f = feesFor(o.id);
-        return f ? { ...o, remittance: true, remittanceDraft: ratesAreDraft(f) } : o;
+        const t = templatesFor(o.id);
+        const base = t ? { ...o, templates: t } : o;
+        return f ? { ...base, remittance: true, remittanceDraft: ratesAreDraft(f) } : base;
       }),
     });
   });
@@ -1030,4 +1146,5 @@ module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
   REMITTANCE_FEES, feesFor, ratesAreDraft, workbookFilename, remittanceRecipients,
+  REMITTANCE_TEMPLATES, TEMPLATE_META, templatesFor,
 };

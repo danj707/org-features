@@ -362,6 +362,17 @@
   .rm-email:hover:not(:disabled) { background: var(--fill-2); border-color: var(--brand); color: var(--brand); }
   .rm-email:disabled { color: var(--faint); cursor: progress; }
   .rm-sent { font-size: 11.5px; color: var(--good); margin-top: 3px; }
+  /* Template pills. COLOUR IS NOT THE MESSAGE — each carries its own word, so a
+     row reads without the legend and without colour vision. The two that this
+     report cannot compute are the warning colours, because on those rows the
+     pill IS the explanation for the missing button. */
+  .tmpl-pills { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .tmpl-pill { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10.5px;
+               font-weight: 700; letter-spacing: .02em; border: 1px solid transparent; white-space: nowrap; }
+  .tmpl-normal  { background: var(--fill-2); color: var(--muted); border-color: var(--line); }
+  .tmpl-tech    { background: var(--good-bg); color: var(--good-ink); border-color: var(--good-edge); }
+  .tmpl-tickets { background: var(--warn-bg-2); color: var(--warn-ink-2); border-color: var(--warn-edge); }
+  .tmpl-minimum { background: var(--bad-bg); color: var(--bad-ink); border-color: var(--bad-edge); }
   .ofs-foot button.ofs-save:disabled { background: var(--line); border-color: var(--line); color: var(--faint); cursor: not-allowed; }
   .ofs-meta { padding: 8px 16px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); }
   /* The "Data as of" line. It sits above the KPI cards and must read as a
@@ -3086,6 +3097,25 @@
            + "&end=" + encodeURIComponent(period.end);
     }
 
+    // WHAT'S ON THAT ORG'S REMITTANCE — read off their own most recent sheet,
+    // not off what this report can build. The two differ for eleven orgs, and
+    // that is the point: a "tickets" pill beside a dashed Remittance column is
+    // the reason the button isn't there.
+    //
+    // No pills at all means NO SHEET ON FILE, which is not the same as being on
+    // the plain template — most of the fleet has never had a remittance, and
+    // printing "normal" for them would be a claim the row cannot support.
+    function templateCell(org) {
+      const meta = snap.templateMeta || {};
+      return e("td", { key: "tmpl", className: "l", "data-rm-tmpl": (org.templates || []).join("+") },
+        !org.templates
+          ? e("span", { className: "zero", title: "No remittance on file for this organization yet" }, "—")
+          : e("span", { className: "tmpl-pills" }, org.templates.map(function (k) {
+              const m = meta[k] || { label: k, title: k };
+              return e("span", { key: k, className: "tmpl-pill tmpl-" + k, title: m.title }, m.label);
+            })));
+    }
+
     // Emailing builds the SAME workbook on the server and attaches it, so there
     // is nothing to download first. The confirm is not ceremony: this sends to
     // real people the moment it is clicked, and the recipients are not on screen
@@ -3210,17 +3240,26 @@
           e("table", null,
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"),
+              e("th", { className: "l" }, "Template"),
               reports.map(r => e("th", { key: r.key, className: "l" }, r.label)),
               e("th", { className: "l" }, "Remittance"))),
             e("tbody", null, orgs.map(o => e("tr", { key: o.id },
               e("td", { className: "name", title: o.name }, o.displayName),
+              templateCell(o),
               reports.map(r => reportCell(o, r)),
               remitCell(o)))))),
         e("div", { style: { padding: "10px 16px", fontSize: 12, color: "var(--muted)", borderTop: "1px solid var(--line)" } },
           orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule",
           e("div", { style: { marginTop: 4 } },
             "Generate remittance builds the finance workbook — summary, transaction log and item log in one file. ",
-            "It needs that organization's card, cash and check rates; orgs without a schedule on file show a dash."))));
+            "It needs that organization's card, cash and check rates; orgs without a schedule on file show a dash."),
+          e("div", { style: { marginTop: 4 } },
+            "Template is what that organization's own remittance contains: ",
+            e("span", { className: "tmpl-pill tmpl-normal" }, "normal"), " card, cash and cheque · ",
+            e("span", { className: "tmpl-pill tmpl-tech" }, "tech"), " a technology fee on total sales · ",
+            e("span", { className: "tmpl-pill tmpl-tickets" }, "tickets"), " the Ticket & Events module · ",
+            e("span", { className: "tmpl-pill tmpl-minimum" }, "min"), " a per-transaction minimum. ",
+            "The last two aren't computed yet, which is why those rows have no button."))));
   }
 
   function fmtDay2(iso) {

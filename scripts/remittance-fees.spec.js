@@ -195,6 +195,67 @@ ok("feesFor refuses an org with no schedule", () => {
   assert.strictEqual(rem.feesFor("not-an-org"), null);
 });
 
+/* ── 4b · the template pills agree with what can be computed ─────────────── */
+
+// THE PILLS AND THE FEE MAP ARE TWO SOURCES FOR ONE FACT, so they are checked
+// against each other rather than kept in step by memory. `templatesFor` says
+// what an org's SHEET contains; `feesFor` says what this report can BUILD. A
+// pill that disagrees with the schedule is exactly the Prescott Valley defect
+// made visible on a row — it billed $0 against a real technology fee because
+// nothing connected the two.
+const TPL = rem.REMITTANCE_TEMPLATES;
+const KINDS = ["tech", "tickets", "minimum"];
+
+ok("every template entry is keyed by UUID and lists known kinds only", () => {
+  const bad = [];
+  for (const [id, kinds] of Object.entries(TPL)) {
+    if (!UUID.test(id)) bad.push(`${id} is not a UUID`);
+    if (!Array.isArray(kinds)) { bad.push(`${id} is not an array`); continue; }
+    for (const k of kinds) if (!KINDS.includes(k)) bad.push(`${id} has unknown kind "${k}"`);
+    if (kinds.includes("normal")) bad.push(`${id} lists "normal" — it is implied, never stored`);
+  }
+  assert.deepStrictEqual(bad, [], bad.join("; "));
+});
+
+ok("every org gets the normal block, and an unknown org gets no pills at all", () => {
+  for (const id of Object.keys(TPL)) {
+    const t = rem.templatesFor(id);
+    assert.ok(Array.isArray(t) && t[0] === "normal", `${id}: ${JSON.stringify(t)}`);
+  }
+  // Null, never ["normal"]: "we have never seen this org's remittance" and
+  // "this org is on the plain template" are different facts.
+  assert.strictEqual(rem.templatesFor("00000000-0000-0000-0000-000000000000"), null);
+});
+
+ok("a tech pill means a tech rate, and a tech rate means a tech pill", () => {
+  const bad = [];
+  for (const [id, f] of entries) {
+    if (f.rateSource === "test") continue;          // the placeholder is not a contract
+    const t = rem.templatesFor(id);
+    if (!t) continue;                                // no sheet on file, nothing to agree with
+    const pill = t.includes("tech"), rate = f.techRateBps > 0;
+    if (pill !== rate) bad.push(`${id}: pill=${pill} rate=${f.techRateBps}bps`);
+  }
+  assert.deepStrictEqual(bad, [],
+    `the Template column and the fee schedule disagree: ${bad.join("; ")}`);
+});
+
+ok("nothing this report cannot compute has a button", () => {
+  const bad = Object.entries(TPL)
+    .filter(([id, kinds]) => FEES[id] &&
+            (kinds.includes("tickets") || kinds.includes("minimum")))
+    .map(([id, kinds]) => `${id} (${kinds.join("+")})`);
+  assert.deepStrictEqual(bad, [],
+    `${bad.join(", ")} has a fee schedule but is on a template this report cannot build`);
+});
+
+ok("every kind the pills can show has a label and a tooltip", () => {
+  const meta = rem.TEMPLATE_META;
+  for (const k of ["normal"].concat(KINDS)) {
+    assert.ok(meta[k] && meta[k].label && meta[k].title, `no meta for "${k}"`);
+  }
+});
+
 /* ── 5 · the rates are frozen ────────────────────────────────────────────── */
 
 // Every schedule below was read out of that org's own most recent remittance
