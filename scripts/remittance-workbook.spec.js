@@ -11,6 +11,11 @@
  *      period's real card output — committed as a fixture so this runs in CI
  *      with no Metabase access. If the generator and that sheet ever disagree,
  *      one of them is wrong and nobody would otherwise find out.
+ *      ONE LINE IS A DELIBERATE EXCEPTION AND IS ASSERTED AS ONE: "Items Sold"
+ *      follows the DANVERS reading (the transaction log's own Item Count, fee
+ *      lines included, 34) rather than Pleasant Hill's hand-built 20. Dan,
+ *      2026-09-22: "stick with whatever i uploaded for danvers." Every money
+ *      row is identical under either reading.
  *   2. THE LAYOUT MATCHES IT TOO, cell for cell. Same four columns, same row
  *      positions, same label text down to its trailing spaces. A generated
  *      sheet and a hand-built one get put side by side; a tidied-up layout
@@ -87,7 +92,13 @@ const money = (c) => (c / 100).toFixed(2);
 const ph = wb.summarize({ txns: PH.txns, items: PH.items, fees: FEES });
 
 eq("PH · Total Sales Transactions",  ph.sales.txnCount,        14);
-eq("PH · Items Sold",                ph.sales.itemCount,       20);
+// 34, not 20. Danvers is the reference sheet and it sums the transaction log's
+// own Item Count, which carries the pass-through fee lines — Pleasant Hill's
+// hand-built sheet reads 20 over this same period because it counts goods.
+// Dan, 2026-09-22: "stick with whatever i uploaded for danvers." The money rows
+// are identical under either reading; only this one line moves.
+eq("PH · Items Sold is the transaction log's Item Count, Danvers-style",
+                                     ph.sales.itemCount,       34);
 eq("PH · Total Value of Items Sold", money(ph.sales.itemsCents),  "590.00");
 eq("PH · Taxes",                     money(ph.sales.taxCents),    "0.00");
 eq("PH · Processing Fees",           money(ph.sales.feeCents),    "20.70");
@@ -482,7 +493,9 @@ eqList("columns · nothing but internals falls back too",
   // Item ID is the column Dan asked about by name, and prepending it is the
   // case that matters: it shifts every letter the summary's COUNTIFS addresses.
   const items = NF.items.map((r, i) => ({ "Item ID": `it-${i}`, ...r }));
-  const txns  = NF.txns.map((r, i) => ({ ...r, "Settlement Ref": `st-${i}` }));
+  // PREPENDED, not appended: the summary addresses the transaction log by
+  // letter, and only a column in FRONT of the ones it sums moves them.
+  const txns  = NF.txns.map((r, i) => ({ "Batch ID": `b-${i}`, ...r }));
   const grown = wb.generate({ org: { name: NF.name, timezone: NF.timezone },
     period: PERIOD, txns, items, fees: { ...FEES, techRateBps: 100 } });
   const head = (sheet) => sheet.rows[0].map(c => (c && c.v !== undefined ? c.v : c));
@@ -490,7 +503,7 @@ eqList("columns · nothing but internals falls back too",
   eq("columns · a new item column reaches the sheet",
     head(grown.sheets[2])[0], "Item ID");
   eq("columns · a new transaction column reaches the sheet",
-    head(grown.sheets[1]).at(-1), "Settlement Ref");
+    head(grown.sheets[1])[0], "Batch ID");
   eqList("columns · the internals still do not",
     head(grown.sheets[1]).concat(head(grown.sheets[2])).filter(h => String(h).startsWith("_")),
     []);
@@ -516,9 +529,22 @@ eqList("columns · nothing but internals falls back too",
     assert.ok(seen > 30, `only ${seen} formulas — the sheet did not build`);
     assert.deepStrictEqual(wrong, [], `\n      ${wrong.join("\n      ")}`);
   });
-  // ...and that it is not passing because the letters never needed to move.
-  eq("columns · the item range really did shift",
-    JSON.stringify(grown.sheets[0]).includes("'Items Log'!$F$2"), true);
+  // ...and that it is not passing because the letters never needed to move:
+  // Item Count is K with the declared order and L with a column in front of it.
+  eq("columns · the transaction range really did shift",
+    JSON.stringify(grown.sheets[0]).includes("'Transactions Log'!$L$2"), true);
+
+  // THE SUMMARY IS COMPUTED OFF THE TRANSACTION LOG ALONE, which is how the
+  // Danvers sheet does it — all 64 of its cross-sheet references are to
+  // 'Transactions Log' and not one is to 'Items Log'. The Items Log ships as
+  // backing data. Reading item counts off it instead is the thing that made our
+  // Items Sold disagree with Danvers in the first place.
+  ok("columns · the summary never addresses the Items Log", () => {
+    const refs = JSON.stringify(grown.sheets[0]).match(/Items Log/g) || [];
+    assert.deepStrictEqual(refs, [], `the summary references the Items Log ${refs.length}x`);
+    assert.ok(JSON.stringify(grown.sheets[0]).includes("Transactions Log"),
+      "...and it must still address the Transactions Log, or this proves nothing");
+  });
 
   // ONE LIST, TWO READERS. remittance.js used to keep its own copy of both
   // column orders, and a copy that drifted by one column would not look wrong —
