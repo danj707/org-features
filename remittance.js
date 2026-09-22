@@ -109,12 +109,32 @@ const workbook = require("./lib/remittance-workbook");
  * it is invisible in a diff. Pleasant Hill was settled exactly that way: two
  * orgs carry that name, and only one returns the sheet's own 14 transactions.
  *
- * TWO FEE MODELS EXIST IN THE WILD AND ONLY ONE IS IMPLEMENTED. Most orgs are
- * a rate plus a fixed fee per payment, which is what this computes. Four —
- * Emeryville, Jeffersonville, Sebastopol and Taylor — are a rate with a
- * per-transaction MINIMUM ("Transaction minimum" on their sheets), i.e.
- * max(rate x amount, minimum) charged per payment. That is different
- * arithmetic, so those orgs are absent rather than served the wrong model.
+ * THIS MAP IS THE **STANDARD** TEMPLATE ONLY — rate + fixed fee per card
+ * payment, plus a flat rate on cash and cheque. Three other shapes exist on
+ * real sheets, and each is a separate template to be flagged per org in
+ * Airtable rather than a variation to be squeezed in here:
+ *
+ *   a per-transaction MINIMUM — max(rate x amount, minimum) per payment
+ *     ("Transaction minimum"): Emeryville, Jeffersonville, Sebastopol, Taylor.
+ *     Different arithmetic, not a different number.
+ *   a TECHNOLOGY FEE — a percentage of total sales across every tender, taken
+ *     off the remittance BELOW "Total Rec Fee": eight orgs. lib/ can draw that
+ *     line, but see the next paragraph for why none of them is here.
+ *   TICKET SERVICE FEES — "Net Ticket Service Fees", which this report does
+ *     not compute at all: ten orgs, only one of them non-zero today.
+ *
+ * A ZERO TODAY IS NOT A ZERO FOREVER, which is why the nine orgs whose ticket
+ * line currently reads $0.00 are held back with the one that does not. The
+ * money is identical this period; the failure is next period, when the line
+ * moves and a workbook that cannot express it under-bills silently.
+ *
+ * AND THE TECHNOLOGY FEE WAS NEVER VERIFIED, unlike every rate that is here.
+ * The rate check reproduced each sheet's "Total Rec Fee" — and the technology
+ * fee sits OUTSIDE that total, so it was read off the sheet and checked
+ * against nothing. Two orgs proved the point: Prescott Valley and The Dance
+ * Palace label it "Technology Fee" where the rest write "Net Technology Fee",
+ * so they parsed as having none and would have shipped billing $0 against a
+ * real $86.36 and $8.95. A component no check covers does not ship.
  *
  * AN ORG THAT IS NOT IN THIS MAP GETS NO BUTTON — not a button that guesses.
  * The held-back orgs and the reason for each are in docs/remittance-rates.md.
@@ -138,28 +158,6 @@ const REMITTANCE_FEES = {
     address2: "Battle Ground, WA 98604",
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Belton — city-of-belton
-  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": {
-    timezone: "America/Chicago",
-    address1: "333 Water Street",
-    address2: "Belton, Texas 76513",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 250,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Boerne — city-of-boerne
-  "71bf9bc4-cd62-482a-aee5-5d790cdba811": {
-    timezone: "America/Chicago",
-    address1: "447 N. Main Street",
-    address2: "Boerne, TX 78006",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
     techRateBps: 0,
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
@@ -241,17 +239,6 @@ const REMITTANCE_FEES = {
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
-  // Danvers, MA — town-of-danvers
-  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": {
-    timezone: "America/New_York",
-    address1: "1 Sylvan Street, Danvers",
-    address2: "Danvers, MA 01923, USA",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 100,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
   // Douglas County, NV — douglas-county-nv
   "0312ebc8-40de-4fc8-a737-8afa26334e13": {
     timezone: "America/Los_Angeles",
@@ -260,17 +247,6 @@ const REMITTANCE_FEES = {
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 0, checkRateBps: 0,
     techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Easton — city-of-easton
-  "f4338fa8-009b-49eb-9a2b-16ca4688694a": {
-    timezone: "",
-    address1: "Remittance Period Start",
-    address2: "Remittance Period End",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 500,
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
@@ -293,17 +269,6 @@ const REMITTANCE_FEES = {
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 0, checkRateBps: 0,
     techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Euclid — city-of-euclid
-  "2a118b52-99af-42f3-9727-d9b46b8d31e4": {
-    timezone: "America/New_York",
-    address1: "585 East 222nd St",
-    address2: "Euclid, OH 44123",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 100,
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
@@ -384,17 +349,6 @@ const REMITTANCE_FEES = {
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
-  // Madeira Beach — city-of-madeira-beach
-  "baa12a2d-b31b-4900-85a1-e6f634f0a3ce": {
-    timezone: "America/New_York",
-    address1: "200 Rex Place",
-    address2: "Madeira Beach, Florida 33708",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
   // Mashantucket Pequot Tribal Nation — mashantucket-pequot-tribal-nation
   "c193567f-9503-4635-a134-f72b5db556b6": {
     timezone: "",
@@ -439,28 +393,6 @@ const REMITTANCE_FEES = {
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
-  // Norman, OK — city-of-norman
-  "574923bd-9e7b-43e0-9e5f-7ce256189cbf": {
-    timezone: "America/Chicago",
-    address1: "201 W Gray St",
-    address2: "Norman, Oklahoma 73069",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Northern Door Sports and Recreation — northern-door-sports-and-recreation
-  "70ea2e35-d1c7-4214-8074-3a598aa991f9": {
-    timezone: "",
-    address1: "Remittance Period Start",
-    address2: "Remittance Period End",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
   // Paradise RPD — paradise-recreation-and-park-district
   "f395300e-2edf-42f3-ba24-bebbceb1fa33": {
     timezone: "America/Los_Angeles",
@@ -488,17 +420,6 @@ const REMITTANCE_FEES = {
     timezone: "America/Chicago",
     address1: "203 Paul St.",
     address2: "Pleasant Hill, MO 64080",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Prescott Valley — prescott-valley
-  "9acfb33a-4114-4f0f-be3c-2eb0a3930550": {
-    timezone: "America/Phoenix",
-    address1: "7501 E Skoog Blvd.",
-    address2: "Prescott Valley, AZ 86314",
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 100, checkRateBps: 100,
     techRateBps: 0,
@@ -549,39 +470,6 @@ const REMITTANCE_FEES = {
     chargeFeeOnRefunds: true,
     rateSource: "remittance",
   },
-  // Shrewsbury, MA — town-of-shrewsbury
-  "0a9c47af-b4c3-4601-ab0f-d2f401bb787a": {
-    timezone: "America/New_York",
-    address1: "100 Maple Avenue",
-    address2: "Shrewsbury, Massachusetts 01545",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Smyrna — city-of-smyrna
-  "efc0724c-8f32-481a-bab3-fc19c724f3a7": {
-    timezone: "America/New_York",
-    address1: "1250 Powder Springs St",
-    address2: "Smyrna, GA 30080",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // The Dance Palace — the-dance-palace
-  "35861ae4-e71e-44e9-a574-9c5d6e691612": {
-    timezone: "America/Los_Angeles",
-    address1: "503 B St.",
-    address2: "Point Reyes Station, CA 94956",
-    cardRateBps: 290, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
   // The Ranch — the-ranch
   "2d147f38-068c-409e-890d-a8acc88d8079": {
     timezone: "America/Los_Angeles",
@@ -598,50 +486,6 @@ const REMITTANCE_FEES = {
     timezone: "America/Chicago",
     address1: "201 West Grundy Street",
     address2: "Tullahoma, TN 37388",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Watertown, MA — watertown
-  "d781690b-c5a0-43c5-8443-9ae43899528c": {
-    timezone: "",
-    address1: "Remittance Period Start",
-    address2: "Remittance Period End",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 0, checkRateBps: 0,
-    techRateBps: 125,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // West Sacramento — city-of-west-sacramento
-  "7d22bf62-060a-4881-9821-9dea6a0538d6": {
-    timezone: "America/Los_Angeles",
-    address1: "1110 West Capitol Ave",
-    address2: "West Sacramento, CA 95691",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 0,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Windham, ME — town-of-windham
-  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": {
-    timezone: "",
-    address1: "Remittance Period Start",
-    address2: "Remittance Period End",
-    cardRateBps: 350, cardFixedCents: 30,
-    cashRateBps: 100, checkRateBps: 100,
-    techRateBps: 100,
-    chargeFeeOnRefunds: true,
-    rateSource: "remittance",
-  },
-  // Yerba Buena Gardens — yerba-buena-gardens
-  "b026a7c3-1e7e-48e1-9f0a-b2f7154b117d": {
-    timezone: "America/Los_Angeles",
-    address1: "750 Howard Street",
-    address2: "San Francisco, CA 94103",
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 0, checkRateBps: 0,
     techRateBps: 0,
