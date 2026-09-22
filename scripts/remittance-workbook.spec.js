@@ -695,8 +695,11 @@ eq("punctuation in an org name cannot escape the filename",
 // Drive the real route: an org with no fee schedule must be refused BEFORE any
 // Metabase call, or a fleet-wide click storm queries every card to then say no.
 ok("the workbook route refuses an org with no fee schedule", () => {
-  const routes = {};
-  const app = { get: (p, _auth, handler) => { routes[p] = handler || _auth; } };
+  const routes = {}, posts = {};
+  const app = {
+    get:  (p, _auth, handler) => { routes[p] = handler || _auth; },
+    post: (p, _auth, handler) => { posts[p]  = handler || _auth; },
+  };
   remittance.mount(app, {
     requireAuth: (_q, _s, next) => next(),
     dataDir: path.join(ROOT, "data"),
@@ -715,6 +718,77 @@ ok("the workbook route refuses an org with no fee schedule", () => {
     assert.strictEqual(status, 503, `status ${status}`);
     assert.ok(/fee schedule/i.test(String(body)), `body: ${String(body).slice(0, 120)}`);
   });
+});
+
+/* ── 6 · emailing the remittance ─────────────────────────────────────────── */
+
+// The email route sends to REAL PEOPLE, so what it refuses matters more than
+// what it sends. Both refusals happen BEFORE any Metabase call and before any
+// mail: an org with no schedule must not be built, and a deploy with no Resend
+// key must say so rather than building a workbook and dropping it.
+function mountRoutes(orgs) {
+  const routes = {}, posts = {};
+  const app = {
+    get:  (p, _auth, h) => { routes[p] = h || _auth; },
+    post: (p, _auth, h) => { posts[p]  = h || _auth; },
+  };
+  remittance.mount(app, {
+    requireAuth: (_q, _s, next) => next(),
+    dataDir: path.join(ROOT, "data"),
+    loadOrgs: () => orgs,
+  });
+  return { routes, posts };
+}
+function fakeRes() {
+  const r = { code: 200, body: null, headers: {} };
+  r.status = (c) => { r.code = c; return r; };
+  r.type = () => r;
+  r.json = (b) => { r.body = b; return r; };
+  r.send = (b) => { r.body = b; return r; };
+  r.setHeader = (k, v) => { r.headers[k] = v; };
+  return r;
+}
+
+ok("the email route is registered as a POST, never a GET", () => {
+  const { routes, posts } = mountRoutes([]);
+  assert.ok(posts["/api/remittance/email"], "no POST /api/remittance/email");
+  assert.ok(!routes["/api/remittance/email"],
+    "registered as a GET — a route that sends mail must not be reachable by a prefetch or a pasted link");
+});
+
+ok("emailing an org with no fee schedule is refused before anything is sent", () => {
+  const { posts } = mountRoutes([{ id: NO_FEES.id, slug: "emeryville", name: NO_FEES.name, displayName: "Emeryville" }]);
+  assert.strictEqual(remittance.feesFor(NO_FEES.id), null, "the org this drives now HAS a schedule");
+  const res = fakeRes();
+  return Promise.resolve(posts["/api/remittance/email"]({ body: { org: NO_FEES.id, end: PERIOD.end } }, res))
+    .then(() => {
+      // 503 either way — no schedule, or no Resend key on this boot. What must
+      // never happen is a 200: that would mean something was sent.
+      assert.notStrictEqual(res.code, 200, "a remittance with no fee schedule was accepted for sending");
+      assert.strictEqual(res.body && res.body.ok, false, `body: ${JSON.stringify(res.body).slice(0, 120)}`);
+    });
+});
+
+// The recipient list is a SERVER-SIDE constant. Nothing an organization can set
+// reaches it — this is a Rec-internal send, and the org is the subject of the
+// email rather than an addressee.
+ok("the recipients are the three Rec addresses", () => {
+  const to = remittance.remittanceRecipients();
+  assert.deepStrictEqual(to, ["dan@rec.us", "jennel@rec.us", "lindsay@rec.us"]);
+});
+ok("an override replaces the default rather than adding to it", () => {
+  const prev = process.env.REMITTANCE_EMAIL_TO;
+  try {
+    process.env.REMITTANCE_EMAIL_TO = "nobody@example.com";
+    assert.deepStrictEqual(remittance.remittanceRecipients(), ["nobody@example.com"]);
+    // A malformed override must not fall back to the real three — that would
+    // mail the people it was set to keep the mail away from.
+    process.env.REMITTANCE_EMAIL_TO = "not-an-address";
+    assert.deepStrictEqual(remittance.remittanceRecipients(), []);
+  } finally {
+    if (prev === undefined) delete process.env.REMITTANCE_EMAIL_TO;
+    else process.env.REMITTANCE_EMAIL_TO = prev;
+  }
 });
 
 /* ── report ─────────────────────────────────────────────────────────────── */

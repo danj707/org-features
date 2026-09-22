@@ -140,6 +140,72 @@ const workbook = require("./lib/remittance-workbook");
  * The held-back orgs and the reason for each are in docs/remittance-rates.md.
  */
 const REMITTANCE_FEES = {
+  // Belton — city-of-belton
+  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": {
+    timezone: "America/Chicago",
+    address1: "333 Water Street",
+    address2: "Belton, Texas 76513",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 250,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Danvers, MA — town-of-danvers
+  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": {
+    timezone: "America/New_York",
+    address1: "1 Sylvan Street, Danvers",
+    address2: "Danvers, MA 01923, USA",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Easton — city-of-easton
+  "f4338fa8-009b-49eb-9a2b-16ca4688694a": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 500,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Euclid — city-of-euclid
+  "2a118b52-99af-42f3-9727-d9b46b8d31e4": {
+    timezone: "America/New_York",
+    address1: "585 East 222nd St",
+    address2: "Euclid, OH 44123",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Watertown, MA — watertown
+  "d781690b-c5a0-43c5-8443-9ae43899528c": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 125,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Windham, ME — town-of-windham
+  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
   // Apex Park and Recreation District — apex-park-and-recreation-district
   "aeba47d0-c97f-49cb-a0e9-93c5af3a68fa": {
     timezone: "America/Denver",
@@ -509,6 +575,74 @@ const REMITTANCE_FEES = {
 
 function feesFor(orgId) { return REMITTANCE_FEES[orgId] || null; }
 
+/* ── emailing a remittance ────────────────────────────────────────────────── */
+
+// WHO GETS IT IS A PLACEHOLDER, and deliberately a visible one. Finance
+// contacts live per organization in Airtable; until this reads them, every
+// remittance goes to the same three people whatever org it is for, which is
+// fine for testing and would be wrong the moment a real one is sent to a city.
+// REMITTANCE_EMAIL_TO overrides it, so a preview or a local boot can be pointed
+// somewhere harmless without editing code.
+const REMITTANCE_DEFAULT_TO = ["dan@rec.us", "jennel@rec.us", "lindsay@rec.us"];
+function remittanceRecipients() {
+  const raw = String(process.env.REMITTANCE_EMAIL_TO || "").trim();
+  if (!raw) return REMITTANCE_DEFAULT_TO.slice();
+  // A malformed override must not fall back to the real three — that would mail
+  // a typo's worth of people the thing it was set to keep away from them.
+  return raw.split(/[,;\s]+/).filter(x => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x));
+}
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const RESEND_FROM = `${process.env.FROM_NAME || "Rec Finance"} <${process.env.FROM_EMAIL || "reports@rec.us"}>`;
+
+const esc = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+// The body carries the period and the total, so a recipient can tell at a
+// glance whether the attachment is the one they were expecting without opening
+// it — and so a remittance built on PLACEHOLDER rates says so in the message
+// as well as in the filename. A file gets forwarded on its own.
+function remittanceEmailHtml({ org, period, total, name, draft }) {
+  return `<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:28px 24px;color:#111">
+  <h2 style="margin:0 0 4px;font-size:19px">${esc(org.displayName || org.name)} — remittance</h2>
+  <p style="margin:0 0 20px;color:#666;font-size:14px">${esc(period.label || (period.start + " – " + period.end))}</p>
+  ${draft ? `<p style="margin:0 0 20px;padding:10px 12px;border-left:3px solid #b45309;background:#fffbeb;font-size:13.5px;line-height:1.5;color:#7c2d12">
+    <strong>Draft.</strong> This organization is on placeholder rates, so the totals below are
+    for shaping the report and are not what Rec billed.</p>` : ""}
+  <table style="border-collapse:collapse;font-size:14px;margin:0 0 20px">
+    <tr><td style="padding:3px 16px 3px 0;color:#666">Period</td><td style="padding:3px 0"><strong>${esc(period.start)} → ${esc(period.end)}</strong></td></tr>
+    <tr><td style="padding:3px 16px 3px 0;color:#666">Total remittance</td><td style="padding:3px 0"><strong>$${esc(total)}</strong></td></tr>
+    <tr><td style="padding:3px 16px 3px 0;color:#666">Attached</td><td style="padding:3px 0">${esc(name)}</td></tr>
+  </table>
+  <p style="margin:0;color:#888;font-size:12.5px;line-height:1.5">
+    Summary, transaction log and item log are the three tabs of the attached workbook.
+    Generated from the CX dashboard.</p>
+</div>`;
+}
+
+async function sendRemittanceEmail({ to, org, period, name, buffer, total, draft }) {
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to,
+      subject: `${draft ? "[DRAFT] " : ""}${org.displayName || org.name} remittance — `
+             + `${period.start} to ${period.end} — $${total}`,
+      html: remittanceEmailHtml({ org, period, total, name, draft }),
+      attachments: [{ filename: name, content: Buffer.from(buffer).toString("base64") }],
+    }),
+    signal: AbortSignal.timeout(60000),
+  });
+  // Resend answers 200 with an error object on some failures, so the status
+  // alone is not the verdict.
+  const out = await r.json().catch(() => ({}));
+  if (!r.ok || out.error) {
+    throw new Error(`resend ${r.status} ${JSON.stringify(out.error || out).slice(0, 160)}`);
+  }
+  return out;
+}
+
 // A schedule read out of that org's own last remittance and checked against it
 // is not a draft — it is the rate Rec actually billed. Only a placeholder is.
 // Testing "not contracted" instead would stamp DRAFT on 48 verified schedules,
@@ -732,6 +866,13 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       reports: Object.values(REPORTS).map(r => ({ key: r.key, label: r.label, configured: !!r.uuid })),
       today,
       currentPeriodEnd: cur ? cur.end : null,
+      // WHO an email would go to, so the confirm dialog can name them. This is
+      // the only place the page can learn it, and a "send to three people"
+      // button whose dialog cannot say which three is not a confirmation.
+      // `emailReady` is false on a deploy with no Resend key, which is every
+      // local boot — the button says so rather than failing on click.
+      emailTo: remittanceRecipients(),
+      emailReady: !!RESEND_API_KEY && remittanceRecipients().length > 0,
       // Newest first: the period that's due sits at the top of the menu and
       // flipping back to prior periods means going down the list.
       periods: periods(today)
@@ -781,60 +922,112 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
   // over the two logs it is computed from. Both feeds are fetched IN PARALLEL —
   // they are independent queries against different cards, and serially this is
   // two cold Metabase reads with a person watching a spinner.
-  app.get("/api/remittance/xlsx", requireAuth, async (req, res) => {
-    const orgId = String(req.query.org || "");
-    const end   = String(req.query.end || "");
+  // ONE BUILDER, TWO ROUTES. The download and the email must be the same file:
+  // a second copy of this would drift the first time either changed, and the
+  // failure is finance receiving a workbook that does not match the one whoever
+  // sent it had checked. Refusals come back as a thrown `status` so both routes
+  // answer the same way — the point of refusing here rather than in the route is
+  // that neither can forget to.
+  async function buildRemittance(orgId, end) {
+    const fail = (status, message) => { const e = new Error(message); e.status = status; throw e; };
 
     const period = findPeriod(end);
-    if (!period) return res.status(400).type("text/plain").send(`Unknown remittance period "${end}".`);
+    if (!period) fail(400, `Unknown remittance period "${end}".`);
 
     const org = loadOrgs().find(o => o.id === orgId);
-    if (!org) return res.status(404).type("text/plain").send("Unknown organization.");
+    if (!org) fail(404, "Unknown organization.");
 
     const fees = feesFor(org.id);
     if (!fees) {
-      return res.status(503).type("text/plain")
-        .send(`No fee schedule on file for ${org.displayName}. The remittance total is computed from `
-            + `that organization's own card, cash and check rates, so there is nothing to generate `
-            + `until they are set — a guessed rate would produce a plausible wrong number.`);
+      fail(503, `No fee schedule on file for ${org.displayName}. The remittance total is computed from `
+              + `that organization's own card, cash and check rates, so there is nothing to generate `
+              + `until they are set — a guessed rate would produce a plausible wrong number.`);
     }
     for (const r of [REPORTS.itemlog, REPORTS.txnlog]) {
-      if (!r.uuid) {
-        return res.status(503).type("text/plain")
-          .send(`${r.label} isn't connected yet — the workbook needs both logs.`);
-      }
+      if (!r.uuid) fail(503, `${r.label} isn't connected yet — the workbook needs both logs.`);
     }
 
+    // Both feeds are fetched IN PARALLEL — they are independent queries against
+    // different cards, and serially this is two cold Metabase reads with a
+    // person watching a spinner.
+    const [txns, items] = await Promise.all([
+      fetchReport(REPORTS.txnlog,  org.id, period.start, period.end),
+      fetchReport(REPORTS.itemlog, org.id, period.start, period.end),
+    ]);
+    const { buffer, summary } = workbook.generate({
+      org: { name: org.name || org.displayName, slug: org.slug, timezone: fees.timezone || "",
+             address1: fees.address1 || "", address2: fees.address2 || "" },
+      period, txns, items, fees,
+    });
+    // The filename finance already uses:
+    //   Danvers_Remittance_Report_-_20260908-20260915.xlsx
+    // Placeholder rates are named in the filename as well as in the sheet —
+    // a file gets forwarded on its own, without whoever downloaded it.
+    const draft = ratesAreDraft(fees);
+    return { org, period, fees, draft, buffer, summary, txns, items,
+             name: workbookFilename(org, period, { draft }) };
+  }
+
+  // The whole remittance as one workbook: the Summary finance types by hand,
+  // over the two logs it is computed from.
+  app.get("/api/remittance/xlsx", requireAuth, async (req, res) => {
+    let built;
     try {
-      const [txns, items] = await Promise.all([
-        fetchReport(REPORTS.txnlog,  org.id, period.start, period.end),
-        fetchReport(REPORTS.itemlog, org.id, period.start, period.end),
-      ]);
-      const { buffer, summary } = workbook.generate({
-        org: { name: org.name || org.displayName, slug: org.slug, timezone: fees.timezone || "",
-               address1: fees.address1 || "", address2: fees.address2 || "" },
-        period, txns, items, fees,
-      });
-      // The filename finance already uses:
-      //   Danvers_Remittance_Report_-_20260908-20260915.xlsx
-      // Placeholder rates are named in the filename as well as in the sheet —
-      // a file gets forwarded on its own, without whoever downloaded it.
-      const name = workbookFilename(org, period, { draft: ratesAreDraft(fees) });
-      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
-      res.setHeader("Cache-Control", "no-store");
-      console.log(`[remittance] workbook ${org.displayName} ${period.start}→${period.end}: `
-        + `${txns.length} txns, ${items.length} items, total $${(summary.final.totalCents / 100).toFixed(2)}`);
-      return res.send(buffer);
+      built = await buildRemittance(String(req.query.org || ""), String(req.query.end || ""));
     } catch (err) {
-      console.error(`[remittance] workbook ${org.displayName} ${period.label} failed: ${err.message}`);
+      if (err.status) return res.status(err.status).type("text/plain").send(err.message);
+      console.error(`[remittance] workbook failed: ${err.message}`);
       return res.status(502).type("text/plain").send(`Could not build the remittance: ${err.message}`);
     }
+    const { org, period, buffer, summary, name, txns, items } = built;
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+    res.setHeader("Cache-Control", "no-store");
+    console.log(`[remittance] workbook ${org.displayName} ${period.start}→${period.end}: `
+      + `${txns.length} txns, ${items.length} items, total $${(summary.final.totalCents / 100).toFixed(2)}`);
+    return res.send(buffer);
+  });
+
+  // Email the same workbook. POST, not GET: it sends mail, so it must not be
+  // reachable by a prefetch, a crawler or a pasted link.
+  app.post("/api/remittance/email", requireAuth, async (req, res) => {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const to = remittanceRecipients();
+    if (!to.length) {
+      return res.status(503).json({ ok: false, error: "No remittance recipients configured." });
+    }
+    if (!RESEND_API_KEY) {
+      return res.status(503).json({ ok: false,
+        error: "RESEND_API_KEY is not set on this deploy, so nothing was sent." });
+    }
+
+    let built;
+    try {
+      built = await buildRemittance(String(body.org || ""), String(body.end || ""));
+    } catch (err) {
+      if (err.status) return res.status(err.status).json({ ok: false, error: err.message });
+      console.error(`[remittance] email build failed: ${err.message}`);
+      return res.status(502).json({ ok: false, error: `Could not build the remittance: ${err.message}` });
+    }
+
+    const { org, period, buffer, summary, name, draft } = built;
+    const total = (summary.final.totalCents / 100).toFixed(2);
+    try {
+      await sendRemittanceEmail({ to, org, period, name, buffer, total, draft });
+    } catch (err) {
+      // Never echo the provider's body: a Resend error can quote the key back,
+      // and this string is rendered straight into the page.
+      console.error(`[remittance] email ${org.displayName} ${period.label} failed: ${err.message}`);
+      return res.status(502).json({ ok: false, error: "The remittance built, but sending it failed." });
+    }
+    console.log(`[remittance] emailed ${org.displayName} ${period.start}→${period.end} `
+      + `($${total}${draft ? ", DRAFT" : ""}) to ${to.join(", ")}`);
+    return res.json({ ok: true, to, file: name, total, draft });
   });
 }
 
 module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
-  REMITTANCE_FEES, feesFor, ratesAreDraft, workbookFilename,
+  REMITTANCE_FEES, feesFor, ratesAreDraft, workbookFilename, remittanceRecipients,
 };

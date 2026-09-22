@@ -122,14 +122,10 @@ ok("per-transaction-minimum orgs have no schedule", () => {
 // it "Technology Fee" where the rest write "Net Technology Fee", so they parsed
 // as having none and would have billed $0 against a real fee.
 const TECH_FEE = {
-  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": "Belton",
-  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": "Danvers, MA",
-  "f4338fa8-009b-49eb-9a2b-16ca4688694a": "Easton",
-  "2a118b52-99af-42f3-9727-d9b46b8d31e4": "Euclid",
+  // Prescott Valley and The Dance Palace carry a ticket line as well, so they
+  // wait on that template. The other six ship — see TECH_VERIFIED below.
   "9acfb33a-4114-4f0f-be3c-2eb0a3930550": "Prescott Valley",
   "35861ae4-e71e-44e9-a574-9c5d6e691612": "The Dance Palace",
-  "d781690b-c5a0-43c5-8443-9ae43899528c": "Watertown, MA",
-  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": "Windham, ME",
 };
 ok("technology-fee orgs have no schedule", () => {
   const present = Object.keys(TECH_FEE).filter(id => FEES[id]).map(id => TECH_FEE[id]);
@@ -161,14 +157,38 @@ ok("ticket-fee orgs have no schedule", () => {
     `${present.join(", ")} carry ticket service fees, which this report cannot compute`);
 });
 
-// The structural form of the same rule, so a NEW org on a non-standard template
-// cannot arrive under a UUID no list above happens to name. Only the placeholder
-// may carry a technology fee — it is what keeps lib/'s tech path exercised.
-ok("no contracted schedule carries a technology fee", () => {
-  const bad = entries.filter(([, f]) => f.rateSource !== "test" && f.techRateBps !== 0)
-                     .map(([id]) => id);
+// A TECHNOLOGY FEE MAY ONLY BE CHARGED WHERE IT WAS CHECKED. The rate check
+// reproduces "Total Rec Fee" and the technology fee sits outside that total, so
+// each of these was verified separately: summarize() driven against live
+// Metabase over that sheet's own period reproduces that sheet's own technology
+// fee. Five tie to the microcent; Danvers ties on the RATE and is $7.00 out on
+// the fee because live total sales are $700 below what its sheet was built
+// from — a data difference, not an arithmetic one.
+//
+// This is the structural half of the template rule: a NEW org cannot arrive
+// billing a technology fee under a UUID no list here happens to name. The
+// placeholder is exempt, which is what keeps lib/'s tech path exercised.
+const TECH_VERIFIED = {
+  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": 250,   // Belton      $106.6400
+  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": 100,   // Danvers     $251.2004 (see above)
+  "f4338fa8-009b-49eb-9a2b-16ca4688694a": 500,   // Easton       $83.8405
+  "2a118b52-99af-42f3-9727-d9b46b8d31e4": 100,   // Euclid       $61.5793
+  "d781690b-c5a0-43c5-8443-9ae43899528c": 125,   // Watertown   $246.3694
+  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": 100,   // Windham     $112.5528
+};
+ok("a technology fee is only charged where it was verified", () => {
+  const bad = entries
+    .filter(([id, f]) => f.rateSource !== "test" && f.techRateBps !== 0 &&
+                         TECH_VERIFIED[id] !== f.techRateBps)
+    .map(([id, f]) => `${id}=${f.techRateBps}bps`);
   assert.deepStrictEqual(bad, [],
-    `${bad.join(", ")} bills a technology fee — that is a separate template`);
+    `${bad.join(", ")} bills an unverified technology fee`);
+});
+ok("every verified technology rate is still the one that was verified", () => {
+  const drifted = Object.entries(TECH_VERIFIED)
+    .filter(([id, bps]) => FEES[id] && FEES[id].techRateBps !== bps)
+    .map(([id, bps]) => `${id}: ${FEES[id].techRateBps} not ${bps}`);
+  assert.deepStrictEqual(drifted, [], drifted.join("; "));
 });
 ok("feesFor refuses an org with no schedule", () => {
   assert.strictEqual(rem.feesFor("6bc65b55-27e4-4447-9c07-22c98c8dd99b"), null);
@@ -188,7 +208,7 @@ const digest = crypto.createHash("sha256").update(JSON.stringify(
 )).digest("hex");
 // A LITERAL, not an env var: a digest that can be supplied from the
 // environment is one a red build can be waved through with.
-const FROZEN = "50ae18167899775e31df44f029e06508bc1d3627328ee6efdd89394ce934a7fa";
+const FROZEN = "887ef93fb0edb3ca807e070163cec2982e2549a625e1b4c1ae674778d2909e0c";
 eq("the fee schedules are unchanged", digest, FROZEN);
 
 /* ── report ──────────────────────────────────────────────────────────────── */
