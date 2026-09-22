@@ -836,6 +836,16 @@ const CASES = [
       await pg.click("[data-feat-gear]");
     } },
   { name: "account health", path: "/ps", needs: "table" },
+  /* The remittance page had no render coverage at all, and the Generate button
+     is rendered from a per-org flag inside the same in-browser-compiled block
+     as everything else here — a slip in it blanks the page, not just the cell.
+     Keyed on the CELL rather than on "a button appeared": the button is offered
+     only where the org has a fee schedule, and a button on every row would
+     generate a remittance from rates nobody set. */
+  { name: "remittance · Niagara Falls can generate one", path: "/ps/remittance",
+    needs: 'td[data-rm-org="city-of-niagara-falls"][data-rm="on"] button.rm-gen' },
+  { name: "remittance · an org with no fee schedule gets no button", path: "/ps/remittance",
+    needs: 'td[data-rm="off"] span.zero' },
   { name: "bug management", path: "/ps/bugs", needs: "table" },
   /* Text rather than a selector: this page is built from inline styles and
      carries no class of its own. Keyed on a figure it computes from the

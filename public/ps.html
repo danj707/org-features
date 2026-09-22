@@ -347,6 +347,13 @@
   .ofs-foot button.ofs-save:hover { background: var(--brand-hover); }
   /* A disabled Save says why in .ofs-footnote — greying it with no
      explanation is what invites "it didn't save". */
+  .rm-gen { padding: 5px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+            color: var(--ink); font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .rm-gen:hover:not(:disabled) { background: var(--fill-2); border-color: var(--brand); color: var(--brand); }
+  .rm-gen:disabled { color: var(--muted); cursor: progress; }
+  /* Placeholder rates are marked on the control as well as in the file: the
+     number it produces is not a real remittance yet. */
+  .rm-gen.rm-draft::after { content: " · draft"; color: var(--muted); font-weight: 500; }
   .ofs-foot button.ofs-save:disabled { background: var(--line); border-color: var(--line); color: var(--faint); cursor: not-allowed; }
   .ofs-meta { padding: 8px 16px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); }
   /* The "Data as of" line. It sits above the KPI cards and must read as a
@@ -3035,26 +3042,61 @@
            + "&report=" + encodeURIComponent(report.key);
     }
 
-    function download(org, report) {
-      const k = cellKey(org, report);
-      if (!report.configured || !period || busy[k]) return;
+    // One implementation for every download on this page — the CSV links and
+    // the workbook button. The server names the file; the fallback only covers
+    // a response that arrived without a Content-Disposition.
+    function pull(k, url, fallbackName) {
+      if (busy[k]) return;
       setBusy(b => Object.assign({}, b, { [k]: true }));
       setErrs(x => Object.assign({}, x, { [k]: "" }));
-      fetch(csvUrl(org, report))
+      fetch(url)
         .then(r => r.ok ? r.blob().then(b => ({ b: b, name: filenameFrom(r) }))
                         : r.text().then(t => Promise.reject(new Error(t))))
         .then(function (out) {
-          const url = URL.createObjectURL(out.b);
+          const href = URL.createObjectURL(out.b);
           const a = document.createElement("a");
-          a.href = url;
-          a.download = out.name || (report.key + "-" + org.slug + "-" + period.start + "-to-" + period.end + ".csv");
+          a.href = href;
+          a.download = out.name || fallbackName;
           document.body.appendChild(a);
           a.click();
           a.remove();
-          URL.revokeObjectURL(url);
+          URL.revokeObjectURL(href);
         })
         .catch(err => setErrs(x => Object.assign({}, x, { [k]: String(err.message || err).slice(0, 180) })))
         .then(() => setBusy(b => Object.assign({}, b, { [k]: false })));
+    }
+
+    function download(org, report) {
+      if (!report.configured || !period) return;
+      pull(cellKey(org, report), csvUrl(org, report),
+           report.key + "-" + org.slug + "-" + period.start + "-to-" + period.end + ".csv");
+    }
+
+    function xlsxUrl(org) {
+      return "/api/remittance/xlsx?org=" + encodeURIComponent(org.id)
+           + "&end=" + encodeURIComponent(period.end);
+    }
+
+    // The workbook needs the org's own fee schedule, so the button appears only
+    // where one exists. An org without one gets a dash and a reason on hover —
+    // a button that generated a remittance from guessed rates would produce a
+    // plausible wrong number, which is worse than no button.
+    function remitCell(org) {
+      const k = org.id + ":xlsx";
+      return e("td", { key: "xlsx", className: "l",
+                       "data-rm-org": org.slug, "data-rm": org.remittance ? "on" : "off" },
+        !org.remittance || !period
+          ? e("span", { className: "zero", title: "No fee schedule on file for this organization yet" }, "—")
+          : e("button", {
+              className: "rm-gen" + (org.remittanceDraft ? " rm-draft" : ""),
+              disabled: !!busy[k],
+              onClick: () => pull(k, xlsxUrl(org),
+                "remittance-" + org.slug + "-" + period.start + "-to-" + period.end + ".xlsx"),
+              title: (org.remittanceDraft ? "Draft rates — " : "")
+                   + "Generate " + org.displayName + "'s remittance workbook for " + period.label
+                   + " (summary + both logs)"
+            }, busy[k] ? "Generating…" : "Generate remittance"),
+        errs[k] ? e("div", { style: { fontSize: 11.5, color: "var(--bad)" } }, errs[k]) : null);
     }
 
     // One cell per report: the period's dates as a download link, with the
@@ -3116,12 +3158,17 @@
           e("table", null,
             e("thead", null, e("tr", null,
               e("th", { className: "l" }, "Organization"),
-              reports.map(r => e("th", { key: r.key, className: "l" }, r.label)))),
+              reports.map(r => e("th", { key: r.key, className: "l" }, r.label)),
+              e("th", { className: "l" }, "Remittance"))),
             e("tbody", null, orgs.map(o => e("tr", { key: o.id },
               e("td", { className: "name", title: o.name }, o.displayName),
-              reports.map(r => reportCell(o, r))))))),
+              reports.map(r => reportCell(o, r)),
+              remitCell(o)))))),
         e("div", { style: { padding: "10px 16px", fontSize: 12, color: "var(--muted)", borderTop: "1px solid var(--line)" } },
-          orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule")));
+          orgs.length + " of " + snap.orgs.length + " organizations · billing periods run 1–7, 8–15, 16–22, 23–EOM · payment and ACH dates come from the finance remittance schedule",
+          e("div", { style: { marginTop: 4 } },
+            "Generate remittance builds the finance workbook — summary, transaction log and item log in one file. ",
+            "It needs that organization's card, cash and check rates; orgs without a schedule on file show a dash."))));
   }
 
   function fmtDay2(iso) {
