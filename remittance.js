@@ -86,17 +86,571 @@ const workbook = require("./lib/remittance-workbook");
  *   timezone                      config.general.primaryTimezone. The org list
  *                                 this report is built on carries only names
  *                                 and ids, so these live here with the rates.
- *   rateSource                    "contracted" once the real schedule is on
- *                                 file; "test" until then, which stamps the
+ *   rateSource                    where the numbers came from. "remittance"
+ *                                 means READ OUT OF THAT ORG'S OWN MOST RECENT
+ *                                 REMITTANCE SHEET and checked (see below);
+ *                                 "test" is a placeholder and stamps the
  *                                 workbook and its filename as a draft.
  *
+ * WHERE THE RATES COME FROM, AND WHY THEY ARE NOT A GUESS. Every remittance
+ * finance has ever sent states that org's own schedule in its Rec Payment
+ * Processing Costs block — "Variable fee per payment", "Fixed fee per payment",
+ * "Rec Cash Fee", "Rec Check Fee", "Technology Fees" — so the schedule is read
+ * off the sheet rather than inferred. An earlier note here said the rates were
+ * "not derivable"; that was wrong, and it is corrected rather than deleted,
+ * because it is the sentence that stopped anyone looking.
+ *
+ * EVERY ENTRY CLEARED TWO CHECKS, AND BOTH ARE NEEDED. The rate has to
+ * reproduce that sheet's own card fee from that sheet's own card total and
+ * payment count; and the org UUID has to reproduce that sheet's card total
+ * from LIVE Metabase over the same period. The first proves the rate was read
+ * correctly, the second proves it is bolted to the right organisation — a
+ * right rate on the wrong org is the failure this file exists to prevent, and
+ * it is invisible in a diff. Pleasant Hill was settled exactly that way: two
+ * orgs carry that name, and only one returns the sheet's own 14 transactions.
+ *
+ * TWO FEE MODELS EXIST IN THE WILD AND ONLY ONE IS IMPLEMENTED. Most orgs are
+ * a rate plus a fixed fee per payment, which is what this computes. Four —
+ * Emeryville, Jeffersonville, Sebastopol and Taylor — are a rate with a
+ * per-transaction MINIMUM ("Transaction minimum" on their sheets), i.e.
+ * max(rate x amount, minimum) charged per payment. That is different
+ * arithmetic, so those orgs are absent rather than served the wrong model.
+ *
  * AN ORG THAT IS NOT IN THIS MAP GETS NO BUTTON — not a button that guesses.
- * The rates are not derivable: they are not in Airtable, and the platform's
- * own payments config carries only the customer-facing pass-through rate
- * (txFees[].rateBps), not the fixed per-payment fee or the cash/check fees.
+ * The held-back orgs and the reason for each are in docs/remittance-rates.md.
  */
 const REMITTANCE_FEES = {
-  // City of Niagara Falls — placeholder rates, for shaping the report.
+  // Apex Park and Recreation District — apex-park-and-recreation-district
+  "aeba47d0-c97f-49cb-a0e9-93c5af3a68fa": {
+    timezone: "America/Denver",
+    address1: "13150 W. 72nd Avenue",
+    address2: "Arvada, CO 80005, USA",
+    cardRateBps: 290, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Battle Ground — city-of-battle-ground
+  "b715f06b-920a-4562-ae7f-7df1477626c2": {
+    timezone: "America/Los_Angeles",
+    address1: "109 SW 1st Street",
+    address2: "Battle Ground, WA 98604",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Belton — city-of-belton
+  "86cb6718-c7a4-4639-9f8b-1495f0dc9969": {
+    timezone: "America/Chicago",
+    address1: "333 Water Street",
+    address2: "Belton, Texas 76513",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 250,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Boerne — city-of-boerne
+  "71bf9bc4-cd62-482a-aee5-5d790cdba811": {
+    timezone: "America/Chicago",
+    address1: "447 N. Main Street",
+    address2: "Boerne, TX 78006",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Buffalo — city-of-buffalo
+  "5aef2fa7-2999-45ed-afc7-0b884196e426": {
+    timezone: "America/Chicago",
+    address1: "212 Central Avenue",
+    address2: "Buffalo, Minnesota 55313",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Central Point — central-point-recreation
+  "449ce3cc-b071-4c6e-b474-d6591d32f617": {
+    timezone: "America/Los_Angeles",
+    address1: "235 S Haskell St",
+    address2: "Central Point, OR  97502",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Chico Recreation District — chicorec
+  "de370d91-868b-4f7b-bf23-3694749661a5": {
+    timezone: "America/Los_Angeles",
+    address1: "545 Vallombrosa Avenue",
+    address2: "Chico, CA 95926",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: false,
+    rateSource: "remittance",
+  },
+  // City of Madison, IN — city-of-madison
+  "14e26ada-ac6c-48ec-ad75-0590daaa4d71": {
+    timezone: "America/New_York",
+    address1: "101 West Main Street",
+    address2: "Madison, IN 47250",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // City of West Haven, CT — city-of-west-haven
+  "83006fa1-fdaf-4f47-a4e1-a184e15f3527": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Clarkstown — town-of-clarkstown
+  "5dee565a-6012-4b4f-a325-0aea81674364": {
+    timezone: "America/New_York",
+    address1: "10 Maple Ave",
+    address2: "New City, NY 10956",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Clarksville, IN — town-of-clarksville
+  "460566d3-3a51-4387-a7a0-0b010923e40d": {
+    timezone: "America/New_York",
+    address1: "2000 Broadway Street",
+    address2: "Clarksville, IN 47129",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Danvers, MA — town-of-danvers
+  "a6aef5df-f742-41a2-9088-1fb6d48c3cb1": {
+    timezone: "America/New_York",
+    address1: "1 Sylvan Street, Danvers",
+    address2: "Danvers, MA 01923, USA",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Douglas County, NV — douglas-county-nv
+  "0312ebc8-40de-4fc8-a737-8afa26334e13": {
+    timezone: "America/Los_Angeles",
+    address1: "1329 Waterloo Lane",
+    address2: "Gardnerville, Nevada 89410",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Easton — city-of-easton
+  "f4338fa8-009b-49eb-9a2b-16ca4688694a": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 500,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // El Segundo — el-segundo-recreation
+  "8ae77057-6bce-4c20-b0f2-366ed5fa14dd": {
+    timezone: "America/Los_Angeles",
+    address1: "401 Sheldon Street",
+    address2: "El Segundo, CA 90245",
+    cardRateBps: 325, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Essex Junction — essex-junction
+  "2e622a3e-80e1-4911-b722-81929ca27056": {
+    timezone: "America/New_York",
+    address1: "75 Maple Street",
+    address2: "Junction, VT 05452",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Euclid — city-of-euclid
+  "2a118b52-99af-42f3-9727-d9b46b8d31e4": {
+    timezone: "America/New_York",
+    address1: "585 East 222nd St",
+    address2: "Euclid, OH 44123",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Hermosa Beach — city-of-hermosa-beach
+  "8890d2c8-329a-48a9-972b-872435bd5fa6": {
+    timezone: "America/Los_Angeles",
+    address1: "710 Pier Avenue",
+    address2: "Hermosa Beach, CA 90254",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Joplin — city-of-joplin
+  "ac04aa52-d629-435f-84af-0fc95e152e7b": {
+    timezone: "America/Chicago",
+    address1: "3301 W. 1st Street",
+    address2: "Joplin, MO 64801",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Jurupa Area Recreation & Park District — jurupa-area-recreation-and-park-district
+  "1f1b6f1d-d0c4-4912-b4a2-077d1786ab20": {
+    timezone: "America/Los_Angeles",
+    address1: "8621 Jurupa Rd",
+    address2: "Jurupa, California 92509",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Lake County, CA — lake-county
+  "ef946698-1e71-4159-b814-f89df3d2e7d4": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Lakeland — city-of-lakeland
+  "f2f03a2b-82b8-4cd6-be40-ae94aea6480b": {
+    timezone: "America/Chicago",
+    address1: "101 West Main Street",
+    address2: "Lakeland, TN 38002",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Lewisburg — city-of-lewisburg
+  "ff965a2b-7746-4de9-8b41-402927cb5879": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Littleton — littleton
+  "992ee322-4927-4558-827d-7f8768580b85": {
+    timezone: "America/New_York",
+    address1: "41 Shattuck Street",
+    address2: "Littleton, MA 01460",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Madeira Beach — city-of-madeira-beach
+  "baa12a2d-b31b-4900-85a1-e6f634f0a3ce": {
+    timezone: "America/New_York",
+    address1: "200 Rex Place",
+    address2: "Madeira Beach, Florida 33708",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Mashantucket Pequot Tribal Nation — mashantucket-pequot-tribal-nation
+  "c193567f-9503-4635-a134-f72b5db556b6": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Menifee — city-of-menifee
+  "bc94a100-8adb-4303-90cb-7c4714c22751": {
+    timezone: "America/Los_Angeles",
+    address1: "29844 Haun Road",
+    address2: "Menifee, CA 92586, USA",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Natchez, MS — city-of-natchez
+  "f64a9263-0fe8-4f90-8015-67b23c546e14": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Needham — needham
+  "9e6de746-5935-4c47-855d-0f50b02bfe7e": {
+    timezone: "America/New_York",
+    address1: "178 Rosemary Street",
+    address2: "Needham, MA 02492",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Norman, OK — city-of-norman
+  "574923bd-9e7b-43e0-9e5f-7ce256189cbf": {
+    timezone: "America/Chicago",
+    address1: "201 W Gray St",
+    address2: "Norman, Oklahoma 73069",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Northern Door Sports and Recreation — northern-door-sports-and-recreation
+  "70ea2e35-d1c7-4214-8074-3a598aa991f9": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Paradise RPD — paradise-recreation-and-park-district
+  "f395300e-2edf-42f3-ba24-bebbceb1fa33": {
+    timezone: "America/Los_Angeles",
+    address1: "6626 Skyway",
+    address2: "Paradise, CA 95969",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Piedmont — city-of-piedmont
+  "5aa9686e-f5f7-49af-bf2d-3be6f6257013": {
+    timezone: "America/Los_Angeles",
+    address1: "120 Vista Avenue",
+    address2: "Piedmont, CA 94611",
+    cardRateBps: 300, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Pleasant Hill, MO — pleasant-hill
+  "52efcded-a5e8-4dbf-8a45-100f70170de0": {
+    timezone: "America/Chicago",
+    address1: "203 Paul St.",
+    address2: "Pleasant Hill, MO 64080",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Prescott Valley — prescott-valley
+  "9acfb33a-4114-4f0f-be3c-2eb0a3930550": {
+    timezone: "America/Phoenix",
+    address1: "7501 E Skoog Blvd.",
+    address2: "Prescott Valley, AZ 86314",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Pueblo County — pueblo-county
+  "5b5a3779-da76-4b83-9229-17de9c525dc0": {
+    timezone: "America/Denver",
+    address1: "215 W. 10th Street",
+    address2: "Pueblo, Colorado 81003",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Putnam County, FL — putnam-county
+  "fe152712-f0bf-41df-892f-5edad45d9168": {
+    timezone: "America/New_York",
+    address1: "2509 Crill Avenue",
+    address2: "Palatka, Florida 32177",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Reading — town-of-reading
+  "8f24ee66-e9a6-40a4-afbb-27efe8ef64d5": {
+    timezone: "America/New_York",
+    address1: "16 Lowell Street",
+    address2: "Reading, MA 01867",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Sacramento County — sacramento-county
+  "90cab301-360d-4c01-9a88-0a67ecd6a9d2": {
+    timezone: "America/Los_Angeles",
+    address1: "1110 West Capitol Ave",
+    address2: "West Sacramento, CA 95691",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Shrewsbury, MA — town-of-shrewsbury
+  "0a9c47af-b4c3-4601-ab0f-d2f401bb787a": {
+    timezone: "America/New_York",
+    address1: "100 Maple Avenue",
+    address2: "Shrewsbury, Massachusetts 01545",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Smyrna — city-of-smyrna
+  "efc0724c-8f32-481a-bab3-fc19c724f3a7": {
+    timezone: "America/New_York",
+    address1: "1250 Powder Springs St",
+    address2: "Smyrna, GA 30080",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // The Dance Palace — the-dance-palace
+  "35861ae4-e71e-44e9-a574-9c5d6e691612": {
+    timezone: "America/Los_Angeles",
+    address1: "503 B St.",
+    address2: "Point Reyes Station, CA 94956",
+    cardRateBps: 290, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // The Ranch — the-ranch
+  "2d147f38-068c-409e-890d-a8acc88d8079": {
+    timezone: "America/Los_Angeles",
+    address1: "600 Ned’s Way",
+    address2: "Tiburon, CA 94920",
+    cardRateBps: 310, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Tullahoma — city-of-tullahoma
+  "bc7afe82-0054-4bed-b77d-787a79a9018e": {
+    timezone: "America/Chicago",
+    address1: "201 West Grundy Street",
+    address2: "Tullahoma, TN 37388",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Watertown, MA — watertown
+  "d781690b-c5a0-43c5-8443-9ae43899528c": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 125,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // West Sacramento — city-of-west-sacramento
+  "7d22bf62-060a-4881-9821-9dea6a0538d6": {
+    timezone: "America/Los_Angeles",
+    address1: "1110 West Capitol Ave",
+    address2: "West Sacramento, CA 95691",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Windham, ME — town-of-windham
+  "1c80a358-74c2-477d-aa0b-87bb2d0514b3": {
+    timezone: "",
+    address1: "Remittance Period Start",
+    address2: "Remittance Period End",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // Yerba Buena Gardens — yerba-buena-gardens
+  "b026a7c3-1e7e-48e1-9f0a-b2f7154b117d": {
+    timezone: "America/Los_Angeles",
+    address1: "750 Howard Street",
+    address2: "San Francisco, CA 94103",
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 0, checkRateBps: 0,
+    techRateBps: 0,
+    chargeFeeOnRefunds: true,
+    rateSource: "remittance",
+  },
+  // City of Niagara Falls — PLACEHOLDER, and the one draft entry. The sheet
+  // filed against Niagara in Airtable is San Francisco's (its header reads
+  // 501 Stanyan Street), so no Niagara schedule is on file.
   "a976a11a-5303-4785-838a-1b281ca77678": {
     timezone: "America/New_York",   // organization.config general.primaryTimezone
     address1: "123 Niagara Falls lane",   // organization.address
@@ -110,6 +664,12 @@ const REMITTANCE_FEES = {
 };
 
 function feesFor(orgId) { return REMITTANCE_FEES[orgId] || null; }
+
+// A schedule read out of that org's own last remittance and checked against it
+// is not a draft — it is the rate Rec actually billed. Only a placeholder is.
+// Testing "not contracted" instead would stamp DRAFT on 48 verified schedules,
+// and a report that calls itself a draft is one finance will not send.
+function ratesAreDraft(fees) { return !fees || fees.rateSource === "test"; }
 
 // Metabase's own query timeout is the real ceiling; this just stops a hung
 // socket from holding the response open forever.
@@ -338,7 +898,7 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       // — the rates themselves are nobody's business outside this server.
       orgs: loadOrgs().map(o => {
         const f = feesFor(o.id);
-        return f ? { ...o, remittance: true, remittanceDraft: f.rateSource !== "contracted" } : o;
+        return f ? { ...o, remittance: true, remittanceDraft: ratesAreDraft(f) } : o;
       }),
     });
   });
@@ -415,7 +975,7 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       //   Danvers_Remittance_Report_-_20260908-20260915.xlsx
       // Placeholder rates are named in the filename as well as in the sheet —
       // a file gets forwarded on its own, without whoever downloaded it.
-      const name = workbookFilename(org, period, { draft: fees.rateSource !== "contracted" });
+      const name = workbookFilename(org, period, { draft: ratesAreDraft(fees) });
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
       res.setHeader("Cache-Control", "no-store");
@@ -432,5 +992,5 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
 module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
-  REMITTANCE_FEES, feesFor, workbookFilename,
+  REMITTANCE_FEES, feesFor, ratesAreDraft, workbookFilename,
 };

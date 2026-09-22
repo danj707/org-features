@@ -658,7 +658,26 @@ ok("Niagara Falls has a schedule", () => {
     assert.strictEqual(typeof f[need], "number", `${need} missing`);
   }
 });
-eq("an org with no schedule gets none", remittance.feesFor(PH.id), null);
+// Pleasant Hill USED to be this spec's example of an org with no schedule, and
+// it has one now. Do not reach for an org that merely happens to be absent: the
+// day it is onboarded this assertion goes vacuous or, worse, red for no reason.
+// Emeryville is absent DELIBERATELY — it bills max(rate x amount, minimum) per
+// payment, which remittance.js does not implement — and remittance-fees.spec.js
+// pins that UUID as absent, so adding a schedule for it fails there by name.
+const NO_FEES = { id: "6bc65b55-27e4-4447-9c07-22c98c8dd99b", name: "City of Emeryville" };
+eq("an org with no schedule gets none", remittance.feesFor(NO_FEES.id), null);
+
+// The fixture's rates were read off the sheet finance uploaded; the shipped
+// schedule was read off that org's own last remittance in Airtable. They are
+// two independent copies of one contract, so they have to agree to the basis
+// point -- and a drift here means one of the two sources has been edited.
+ok("the shipped Pleasant Hill schedule matches the sheet this spec is built on", () => {
+  const f = remittance.feesFor(PH.id);
+  assert.ok(f, "Pleasant Hill lost its schedule");
+  for (const k of ["cardRateBps", "cardFixedCents", "cashRateBps", "checkRateBps", "chargeFeeOnRefunds"]) {
+    assert.strictEqual(f[k], FEES[k], `${k}: shipped ${f[k]}, sheet ${FEES[k]}`);
+  }
+});
 
 // The filename finance already uses. A generated workbook has to file next to
 // the hand-built ones, not sort into its own group at the top of the folder.
@@ -681,15 +700,17 @@ ok("the workbook route refuses an org with no fee schedule", () => {
   remittance.mount(app, {
     requireAuth: (_q, _s, next) => next(),
     dataDir: path.join(ROOT, "data"),
-    loadOrgs: () => [{ id: PH.id, slug: "pleasant-hill", name: PH.name, displayName: "Pleasant Hill" }],
+    loadOrgs: () => [{ id: NO_FEES.id, slug: "emeryville", name: NO_FEES.name, displayName: "Emeryville" }],
   });
   const handler = routes["/api/remittance/xlsx"];
   assert.ok(handler, "no /api/remittance/xlsx route registered");
+  // Or the refusal below is proving nothing about the gate.
+  assert.strictEqual(remittance.feesFor(NO_FEES.id), null, "the org this drives now HAS a schedule");
 
   let status = 200, body = "";
   const res = { status(c) { status = c; return this; }, type() { return this; },
                 send(b) { body = b; return this; }, setHeader() {} };
-  const done = handler({ query: { org: PH.id, end: PERIOD.end } }, res);
+  const done = handler({ query: { org: NO_FEES.id, end: PERIOD.end } }, res);
   return Promise.resolve(done).then(() => {
     assert.strictEqual(status, 503, `status ${status}`);
     assert.ok(/fee schedule/i.test(String(body)), `body: ${String(body).slice(0, 120)}`);
