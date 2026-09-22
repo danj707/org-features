@@ -73,6 +73,10 @@ function ok(name, fn) {
 }
 const eq = (name, got, want) => ok(name, () => assert.strictEqual(
   typeof got === "function" ? got() : got, want));
+// A column list is a list, and strictEqual on two arrays only ever compares
+// references — it fails on a correct answer and would pass on nothing.
+const eqList = (name, got, want) => ok(name, () => assert.deepStrictEqual(
+  typeof got === "function" ? got() : got, want));
 // Read through this rather than chaining off a .find() — a mutation that drops
 // the row makes the chain throw, and a spec that dies has told nobody what broke.
 const val = (fn, dflt = null) => { try { const v = fn(); return v === undefined ? dflt : v; } catch { return dflt; } };
@@ -444,6 +448,97 @@ for (const [who, org, data, fees] of [
       Number(evaluate(summary.rows[row][3].f, summary.name)).toFixed(2),
       (gen.summary.final.totalCents / 100).toFixed(2));
   });
+}
+
+/* ── 3c · what the card sends is what the sheet carries ──────────────────── */
+/*
+ * The log sheets used to be built from a hardcoded column list, so a column the
+ * export gained was dropped with nothing on screen saying so. They are built
+ * from the ROWS now, and the only thing held back is the card's own leading
+ * underscore. Dan, 2026-09-22: "whatever data is coming from the items and
+ * transactions log, go with that and include it."
+ *
+ * The fixture is a real capture, so it already carries _sort_at and friends —
+ * which is what makes the filtering half non-vacuous. The pass-through half
+ * needs a column that does not exist yet, so it is planted.
+ */
+eq("columns · the fixture really does carry the card's internals",
+  Object.keys(NF.items[0]).filter(k => k.startsWith("_")).length > 0, true);
+
+eqList("columns · an internal column is held back",
+  wb.logColumns([{ "Item Name": "x", _sort_at: "2026-01-01", _amount_cents: 5 }]),
+  ["Item Name"]);
+eqList("columns · a new REAL column is kept, in the card's own order",
+  wb.logColumns([{ "Item ID": "abc", "Item Name": "x" }]),
+  ["Item ID", "Item Name"]);
+eqList("columns · a column only later rows carry is still picked up",
+  wb.logColumns([{ a: 1 }, { a: 1, b: 2 }]), ["a", "b"]);
+eqList("columns · no rows falls back to the declared header",
+  wb.logColumns([], ["Date", "Location"]), ["Date", "Location"]);
+eqList("columns · nothing but internals falls back too",
+  wb.logColumns([{ _sort_at: "x" }], ["Date"]), ["Date"]);
+
+{
+  // Item ID is the column Dan asked about by name, and prepending it is the
+  // case that matters: it shifts every letter the summary's COUNTIFS addresses.
+  const items = NF.items.map((r, i) => ({ "Item ID": `it-${i}`, ...r }));
+  const txns  = NF.txns.map((r, i) => ({ ...r, "Settlement Ref": `st-${i}` }));
+  const grown = wb.generate({ org: { name: NF.name, timezone: NF.timezone },
+    period: PERIOD, txns, items, fees: { ...FEES, techRateBps: 100 } });
+  const head = (sheet) => sheet.rows[0].map(c => (c && c.v !== undefined ? c.v : c));
+
+  eq("columns · a new item column reaches the sheet",
+    head(grown.sheets[2])[0], "Item ID");
+  eq("columns · a new transaction column reaches the sheet",
+    head(grown.sheets[1]).at(-1), "Settlement Ref");
+  eqList("columns · the internals still do not",
+    head(grown.sheets[1]).concat(head(grown.sheets[2])).filter(h => String(h).startsWith("_")),
+    []);
+  // The load-bearing half. A summary that kept the old letters would address
+  // the column to the left of every one it means — which reads as a perfectly
+  // plausible sheet and sums the wrong thing, so the guard is that every
+  // formula still agrees with the number printed beside it.
+  ok("columns · the summary's formulas move with them", () => {
+    const evaluate = makeEvaluator(grown.sheets);
+    const summary = grown.sheets[0];
+    const wrong = [];
+    let seen = 0;
+    summary.rows.forEach((row, r) => (row || []).forEach((c, ci) => {
+      if (!c || typeof c !== "object" || !c.f) return;
+      seen++;
+      const ref = `${String.fromCharCode(65 + ci)}${r + 1}`;
+      let got;
+      try { got = evaluate(c.f, summary.name); }
+      catch (err) { wrong.push(`${ref}: ${err.message}`); return; }
+      if (Math.abs(Number(got) - Number(c.v)) > 1e-9)
+        wrong.push(`${ref}: shows ${c.v} but ${c.f} gives ${got}`);
+    }));
+    assert.ok(seen > 30, `only ${seen} formulas — the sheet did not build`);
+    assert.deepStrictEqual(wrong, [], `\n      ${wrong.join("\n      ")}`);
+  });
+  // ...and that it is not passing because the letters never needed to move.
+  eq("columns · the item range really did shift",
+    JSON.stringify(grown.sheets[0]).includes("'Items Log'!$F$2"), true);
+
+  // ONE LIST, TWO READERS. remittance.js used to keep its own copy of both
+  // column orders, and a copy that drifted by one column would not look wrong —
+  // the summary addresses these logs by LETTER, so it would simply sum the
+  // column next door.
+  ok("columns · remittance.js does not retype the column lists", () => {
+    const src = fs.readFileSync(path.join(ROOT, "remittance.js"), "utf8");
+    for (const name of ["Cart Sub-Total", "Customer Rec ID", "Fee Category"]) {
+      assert.ok(!src.includes(`"${name}"`),
+        `remittance.js spells out "${name}" — read the list from the workbook instead`);
+    }
+    assert.strictEqual(remittance.ITEM_LOG_COLUMNS, wb.ITEM_COLUMNS);
+    assert.strictEqual(remittance.TRANSACTION_LOG_COLUMNS, wb.TXN_COLUMNS);
+  });
+
+  // One rule, both exports. A CSV and a workbook of the same period that
+  // disagreed about which columns exist is the thing this removes.
+  eqList("columns · the CSV header matches the sheet's",
+    remittance.rowsToCsv(items).split("\n")[0].split(",").map(c => c.replace(/"/g, "")),
+    head(grown.sheets[2]));
 }
 
 /* ── 4 · the file is a real workbook ─────────────────────────────────────── */

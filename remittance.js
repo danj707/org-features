@@ -122,18 +122,14 @@ const FIRST_PERIOD_END = "2026-08-15";
 
 // Column order of each product export. Only used as the header when a period
 // has no rows at all, so finance still gets a well-formed file with the right
-// shape instead of an empty one.
-const ITEM_LOG_COLUMNS = [
-  "Date", "Location", "Transaction ID", "Customer Name", "Type", "Method",
-  "Item Value", "Item Type", "Fee Category", "Item Name", "GL Code", "Customer Email",
-];
-const TRANSACTION_LOG_COLUMNS = [
-  "Date", "Location", "Staff", "Transaction ID", "Customer Name", "Customer Email",
-  "Customer Phone", "Customer Rec ID", "Type", "Transaction Created By", "Item Count",
-  "Cart Value", "Total Tax on Cart Items", "Cart Sub-Total", "Ticket Service Fee",
-  "Credits", "Cash", "Check", "Credit Card", "Credit Card Processing Fee",
-  "Scholarship", "Gift Card", "Total Transaction Amount", "Method",
-];
+// shape instead of an empty one — what a period WITH rows carries is whatever
+// the card sent, through workbook.logColumns.
+//
+// READ FROM THE WORKBOOK RATHER THAN RETYPED. The summary's formulas address
+// these logs by column letter, so a second copy here that drifted by one column
+// would not look wrong — it would just sum the wrong column.
+const ITEM_LOG_COLUMNS = workbook.ITEM_COLUMNS;
+const TRANSACTION_LOG_COLUMNS = workbook.TXN_COLUMNS;
 REPORTS.itemlog.columns = ITEM_LOG_COLUMNS;
 REPORTS.txnlog.columns  = TRANSACTION_LOG_COLUMNS;
 
@@ -240,10 +236,10 @@ function periodStatus(p, today = new Date().toISOString().slice(0, 10)) {
  * the right shape.
  */
 function rowsToCsv(rows, fallbackColumns) {
-  // Helper columns the card emits for the UI (leading "_") never reach the file.
-  const cols = rows.length
-    ? Object.keys(rows[0]).filter(k => !k.startsWith("_"))
-    : (fallbackColumns || ITEM_LOG_COLUMNS);
+  // One rule, both exports: the CSV and the workbook have to agree about which
+  // columns a period has, or the same period reads two ways depending on which
+  // button finance pressed.
+  const cols = workbook.logColumns(rows, fallbackColumns || ITEM_LOG_COLUMNS);
   const esc = (v) => `"${String(v === null || v === undefined ? "" : v).replace(/"/g, '""')}"`;
   const out = [cols.map(esc).join(",")];
   for (const row of rows) out.push(cols.map(c => esc(row[c])).join(","));
