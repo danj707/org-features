@@ -69,10 +69,23 @@ const workbook = require("./lib/remittance-workbook");
  *
  *   cardRateBps / cardFixedCents  what Rec charges per card payment
  *   cashRateBps / checkRateBps    what Rec charges on money it never touched
+ *   techRateBps                   the technology fee, a percentage of TOTAL
+ *                                 sales across every tender. ABSENT MEANS THE
+ *                                 ORG HAS NONE and the section is left out —
+ *                                 a zero row would assert a fee that is not in
+ *                                 their contract, and it comes straight off the
+ *                                 remittance total.
  *   chargeFeeOnRefunds            whether the card fee is billed again on
  *                                 refunded volume. The existing sheet totals
  *                                 its refund lines into "Total Rec Fee", so
  *                                 that is what this reproduces.
+ *   address1 / address2           the two header lines, VERBATIM. Finance
+ *                                 breaks the address at a different comma for
+ *                                 different orgs, so this is two literal lines
+ *                                 rather than one string split by rule.
+ *   timezone                      config.general.primaryTimezone. The org list
+ *                                 this report is built on carries only names
+ *                                 and ids, so these live here with the rates.
  *   rateSource                    "contracted" once the real schedule is on
  *                                 file; "test" until then, which stamps the
  *                                 workbook and its filename as a draft.
@@ -86,8 +99,11 @@ const REMITTANCE_FEES = {
   // City of Niagara Falls — placeholder rates, for shaping the report.
   "a976a11a-5303-4785-838a-1b281ca77678": {
     timezone: "America/New_York",   // organization.config general.primaryTimezone
+    address1: "123 Niagara Falls lane",   // organization.address
+    address2: " Niagara Falls, 45336",
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
     chargeFeeOnRefunds: true,
     rateSource: "test",
   },
@@ -293,6 +309,17 @@ function slugify(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "org";
 }
 
+// The workbook is named the way finance already names it —
+// Danvers_Remittance_Report_-_20260908-20260915.xlsx — so a generated one files
+// alongside the hand-built ones instead of sorting into its own group.
+const compactDate = (iso) => String(iso).replace(/-/g, "");
+function workbookFilename(org, period, { draft } = {}) {
+  const name = String(org.displayName || org.name || org.slug || "org")
+    .replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "") || "org";
+  return `${name}_Remittance_Report_-_${compactDate(period.start)}-${compactDate(period.end)}`
+       + `${draft ? "_DRAFT" : ""}.xlsx`;
+}
+
 function mount(app, { requireAuth, dataDir, loadOrgs }) {
   _schedule = loadSchedule(dataDir);
 
@@ -388,11 +415,11 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
                address1: fees.address1 || "", address2: fees.address2 || "" },
         period, txns, items, fees,
       });
-      // Placeholder rates are named in the filename as well as in the sheet:
+      // The filename finance already uses:
+      //   Danvers_Remittance_Report_-_20260908-20260915.xlsx
+      // Placeholder rates are named in the filename as well as in the sheet —
       // a file gets forwarded on its own, without whoever downloaded it.
-      const draft = fees.rateSource !== "contracted" ? "draft-" : "";
-      const name = `remittance-${draft}${slugify(org.displayName || org.slug)}`
-                 + `-${period.start}-to-${period.end}.xlsx`;
+      const name = workbookFilename(org, period, { draft: fees.rateSource !== "contracted" });
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
       res.setHeader("Cache-Control", "no-store");
@@ -409,5 +436,5 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
 module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
-  REMITTANCE_FEES, feesFor,
+  REMITTANCE_FEES, feesFor, workbookFilename,
 };
