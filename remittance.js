@@ -69,10 +69,23 @@ const workbook = require("./lib/remittance-workbook");
  *
  *   cardRateBps / cardFixedCents  what Rec charges per card payment
  *   cashRateBps / checkRateBps    what Rec charges on money it never touched
+ *   techRateBps                   the technology fee, a percentage of TOTAL
+ *                                 sales across every tender. ABSENT MEANS THE
+ *                                 ORG HAS NONE and the section is left out —
+ *                                 a zero row would assert a fee that is not in
+ *                                 their contract, and it comes straight off the
+ *                                 remittance total.
  *   chargeFeeOnRefunds            whether the card fee is billed again on
  *                                 refunded volume. The existing sheet totals
  *                                 its refund lines into "Total Rec Fee", so
  *                                 that is what this reproduces.
+ *   address1 / address2           the two header lines, VERBATIM. Finance
+ *                                 breaks the address at a different comma for
+ *                                 different orgs, so this is two literal lines
+ *                                 rather than one string split by rule.
+ *   timezone                      config.general.primaryTimezone. The org list
+ *                                 this report is built on carries only names
+ *                                 and ids, so these live here with the rates.
  *   rateSource                    "contracted" once the real schedule is on
  *                                 file; "test" until then, which stamps the
  *                                 workbook and its filename as a draft.
@@ -86,8 +99,11 @@ const REMITTANCE_FEES = {
   // City of Niagara Falls — placeholder rates, for shaping the report.
   "a976a11a-5303-4785-838a-1b281ca77678": {
     timezone: "America/New_York",   // organization.config general.primaryTimezone
+    address1: "123 Niagara Falls lane",   // organization.address
+    address2: " Niagara Falls, 45336",
     cardRateBps: 350, cardFixedCents: 30,
     cashRateBps: 100, checkRateBps: 100,
+    techRateBps: 100,
     chargeFeeOnRefunds: true,
     rateSource: "test",
   },
@@ -106,18 +122,14 @@ const FIRST_PERIOD_END = "2026-08-15";
 
 // Column order of each product export. Only used as the header when a period
 // has no rows at all, so finance still gets a well-formed file with the right
-// shape instead of an empty one.
-const ITEM_LOG_COLUMNS = [
-  "Date", "Location", "Transaction ID", "Customer Name", "Type", "Method",
-  "Item Value", "Item Type", "Fee Category", "Item Name", "GL Code", "Customer Email",
-];
-const TRANSACTION_LOG_COLUMNS = [
-  "Date", "Location", "Staff", "Transaction ID", "Customer Name", "Customer Email",
-  "Customer Phone", "Customer Rec ID", "Type", "Transaction Created By", "Item Count",
-  "Cart Value", "Total Tax on Cart Items", "Cart Sub-Total", "Ticket Service Fee",
-  "Credits", "Cash", "Check", "Credit Card", "Credit Card Processing Fee",
-  "Scholarship", "Gift Card", "Total Transaction Amount", "Method",
-];
+// shape instead of an empty one — what a period WITH rows carries is whatever
+// the card sent, through workbook.logColumns.
+//
+// READ FROM THE WORKBOOK RATHER THAN RETYPED. The summary's formulas address
+// these logs by column letter, so a second copy here that drifted by one column
+// would not look wrong — it would just sum the wrong column.
+const ITEM_LOG_COLUMNS = workbook.ITEM_COLUMNS;
+const TRANSACTION_LOG_COLUMNS = workbook.TXN_COLUMNS;
 REPORTS.itemlog.columns = ITEM_LOG_COLUMNS;
 REPORTS.txnlog.columns  = TRANSACTION_LOG_COLUMNS;
 
@@ -224,10 +236,10 @@ function periodStatus(p, today = new Date().toISOString().slice(0, 10)) {
  * the right shape.
  */
 function rowsToCsv(rows, fallbackColumns) {
-  // Helper columns the card emits for the UI (leading "_") never reach the file.
-  const cols = rows.length
-    ? Object.keys(rows[0]).filter(k => !k.startsWith("_"))
-    : (fallbackColumns || ITEM_LOG_COLUMNS);
+  // One rule, both exports: the CSV and the workbook have to agree about which
+  // columns a period has, or the same period reads two ways depending on which
+  // button finance pressed.
+  const cols = workbook.logColumns(rows, fallbackColumns || ITEM_LOG_COLUMNS);
   const esc = (v) => `"${String(v === null || v === undefined ? "" : v).replace(/"/g, '""')}"`;
   const out = [cols.map(esc).join(",")];
   for (const row of rows) out.push(cols.map(c => esc(row[c])).join(","));
@@ -291,6 +303,17 @@ async function fetchReport(report, orgId, startDate, endDate) {
 
 function slugify(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "org";
+}
+
+// The workbook is named the way finance already names it —
+// Danvers_Remittance_Report_-_20260908-20260915.xlsx — so a generated one files
+// alongside the hand-built ones instead of sorting into its own group.
+const compactDate = (iso) => String(iso).replace(/-/g, "");
+function workbookFilename(org, period, { draft } = {}) {
+  const name = String(org.displayName || org.name || org.slug || "org")
+    .replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "") || "org";
+  return `${name}_Remittance_Report_-_${compactDate(period.start)}-${compactDate(period.end)}`
+       + `${draft ? "_DRAFT" : ""}.xlsx`;
 }
 
 function mount(app, { requireAuth, dataDir, loadOrgs }) {
@@ -388,11 +411,11 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
                address1: fees.address1 || "", address2: fees.address2 || "" },
         period, txns, items, fees,
       });
-      // Placeholder rates are named in the filename as well as in the sheet:
+      // The filename finance already uses:
+      //   Danvers_Remittance_Report_-_20260908-20260915.xlsx
+      // Placeholder rates are named in the filename as well as in the sheet —
       // a file gets forwarded on its own, without whoever downloaded it.
-      const draft = fees.rateSource !== "contracted" ? "draft-" : "";
-      const name = `remittance-${draft}${slugify(org.displayName || org.slug)}`
-                 + `-${period.start}-to-${period.end}.xlsx`;
+      const name = workbookFilename(org, period, { draft: fees.rateSource !== "contracted" });
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
       res.setHeader("Cache-Control", "no-store");
@@ -409,5 +432,5 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
 module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
-  REMITTANCE_FEES, feesFor,
+  REMITTANCE_FEES, feesFor, workbookFilename,
 };
