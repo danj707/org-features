@@ -13,7 +13,8 @@
  *
  * Routes (both behind auth — this is fleet-wide finance data):
  *   GET /api/remittance      → periods + orgs + per-report config state
- *   GET /api/remittance/csv  → the export (?org=<uuid>&end=<date>&report=<key>)
+ *   GET /api/remittance/csv  → one log as CSV (?org=<uuid>&end=<date>&report=<key>)
+ *   GET /api/remittance/xlsx → the whole remittance workbook (?org=<uuid>&end=<date>)
  *
  * Data source: shared, org-parameterized Metabase public cards reading the
  * materialized.item_log_report / materialized.transaction_report views. Unlike
@@ -54,6 +55,45 @@ const REPORTS = {
   txnlog:  { key: "txnlog",  label: "Transaction log", file: "transaction-log", uuid: TRANSACTION_LOG_UUID },
 };
 const DEFAULT_REPORT = "itemlog";
+
+// The generated remittance workbook (Summary + both logs), which is the sheet
+// finance builds by hand today. Composition lives in lib/; this file only
+// decides which orgs get one and on what fee schedule.
+const workbook = require("./lib/remittance-workbook");
+
+/**
+ * Per-org fee schedule, keyed by the rec.us organization UUID — NEVER by slug
+ * or name. Two orgs here are called Pleasant Hill and three are called some
+ * form of San Francisco; the UUID is the only stable key, and billing the
+ * wrong org's rates is the worst outcome this file has.
+ *
+ *   cardRateBps / cardFixedCents  what Rec charges per card payment
+ *   cashRateBps / checkRateBps    what Rec charges on money it never touched
+ *   chargeFeeOnRefunds            whether the card fee is billed again on
+ *                                 refunded volume. The existing sheet totals
+ *                                 its refund lines into "Total Rec Fee", so
+ *                                 that is what this reproduces.
+ *   rateSource                    "contracted" once the real schedule is on
+ *                                 file; "test" until then, which stamps the
+ *                                 workbook and its filename as a draft.
+ *
+ * AN ORG THAT IS NOT IN THIS MAP GETS NO BUTTON — not a button that guesses.
+ * The rates are not derivable: they are not in Airtable, and the platform's
+ * own payments config carries only the customer-facing pass-through rate
+ * (txFees[].rateBps), not the fixed per-payment fee or the cash/check fees.
+ */
+const REMITTANCE_FEES = {
+  // City of Niagara Falls — placeholder rates, for shaping the report.
+  "a976a11a-5303-4785-838a-1b281ca77678": {
+    timezone: "America/New_York",   // organization.config general.primaryTimezone
+    cardRateBps: 350, cardFixedCents: 30,
+    cashRateBps: 100, checkRateBps: 100,
+    chargeFeeOnRefunds: true,
+    rateSource: "test",
+  },
+};
+
+function feesFor(orgId) { return REMITTANCE_FEES[orgId] || null; }
 
 // Metabase's own query timeout is the real ceiling; this just stops a hung
 // socket from holding the response open forever.
@@ -270,7 +310,13 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       periods: periods(today)
         .map(p => ({ ...p, status: periodStatus(p, today) }))
         .reverse(),
-      orgs: loadOrgs(),
+      // The workbook needs a fee schedule, so the button is offered per org
+      // rather than fleet-wide. Only whether one EXISTS travels to the browser
+      // — the rates themselves are nobody's business outside this server.
+      orgs: loadOrgs().map(o => {
+        const f = feesFor(o.id);
+        return f ? { ...o, remittance: true, remittanceDraft: f.rateSource !== "contracted" } : o;
+      }),
     });
   });
 
@@ -303,9 +349,65 @@ function mount(app, { requireAuth, dataDir, loadOrgs }) {
       return res.status(502).type("text/plain").send(`Could not build the ${report.label.toLowerCase()}: ${err.message}`);
     }
   });
+
+  // The whole remittance as one workbook: the Summary finance types by hand,
+  // over the two logs it is computed from. Both feeds are fetched IN PARALLEL —
+  // they are independent queries against different cards, and serially this is
+  // two cold Metabase reads with a person watching a spinner.
+  app.get("/api/remittance/xlsx", requireAuth, async (req, res) => {
+    const orgId = String(req.query.org || "");
+    const end   = String(req.query.end || "");
+
+    const period = findPeriod(end);
+    if (!period) return res.status(400).type("text/plain").send(`Unknown remittance period "${end}".`);
+
+    const org = loadOrgs().find(o => o.id === orgId);
+    if (!org) return res.status(404).type("text/plain").send("Unknown organization.");
+
+    const fees = feesFor(org.id);
+    if (!fees) {
+      return res.status(503).type("text/plain")
+        .send(`No fee schedule on file for ${org.displayName}. The remittance total is computed from `
+            + `that organization's own card, cash and check rates, so there is nothing to generate `
+            + `until they are set — a guessed rate would produce a plausible wrong number.`);
+    }
+    for (const r of [REPORTS.itemlog, REPORTS.txnlog]) {
+      if (!r.uuid) {
+        return res.status(503).type("text/plain")
+          .send(`${r.label} isn't connected yet — the workbook needs both logs.`);
+      }
+    }
+
+    try {
+      const [txns, items] = await Promise.all([
+        fetchReport(REPORTS.txnlog,  org.id, period.start, period.end),
+        fetchReport(REPORTS.itemlog, org.id, period.start, period.end),
+      ]);
+      const { buffer, summary } = workbook.generate({
+        org: { name: org.name || org.displayName, slug: org.slug, timezone: fees.timezone || "",
+               address1: fees.address1 || "", address2: fees.address2 || "" },
+        period, txns, items, fees,
+      });
+      // Placeholder rates are named in the filename as well as in the sheet:
+      // a file gets forwarded on its own, without whoever downloaded it.
+      const draft = fees.rateSource !== "contracted" ? "draft-" : "";
+      const name = `remittance-${draft}${slugify(org.displayName || org.slug)}`
+                 + `-${period.start}-to-${period.end}.xlsx`;
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+      res.setHeader("Cache-Control", "no-store");
+      console.log(`[remittance] workbook ${org.displayName} ${period.start}→${period.end}: `
+        + `${txns.length} txns, ${items.length} items, total $${(summary.final.totalCents / 100).toFixed(2)}`);
+      return res.send(buffer);
+    } catch (err) {
+      console.error(`[remittance] workbook ${org.displayName} ${period.label} failed: ${err.message}`);
+      return res.status(502).type("text/plain").send(`Could not build the remittance: ${err.message}`);
+    }
+  });
 }
 
 module.exports = {
   mount, rowsToCsv, periods, currentPeriod, periodStatus,
   ITEM_LOG_COLUMNS, TRANSACTION_LOG_COLUMNS, REPORTS,
+  REMITTANCE_FEES, feesFor,
 };
